@@ -248,6 +248,26 @@ export const DISCOUNTED_PREMIUM_PLANS_BY_COUNTRY: Partial<
 export const LOW_CREDIT_PROMO_MONTHS = 3;
 
 /**
+ * Halloween targeted win-back offer: 1 month of unlimited PRO for ₾9.99
+ * (50% off the ₾19.90 monthly anchor), offered exclusively to low-credit
+ * users who keep returning to the site after depleting their credits.
+ *
+ * Billed as a recurring monthly Stripe subscription at ₾9.99/month so
+ * `syncPremiumSubscription` and the billing portal work out of the box.
+ */
+export const HALLOWEEN_PROMO_PLAN: PremiumPlan = {
+  key: "promo_ge_halloween_monthly",
+  countryCode: "GE",
+  amountMinor: 999,
+  currency: "gel",
+  interval: "month",
+  intervalCount: 1,
+  stripeLookupKey: "vivida_promo_ge_halloween_monthly_999_v1",
+};
+
+export const HALLOWEEN_PROMO_MONTHS = 1;
+
+/**
  * Months in one billing cycle, read back from a subscription's own period.
  *
  * Derived rather than stored: `premium_subscription` never recorded an

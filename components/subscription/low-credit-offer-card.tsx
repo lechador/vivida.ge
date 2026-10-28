@@ -52,12 +52,17 @@ export function LowCreditOfferCard({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
+  const isSingleMonth = months === 1;
   const [pending, setPending] = useState(false);
   const [error, setError] = useState(false);
 
   const price = formatBillingAmount(plan.amountMinor, plan.currency, locale);
   const standardTotal = standardPlan
-    ? formatBillingAmount(standardPlan.amountMinor * months, standardPlan.currency, locale)
+    ? formatBillingAmount(
+        standardPlan.amountMinor * months,
+        standardPlan.currency,
+        locale,
+      )
     : null;
 
   useEffect(() => {
@@ -93,11 +98,28 @@ export function LowCreditOfferCard({
         body: JSON.stringify({ offer: "low_credits" }),
       });
       const data = (await response.json().catch(() => ({}))) as {
-        url?: string; eventId?: string; value?: number; currency?: string; contentId?: string;
+        url?: string;
+        eventId?: string;
+        value?: number;
+        currency?: string;
+        contentId?: string;
       };
       if (data.url) {
-        fbTrack("InitiateCheckout", { value: data.value, currency: data.currency, content_ids: [data.contentId], content_type: "product" }, data.eventId);
-        trackEvent(ANALYTICS_EVENT.checkoutStarted, { product: data.contentId, value: data.value, currency: data.currency });
+        fbTrack(
+          "InitiateCheckout",
+          {
+            value: data.value,
+            currency: data.currency,
+            content_ids: [data.contentId],
+            content_type: "product",
+          },
+          data.eventId,
+        );
+        trackEvent(ANALYTICS_EVENT.checkoutStarted, {
+          product: data.contentId,
+          value: data.value,
+          currency: data.currency,
+        });
         window.location.assign(data.url);
         return;
       }
@@ -110,26 +132,35 @@ export function LowCreditOfferCard({
 
   return (
     <section className="relative overflow-hidden rounded-3xl border border-[var(--vivida-gold)]/45 bg-gradient-to-br from-[var(--vivida-gold)]/16 via-card/70 to-[var(--vivida-violet)]/14 p-6 ring-1 ring-foreground/5 sm:p-8">
-      <div aria-hidden className="absolute -right-16 -top-20 size-56 rounded-full bg-[var(--vivida-gold)]/20 blur-3xl" />
+      <div
+        aria-hidden
+        className="absolute -right-16 -top-20 size-56 rounded-full bg-[var(--vivida-gold)]/20 blur-3xl"
+      />
 
       <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--vivida-gold)]/20 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-[var(--vivida-gold)]">
               <Sparkles className="size-3.5" />
-              {en ? "Personal offer" : "პერსონალური შეთავაზება"}
+              {en
+                ? "🎃 Halloween Special · Personal offer"
+                : "🎃 ჰელოუინის სპეციალური შეთავაზება"}
             </span>
           </div>
 
           <h2 className="mt-3 text-2xl font-semibold tracking-tight">
             {en
-              ? `${months} months of unlimited Vivida`
-              : `${months} თვე ულიმიტო Vivida`}
+              ? isSingleMonth
+                ? "1 month of unlimited Vivida PRO"
+                : `${months} months of unlimited Vivida`
+              : isSingleMonth
+                ? "1 თვე ულიმიტო Vivida PRO"
+                : `${months} თვე ულიმიტო Vivida`}
           </h2>
           <p className="mt-1.5 text-sm text-foreground/75">
             {en
-              ? "Your credits are nearly gone. Open everything instead, no credits, no limits."
-              : "შენი კრედიტები იწურება. ამის ნაცვლად გახსენი ყველაფერი, კრედიტების და ლიმიტების გარეშე."}
+              ? "Your credits are nearly gone. Open everything for Halloween week — no credits, no limits."
+              : "შენი კრედიტები იწურება. ჰელოუინის კვირაში გახსენი ყველაფერი სპეციალურ ფასად — კრედიტებისა და ლიმიტების გარეშე."}
           </p>
 
           <ul className="mt-4 space-y-2 text-sm text-foreground/80">
@@ -157,7 +188,13 @@ export function LowCreditOfferCard({
           )}
           <div className="text-3xl font-bold tracking-tight">{price}</div>
           <div className="text-xs text-muted-foreground">
-            {en ? `for ${months} months` : `${months} თვის განმავლობაში`}
+            {en
+              ? isSingleMonth
+                ? "for 1 month · unlimited"
+                : `for ${months} months`
+              : isSingleMonth
+                ? "1 თვის განმავლობაში · ულიმიტო"
+                : `${months} თვის განმავლობაში`}
           </div>
 
           <Button
@@ -179,8 +216,12 @@ export function LowCreditOfferCard({
 
           <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
             {en
-              ? `Renews at ${price} every ${months} months. Cancel any time.`
-              : `განახლდება ${price}-ად ყოველ ${months} თვეში. გაუქმება ნებისმიერ დროს.`}
+              ? isSingleMonth
+                ? `Renews at ${price} every month. Cancel any time.`
+                : `Renews at ${price} every ${months} months. Cancel any time.`
+              : isSingleMonth
+                ? `განახლდება ${price}-ად ყოველ თვეში. გაუქმება ნებისმიერ დროს.`
+                : `განახლდება ${price}-ად ყოველ ${months} თვეში. გაუქმება ნებისმიერ დროს.`}
           </p>
         </div>
       </div>

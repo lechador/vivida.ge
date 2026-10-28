@@ -9,20 +9,18 @@ import {
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Win-back offer for users who have nearly run out of credits: three months of
- * PRO for ₾29. The reader's actual balance is on the page, the offer only
- * makes sense next to the number that prompted it, and the deadline is
- * spelled out rather than implied, since the card on /credits disappears on
- * its own when it lapses.
+ * Halloween win-back offer for users who have run down to <= 3 credits and
+ * keep visiting the site: 1 month of unlimited PRO for ₾9.99 (50% off ₾19.90).
  *
- * The button goes to /credits, not straight to Stripe: the price has to be
- * re-checked against the campaign server-side before anyone is charged, and
- * /credits is where that check already lives.
+ * The button goes to /credits (via /login?next=%2Fcredits), not straight to
+ * Stripe: eligibility is verified against `email_campaign_recipient` on both
+ * /credits and /api/subscription/checkout.
  */
 export function LowCreditOfferEmail({
   name,
   balance,
   priceLabel,
+  regularPriceLabel = "₾19.90",
   months,
   deadlineLabel,
   creditsUrl,
@@ -32,12 +30,14 @@ export function LowCreditOfferEmail({
   name: string | null;
   /** The reader's credit balance at send time, the reason for the email. */
   balance: number;
-  /** Pre-formatted price, e.g. "₾29.00". */
+  /** Pre-formatted promo price, e.g. "₾9.99". */
   priceLabel: string;
+  /** Pre-formatted anchor price shown struck through, e.g. "₾19.90". */
+  regularPriceLabel?: string;
   months: number;
   /**
    * Localised last day of the offer, already in the form the sentence needs,
-   * genitive in Georgian ("1 სექტემბრის"), plain in English ("1 September").
+   * genitive in Georgian ("2 ნოემბრის"), plain in English ("2 November").
    */
   deadlineLabel: string;
   creditsUrl: string;
@@ -45,111 +45,203 @@ export function LowCreditOfferEmail({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const isSingleMonth = months === 1;
   const greeting = name
-    ? en ? `Hello, ${name}!` : `სალამი, ${name}!`
-    : en ? "Hello!" : "სალამი!";
+    ? en
+      ? `Hello, ${name}!`
+      : `სალამი, ${name}!`
+    : en
+      ? "Hello!"
+      : "სალამი!";
+
+  const spanTextEn = isSingleMonth ? "1 month" : `${months} months`;
+  const spanTextKa = isSingleMonth ? "1 თვე" : `${months} თვე`;
+
+  const balanceLead = en
+    ? balance <= 0
+      ? "Your credits have reached 0, yet we see you still coming back to check the stars."
+      : `You only have ${balance} ${balance === 1 ? "credit" : "credits"} left, yet we see you still coming back to check the stars.`
+    : balance <= 0
+      ? "შენს ბალანსზე კრედიტები ამოიწურა, მაგრამ ვხედავთ, რომ ვარსკვლავებთან კავშირს არ წყვეტ და კვლავ გვსტუმრობ."
+      : `შენს ბალანსზე სულ ${balance} კრედიტია დარჩენილი, მაგრამ ვხედავთ, რომ ვარსკვლავებთან კავშირს არ წყვეტ და კვლავ ჩვენთან ხარ.`;
 
   const perks = en
     ? [
-        "Unlimited AI chat with your astrologer",
-        "Compatibility readings with anyone, as often as you like",
-        "Full test results, personality, IQ, EQ, Big Five",
-        "7-day forecasts, tarot readings and PDF charts",
-        "Verified badge on your profile",
+        "🔮  Unlimited Tarot spreads & deep follow-up questions all month long",
+        "✨  Unlimited 24/7 AI chat with your personal astrologer",
+        "🌙  Unlimited synastry & compatibility readings with anyone",
+        "📜  7-day cosmic forecasts, dream interpretations & PDF reports",
+        "👑  Full personality, IQ, EQ & Big Five results + Verified profile badge",
       ]
     : [
-        "ულიმიტო AI ჩატი შენს ასტროლოგთან",
-        "თავსებადობა ნებისმიერთან, რამდენჯერაც გინდა",
-        "ტესტების სრული შედეგები, პიროვნება, IQ, EQ, Big Five",
-        "7-დღიანი პროგნოზები, ტარო და PDF რუკები",
-        "Verified badge შენს პროფილზე",
+        "🔮  ულიმიტო ტაროს გაშლები და ჩაღრმავებული კითხვები მთელი თვის განმავლობაში",
+        "✨  ულიმიტო AI ჩატი შენს პირად ასტროლოგთან — იკითხე რაც გინდა, ლიმიტის გარეშე",
+        "🌙  თავსებადობისა და სინასტრიის ანალიზი ნებისმიერ ადამიანთან, რამდენჯერაც გინდა",
+        "📜  7-დღიანი პროგნოზები, სიზმრების ახსნა და პერსონალური PDF რუკები",
+        "👑  ტესტების სრული შედეგები (MBTI, IQ, EQ, Big Five) და Verified badge პროფილზე",
       ];
+
+  const halloweenButtonStyle: React.CSSProperties = {
+    ...buttonStyle,
+    background:
+      "linear-gradient(135deg, #f97316 0%, #ec4899 52%, #a855f7 100%)",
+    color: "#ffffff",
+    fontWeight: 700,
+    padding: "14px 28px",
+    boxShadow: "0 8px 24px rgba(249, 115, 22, 0.28)",
+  };
 
   return (
     <EmailLayout
       preview={
         en
-          ? `${months} months of unlimited Vivida for ${priceLabel}`
-          : `${months} თვე ულიმიტო Vivida ${priceLabel}-ად`
+          ? `🎃 Halloween Special: ${spanTextEn} of unlimited Vivida PRO for just ${priceLabel}`
+          : `🎃 ჰელოუინის სპეციალური შეთავაზება: ${spanTextKa} ულიმიტო Vivida PRO მხოლოდ ${priceLabel}-ად`
       }
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
     >
-      <Text
-        style={{
-          color: "#9b94ad",
-          fontSize: "12px",
-          letterSpacing: "0.18em",
-          margin: "0 0 6px",
-          textTransform: "uppercase",
-        }}
-      >
-        {en ? "Personal offer" : "პერსონალური შეთავაზება"}
-      </Text>
+      {/* Halloween badge */}
+      <div style={{ marginBottom: "14px" }}>
+        <span
+          style={{
+            backgroundColor: "rgba(249, 115, 22, 0.14)",
+            border: "1px solid rgba(249, 115, 22, 0.42)",
+            borderRadius: "9999px",
+            color: "#fb923c",
+            display: "inline-block",
+            fontSize: "11px",
+            fontWeight: 700,
+            letterSpacing: "0.14em",
+            padding: "5px 12px",
+            textTransform: "uppercase",
+          }}
+        >
+          {en
+            ? "🎃 Halloween Special · Personal Offer"
+            : "🎃 ჰელოუინის სპეციალური შეთავაზება"}
+        </span>
+      </div>
 
       <Heading
         as="h1"
         style={{
           color: "#ffffff",
           fontSize: "24px",
-          fontWeight: 600,
-          letterSpacing: "-0.01em",
-          lineHeight: "30px",
-          margin: "0 0 14px",
+          fontWeight: 700,
+          letterSpacing: "-0.015em",
+          lineHeight: "32px",
+          margin: "0 0 16px",
         }}
       >
         {en
-          ? `${months} months of unlimited Vivida, ${priceLabel}`
-          : `${months} თვე ულიმიტო Vivida, ${priceLabel}`}
+          ? `Unlock the veil: ${spanTextEn} of unlimited Vivida PRO for just ${priceLabel}`
+          : `როცა სამყაროებს შორის ზღვარი ქრება — ${spanTextKa} ულიმიტო Vivida PRO მხოლოდ ${priceLabel}-ად`}
       </Heading>
 
-      <Text style={{ ...paragraphStyle, color: "#cfc7df", fontSize: "16px" }}>
+      <Text style={{ ...paragraphStyle, color: "#f3e8ff", fontSize: "16px" }}>
         {greeting}
       </Text>
 
       <Text style={paragraphStyle}>
+        {balanceLead}{" "}
         {en
-          ? `You have ${balance} ${balance === 1 ? "credit" : "credits"} left. Before they run out, here is something we are offering only to you: ${months} months of Vivida PRO for ${priceLabel}, no credits, no limits, everything open.`
-          : `შენს ბალანსზე ${balance} კრედიტია დარჩენილი. სანამ ისინი ამოიწურება, გთავაზობთ იმას, რაც მხოლოდ შენთვისაა: ${months} თვე Vivida PRO ${priceLabel}-ად, კრედიტების გარეშე, ლიმიტების გარეშე, ყველაფერი ღიაა.`}
+          ? "Halloween is the most mystical week of the year — when intuition, Tarot cards, and astrological transits speak the loudest."
+          : "ჰელოუინი წლის ყველაზე მისტიკური პერიოდია — დრო, როცა ინტუიცია, ტაროს არკანები და ვარსკვლავების მინიშნებები ყველაზე მძაფრად იგრძნობა."}
       </Text>
 
-      {/* Offer block, the price gets its own frame so it survives a skim. */}
+      <Text style={paragraphStyle}>
+        {en
+          ? `Because you're one of our most engaged explorers, we unlocked a private Halloween offer on your account: ${spanTextEn} of unlimited Vivida PRO for just ${priceLabel} instead of ${regularPriceLabel}. No credit counting, no locked answers — everything is open.`
+          : `რადგან ჩვენი ერთ-ერთი ყველაზე აქტიური მომხმარებელი ხარ, სპეციალურად შენს ანგარიშზე გავხსენით დახურული ჰელოუინის ფასდაკლება: ${spanTextKa} ულიმიტო Vivida PRO მხოლოდ ${priceLabel}-ად (სტანდარტული ${regularPriceLabel}-ის ნაცვლად). აღარანაირი კრედიტების თვლა — ყველაფერი სრულად ღიაა.`}
+      </Text>
+
+      {/* Halloween Offer Frame */}
       <div
         style={{
-          background: "rgba(234, 195, 88, 0.07)",
-          border: "1px solid rgba(234, 195, 88, 0.35)",
-          borderRadius: "12px",
-          margin: "0 0 18px",
-          padding: "18px 20px",
+          background:
+            "linear-gradient(145deg, rgba(249, 115, 22, 0.13) 0%, rgba(168, 85, 247, 0.12) 100%)",
+          border: "1px solid rgba(249, 115, 22, 0.45)",
+          borderRadius: "16px",
+          margin: "20px 0 22px",
+          padding: "20px 22px",
         }}
       >
         <Text
           style={{
-            color: "#eac358",
-            fontSize: "26px",
+            color: "#fdba74",
+            fontSize: "11px",
             fontWeight: 700,
-            lineHeight: "32px",
-            margin: 0,
+            letterSpacing: "0.14em",
+            margin: "0 0 6px",
+            textTransform: "uppercase",
           }}
         >
-          {priceLabel}
+          {en ? "✦ −50% Halloween Privilege" : "✦ −50% ჰელოუინის პრივილეგია"}
         </Text>
         <Text
           style={{
-            color: "#d8d2ee",
+            color: "#ffffff",
+            fontSize: "30px",
+            fontWeight: 800,
+            lineHeight: "36px",
+            margin: 0,
+          }}
+        >
+          <span
+            style={{
+              color: "#9b94ad",
+              fontSize: "18px",
+              fontWeight: 500,
+              marginRight: "10px",
+              textDecoration: "line-through",
+            }}
+          >
+            {regularPriceLabel}
+          </span>
+          <span style={{ color: "#fb923c" }}>{priceLabel}</span>
+          <span
+            style={{
+              color: "#d8d2ee",
+              fontSize: "15px",
+              fontWeight: 500,
+              marginLeft: "6px",
+            }}
+          >
+            {en
+              ? isSingleMonth
+                ? "/ month"
+                : `/ ${months} months`
+              : isSingleMonth
+                ? "/ 1 თვე"
+                : `/ ${months} თვე`}
+          </span>
+        </Text>
+        <Text
+          style={{
+            color: "#e7e3f0",
             fontSize: "14px",
             lineHeight: "20px",
-            margin: "4px 0 0",
+            margin: "6px 0 0",
           }}
         >
           {en
-            ? `for ${months} full months of unlimited access`
-            : `${months} სრული თვის ულიმიტო წვდომისთვის`}
+            ? `Full ${spanTextEn} of unlimited PRO access — zero credit limits`
+            : `${isSingleMonth ? "1 სრული თვის" : `${months} სრული თვის`} ულიმიტო PRO წვდომა — ნული შეზღუდვა`}
         </Text>
       </div>
 
-      <Text style={{ ...paragraphStyle, margin: "0 0 8px", fontWeight: 600 }}>
-        {en ? "What opens up:" : "რა იხსნება:"}
+      <Text
+        style={{
+          ...paragraphStyle,
+          color: "#ffffff",
+          margin: "0 0 10px",
+          fontWeight: 600,
+        }}
+      >
+        {en
+          ? "Everything that opens immediately:"
+          : "რა იხსნება გააქტიურებისთანავე:"}
       </Text>
       {perks.map((perk) => (
         <Text
@@ -157,26 +249,33 @@ export function LowCreditOfferEmail({
           style={{
             color: "#e7e3f0",
             fontSize: "15px",
-            lineHeight: "22px",
-            margin: "0 0 6px",
+            lineHeight: "23px",
+            margin: "0 0 8px",
           }}
         >
-          ✦&nbsp;&nbsp;{perk}
+          {perk}
         </Text>
       ))}
 
-      <div style={{ marginTop: 22 }}>
-        <Button href={creditsUrl} style={buttonStyle}>
-          {en ? "Activate the offer" : "გაააქტიურე შეთავაზება"}
+      <div style={{ marginTop: 26, marginBottom: 8 }}>
+        <Button href={creditsUrl} style={halloweenButtonStyle}>
+          {en
+            ? `🎃 Claim Unlimited Month for ${priceLabel} →`
+            : `🎃 გაააქტიურე ულიმიტო თვე ${priceLabel}-ად →`}
         </Button>
       </div>
 
-      <Hr style={{ borderColor: "rgba(167, 139, 250, 0.12)", margin: "24px 0 0" }} />
+      <Hr
+        style={{
+          borderColor: "rgba(249, 115, 22, 0.2)",
+          margin: "24px 0 0",
+        }}
+      />
 
       <Text style={mutedStyle}>
         {en
-          ? `The offer is tied to your account and is open until ${deadlineLabel}. Afterwards it renews at the same ${priceLabel} every ${months} months, and you can cancel any time.`
-          : `შეთავაზება შენს ანგარიშზეა მიბმული და ძალაშია ${deadlineLabel} ჩათვლით. შემდეგ ავტომატურად განახლდება იმავე ${priceLabel}-ად ყოველ ${months} თვეში, გაუქმება კი ნებისმიერ დროს შეგიძლია.`}
+          ? `⏳ This Halloween offer is exclusively linked to your account and expires on ${deadlineLabel}. Afterwards it renews at the same ${priceLabel} every ${isSingleMonth ? "month" : `${months} months`}, and you can cancel any time with one click.`
+          : `⏳ ეს ჰელოუინის შეთავაზება მიბმულია მხოლოდ შენს ანგარიშზე და მოქმედებს ${deadlineLabel} ჩათვლით. შემდეგ ავტომატურად განახლდება იმავე ${priceLabel}-ად ${isSingleMonth ? "ყოველ თვეში" : `ყოველ ${months} თვეში`}, გაუქმება კი ნებისმიერ დროს, ერთი კლიკით შეგიძლია.`}
       </Text>
     </EmailLayout>
   );

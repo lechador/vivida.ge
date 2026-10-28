@@ -1,5 +1,5 @@
 /**
- * The low-credit win-back offer: three months of PRO for ₾29.
+ * The Halloween low-credit win-back offer: 1 month of unlimited PRO for ₾9.99.
  *
  * Who may see it is decided here and nowhere else. The audience is not a
  * property of the user (a "has_offer" column would have needed a migration and
@@ -14,24 +14,24 @@ import { and, eq, isNotNull } from "drizzle-orm";
 import { db } from "@/db";
 import { emailCampaignRecipients, emailCampaigns, users } from "@/db/schema";
 import {
-  LOW_CREDIT_PROMO_MONTHS,
-  LOW_CREDIT_PROMO_PLAN,
-  normalizeCountryCode,
+  HALLOWEEN_PROMO_MONTHS,
+  HALLOWEEN_PROMO_PLAN,
+  premiumPlanForCountry,
   type PremiumPlan,
 } from "@/lib/billing-config";
 
-export const LOW_CREDIT_OFFER_CAMPAIGN_SLUG = "low-credits-3mo-29-2026";
+export const LOW_CREDIT_OFFER_CAMPAIGN_SLUG = "halloween-low-credits-999-2026";
 
 /** Balance at or below which the campaign addressed a user. */
-export const LOW_CREDIT_OFFER_THRESHOLD = 4;
+export const LOW_CREDIT_OFFER_THRESHOLD = 3;
 
 /**
- * Offer closes at midnight Tbilisi on 1 September 2026 (UTC+4). The deadline
- * is a constant rather than a column because it is the same for everyone,
- * and because a lapsed offer must stop selling on its own, without anyone
- * remembering to archive the Stripe price.
+ * Offer closes at the end of 2 November 2026 in Tbilisi (23:59:59 UTC+4 =
+ * 19:59:59Z). The deadline is a constant rather than a column because it is
+ * the same for everyone, and because a lapsed offer must stop selling on its
+ * own, without anyone remembering to archive the Stripe price.
  */
-export const LOW_CREDIT_OFFER_ENDS_AT = new Date("2026-09-01T19:59:59Z");
+export const LOW_CREDIT_OFFER_ENDS_AT = new Date("2026-11-02T19:59:59Z");
 
 export type LowCreditOffer = {
   plan: PremiumPlan;
@@ -56,6 +56,7 @@ export async function getLowCreditOffer(
   const [row] = await db
     .select({
       countryCode: users.residenceCountryCode,
+      interfaceLanguage: users.interfaceLanguage,
       isPremium: users.isPremium,
       premiumUntil: users.premiumUntil,
     })
@@ -79,9 +80,13 @@ export async function getLowCreditOffer(
     .limit(1);
 
   if (!row) return null;
-  // Priced in lari, so it stays with the market it was priced for even if the
-  // user's country changed after the send.
-  if (normalizeCountryCode(row.countryCode) !== LOW_CREDIT_PROMO_PLAN.countryCode) {
+  // Priced in lari: allow users in the GEL catalogue market (GE or unlisted
+  // countries that fall back to GE) as well as Georgian-interface users.
+  const resolvedPlan = premiumPlanForCountry(row.countryCode);
+  if (
+    resolvedPlan.currency !== HALLOWEEN_PROMO_PLAN.currency &&
+    row.interfaceLanguage !== "ka"
+  ) {
     return null;
   }
   // Already paying, the same guard /api/subscription/checkout applies, so a
@@ -91,8 +96,8 @@ export async function getLowCreditOffer(
   }
 
   return {
-    plan: LOW_CREDIT_PROMO_PLAN,
-    months: LOW_CREDIT_PROMO_MONTHS,
+    plan: HALLOWEEN_PROMO_PLAN,
+    months: HALLOWEEN_PROMO_MONTHS,
     endsAt: LOW_CREDIT_OFFER_ENDS_AT,
   };
 }

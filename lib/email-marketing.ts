@@ -33,8 +33,9 @@ import {
 } from "@/lib/promo-offer";
 import {
   formatBillingAmount,
-  LOW_CREDIT_PROMO_MONTHS,
-  LOW_CREDIT_PROMO_PLAN,
+  HALLOWEEN_PROMO_MONTHS,
+  HALLOWEEN_PROMO_PLAN,
+  PREMIUM_PLANS_BY_COUNTRY,
 } from "@/lib/billing-config";
 import { kaDayMonthGenitive } from "@/lib/i18n/ka-date";
 import { dailyEmailSubject } from "@/lib/daily-headline";
@@ -158,10 +159,8 @@ async function resolveAudience(
       );
   }
   if (template === "low_credit_offer") {
-    // Georgian users who are nearly out of credits and are not already paying.
-    // leftJoin, not innerJoin: a user with no wallet row has no credits at all,
-    // which is the most qualified state this campaign has, an innerJoin would
-    // silently drop exactly those people.
+    // Low-credit users (<= 3 credits) who spent their credits down to <= 3 and
+    // still returned to the site afterwards, excluding active PRO subscribers.
     const rows = await db
       .select({
         userId: users.id,
@@ -177,8 +176,50 @@ async function resolveAudience(
       .where(
         and(
           eq(users.emailMarketing, true),
-          eq(users.residenceCountryCode, LOW_CREDIT_PROMO_PLAN.countryCode),
           sql`coalesce(${creditAccounts.balance}, 0) <= ${LOW_CREDIT_OFFER_THRESHOLD}`,
+          sql`EXISTS (
+            SELECT 1 FROM credit_transaction ct
+            WHERE ct.user_id = ${users.id} AND ct.amount < 0
+          )`,
+          sql`(
+            EXISTS (
+              SELECT 1 FROM user_activity_day uad
+              WHERE uad.user_id = ${users.id}
+                AND uad.date_local > to_char(
+                  (
+                    SELECT MIN(t.created_at)
+                    FROM (
+                      SELECT
+                        ct.created_at,
+                        SUM(ct.amount) OVER (ORDER BY ct.created_at ASC, ct.id ASC) AS running_balance
+                      FROM credit_transaction ct
+                      WHERE ct.user_id = ${users.id}
+                    ) t
+                    WHERE t.running_balance <= ${LOW_CREDIT_OFFER_THRESHOLD}
+                      AND t.created_at > COALESCE(
+                        (
+                          SELECT MAX(t2.created_at)
+                          FROM (
+                            SELECT
+                              ct2.created_at,
+                              SUM(ct2.amount) OVER (ORDER BY ct2.created_at ASC, ct2.id ASC) AS running_balance
+                            FROM credit_transaction ct2
+                            WHERE ct2.user_id = ${users.id}
+                          ) t2
+                          WHERE t2.running_balance > ${LOW_CREDIT_OFFER_THRESHOLD}
+                        ),
+                        '-infinity'::timestamptz
+                      )
+                  ) AT TIME ZONE 'Asia/Tbilisi',
+                  'YYYY-MM-DD'
+                )
+            )
+            OR ${users.lastLoginAt} > (
+              SELECT MAX(ct.created_at)
+              FROM credit_transaction ct
+              WHERE ct.user_id = ${users.id}
+            ) + interval '30 minutes'
+          )`,
         ),
       );
     const now = Date.now();
@@ -234,14 +275,14 @@ export async function ensureBirthDetailsCampaign(): Promise<{ id: string }> {
 }
 
 const OFFER_SUBJECT = {
-  ka: `${LOW_CREDIT_PROMO_MONTHS} თვე ულიმიტო Vivida, მხოლოდ ${formatBillingAmount(
-    LOW_CREDIT_PROMO_PLAN.amountMinor,
-    LOW_CREDIT_PROMO_PLAN.currency,
+  ka: `🎃 ჰელოუინის სპეციალური შეთავაზება: 1 თვე ულიმიტო Vivida PRO მხოლოდ ${formatBillingAmount(
+    HALLOWEEN_PROMO_PLAN.amountMinor,
+    HALLOWEEN_PROMO_PLAN.currency,
     "ka",
-  )}`,
-  en: `${LOW_CREDIT_PROMO_MONTHS} months of unlimited Vivida, just ${formatBillingAmount(
-    LOW_CREDIT_PROMO_PLAN.amountMinor,
-    LOW_CREDIT_PROMO_PLAN.currency,
+  )}-ად`,
+  en: `🎃 Halloween Special: 1 month of unlimited Vivida PRO for just ${formatBillingAmount(
+    HALLOWEEN_PROMO_PLAN.amountMinor,
+    HALLOWEEN_PROMO_PLAN.currency,
     "en",
   )}`,
 };
@@ -251,7 +292,7 @@ export async function ensureLowCreditOfferCampaign(): Promise<{ id: string }> {
     .insert(emailCampaigns)
     .values({
       slug: LOW_CREDIT_OFFER_CAMPAIGN_SLUG,
-      name: "Low credits · 3 months PRO for ₾29",
+      name: "Halloween low credits · 1 month PRO for ₾9.99",
       template: "low_credit_offer",
       subject: OFFER_SUBJECT.ka,
       // No credit reward: the campaign's conversion is the subscription, and a
@@ -259,7 +300,7 @@ export async function ensureLowCreditOfferCampaign(): Promise<{ id: string }> {
       // move onto PRO.
       rewardCredits: 0,
       status: "draft",
-      ctaLabel: "გაააქტიურე შეთავაზება",
+      ctaLabel: "გაააქტიურე ულიმიტო თვე ₾9.99-ად",
       ctaUrl: "/credits",
     })
     .onConflictDoUpdate({
@@ -460,7 +501,7 @@ export async function sendLowCreditOfferTest(to: string): Promise<boolean> {
       allowCompletedProfile: true,
     },
     { ...recipient, email: recipient.email },
-    `campaign:${campaign.id}:${recipient.userId}`,
+    `campaign-test:${campaign.id}:${recipient.userId}:${Date.now()}`,
   );
 }
 
@@ -699,10 +740,14 @@ async function dispatch(
       current.premiumUntil &&
       current.premiumUntil.getTime() > Date.now(),
     );
-    if (stillPremium) return false;
+    if (stillPremium && !opts.allowCompletedProfile) return false;
     if (balance > LOW_CREDIT_OFFER_THRESHOLD && !opts.allowCompletedProfile) {
       return false;
     }
+    const displayBalance =
+      opts.allowCompletedProfile && balance > LOW_CREDIT_OFFER_THRESHOLD
+        ? 2
+        : balance;
 
     const unsubUrl = localizedAbsUrl(
       `/unsubscribe?token=${token}&type=marketing`,
@@ -717,13 +762,18 @@ async function dispatch(
         subject,
         react: LowCreditOfferEmail({
           name: recipient.name?.split(" ")[0] ?? null,
-          balance,
+          balance: displayBalance,
           priceLabel: formatBillingAmount(
-            LOW_CREDIT_PROMO_PLAN.amountMinor,
-            LOW_CREDIT_PROMO_PLAN.currency,
+            HALLOWEEN_PROMO_PLAN.amountMinor,
+            HALLOWEEN_PROMO_PLAN.currency,
             locale,
           ),
-          months: LOW_CREDIT_PROMO_MONTHS,
+          regularPriceLabel: formatBillingAmount(
+            PREMIUM_PLANS_BY_COUNTRY.GE.amountMinor * HALLOWEEN_PROMO_MONTHS,
+            PREMIUM_PLANS_BY_COUNTRY.GE.currency,
+            locale,
+          ),
+          months: HALLOWEEN_PROMO_MONTHS,
           deadlineLabel:
             locale === "ka"
               ? kaDayMonthGenitive(LOW_CREDIT_OFFER_ENDS_AT)
