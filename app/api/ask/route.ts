@@ -4,7 +4,21 @@ import { after } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { charts, chartChatMessages } from "@/db/schema";
-import { CREDIT_COST, FREE_ALLOWANCE, spendCredits } from "@/lib/credits";
+import {
+  CREDIT_COST,
+  FREE_ALLOWANCE,
+  getBalance,
+  spendCredits,
+} from "@/lib/credits";
+import { isPremiumUser } from "@/lib/premium";
+import {
+  DirectiveFilter,
+  encodeMarker,
+  parseDirective,
+  stripMarkers,
+  stripMarkersForModel,
+} from "@/lib/ask-synastry-pure";
+import { buildSynastryProposal } from "@/lib/ask-synastry";
 import { computeChartSalience } from "@/lib/report-salience";
 import { buildChartChatSystem } from "@/lib/chart-chat";
 import {
@@ -140,13 +154,19 @@ export async function POST(req: Request) {
           : `ადამიანი წერს ${v === "short" ? "მოკლე, მარტივ" : v === "detailed" ? "გრძელ, გაშლილ" : "საშუალო სიგრძის"} შეტყობინებებს, პასუხის სიგრძე და სიმარტივე ამას შეუსაბამე.`;
     }
   }
+  // Premium flag + balance let the astrologer state cost/affordability
+  // truthfully when the user asks about compatibility or top-ups.
+  const [premium, balance] = await Promise.all([
+    isPremiumUser(userId).catch(() => false),
+    getBalance(userId).catch(() => 0),
+  ]);
   const system = buildChartChatSystem(
     session.user?.name?.split(" ")[0] ?? null,
     chartRow.data,
     salience,
     locale,
     memoryBlock,
-    { depth, distress, recentUserMessages },
+    { depth, distress, recentUserMessages, account: { premium, balance } },
   );
 
   // Refresh the rolling portrait in the background (cheap merge, throttled
@@ -163,7 +183,7 @@ export async function POST(req: Request) {
     { role: "system", content: system },
     ...history.map((m) => ({
       role: m.role === "assistant" ? ("assistant" as const) : ("user" as const),
-      content: m.content,
+      content: stripMarkersForModel(m.content),
     })),
     { role: "user", content: message },
   ];
@@ -171,13 +191,42 @@ export async function POST(req: Request) {
   const encoder = new TextEncoder();
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
+      // `full` is what the user saw and what is persisted; the synastry
+      // directive is hidden from the stream and replaced by a proposal card.
       let full = "";
+      const filter = new DirectiveFilter();
       try {
         for await (const delta of streamChatCompletion(messages, {
           maxTokens: ASK_DEPTH_TOKENS[depth],
         })) {
-          full += delta;
-          controller.enqueue(encoder.encode(delta));
+          const visible = filter.push(delta);
+          if (visible) {
+            full += visible;
+            controller.enqueue(encoder.encode(visible));
+          }
+        }
+        const tail = filter.end();
+        if (tail.text) {
+          full += tail.text;
+          controller.enqueue(encoder.encode(tail.text));
+        }
+        const directive = tail.directive
+          ? parseDirective(tail.directive)
+          : null;
+        if (directive) {
+          const proposal = await buildSynastryProposal(userId, directive).catch(
+            (e) => {
+              console.warn("[ask] synastry proposal failed:", e);
+              return null;
+            },
+          );
+          const card = proposal
+            ? encodeMarker("synastry-proposal", proposal)
+            : locale !== "ka"
+              ? '\n\nI could not find that birth city. Tell me the city again (for example "Tbilisi") and I will set it up.'
+              : "\n\nამ დაბადების ადგილს ვერ მივაგენი. მითხარი ქალაქი თავიდან (მაგ. „თბილისი“) და მოვამზადებ.";
+          full = full.trimEnd() + card;
+          controller.enqueue(encoder.encode(card));
         }
       } catch (err) {
         console.error("[ask] stream failed:", err);
@@ -210,8 +259,12 @@ export async function POST(req: Request) {
               kind: "ai",
               sourceId: assistantMessage.id,
               title: message.slice(0, 160),
-              summary: full.slice(0, 240),
-              content: { type: "ai", question: message, answer: full },
+              summary: stripMarkers(full).slice(0, 240),
+              content: {
+                type: "ai",
+                question: message,
+                answer: stripMarkers(full),
+              },
               href: "/ask",
               language: locale,
               occurredAt: assistantMessage.createdAt,

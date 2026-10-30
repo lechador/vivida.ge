@@ -19,6 +19,7 @@ import {
 import type { ChartSalience } from "@/lib/report-salience";
 import type { HouseJson, NatalChartJson } from "@/db/schema";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { buildViVidaGuide, type AskAccountState } from "@/lib/vivida-guide";
 import {
   depthInstruction,
   distressInstruction,
@@ -715,6 +716,8 @@ export function buildChartChatSystem(
     distress?: DistressLevel;
     now?: Date;
     recentUserMessages?: string[];
+    /** Premium flag + balance so the model can state cost/affordability. */
+    account?: AskAccountState;
   } = {},
 ): string {
   const extras = [
@@ -724,6 +727,7 @@ export function buildChartChatSystem(
     .filter(Boolean)
     .join("\n");
   const extraBlock = extras ? `\n${extras}\n` : "";
+  const guide = buildViVidaGuide(locale, opts.account);
   const mentionedBlock = opts.recentUserMessages?.length
     ? buildMentionedChartsContext(opts.recentUserMessages, locale)
     : "";
@@ -752,7 +756,8 @@ Rules:
 - Always answer in English, even if prior conversation history contains Georgian.
 
 ${name}'s natal chart:
-${buildChartContext(chart, salience, "en", opts.now)}${mentionedBlock}`;
+${buildChartContext(chart, salience, "en", opts.now)}${mentionedBlock}
+${guide}`;
   }
   const name = firstName || "მომხმარებლის";
   const memory = memoryBlock.trim()
@@ -777,5 +782,6 @@ ${memory}${extraBlock}
 - ნუ მისცემ სამედიცინო, იურიდიულ ან ფინანსურ დირექტივებს. ასტროლოგია თვითშემეცნებისა და რეფლექსიის ხელსაწყოა, არა წინასწარმეტყველება.
 
 ${name}-ის ნატალური რუკა:
-${buildChartContext(chart, salience, "ka", opts.now)}${mentionedBlock}`;
+${buildChartContext(chart, salience, "ka", opts.now)}${mentionedBlock}
+${guide}`;
 }

@@ -17,6 +17,11 @@ import {
   type ChartStarterId,
 } from "@/lib/chart-chat-starters";
 import { ContextualPaywallActions } from "@/components/billing/contextual-paywall-actions";
+import {
+  SynastryProposalCard,
+  SynastryResultCard,
+} from "@/components/ask/synastry-cards";
+import { splitMarkers } from "@/lib/ask-synastry-pure";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -301,6 +306,23 @@ export function ChartChat({
     }
   }
 
+  // Proposals whose result already exists later in the thread stay resolved
+  // after a reload, so an old confirm button can't be tapped twice.
+  const resolvedSynastryKeys = new Set(
+    messages.flatMap((m) =>
+      m.role === "assistant"
+        ? splitMarkers(m.content).flatMap((seg) =>
+            seg.type === "result" ? [seg.data.key] : [],
+          )
+        : [],
+    ),
+  );
+
+  function appendAssistant(content: string) {
+    stickRef.current = true;
+    setMessages((prev) => [...prev, { role: "assistant", content }]);
+  }
+
   const empty = messages.length === 0;
   const overLimit = input.trim().length > CHAT_MAX_INPUT_LEN;
   const showCounter =
@@ -398,8 +420,39 @@ export function ChartChat({
               <div className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-sm border border-border bg-secondary/60 text-primary">
                 <Sparkles className="size-3.5" />
               </div>
-              <div className="max-w-[88%] rounded-md border border-border bg-card px-3.5 py-2.5 text-[15px] leading-relaxed break-words whitespace-pre-wrap text-foreground/90 sm:max-w-[85%] sm:px-4 sm:py-3 sm:text-base">
-                {m.content || <TypingDots />}
+              <div className="flex min-w-0 max-w-[92%] flex-col gap-2 sm:max-w-[85%]">
+                {m.content ? (
+                  splitMarkers(m.content).map((seg, si) =>
+                    seg.type === "text" ? (
+                      seg.text.trim() ? (
+                        <div
+                          key={si}
+                          className="rounded-md border border-border bg-card px-3.5 py-2.5 text-[15px] leading-relaxed break-words whitespace-pre-wrap text-foreground/90 sm:px-4 sm:py-3 sm:text-base"
+                        >
+                          {seg.text.trim()}
+                        </div>
+                      ) : null
+                    ) : seg.type === "proposal" ? (
+                      <SynastryProposalCard
+                        key={si}
+                        proposal={seg.data}
+                        locale={locale}
+                        resolved={resolvedSynastryKeys.has(seg.data.key)}
+                        onResult={appendAssistant}
+                      />
+                    ) : (
+                      <SynastryResultCard
+                        key={si}
+                        result={seg.data}
+                        locale={locale}
+                      />
+                    ),
+                  )
+                ) : (
+                  <div className="rounded-md border border-border bg-card px-3.5 py-2.5 text-[15px] sm:px-4 sm:py-3">
+                    <TypingDots />
+                  </div>
+                )}
               </div>
             </div>
           ),
