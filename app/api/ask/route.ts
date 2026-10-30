@@ -126,14 +126,14 @@ export async function POST(req: Request) {
   // System prompt: chart grounding + long-term memory + style mirroring.
   // Stored portrait wins; for newcomers (no portrait yet) infer verbosity
   // deterministically from their own turns so adaptation is instant.
+  const recentUserMessages = [
+    ...history.filter((m) => m.role !== "assistant").map((m) => m.content),
+    message,
+  ];
   let memoryBlock = buildMemoryBlock(storedMemory, locale);
   if (!memoryBlock) {
-    const userTurns = history
-      .filter((m) => m.role !== "assistant")
-      .map((m) => m.content);
-    userTurns.push(message);
-    if (userTurns.length >= 2) {
-      const v = inferVerbosity(userTurns);
+    if (recentUserMessages.length >= 2) {
+      const v = inferVerbosity(recentUserMessages);
       memoryBlock =
         locale === "en"
           ? `The person writes ${v === "short" ? "short, simple" : v === "detailed" ? "long, elaborate" : "medium-length"} messages, match that length and simplicity.`
@@ -146,7 +146,7 @@ export async function POST(req: Request) {
     salience,
     locale,
     memoryBlock,
-    { depth, distress },
+    { depth, distress, recentUserMessages },
   );
 
   // Refresh the rolling portrait in the background (cheap merge, throttled

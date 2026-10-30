@@ -12,10 +12,12 @@ export function BirthdayEmail({
   name,
   paragraphs,
   dashboardUrl,
+  showGift = true,
 }: {
   name: string | null;
   paragraphs: string[];
   dashboardUrl: string;
+  showGift?: boolean;
 }) {
   return (
     <EmailLayout preview="დღეს შენი დღეა, და მთელი ცა ამას აღნიშნავს ✨">
@@ -112,25 +114,32 @@ export function BirthdayEmail({
         </Button>
       </Section>
 
-      {/* The gift, a quiet P.S., deliberately not the headline */}
-      <Hr
-        style={{
-          borderColor: "rgba(167, 139, 250, 0.18)",
-          margin: "22px 0 14px",
-        }}
-      />
-      <Text
-        style={{
-          color: "#8d82a6",
-          fontSize: "13px",
-          lineHeight: "21px",
-          margin: 0,
-        }}
-      >
-        P.S. პატარა საჩუქარი ჩვენგან: შენს ბალანსს დაბადების დღის საპატივცემულოდ{" "}
-        <span style={{ color: "#eac358", fontWeight: 600 }}>10 კრედიტი</span>{" "}
-        დაემატა, უკვე შენია, არაფერი გჭირდება. 🎁
-      </Text>
+      {/* The gift, a quiet P.S., deliberately not the headline (omitted for PRO users) */}
+      {showGift ? (
+        <>
+          <Hr
+            style={{
+              borderColor: "rgba(167, 139, 250, 0.18)",
+              margin: "22px 0 14px",
+            }}
+          />
+          <Text
+            style={{
+              color: "#8d82a6",
+              fontSize: "13px",
+              lineHeight: "21px",
+              margin: 0,
+            }}
+          >
+            P.S. პატარა საჩუქარი ჩვენგან: შენს ბალანსს დაბადების დღის
+            საპატივცემულოდ{" "}
+            <span style={{ color: "#eac358", fontWeight: 600 }}>
+              10 კრედიტი
+            </span>{" "}
+            დაემატა, უკვე შენია, არაფერი გჭირდება. 🎁
+          </Text>
+        </>
+      ) : null}
     </EmailLayout>
   );
 }

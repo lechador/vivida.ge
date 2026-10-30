@@ -5,6 +5,7 @@ import { isAdminEmail } from "@/lib/admin-auth";
 import {
   BIRTHDAY_SUBJECT,
   FALLBACK_PARAGRAPHS,
+  FALLBACK_PARAGRAPHS_PRO,
   generateBirthdayCopy,
 } from "@/lib/birthday";
 import { BirthdayEmail } from "@/lib/email-templates/birthday";
@@ -32,17 +33,21 @@ export async function GET(req: Request) {
   const to = url.searchParams.get("to");
   const name = url.searchParams.get("name") || null;
   const sign = url.searchParams.get("sign") || null;
+  const isPro =
+    url.searchParams.get("pro") === "1" ||
+    url.searchParams.get("pro") === "true";
   if (!to) return Response.json({ error: "to required" }, { status: 400 });
 
   const key = process.env.RESEND_API_KEY;
-  if (!key) return Response.json({ error: "resend not configured" }, { status: 503 });
+  if (!key)
+    return Response.json({ error: "resend not configured" }, { status: 503 });
 
   let paragraphs: string[];
   let source = "ai";
   try {
     paragraphs = await generateBirthdayCopy(name, sign);
   } catch (err) {
-    paragraphs = FALLBACK_PARAGRAPHS;
+    paragraphs = isPro ? FALLBACK_PARAGRAPHS_PRO : FALLBACK_PARAGRAPHS;
     source = `fallback (${(err as Error).message})`;
   }
 
@@ -64,13 +69,14 @@ export async function GET(req: Request) {
       name,
       paragraphs,
       dashboardUrl: `${origin.replace(/\/$/, "")}/dashboard`,
+      showGift: !isPro,
     }),
   });
 
   if (result.error) {
     return Response.json(
       { error: result.error.message ?? "send failed" },
-      { status: 502 }
+      { status: 502 },
     );
   }
   return Response.json({ ok: true, id: result.data?.id, source, paragraphs });

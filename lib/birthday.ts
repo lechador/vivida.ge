@@ -20,6 +20,7 @@ import { emailSendLog } from "@/db/schema";
 import { grantCredits } from "@/lib/credits";
 import { BIRTHDAY_CREDITS } from "@/lib/credits-config";
 import { BirthdayEmail } from "@/lib/email-templates/birthday";
+import { isPremiumUser } from "@/lib/premium";
 import { acquireResendSlot } from "@/lib/resend-throttle";
 import { signByIndex } from "@/lib/zodiac";
 
@@ -57,11 +58,18 @@ export const FALLBACK_PARAGRAPHS = [
   "ვარსკვლავები დღეს შენს პატივსაცემად ანათებენ, ჩვენ კი პატარა საჩუქარი მოგიმზადეთ. ❤️",
 ];
 
+/** Curated fallback body for PRO users (no credit gift mention). */
+export const FALLBACK_PARAGRAPHS_PRO = [
+  "დღეს შენი დღეა, და მთელი ცა შენკენ იყურება. გვინდა ვივიდას გუნდიდან გულით მოგილოცოთ დაბადების დღე: იყოს ეს წელი შენთვის ნათელი, თბილი და სავსე იმ რამით, რაც ნამდვილად გახარებს.",
+  "ვარსკვლავები დღეს შენს პატივსაცემად ანათებენ — წინ საუკეთესო პირადი წელი გელოდება. ❤️",
+];
+
 type BirthdayUser = {
   userId: string;
   email: string | null;
   name: string | null;
   sunSignIndex: number | null;
+  isPremium: boolean;
 };
 
 /**
@@ -74,8 +82,10 @@ async function findBirthdayUsers(): Promise<BirthdayUser[]> {
     email: string | null;
     name: string | null;
     sun_idx: number | null;
+    is_premium: boolean | null;
   }>(dsql`
     SELECT u.id AS user_id, u.email, u.name,
+           (u.is_premium AND u.premium_until IS NOT NULL AND u.premium_until > now()) AS is_premium,
            (c.data->'bodies'->'sun'->>'signIndex')::int AS sun_idx
     FROM profile p
     JOIN "user" u ON u.id = p.user_id
@@ -98,6 +108,7 @@ async function findBirthdayUsers(): Promise<BirthdayUser[]> {
     email: (r.email as string) ?? null,
     name: (r.name as string) ?? null,
     sunSignIndex: r.sun_idx == null ? null : Number(r.sun_idx),
+    isPremium: Boolean(r.is_premium),
   }));
 }
 
@@ -119,12 +130,16 @@ async function alreadyGiftedThisYear(userId: string): Promise<boolean> {
 }
 
 /**
- * The birthday present: BIRTHDAY_CREDITS credits. Routed through grantCredits
- * so the user also gets a "credit" bell notification. The once-a-year
- * email_send_log guard (alreadyGiftedThisYear) already prevents double-gifting.
+ * The birthday present: BIRTHDAY_CREDITS credits for free users. PRO users
+ * bypass every credit gate, so gifting them credits makes no sense.
+ * Routed through grantCredits so the user also gets a "credit" bell
+ * notification. The once-a-year email_send_log guard (alreadyGiftedThisYear)
+ * already prevents double-gifting.
  */
-async function giftBirthdayCredits(userId: string): Promise<void> {
+async function giftBirthdayCredits(userId: string): Promise<boolean> {
+  if (await isPremiumUser(userId)) return false;
   await grantCredits(userId, BIRTHDAY_CREDITS, "birthday_gift");
+  return true;
 }
 
 interface OpenRouterJson {
@@ -236,11 +251,11 @@ export async function sendBirthdayGifts(): Promise<BirthdayResult> {
         })
         .returning({ id: emailSendLog.id });
 
-      await giftBirthdayCredits(u.userId);
-      result.gifted++;
+      const gifted = !u.isPremium && (await giftBirthdayCredits(u.userId));
+      if (gifted) result.gifted++;
 
       if (!resend || !u.email) {
-        // Gift applied but no way to email, mark so admin can see it.
+        // Gift applied (for non-PRO) but no way to email, mark so admin can see it.
         await db
           .update(emailSendLog)
           .set({
@@ -264,7 +279,7 @@ export async function sendBirthdayGifts(): Promise<BirthdayResult> {
           "[birthday] AI copy failed, using fallback:",
           (err as Error).message,
         );
-        paragraphs = FALLBACK_PARAGRAPHS;
+        paragraphs = gifted ? FALLBACK_PARAGRAPHS : FALLBACK_PARAGRAPHS_PRO;
       }
 
       // Shares the 2 req/s Resend budget with the daily blast that runs
@@ -279,6 +294,7 @@ export async function sendBirthdayGifts(): Promise<BirthdayResult> {
             name: firstName,
             paragraphs,
             dashboardUrl: `${ORIGIN.replace(/\/$/, "")}/dashboard`,
+            showGift: gifted,
           }),
         },
         { idempotencyKey: `birthday:${u.userId}:${year}` },
