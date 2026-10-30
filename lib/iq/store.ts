@@ -3,7 +3,7 @@ import { desc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { iqResults, type IqDomainScoresJson } from "@/db/schema";
 import { IQ_ITEMS } from "@/lib/iq/items";
-import { scoreIq, type IqResult } from "@/lib/iq/scoring";
+import { isScorableIqAttempt, scoreIq, type IqResult } from "@/lib/iq/scoring";
 
 /**
  * Persist a completed IQ attempt. Scores server-side (authoritative, same
@@ -18,6 +18,15 @@ export async function saveIqResult(input: {
   userId?: string | null;
 }): Promise<{ result: IqResult; id: string | null }> {
   const r = scoreIq(input.answers);
+
+  // Validity gate: too few administered items (timed-out partial run) or an
+  // implausibly fast completion is not a measurement. Score it for the
+  // caller's response, but never persist it, partial rows with a handful
+  // of items previously stored IQ values up to 145 and would poison any
+  // future re-norming.
+  if (!isScorableIqAttempt(r.total, input.timeUsedSec)) {
+    return { result: r, id: null };
+  }
   const domainScores: IqDomainScoresJson = {
     numeric: 0,
     logic: 0,
@@ -61,13 +70,17 @@ export async function saveIqResult(input: {
   return { result: r, id: row?.id ?? null };
 }
 
-/** Only keep answers for items still in the bank, and only integer choices. */
+/** Only keep answers for items still in the bank, and only choices that
+ *  could actually have been picked (-1 = skipped, or a real option index).
+ *  An out-of-range integer previously survived sanitising untouched. */
 export function sanitizeAnswers(raw: unknown): Record<string, number> {
   const out: Record<string, number> = {};
   if (!raw || typeof raw !== "object") return out;
-  const ids = new Set(IQ_ITEMS.map((i) => i.id));
+  const byId = new Map(IQ_ITEMS.map((i) => [i.id, i]));
   for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
-    if (ids.has(k) && typeof v === "number" && Number.isInteger(v)) out[k] = v;
+    const item = byId.get(k);
+    if (!item || typeof v !== "number" || !Number.isInteger(v)) continue;
+    if (v === -1 || (v >= 0 && v < item.options.length)) out[k] = v;
   }
   return out;
 }

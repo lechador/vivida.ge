@@ -77,7 +77,7 @@ const IQ_FAQ = [
   },
   {
     q: "რამდენად ზუსტია ონლაინ IQ ტესტი?",
-    a: "ერთჯერადი ონლაინ ტესტის ცდომილება დაახლოებით ±5 ქულაა და დამოკიდებულია დაღლილობასა და ყურადღებაზე. ეს არ არის კლინიკური დიაგნოზი, არამედ საიმედო შეფასება.",
+    a: "ქულა შეფასებაა და არა ზუსტი გაზომვა, ტიპური ცდომილება დაახლოებით ±6 ქულაა, ამიტომ შედეგთან ერთად ყოველთვის ნახავ სავარაუდო დიაპაზონს. ნორმები Vivida-ს ტესტის რეალური გამვლელების შედეგებზეა დაფუძნებული. ეს არ არის კლინიკური დიაგნოზი.",
   },
 ];
 
@@ -92,7 +92,7 @@ const IQ_FAQ_EN = [
   },
   {
     q: "How accurate is an online IQ test?",
-    a: "A single online attempt has meaningful uncertainty and can be affected by fatigue, distractions and familiarity with the format. Treat the score as an estimate, not a clinical or professionally administered assessment.",
+    a: "The score is an estimate, not an exact measurement: typical uncertainty is about ±6 points, which is why your result always comes with an estimated range. Norms are based on real Vivida test-takers. Treat the score as an estimate, not a clinical or professionally administered assessment.",
   },
 ];
 

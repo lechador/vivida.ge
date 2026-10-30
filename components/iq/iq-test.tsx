@@ -20,6 +20,7 @@ import {
   IQ_ADAPTIVE_LENGTH,
   firstAdaptiveItem,
   nextAdaptiveItem,
+  optionOrderFor,
 } from "@/lib/iq/adaptive";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
@@ -44,6 +45,9 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
   const [timeLeft, setTimeLeft] = useState(IQ_TIME_LIMIT_SEC);
   const [submitting, setSubmitting] = useState(false);
   const submittedRef = useRef(false);
+  // Per-attempt seed for option shuffling (see optionOrderFor): stable for
+  // the whole sitting, different on a retake.
+  const [attemptSeed] = useState(() => Math.floor(Math.random() * 2 ** 31));
 
   const step = administered.length; // 1-based count of items shown so far
   const q = administered[step - 1];
@@ -189,9 +193,11 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
           </p>
         )}
 
-        {/* Options */}
+        {/* Options (display order shuffled per attempt; answers are
+            recorded by canonical index, so scoring never sees the shuffle) */}
         <IqOptions
           item={q}
+          order={optionOrderFor(q.id, attemptSeed, q.options.length)}
           selected={answers[q.id]}
           onPick={pick}
           locale={locale}
@@ -314,11 +320,14 @@ function IqStem({ item, locale }: { item: IqItem; locale: UserLocale }) {
 
 function IqOptions({
   item,
+  order,
   selected,
   onPick,
   locale,
 }: {
   item: IqItem;
+  /** Canonical option indices in display order (per-attempt shuffle). */
+  order: number[];
   selected: number | undefined;
   onPick: (i: number) => void;
   locale: UserLocale;
@@ -332,7 +341,9 @@ function IqOptions({
         isFigure ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-1",
       )}
     >
-      {item.options.map((opt, i) => {
+      {order.map((canonicalIdx, displayIdx) => {
+        const opt = item.options[canonicalIdx];
+        const i = canonicalIdx;
         const active = selected === i;
         return (
           <button
@@ -346,8 +357,8 @@ function IqOptions({
             aria-label={
               opt.kind === "figure"
                 ? locale === "en"
-                  ? `Option ${String.fromCharCode(65 + i)}`
-                  : `ვარიანტი ${String.fromCharCode(65 + i)}`
+                  ? `Option ${String.fromCharCode(65 + displayIdx)}`
+                  : `ვარიანტი ${String.fromCharCode(65 + displayIdx)}`
                 : undefined
             }
             className={cn(
@@ -372,7 +383,7 @@ function IqOptions({
                       : "border-border text-muted-foreground",
                   )}
                 >
-                  {String.fromCharCode(65 + i)}
+                  {String.fromCharCode(65 + displayIdx)}
                 </span>
                 {locale === "en" ? (opt.textEn ?? opt.text) : opt.text}
               </span>

@@ -1,5 +1,5 @@
 import { IQ_ITEMS, type IqDomain, type IqItem } from "@/lib/iq/items";
-import { estimateTheta } from "@/lib/iq/scoring";
+import { estimateTheta, THETA_MEAN } from "@/lib/iq/scoring";
 
 /**
  * Adaptive item selection (computerised adaptive testing) for the IQ test.
@@ -26,18 +26,49 @@ export const IQ_ADAPTIVE_LENGTH = 25;
  * represented so the subscores mean something.
  */
 const DOMAIN_TARGET: Record<IqDomain, number> = {
-  numeric: 9,
+  numeric: 8,
   pattern: 8,
   logic: 5,
-  spatial: 3,
+  spatial: 4,
 };
 
 /**
- * Opening item: difficulty nearest 0 (population-average ability), so the test
- * starts neither trivial nor brutal before we know anything about the taker.
+ * Display order for an item's options in one attempt: a deterministic
+ * shuffle seeded by (attempt seed, item id), returning canonical option
+ * indices in display order. The bank's authored order puts the correct
+ * answer at index 1 in nearly half the items, so always picking the
+ * second option scored 86, twenty points above honest guessing, before
+ * this existed. Answers are always recorded by canonical index, so
+ * scoring is untouched; only the on-screen position moves.
+ */
+export function optionOrderFor(
+  itemId: string,
+  seed: number,
+  count: number,
+): number[] {
+  let h = seed >>> 0;
+  for (let i = 0; i < itemId.length; i++)
+    h = (h * 31 + itemId.charCodeAt(i)) >>> 0;
+  const order = Array.from({ length: count }, (_, i) => i);
+  for (let i = count - 1; i > 0; i--) {
+    h = (h * 1103515245 + 12345) >>> 0;
+    const j = h % (i + 1);
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return order;
+}
+
+/**
+ * Opening item: difficulty nearest THETA_MEAN (the calibrated ability that
+ * maps to IQ 100), so the test starts neither trivial nor brutal before we
+ * know anything about the taker. On the calibrated scale that mean sits at
+ * θ ≈ 2, not at 0, the previous "closest to 0" opener was an easy item for
+ * the typical taker.
  */
 export function firstAdaptiveItem(): IqItem {
-  return [...IQ_ITEMS].sort((a, b) => Math.abs(a.b) - Math.abs(b.b))[0];
+  return [...IQ_ITEMS].sort(
+    (a, b) => Math.abs(a.b - THETA_MEAN) - Math.abs(b.b - THETA_MEAN),
+  )[0];
 }
 
 /**
@@ -47,7 +78,7 @@ export function firstAdaptiveItem(): IqItem {
  */
 export function nextAdaptiveItem(
   administered: IqItem[],
-  correct: boolean[]
+  correct: boolean[],
 ): IqItem | null {
   const { theta } = estimateTheta(administered, correct);
 
@@ -65,7 +96,7 @@ export function nextAdaptiveItem(
 
   // Prefer domains still under quota; fall back to anything if all are met.
   const underQuota = remaining.filter(
-    (it) => count[it.domain] < DOMAIN_TARGET[it.domain]
+    (it) => count[it.domain] < DOMAIN_TARGET[it.domain],
   );
   const pool = underQuota.length > 0 ? underQuota : remaining;
 

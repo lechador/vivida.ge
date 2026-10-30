@@ -7,7 +7,7 @@ import { Brain, Check, Lock, RotateCcw, Share2, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { scoreIq, type IqResult } from "@/lib/iq/scoring";
+import { isScorableIqAttempt, scoreIq, type IqResult } from "@/lib/iq/scoring";
 import { IQ_ANSWERS_STORAGE_KEY } from "@/lib/iq/items";
 import { IqBellCurve, DomainBar } from "@/components/iq/iq-bell-curve";
 import { ProfileVisibilityToggle } from "@/components/tests/profile-visibility-toggle";
@@ -121,6 +121,31 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
     router.push("/iq-testi");
   }
 
+  // Too few administered items (the timer ran out early) is not a
+  // measurement: the estimate would be mostly prior. Show that honestly
+  // instead of a precise-looking number from a handful of answers.
+  const timeUsedSec = (stored as Stored | null)?.timeUsedSec;
+  if (!isScorableIqAttempt(result.total, timeUsedSec)) {
+    return (
+      <div className="rounded-3xl border border-border bg-card/55 p-8 text-center ring-1 ring-foreground/5 backdrop-blur-xl">
+        <p className="mx-auto max-w-md text-pretty text-foreground/85">
+          {en
+            ? `Only ${result.total} tasks were completed, which is not enough for a reliable estimate. Please retake the test and answer at least 20 tasks.`
+            : `მხოლოდ ${result.total} დავალებაა შესრულებული, ეს საიმედო შეფასებისთვის საკმარისი არ არის. გაიარე ტესტი თავიდან და უპასუხე მინიმუმ 20 დავალებას.`}
+        </p>
+        <Button
+          type="button"
+          variant="mystic"
+          className="mt-5 gap-1.5"
+          onClick={retake}
+        >
+          <RotateCcw className="size-4" />
+          {en ? "Retake the test" : "ტესტის თავიდან გავლა"}
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-5">
       {/* Score card */}
@@ -228,8 +253,8 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
 
       <p className="mx-auto max-w-lg text-center text-xs leading-relaxed text-muted-foreground">
         {en
-          ? "A single online result is approximate and can be affected by fatigue, environment and attention. This is not a clinical or professionally administered assessment."
-          : "ერთჯერადი ონლაინ ტესტის შედეგი მიახლოებითია (±5 ქულა) და დამოკიდებულია დაღლილობაზე, გარემოსა და ყურადღებაზე. ეს არ არის კლინიკური დიაგნოზი."}
+          ? "A single online result is approximate and can be affected by fatigue, environment and attention. The range shown above reflects the measurement uncertainty. This is not a clinical or professionally administered assessment."
+          : "ერთჯერადი ონლაინ ტესტის შედეგი მიახლოებითია და დამოკიდებულია დაღლილობაზე, გარემოსა და ყურადღებაზე. ზემოთ ნაჩვენები დიაპაზონი სწორედ ამ ცდომილებას ასახავს. ეს არ არის კლინიკური დიაგნოზი."}
       </p>
     </div>
   );

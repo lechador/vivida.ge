@@ -13,9 +13,13 @@
 import { neon } from "@neondatabase/serverless";
 import { readFileSync } from "node:fs";
 
-for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split("\n")) {
+for (const line of readFileSync(
+  new URL("../.env.local", import.meta.url),
+  "utf8",
+).split("\n")) {
   const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-  if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+  if (m && !process.env[m[1]])
+    process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
 }
 const url = process.env.DATABASE_URL;
 if (!url) {
@@ -33,7 +37,7 @@ const rows = await sql`SELECT theta, item_correct
 console.log(`completed tests with per-item data: ${rows.length}`);
 if (rows.length < MIN_RESULTS) {
   console.log(
-    `\nNeed ≥ ${MIN_RESULTS} to re-norm with confidence, collecting. (Nothing changed.)`
+    `\nNeed ≥ ${MIN_RESULTS} to re-norm with confidence, collecting. (Nothing changed.)`,
   );
   process.exit(0);
 }
@@ -42,11 +46,15 @@ if (rows.length < MIN_RESULTS) {
 const thetas = rows.map((r) => Number(r.theta)).filter(Number.isFinite);
 const mean = thetas.reduce((a, b) => a + b, 0) / thetas.length;
 const sd = Math.sqrt(
-  thetas.reduce((a, b) => a + (b - mean) ** 2, 0) / thetas.length
+  thetas.reduce((a, b) => a + (b - mean) ** 2, 0) / thetas.length,
 );
 console.log("\n── Suggested anchor (lib/iq/scoring.ts) ──");
-console.log(`  THETA_MEAN = ${mean.toFixed(2)}   (currently 0.55)`);
-console.log(`  THETA_SD   = ${sd.toFixed(2)}   (currently 1.05)`);
+console.log(
+  `  THETA_MEAN = ${mean.toFixed(2)}   (see THETA_MEAN in lib/iq/scoring.ts)`,
+);
+console.log(
+  `  THETA_SD   = ${sd.toFixed(2)}   (see THETA_SD in lib/iq/scoring.ts)`,
+);
 
 // ── 2. Observed difficulty per item (conditional Rasch MLE for b) ────────────
 const byItem = new Map(); // id → [{theta, correct}]
@@ -89,11 +97,15 @@ for (const [id, pts] of byItem) {
 }
 report.sort((a, b) => a.seen - b.seen);
 
-console.log("\n── Observed item difficulty (compare to assigned b in items.ts) ──");
+console.log(
+  "\n── Observed item difficulty (compare to assigned b in items.ts) ──",
+);
 console.log("  item     seen   pass%   observed b");
 for (const r of report) {
   console.log(
-    `  ${r.id.padEnd(7)} ${String(r.seen).padStart(5)}  ${String(r.pass).padStart(5)}   ${r.b}`
+    `  ${r.id.padEnd(7)} ${String(r.seen).padStart(5)}  ${String(r.pass).padStart(5)}   ${r.b}`,
   );
 }
-console.log("\nReport only, no changes written. Edit items.ts / scoring.ts by hand.");
+console.log(
+  "\nReport only, no changes written. Edit items.ts / scoring.ts by hand.",
+);
