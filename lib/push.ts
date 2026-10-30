@@ -4,12 +4,81 @@
  * of a `push_subscription` row means the user opted into notifications.
  */
 
+import { createHash } from "node:crypto";
 import webpush from "web-push";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 
 import { db } from "@/db";
-import { pushSubscriptions, dailyHoroscopes, users } from "@/db/schema";
+import {
+  pushSubscriptions,
+  dailyHoroscopes,
+  rateLimitHits,
+  users,
+} from "@/db/schema";
 import { normalizeUserLocale } from "@/lib/i18n/user-locale";
+
+export const DAILY_PUSH_BUCKET = "push_daily";
+
+export function hashPushUserId(userId: string): string {
+  return createHash("sha256").update(userId).digest("hex");
+}
+
+export function utcDayWindowStart(now: Date = new Date()): Date {
+  return new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+  );
+}
+
+export function utcDayWindowStartFromDateKey(sendDate: string): Date {
+  const parsed = new Date(`${sendDate}T00:00:00.000Z`);
+  return Number.isNaN(parsed.getTime()) ? utcDayWindowStart() : parsed;
+}
+
+/**
+ * Atomically claim the user's single push slot for the given UTC day.
+ * Returns true if this caller won the day's only slot, false if a push was
+ * already sent (or claimed) for this user today.
+ */
+export async function claimDailyPushSlot(
+  userId: string,
+  windowStart: Date = utcDayWindowStart(),
+): Promise<boolean> {
+  const identifier = hashPushUserId(userId);
+  const [row] = await db
+    .insert(rateLimitHits)
+    .values({
+      bucket: DAILY_PUSH_BUCKET,
+      identifier,
+      windowStart,
+      count: 1,
+    })
+    .onConflictDoUpdate({
+      target: [
+        rateLimitHits.bucket,
+        rateLimitHits.identifier,
+        rateLimitHits.windowStart,
+      ],
+      set: { count: sql`${rateLimitHits.count} + 1` },
+    })
+    .returning({ count: rateLimitHits.count });
+  return (row?.count ?? 1) === 1;
+}
+
+export async function releaseDailyPushSlot(
+  userId: string,
+  windowStart: Date = utcDayWindowStart(),
+): Promise<void> {
+  const identifier = hashPushUserId(userId);
+  await db
+    .delete(rateLimitHits)
+    .where(
+      and(
+        eq(rateLimitHits.bucket, DAILY_PUSH_BUCKET),
+        eq(rateLimitHits.identifier, identifier),
+        eq(rateLimitHits.windowStart, windowStart),
+      ),
+    );
+}
 
 let configured = false;
 
@@ -77,10 +146,15 @@ async function sendToSubs(
   return ok;
 }
 
-/** Send a push to every device a user has subscribed. Returns # delivered. */
+/**
+ * Send a push to every device a user has subscribed. Returns # delivered.
+ * Enforces a hard cap of at most 1 push per user per UTC day across all push
+ * channels unless `bypassDailyCap` is explicitly set (e.g. user-initiated test).
+ */
 export async function sendPushToUser(
   userId: string,
   payload: PushPayload,
+  opts?: { bypassDailyCap?: boolean; now?: Date },
 ): Promise<number> {
   if (!ensureConfigured()) return 0;
   const subs = await db
@@ -92,7 +166,19 @@ export async function sendPushToUser(
     })
     .from(pushSubscriptions)
     .where(eq(pushSubscriptions.userId, userId));
-  return subs.length ? sendToSubs(subs, payload) : 0;
+  if (!subs.length) return 0;
+
+  const windowStart = utcDayWindowStart(opts?.now);
+  if (!opts?.bypassDailyCap) {
+    const claimed = await claimDailyPushSlot(userId, windowStart);
+    if (!claimed) return 0;
+  }
+
+  const delivered = await sendToSubs(subs, payload);
+  if (delivered === 0 && !opts?.bypassDailyCap) {
+    await releaseDailyPushSlot(userId, windowStart).catch(() => undefined);
+  }
+  return delivered;
 }
 
 const GENERIC_BODY = "შენი დღევანდელი ჰოროსკოპი მზადაა, გახსენი და ნახე ✨";
@@ -100,7 +186,7 @@ const GENERIC_BODY_EN =
   "Your daily horoscope is ready, open it to read more ✨";
 
 /**
- * Daily push blast. One notification per subscribed user, using today's
+ * Daily push blast. One notification per subscribed user per day, using today's
  * personalized headline when it's already generated (the email blast on the
  * same cron generates them), otherwise a generic nudge. Deep-links to the
  * dashboard.
@@ -110,26 +196,41 @@ export async function sendDailyPushBlast(opts: {
 }): Promise<{ recipients: number; sent: number }> {
   if (!ensureConfigured()) return { recipients: 0, sent: 0 };
 
-  const rows = await db
-    .select({
-      userId: pushSubscriptions.userId,
-      locale: users.interfaceLanguage,
-      id: pushSubscriptions.id,
-      endpoint: pushSubscriptions.endpoint,
-      p256dh: pushSubscriptions.p256dh,
-      auth: pushSubscriptions.auth,
-      headline: dailyHoroscopes.headline,
-      language: dailyHoroscopes.language,
-    })
-    .from(pushSubscriptions)
-    .innerJoin(users, eq(users.id, pushSubscriptions.userId))
-    .leftJoin(
-      dailyHoroscopes,
-      and(
-        eq(dailyHoroscopes.userId, pushSubscriptions.userId),
-        eq(dailyHoroscopes.date, opts.sendDate),
+  const windowStart = utcDayWindowStartFromDateKey(opts.sendDate);
+
+  const [rows, alreadyPushed] = await Promise.all([
+    db
+      .select({
+        userId: pushSubscriptions.userId,
+        locale: users.interfaceLanguage,
+        id: pushSubscriptions.id,
+        endpoint: pushSubscriptions.endpoint,
+        p256dh: pushSubscriptions.p256dh,
+        auth: pushSubscriptions.auth,
+        headline: dailyHoroscopes.headline,
+        language: dailyHoroscopes.language,
+      })
+      .from(pushSubscriptions)
+      .innerJoin(users, eq(users.id, pushSubscriptions.userId))
+      .leftJoin(
+        dailyHoroscopes,
+        and(
+          eq(dailyHoroscopes.userId, pushSubscriptions.userId),
+          eq(dailyHoroscopes.date, opts.sendDate),
+        ),
       ),
-    );
+    db
+      .select({ identifier: rateLimitHits.identifier })
+      .from(rateLimitHits)
+      .where(
+        and(
+          eq(rateLimitHits.bucket, DAILY_PUSH_BUCKET),
+          eq(rateLimitHits.windowStart, windowStart),
+        ),
+      ),
+  ]);
+
+  const pushedTodayHashes = new Set(alreadyPushed.map((r) => r.identifier));
 
   const recipients = new Map<
     string,
@@ -142,6 +243,7 @@ export async function sendDailyPushBlast(opts: {
     }
   >();
   for (const row of rows) {
+    if (pushedTodayHashes.has(hashPushUserId(row.userId))) continue;
     const current = recipients.get(row.userId) ?? {
       userId: row.userId,
       locale: row.locale,
@@ -159,11 +261,15 @@ export async function sendDailyPushBlast(opts: {
   }
 
   let sent = 0;
+  let pushedRecipients = 0;
   const entries = Array.from(recipients.values());
   let next = 0;
   async function worker() {
     while (next < entries.length) {
       const recipient = entries[next++];
+      const claimed = await claimDailyPushSlot(recipient.userId, windowStart);
+      if (!claimed) continue;
+
       const locale = normalizeUserLocale(recipient.locale);
       const payload = {
         title: "Vivida ✨",
@@ -174,13 +280,21 @@ export async function sendDailyPushBlast(opts: {
               ? GENERIC_BODY_EN
               : GENERIC_BODY,
         url: "/dashboard",
-        tag: `daily-${opts.sendDate}`,
+        tag: "vivida-daily",
       };
-      sent += await sendToSubs(recipient.subs, payload);
+      const delivered = await sendToSubs(recipient.subs, payload);
+      if (delivered === 0) {
+        await releaseDailyPushSlot(recipient.userId, windowStart).catch(
+          () => undefined,
+        );
+      } else {
+        pushedRecipients++;
+        sent += delivered;
+      }
     }
   }
   await Promise.all(
     Array.from({ length: Math.min(20, entries.length) }, () => worker()),
   );
-  return { recipients: recipients.size, sent };
+  return { recipients: pushedRecipients, sent };
 }

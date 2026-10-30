@@ -13,12 +13,16 @@ export async function POST() {
     return Response.json({ error: "unavailable" }, { status: 503 });
   }
 
-  const sent = await sendPushToUser(userId, {
-    title: "Vivida ✨",
-    body: "შეტყობინებები ჩართულია, აქ მიიღებ დღიურ ჰოროსკოპს.",
-    url: "/dashboard",
-    tag: "test",
-  });
+  const sent = await sendPushToUser(
+    userId,
+    {
+      title: "Vivida ✨",
+      body: "შეტყობინებები ჩართულია, აქ მიიღებ დღიურ ჰოროსკოპს.",
+      url: "/dashboard",
+      tag: "test",
+    },
+    { bypassDailyCap: true },
+  );
 
   return Response.json({ ok: true, sent });
 }

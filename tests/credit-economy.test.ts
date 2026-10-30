@@ -37,7 +37,7 @@ describe("credit economy guardrails", () => {
   });
 
   it("keeps signup and birthday grants calibrated to the 2.5x free/spend guardrail", () => {
-    expect(SIGNUP_BONUS).toBe(3);
+    expect(SIGNUP_BONUS).toBe(4);
     expect(BIRTHDAY_CREDITS).toBe(10);
   });
 });

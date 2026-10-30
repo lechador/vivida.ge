@@ -15,9 +15,10 @@ self.addEventListener("push", (event) => {
     body: data.body || "",
     icon: "/apple-icon.png",
     badge: "/apple-icon.png",
-    tag: data.tag || undefined,
-    // Replace an earlier notification with the same tag instead of stacking.
-    renotify: Boolean(data.tag),
+    // Collapse unopened notifications under a single tag by default so they
+    // replace in place rather than stacking in the notification tray.
+    tag: data.tag || "vivida-daily",
+    renotify: false,
     data: { url: data.url || "/dashboard" },
   };
   event.waitUntil(self.registration.showNotification(title, options));

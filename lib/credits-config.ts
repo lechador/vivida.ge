@@ -9,12 +9,12 @@
  * Tuning the economy is a one-line change in this file.
  */
 
-export const SIGNUP_BONUS = 3;
+export const SIGNUP_BONUS = 4;
 /** signup_credits_v1: staged cohort receives this immediately. */
-export const STAGED_SIGNUP_BONUS = 3;
+export const STAGED_SIGNUP_BONUS = 4;
 /**
  * signup_credits_v1: staged cohort receives this on its first 24h+ return.
- * Retired to 0 (2026-10-24): the welcome grant is now a single 5-credit bonus,
+ * Retired to 0 (2026-10-24): the welcome grant is now a single 4-credit bonus,
  * and returning is rewarded through the monthly bonus instead.
  */
 export const STAGED_RETURN_BONUS = 0;
