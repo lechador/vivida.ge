@@ -139,6 +139,7 @@ export default async function AskPage({
      */
     <main
       data-no-body-bottom-pad
+      data-chat-viewport
       lang={locale}
       className="relative isolate flex h-[100dvh] flex-col overflow-hidden bg-background"
     >
@@ -146,8 +147,8 @@ export default async function AskPage({
 
       <AppHeader authed active="ask" />
 
-      <section className="relative z-10 mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col px-3 pb-[calc(4.5rem_+_max(env(safe-area-inset-bottom),0.25rem))] pt-3 sm:px-6 sm:pt-8 lg:pb-6">
-        <header className="mb-3 shrink-0 border-b border-border pb-3 sm:mb-4 sm:pb-4">
+      <section className="relative z-10 mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col px-3 pb-[calc(4.5rem_+_max(env(safe-area-inset-bottom),0.25rem))] pt-2 sm:px-6 sm:pt-8 lg:pb-6">
+        <header className="mb-3 hidden shrink-0 border-b border-border pb-3 sm:mb-4 sm:block sm:pb-4">
           {/* Bilingual eyebrow wraps to two lines on phones and just eats
               thread height; the app header breadcrumb already names the
               section, so it stays a desktop flourish. */}

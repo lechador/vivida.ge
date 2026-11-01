@@ -905,7 +905,7 @@ export function ChartChat({
             </CreditHint>
           )}
         </div>
-        <p className="mt-1 text-center text-[11px] leading-snug text-muted-foreground sm:mt-1.5">
+        <p className="mt-1 hidden text-center text-[11px] leading-snug text-muted-foreground sm:mt-1.5 sm:block">
           {en
             ? "Astrological interpretations are for reflection, not high-stakes decisions."
             : "ასტროლოგიური ანალიზი განკუთვნილია რეფლექსიისთვის, არა გადაწყვეტილებებისთვის."}

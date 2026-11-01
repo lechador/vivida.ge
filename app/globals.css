@@ -183,6 +183,19 @@ html[lang="hy"] .locale-ka-only {
   }
 
   /*
+   * Chat-style pages (/ask) own the whole viewport: the thread scrolls
+   * inside its own panel, so the document must never scroll or rubber-band
+   * on phones. Without this the page drifts vertically whenever the thread
+   * (or the keyboard) changes height.
+   */
+  html:has([data-chat-viewport]),
+  body:has([data-chat-viewport]) {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  /*
    * Desktop left sidebar: when DesktopSidebar is mounted, push the body
    * content right by the sidebar width so the fixed-position rail
    * doesn't overlap page content. Same automatic-via-:has() pattern as
