@@ -1,0 +1,101 @@
+name: Heavy Checks
+
+# Browser + performance checks are too slow for every push (~8 min combined).
+# Run them manually from the Actions tab, or let the weekly schedule catch
+# regressions on main.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 1" # Mondays 03:00 UTC
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  heavy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: vivida_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d vivida_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vivida_test
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vivida_test
+      AUTH_SECRET: ci-only-auth-secret-that-is-long-enough-for-tests
+      GOOGLE_CLIENT_ID: ci-google-client-id
+      GOOGLE_CLIENT_SECRET: ci-google-client-secret
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Cache Next.js build output
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-${{ hashFiles('package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            nextjs-${{ hashFiles('package-lock.json') }}-
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply database migrations
+        run: npm run db:migrate
+
+      - name: Build
+        run: npm run build
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end smoke tests
+        run: npm run test:e2e
+
+      - name: Upload Playwright failure reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-reports
+          path: test-results/
+          if-no-files-found: ignore
+
+      - name: Lighthouse performance budgets
+        run: npm run perf:ci
+
+      - name: Check Lighthouse report integrity
+        run: node scripts/check-lighthouse-reports.mjs .lighthouserc
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: .lighthouserc/
+          include-hidden-files: true
