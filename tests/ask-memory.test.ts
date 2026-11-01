@@ -61,6 +61,7 @@ describe("ask memory", () => {
         },
         turnsSeen: 10,
         nudgesEnabled: true,
+        topicStartedAt: null,
         updatedAt: new Date(),
       },
       "ka",
@@ -68,6 +69,34 @@ describe("ask memory", () => {
     expect(block).toContain("სიყვარულის თემები");
     expect(block).toContain("მოკლე");
     expect(block).toContain("ურთიერთობა");
+  });
+
+  it("keeps style but drops earlier topics in an isolated (new) topic", () => {
+    const memory = {
+      userId: "u1",
+      summary: "სიყვარულის თემები აინტერესებს",
+      traits: {
+        verbosity: "short" as const,
+        tone: "მხიარული",
+        topics: ["ურთიერთობა"],
+        notes: "ახალი სამსახური",
+        openLoops: ["გასაუბრება ხუთშაბათს"],
+      },
+      turnsSeen: 10,
+      nudgesEnabled: true,
+      topicStartedAt: new Date(),
+      updatedAt: new Date(),
+    };
+    const block = buildMemoryBlock(memory, "ka", { topicIsolated: true });
+    expect(block).toContain("მოკლე");
+    expect(block).toContain("ტონი: მხიარული");
+    expect(block).not.toContain("მუდმივი თემები");
+    expect(block).not.toContain("გასაუბრება ხუთშაბათს");
+    expect(block).toContain("არ ახსენო წინა თემები");
+    // English variant carries the same guard.
+    expect(buildMemoryBlock(memory, "en", { topicIsolated: true })).toContain(
+      "Do NOT bring up earlier topics",
+    );
   });
 
   it("sanitizes the LLM merge output", () => {

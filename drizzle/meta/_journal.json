@@ -708,6 +708,13 @@
       "when": 1793567994978,
       "tag": "0100_fearless_ben_grimm",
       "breakpoints": true
+    },
+    {
+      "idx": 101,
+      "version": "7",
+      "when": 1793568977325,
+      "tag": "0101_giant_ben_grimm",
+      "breakpoints": true
     }
   ]
 }

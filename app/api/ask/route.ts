@@ -1,4 +1,4 @@
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, gte, sql } from "drizzle-orm";
 import { after } from "next/server";
 
 import { auth } from "@/auth";
@@ -26,6 +26,7 @@ import {
   buildMemoryBlock,
   detectDistress,
   getAskMemory,
+  getAskTopicStart,
   inferVerbosity,
   normalizeAskDepth,
   refreshAskMemory,
@@ -94,8 +95,12 @@ export async function POST(req: Request) {
   const locale = await getUserLocale(userId);
   // Long-term memory: rolling portrait (PK lookup, free). Never fails the request.
   const storedMemory = await getAskMemory(userId).catch(() => null);
+  // "New topic" cut-off: older turns are neither shown nor sent to the model.
+  const topicStartedAt = await getAskTopicStart(userId).catch(() => null);
+  const topicIsolated = topicStartedAt !== null;
 
-  // Recent history (oldest→newest) for conversational continuity.
+  // Recent history (oldest→newest) for conversational continuity, limited to
+  // the topic the user is currently on.
   const history = (
     await db
       .select({
@@ -103,7 +108,14 @@ export async function POST(req: Request) {
         content: chartChatMessages.content,
       })
       .from(chartChatMessages)
-      .where(eq(chartChatMessages.userId, userId))
+      .where(
+        topicStartedAt
+          ? and(
+              eq(chartChatMessages.userId, userId),
+              gte(chartChatMessages.createdAt, topicStartedAt),
+            )
+          : eq(chartChatMessages.userId, userId),
+      )
       .orderBy(desc(chartChatMessages.createdAt))
       .limit(HISTORY_LIMIT)
   ).reverse();
@@ -144,7 +156,7 @@ export async function POST(req: Request) {
     ...history.filter((m) => m.role !== "assistant").map((m) => m.content),
     message,
   ];
-  let memoryBlock = buildMemoryBlock(storedMemory, locale);
+  let memoryBlock = buildMemoryBlock(storedMemory, locale, { topicIsolated });
   if (!memoryBlock) {
     if (recentUserMessages.length >= 2) {
       const v = inferVerbosity(recentUserMessages);

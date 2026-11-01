@@ -59,6 +59,36 @@ export async function getAskMemory(
   return row;
 }
 
+/**
+ * The current topic cut-off: turns older than this stay out of the model
+ * context (and off the thread) after the user starts a new topic.
+ */
+export async function getAskTopicStart(userId: string): Promise<Date | null> {
+  const [row] = await db
+    .select({ topicStartedAt: askUserMemories.topicStartedAt })
+    .from(askUserMemories)
+    .where(eq(askUserMemories.userId, userId))
+    .limit(1);
+  return row?.topicStartedAt ?? null;
+}
+
+/**
+ * Start a fresh topic without touching the rolling portrait. Returns the new
+ * cut-off second (truncated to whole seconds so a message written in the same
+ * second as the cut still lands inside the new topic).
+ */
+export async function startAskTopic(userId: string): Promise<Date> {
+  const cut = new Date(Math.floor(Date.now() / 1000) * 1000);
+  await db
+    .insert(askUserMemories)
+    .values({ userId, summary: "", traits: {}, topicStartedAt: cut })
+    .onConflictDoUpdate({
+      target: askUserMemories.userId,
+      set: { topicStartedAt: cut, updatedAt: new Date() },
+    });
+  return cut;
+}
+
 const MERGE_SYSTEM = `You maintain a rolling portrait of a user chatting with their personal astrologer. Merge the old portrait with the recent conversation into an updated one. Rules:
 - Remember durable facts only: life context (relationships, work, studies), recurring interests, emotional patterns, how they like to be spoken to (short/detailed, playful/serious). Drop one-off details.
 - Track open loops: up to 3 unresolved threads worth asking about later (an upcoming interview, an ongoing conflict, a decision they keep returning to). Each ≤8 words. Drop loops that resolved.

@@ -65,6 +65,13 @@ export const askUserMemories = pgTable("ask_user_memory", {
   turnsSeen: integer("turns_seen").notNull().default(0),
   /** Proactive ask nudges (open-loop follow-ups). One-tap off in the memory panel. */
   nudgesEnabled: boolean("nudges_enabled").notNull().default(true),
+  /**
+   * Cut-off marker for "start a new topic": turns older than this are neither
+   * shown in the thread nor sent to the model, so a fresh subject isn't mixed
+   * with the previous one. The portrait above survives, the chat history
+   * stops being fed in. NULL means the whole history is in play.
+   */
+  topicStartedAt: timestamp("topic_started_at", { withTimezone: true }),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
     .notNull(),

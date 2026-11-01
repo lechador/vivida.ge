@@ -29,8 +29,10 @@ export function inferVerbosity(
 export function buildMemoryBlock(
   memory: AskUserMemory | null,
   locale: UserLocale = "ka",
+  opts: { topicIsolated?: boolean } = {},
 ): string {
   if (!memory) return "";
+  const isolated = opts.topicIsolated === true;
   const parts: string[] = [];
   if (memory.summary.trim())
     parts.push(memory.summary.trim().slice(0, MAX_SUMMARY_CHARS));
@@ -44,14 +46,17 @@ export function buildMemoryBlock(
     );
   if (t.tone)
     traitBits.push(locale === "en" ? `tone: ${t.tone}` : `ტონი: ${t.tone}`);
-  if (t.topics?.length)
+  // A fresh topic keeps the person's durable style but not the story they just
+  // left: recurring topics, short-lived notes and open threads are the parts
+  // that would drag the previous subject into unrelated answers.
+  if (!isolated && t.topics?.length)
     traitBits.push(
       locale === "en"
         ? `recurring topics: ${t.topics.join(", ")}`
         : `მუდმივი თემები: ${t.topics.join(", ")}`,
     );
-  if (t.notes) traitBits.push(t.notes.slice(0, 300));
-  if (t.openLoops?.length) {
+  if (!isolated && t.notes) traitBits.push(t.notes.slice(0, 300));
+  if (!isolated && t.openLoops?.length) {
     traitBits.push(
       locale === "en"
         ? `open threads (gently ask about one at most occasionally, never every message): ${t.openLoops.join("; ")}`
@@ -61,6 +66,11 @@ export function buildMemoryBlock(
   const traitsLine = traitBits.length > 0 ? traitBits.join("; ") : "";
   const body = [...parts, traitsLine].filter(Boolean).join("\n");
   if (!body) return "";
+  if (isolated) {
+    return locale === "en"
+      ? `Background about this person from earlier conversations. They just started a new topic, so use this only to match their tone and level of detail. Do NOT bring up earlier topics, people or open threads unless the person mentions them first:\n${body}`
+      : `ფონური ინფორმაცია ამ ადამიანზე წინა საუბრებიდან. მან ახლახან ახალი თემა დაიწყო, ამიტომ გამოიყენე ეს მხოლოდ ტონისა და დეტალურობის შესაბამისად. არ ახსენო წინა თემები, ადამიანები ან ღია საკითხები, სანამ თავად არ მოიხსენიებს:\n${body}`;
+  }
   return locale === "en"
     ? `What you remember about this person (from earlier conversations, refer back to it naturally, never recite it verbatim):\n${body}`
     : `რას გახსოვს ამ ადამიანზე (წინა საუბრებიდან, გამოიყენე ბუნებრივად, ნუ ჩამოთვლი სიტყვა-სიტყვით):\n${body}`;

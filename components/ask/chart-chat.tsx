@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Brain, Lock, Send, Sparkles, X } from "lucide-react";
+import {
+  Brain,
+  Lock,
+  MessageSquarePlus,
+  Send,
+  Sparkles,
+  X,
+} from "lucide-react";
 
 import { CreditHint } from "@/components/credits/credit-hint";
 import { CREDIT_COST, FREE_ALLOWANCE } from "@/lib/credits-config";
@@ -122,6 +129,31 @@ export function ChartChat({
   const [memory, setMemory] = useState<AskMemoryView | null>(initialMemory);
   const [forgetArmed, setForgetArmed] = useState(false);
   const [forgetting, setForgetting] = useState(false);
+  /** A new topic hides the previous thread; memory (the portrait) is kept. */
+  const [newTopicNote, setNewTopicNote] = useState(false);
+  const [startingTopic, setStartingTopic] = useState(false);
+
+  async function startNewTopic() {
+    if (startingTopic) return;
+    setStartingTopic(true);
+    try {
+      const res = await fetch("/api/ask/new-topic", { method: "POST" });
+      if (!res.ok) throw new Error("new topic failed");
+      setMessages([]);
+      setError(null);
+      setNeedsCredits(false);
+      setFollowUpDismissed(true);
+      setNewTopicNote(true);
+    } catch {
+      setError(
+        en
+          ? "Could not start a new topic. Please try again."
+          : "ახალი თემის დაწყება ვერ მოხერხდა. სცადე ხელახლა.",
+      );
+    } finally {
+      setStartingTopic(false);
+    }
+  }
 
   function pickDepth(d: AskDepth) {
     setDepth(d);
@@ -375,6 +407,13 @@ export function ChartChat({
                 ? "ask anything about your natal chart, personality, emotional patterns, relationships, career, or transit timing."
                 : "დამისვი შეკითხვა შენი რუკის შესახებ: ხასიათი, ემოციები, ურთიერთობები, კარიერა თუ დრო."}
             </p>
+            {newTopicNote && (
+              <p className="mt-2 rounded-sm border border-primary/30 bg-primary/8 px-3 py-2 text-xs leading-relaxed text-foreground/85">
+                {en
+                  ? "New topic started. I still remember what I know about you, but I won't bring up the earlier conversation unless you do."
+                  : "ახალი თემა დაიწყო. რაც შენზე ვიცი, მაინც მახსოვს, მაგრამ წინა საუბარს აღარ ვახსენებ, თუ შენ თვითონ არ მოიხსენიე."}
+              </p>
+            )}
             {/* Two columns on phones as well: four full-width chips are
                 taller than the visible thread on short screens. */}
             <div className="mt-4 grid grid-cols-2 gap-1.5 sm:mt-5 sm:gap-2">
@@ -396,24 +435,25 @@ export function ChartChat({
                   {starter.text}
                 </button>
               ))}
-              {topicStarters.map((topic) => (
-                <button
-                  key={topic.label}
-                  type="button"
-                  onClick={() => {
-                    trackEvent(ANALYTICS_EVENT.recommendationClicked, {
-                      placement: "chart_chat_topic",
-                      destination: "ai_chart_chat",
-                      product: "ai_chart_chat",
-                      recommendation: topic.label,
-                    });
-                    void send(topic.prompt);
-                  }}
-                  className="rounded-sm border border-primary/30 bg-primary/8 px-3 py-2 text-left text-[14px] text-foreground/90 transition-colors hover:bg-primary/15 sm:px-3.5 sm:py-2.5 sm:text-sm"
-                >
-                  {topic.label}
-                </button>
-              ))}
+              {!newTopicNote &&
+                topicStarters.map((topic) => (
+                  <button
+                    key={topic.label}
+                    type="button"
+                    onClick={() => {
+                      trackEvent(ANALYTICS_EVENT.recommendationClicked, {
+                        placement: "chart_chat_topic",
+                        destination: "ai_chart_chat",
+                        product: "ai_chart_chat",
+                        recommendation: topic.label,
+                      });
+                      void send(topic.prompt);
+                    }}
+                    className="rounded-sm border border-primary/30 bg-primary/8 px-3 py-2 text-left text-[14px] text-foreground/90 transition-colors hover:bg-primary/15 sm:px-3.5 sm:py-2.5 sm:text-sm"
+                  >
+                    {topic.label}
+                  </button>
+                ))}
             </div>
           </div>
         )}
@@ -567,7 +607,7 @@ export function ChartChat({
         </div>
       )}
 
-      <div className="mb-1.5 flex shrink-0 items-center justify-between gap-2 sm:mb-2">
+      <div className="mb-1.5 flex shrink-0 flex-wrap items-center justify-between gap-2 sm:mb-2">
         <div
           role="group"
           aria-label={en ? "Answer length" : "პასუხის სიგრძე"}
@@ -589,21 +629,35 @@ export function ChartChat({
             </button>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            setForgetArmed(false);
-            setMemoryOpen((v) => !v);
-          }}
-          aria-expanded={memoryOpen}
-          aria-label={en ? "Memory" : "მეხსიერება"}
-          className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-sm border border-border bg-card px-2.5 py-1.5 text-[12px] text-muted-foreground transition-colors hover:text-foreground sm:px-3"
-        >
-          <Brain className="size-3.5" />
-          <span className="hidden min-[360px]:inline">
-            {en ? "Memory" : "მეხსიერება"}
-          </span>
-        </button>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => {
+              setForgetArmed(false);
+              setMemoryOpen((v) => !v);
+            }}
+            aria-expanded={memoryOpen}
+            aria-label={en ? "Memory" : "მეხსიერება"}
+            className="flex size-8 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-sm border border-border bg-card text-[12px] text-muted-foreground transition-colors hover:text-foreground sm:size-auto sm:px-3 sm:py-1.5"
+          >
+            <Brain className="size-3.5" />
+            <span className="hidden sm:inline">
+              {en ? "Memory" : "მეხსიერება"}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => void startNewTopic()}
+            disabled={startingTopic}
+            aria-label={en ? "Start a new topic" : "ახალი თემა"}
+            className="flex size-8 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-sm border border-border bg-card text-[12px] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50 sm:size-auto sm:px-3 sm:py-1.5"
+          >
+            <MessageSquarePlus className="size-3.5" />
+            <span className="hidden sm:inline">
+              {en ? "New topic" : "ახალი თემა"}
+            </span>
+          </button>
+        </div>
       </div>
 
       {memoryOpen && (

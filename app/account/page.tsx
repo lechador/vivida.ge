@@ -13,6 +13,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { DangerZone } from "@/components/account/danger-zone";
 import { VisibilityCard } from "@/components/account/visibility-card";
+import { PrivacyChoicesCard } from "@/components/account/privacy-choices-card";
 import { GenderCard } from "@/components/account/gender-card";
 import { PhotoUploader } from "@/components/account/photo-uploader";
 import { AiAvatarGenerator } from "@/components/account/ai-avatar-generator";
@@ -358,6 +359,11 @@ export default async function AccountPage() {
             }}
             defaultName={user.name ?? null}
           />
+        </div>
+
+        {/* Privacy / cookie choices (mobile has no floating shield anymore) */}
+        <div className="mb-6">
+          <PrivacyChoicesCard locale={locale} />
         </div>
 
         {/* Birth data */}

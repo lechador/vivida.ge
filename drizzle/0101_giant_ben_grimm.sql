@@ -1,0 +1,1 @@
+ALTER TABLE "ask_user_memory" ADD COLUMN "topic_started_at" timestamp with time zone;

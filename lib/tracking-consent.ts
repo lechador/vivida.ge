@@ -2,6 +2,8 @@ import { isSensitiveTokenPath } from "@/lib/privacy/sensitive-routes";
 
 export const TRACKING_CONSENT_COOKIE = "vivida_tracking_consent";
 export const TRACKING_CONSENT_MAX_AGE_SECONDS = 60 * 60 * 24 * 180;
+/** localStorage mirror of the cookie choice, so a pruned cookie can't re-ask. */
+export const TRACKING_CONSENT_STORAGE_KEY = "vivida_tracking_consent_v1";
 
 export type TrackingConsent = "granted" | "denied" | null;
 
@@ -18,7 +20,25 @@ export function trackingConsentFromCookieString(
 
 export function browserTrackingConsent(): TrackingConsent {
   if (typeof document === "undefined") return null;
-  return trackingConsentFromCookieString(document.cookie);
+  const fromCookie = trackingConsentFromCookieString(document.cookie);
+  if (fromCookie) return fromCookie;
+  // Fallback for browsers that block or prune the cookie: remember the choice
+  // locally too, so the panel does not reappear on every visit.
+  try {
+    const stored = window.localStorage.getItem(TRACKING_CONSENT_STORAGE_KEY);
+    return stored === "granted" || stored === "denied" ? stored : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Mirror a choice into localStorage (cookie is still the primary record). */
+export function rememberTrackingConsent(value: "granted" | "denied"): void {
+  try {
+    window.localStorage.setItem(TRACKING_CONSENT_STORAGE_KEY, value);
+  } catch {
+    /* private mode, the cookie remains the record */
+  }
 }
 
 export function browserTrackingAllowed(): boolean {

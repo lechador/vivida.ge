@@ -9,7 +9,7 @@ import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { InlineBirthDatePrompt } from "@/components/astro/inline-birth-date-prompt";
 import { ChartChat } from "@/components/ask/chart-chat";
 import type { AskMemoryView } from "@/components/ask/chart-chat";
-import { getAskMemory } from "@/lib/ask-memory";
+import { getAskMemory, getAskTopicStart } from "@/lib/ask-memory";
 import { markAskNudgesOpened } from "@/lib/ask-nudges";
 import {
   buildFollowUpQuestion,
@@ -53,6 +53,7 @@ export default async function AskPage({
         id: chartChatMessages.id,
         role: chartChatMessages.role,
         content: chartChatMessages.content,
+        createdAt: chartChatMessages.createdAt,
       })
       .from(chartChatMessages)
       .where(eq(chartChatMessages.userId, user.id))
@@ -85,11 +86,16 @@ export default async function AskPage({
     );
 
   const firstName = user.name?.split(" ")[0] ?? null;
-  const initialMessages = history.map((m) => ({
-    id: m.id,
-    role: m.role === "assistant" ? ("assistant" as const) : ("user" as const),
-    content: m.content,
-  }));
+  // A "new topic" cut-off keeps earlier turns off the thread; the memory
+  // portrait is separate and survives it.
+  const topicStartedAt = await getAskTopicStart(user.id).catch(() => null);
+  const initialMessages = history
+    .filter((m) => !topicStartedAt || m.createdAt >= topicStartedAt)
+    .map((m) => ({
+      id: m.id,
+      role: m.role === "assistant" ? ("assistant" as const) : ("user" as const),
+      content: m.content,
+    }));
   const premium = await isPremiumUser(user.id);
 
   const storedMemory = await getAskMemory(user.id).catch(() => null);
