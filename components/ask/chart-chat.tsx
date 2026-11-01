@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Brain,
   Lock,
   MessageSquarePlus,
+  MessagesSquare,
   Send,
   Sparkles,
   X,
@@ -67,6 +69,14 @@ export type AskMemoryView = {
   nudgesEnabled: boolean;
 };
 
+/** One switchable topic in the conversation list. */
+export type AskConversationView = {
+  id: string;
+  title: string;
+  /** Pre-formatted relative label ("დღეს", "გუშინ", "3 მარ"). */
+  when: string;
+};
+
 /** Device-level answer-depth preference (mirrors the server default "auto"). */
 const DEPTH_KEY = "vivida_ask_depth_v1";
 /** Preserves an unanswered question across checkout when a user hits 402. */
@@ -83,6 +93,9 @@ export function ChartChat({
   followUp = null,
   topicStarters = [],
   initialMemory = null,
+  conversations = [],
+  activeConversationId = null,
+  isNewTopic = false,
 }: {
   initialMessages: Msg[];
   initialStarter?: ChartStarterId;
@@ -96,6 +109,12 @@ export function ChartChat({
   topicStarters?: TopicStarter[];
   /** Transparency snapshot of what the model remembers (null when nothing). */
   initialMemory?: AskMemoryView | null;
+  /** Switchable topics, newest activity first. */
+  conversations?: AskConversationView[];
+  /** The conversation rendered on screen (null before the first one exists). */
+  activeConversationId?: string | null;
+  /** The active conversation is a fresh topic with no turns yet. */
+  isNewTopic?: boolean;
 }) {
   const en = locale !== "ka";
   const starters = chartStarterOptions(locale);
@@ -103,25 +122,40 @@ export function ChartChat({
     ? { auto: "Auto", short: "Brief", detailed: "Detailed" }
     : { auto: "ავტო", short: "მოკლედ", detailed: "დეტალურად" };
   const [messages, setMessages] = useState<Msg[]>(initialMessages);
-  const [input, setInput] = useState(() => {
-    if (initialStarter) return chartStarterText(initialStarter, locale);
-    if (typeof window === "undefined") return "";
-    try {
-      return window.sessionStorage.getItem(PENDING_QUESTION_KEY) ?? "";
-    } catch {
-      return "";
-    }
-  });
+  // Both composer values start from the server-safe defaults so hydration is
+  // clean; the device-local draft/depth are applied right after mount below.
+  const [input, setInput] = useState(() =>
+    initialStarter ? chartStarterText(initialStarter, locale) : "",
+  );
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Tracked separately from the message so the 402 branch can also offer
   // the standard invite/top-up CTA, like every other credit gate.
   const [needsCredits, setNeedsCredits] = useState(false);
-  const [depth, setDepth] = useState<AskDepth>(() =>
-    typeof window === "undefined"
-      ? "auto"
-      : normalizeAskDepth(window.localStorage.getItem(DEPTH_KEY)),
-  );
+  const [depth, setDepth] = useState<AskDepth>("auto");
+
+  useEffect(() => {
+    // Restore a question parked by the paywall, and the last depth choice.
+    // Storage is read one tick later, together with applying the state, so the
+    // server HTML and the first client render agree (and a remount is safe).
+    const timer = setTimeout(() => {
+      try {
+        const pending = window.sessionStorage.getItem(PENDING_QUESTION_KEY);
+        if (pending) {
+          window.sessionStorage.removeItem(PENDING_QUESTION_KEY);
+          if (!initialStarter) setInput((current) => current || pending);
+        }
+      } catch {
+        /* sessionStorage unavailable */
+      }
+      try {
+        setDepth(normalizeAskDepth(window.localStorage.getItem(DEPTH_KEY)));
+      } catch {
+        /* localStorage unavailable */
+      }
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [initialStarter]);
   /** Proactive follow-up chip is dismissible per open. */
   const [followUpDismissed, setFollowUpDismissed] = useState(false);
   /** Transparency panel: what the model remembers + forget button. */
@@ -129,21 +163,34 @@ export function ChartChat({
   const [memory, setMemory] = useState<AskMemoryView | null>(initialMemory);
   const [forgetArmed, setForgetArmed] = useState(false);
   const [forgetting, setForgetting] = useState(false);
-  /** A new topic hides the previous thread; memory (the portrait) is kept. */
-  const [newTopicNote, setNewTopicNote] = useState(false);
+  const router = useRouter();
+  /** Which conversation this thread writes into (server may create one). */
+  const [conversationId, setConversationId] = useState<string | null>(
+    activeConversationId,
+  );
+  const [conversationsOpen, setConversationsOpen] = useState(false);
   const [startingTopic, setStartingTopic] = useState(false);
+
+  /** Switch to another saved topic; the URL carries the choice across reloads. */
+  function openConversation(id: string) {
+    setConversationsOpen(false);
+    if (id === conversationId) return;
+    router.push(`/ask?c=${encodeURIComponent(id)}`);
+  }
 
   async function startNewTopic() {
     if (startingTopic) return;
     setStartingTopic(true);
     try {
-      const res = await fetch("/api/ask/new-topic", { method: "POST" });
+      const res = await fetch("/api/ask/conversations", { method: "POST" });
       if (!res.ok) throw new Error("new topic failed");
-      setMessages([]);
-      setError(null);
-      setNeedsCredits(false);
-      setFollowUpDismissed(true);
-      setNewTopicNote(true);
+      const data = (await res.json().catch(() => ({}))) as {
+        conversation?: { id?: string };
+      };
+      const id = data.conversation?.id;
+      if (!id) throw new Error("missing conversation id");
+      setConversationsOpen(false);
+      router.push(`/ask?c=${encodeURIComponent(id)}`);
     } catch {
       setError(
         en
@@ -217,11 +264,6 @@ export function ChartChat({
       openedRef.current = true;
       el.scrollTop = el.scrollHeight;
     }
-    try {
-      window.sessionStorage.removeItem(PENDING_QUESTION_KEY);
-    } catch {
-      /* sessionStorage unavailable */
-    }
   }, []);
 
   // New turns glide to the bottom, unless the reader scrolled up to read.
@@ -274,7 +316,11 @@ export function ChartChat({
       const res = await fetch("/api/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: msg, depth }),
+        body: JSON.stringify({
+          message: msg,
+          depth,
+          conversationId: conversationId ?? undefined,
+        }),
       });
       if (!res.ok || !res.body) {
         const data = await res.json().catch(() => ({}));
@@ -311,6 +357,8 @@ export function ChartChat({
         return;
       }
       const assistantId = res.headers.get("x-message-id");
+      const servedConversationId = res.headers.get("x-conversation-id");
+      if (servedConversationId) setConversationId(servedConversationId);
       if (assistantId) {
         setMessages((prev) => {
           const copy = [...prev];
@@ -407,11 +455,11 @@ export function ChartChat({
                 ? "ask anything about your natal chart, personality, emotional patterns, relationships, career, or transit timing."
                 : "დამისვი შეკითხვა შენი რუკის შესახებ: ხასიათი, ემოციები, ურთიერთობები, კარიერა თუ დრო."}
             </p>
-            {newTopicNote && (
+            {isNewTopic && (
               <p className="mt-2 rounded-sm border border-primary/30 bg-primary/8 px-3 py-2 text-xs leading-relaxed text-foreground/85">
                 {en
-                  ? "New topic started. I still remember what I know about you, but I won't bring up the earlier conversation unless you do."
-                  : "ახალი თემა დაიწყო. რაც შენზე ვიცი, მაინც მახსოვს, მაგრამ წინა საუბარს აღარ ვახსენებ, თუ შენ თვითონ არ მოიხსენიე."}
+                  ? "New topic started. Earlier conversations are saved, you can switch back anytime. I still remember what I know about you, but I won't bring up the other thread unless you do."
+                  : "ახალი თემა დაიწყო. წინა საუბრები შენახულია და ნებისმიერ დროს შეგიძლია დაუბრუნდე. რაც შენზე ვიცი, მაინც მახსოვს, მაგრამ სხვა საუბარს აღარ ვახსენებ, თუ შენ თვითონ არ მოიხსენიე."}
               </p>
             )}
             {/* Two columns on phones as well: four full-width chips are
@@ -435,7 +483,7 @@ export function ChartChat({
                   {starter.text}
                 </button>
               ))}
-              {!newTopicNote &&
+              {!isNewTopic &&
                 topicStarters.map((topic) => (
                   <button
                     key={topic.label}
@@ -633,7 +681,23 @@ export function ChartChat({
           <button
             type="button"
             onClick={() => {
+              setMemoryOpen(false);
+              setConversationsOpen((v) => !v);
+            }}
+            aria-expanded={conversationsOpen}
+            aria-label={en ? "Conversations" : "საუბრები"}
+            className="flex size-8 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-sm border border-border bg-card text-[12px] text-muted-foreground transition-colors hover:text-foreground sm:size-auto sm:px-3 sm:py-1.5"
+          >
+            <MessagesSquare className="size-3.5" />
+            <span className="hidden sm:inline">
+              {en ? "Conversations" : "საუბრები"}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
               setForgetArmed(false);
+              setConversationsOpen(false);
               setMemoryOpen((v) => !v);
             }}
             aria-expanded={memoryOpen}
@@ -659,6 +723,49 @@ export function ChartChat({
           </button>
         </div>
       </div>
+
+      {conversationsOpen && (
+        <div className="chat-scroll mb-2 max-h-[38dvh] shrink-0 overflow-y-auto rounded-md border border-border bg-card sm:max-h-[45dvh]">
+          <p className="px-3.5 pt-3 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+            {en ? "Your conversations" : "შენი საუბრები"}
+          </p>
+          {conversations.length === 0 ? (
+            <p className="px-3.5 py-3 text-[13px] text-muted-foreground">
+              {en
+                ? "No conversations yet. Ask your first question."
+                : "ჯერ საუბარი არ გაქვს. დასვი პირველი კითხვა."}
+            </p>
+          ) : (
+            <ul className="mt-1 divide-y divide-border">
+              {conversations.map((conversation) => {
+                const active = conversation.id === conversationId;
+                return (
+                  <li key={conversation.id}>
+                    <button
+                      type="button"
+                      onClick={() => openConversation(conversation.id)}
+                      aria-current={active ? "true" : undefined}
+                      className={`flex w-full items-center gap-3 px-3.5 py-2.5 text-left text-[13px] transition-colors ${
+                        active
+                          ? "bg-primary/10 text-foreground"
+                          : "text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
+                      }`}
+                    >
+                      <span className="min-w-0 flex-1 truncate">
+                        {conversation.title ||
+                          (en ? "New topic" : "ახალი თემა")}
+                      </span>
+                      <span className="shrink-0 font-mono text-[11px] tabular-nums text-muted-foreground">
+                        {conversation.when}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      )}
 
       {memoryOpen && (
         <div className="chat-scroll mb-2 max-h-[38dvh] shrink-0 overflow-y-auto rounded-md border border-border bg-card p-3.5 text-[13px] leading-relaxed sm:max-h-[45dvh]">

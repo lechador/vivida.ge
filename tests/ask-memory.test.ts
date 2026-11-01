@@ -61,7 +61,6 @@ describe("ask memory", () => {
         },
         turnsSeen: 10,
         nudgesEnabled: true,
-        topicStartedAt: null,
         updatedAt: new Date(),
       },
       "ka",
@@ -84,7 +83,6 @@ describe("ask memory", () => {
       },
       turnsSeen: 10,
       nudgesEnabled: true,
-      topicStartedAt: new Date(),
       updatedAt: new Date(),
     };
     const block = buildMemoryBlock(memory, "ka", { topicIsolated: true });

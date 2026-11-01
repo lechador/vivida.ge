@@ -14,9 +14,45 @@ import type { MbtiScoresJson } from "./archive";
 import { users } from "./users";
 
 /**
- * "Chat with your chart" (ჰკითხე ვარსკვლავებს), one ongoing thread per user.
- * Each row is a turn; `role` is 'user' | 'assistant'. The AI is grounded in
- * the user's natal chart at request time (not stored per message).
+ * One conversation ("topic") in "chat with your chart". Users can keep several
+ * and switch between them; each message row points at its conversation. The
+ * rolling memory portrait is per user, not per conversation.
+ */
+export const askConversations = pgTable(
+  "ask_conversation",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** First question, truncated; empty until the first turn lands. */
+    title: text("title").notNull().default(""),
+    /**
+     * True for conversations started via "new topic": the memory portrait is
+     * injected as background only (no earlier topics/open loops), so a fresh
+     * subject is not mixed with the previous one. Backfilled history is false.
+     */
+    isolatedMemory: boolean("isolated_memory").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    /** Bumped on every turn; drives the conversation switcher's ordering. */
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("ask_conversation_user_updated_idx").on(t.userId, t.updatedAt)],
+);
+
+export type AskConversation = typeof askConversations.$inferSelect;
+
+/**
+ * "Chat with your chart" (ჰკითხე ვარსკვლავებს) turns. Each row is a turn;
+ * `role` is 'user' | 'assistant'. The AI is grounded in the user's natal chart
+ * at request time (not stored per message). `conversationId` groups turns into
+ * switchable topics; NULL only on rows written before conversations existed.
  */
 export const chartChatMessages = pgTable(
   "chart_chat_message",
@@ -27,6 +63,10 @@ export const chartChatMessages = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    conversationId: text("conversation_id").references(
+      () => askConversations.id,
+      { onDelete: "cascade" },
+    ),
     /** 'user' | 'assistant' */
     role: text("role").notNull(),
     content: text("content").notNull(),
@@ -34,7 +74,13 @@ export const chartChatMessages = pgTable(
       .defaultNow()
       .notNull(),
   },
-  (t) => [index("chart_chat_user_created_idx").on(t.userId, t.createdAt)],
+  (t) => [
+    index("chart_chat_user_created_idx").on(t.userId, t.createdAt),
+    index("chart_chat_conversation_created_idx").on(
+      t.conversationId,
+      t.createdAt,
+    ),
+  ],
 );
 
 export type ChartChatMessage = typeof chartChatMessages.$inferSelect;
@@ -65,13 +111,6 @@ export const askUserMemories = pgTable("ask_user_memory", {
   turnsSeen: integer("turns_seen").notNull().default(0),
   /** Proactive ask nudges (open-loop follow-ups). One-tap off in the memory panel. */
   nudgesEnabled: boolean("nudges_enabled").notNull().default(true),
-  /**
-   * Cut-off marker for "start a new topic": turns older than this are neither
-   * shown in the thread nor sent to the model, so a fresh subject isn't mixed
-   * with the previous one. The portrait above survives, the chat history
-   * stops being fed in. NULL means the whole history is in play.
-   */
-  topicStartedAt: timestamp("topic_started_at", { withTimezone: true }),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
     .notNull(),

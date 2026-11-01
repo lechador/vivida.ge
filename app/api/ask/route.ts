@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, sql } from "drizzle-orm";
+import { desc, eq, and, sql } from "drizzle-orm";
 import { after } from "next/server";
 
 import { auth } from "@/auth";
@@ -26,11 +26,14 @@ import {
   buildMemoryBlock,
   detectDistress,
   getAskMemory,
-  getAskTopicStart,
   inferVerbosity,
   normalizeAskDepth,
   refreshAskMemory,
 } from "@/lib/ask-memory";
+import {
+  resolveConversation,
+  touchAskConversation,
+} from "@/lib/ask-conversations";
 import {
   isOpenRouterConfigured,
   streamChatCompletion,
@@ -76,6 +79,7 @@ export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as {
     message?: unknown;
     depth?: unknown;
+    conversationId?: unknown;
   };
   const message = typeof body.message === "string" ? body.message.trim() : "";
   const depth = normalizeAskDepth(body.depth);
@@ -95,12 +99,22 @@ export async function POST(req: Request) {
   const locale = await getUserLocale(userId);
   // Long-term memory: rolling portrait (PK lookup, free). Never fails the request.
   const storedMemory = await getAskMemory(userId).catch(() => null);
-  // "New topic" cut-off: older turns are neither shown nor sent to the model.
-  const topicStartedAt = await getAskTopicStart(userId).catch(() => null);
-  const topicIsolated = topicStartedAt !== null;
+  // The turn belongs to one conversation; a valid id switches topics, an
+  // unknown one is a client bug (never silently write into another thread).
+  const conversationIdIn =
+    typeof body.conversationId === "string" && body.conversationId.trim()
+      ? body.conversationId.trim()
+      : null;
+  const resolved = await resolveConversation(userId, conversationIdIn);
+  if (!resolved) {
+    return Response.json({ error: "conversation_not_found" }, { status: 404 });
+  }
+  const conversation = resolved.conversation;
+  // "New topic" conversations inject the portrait as background only, so the
+  // previous subject is not dragged in unless the user raises it.
+  const topicIsolated = conversation.isolatedMemory;
 
-  // Recent history (oldest→newest) for conversational continuity, limited to
-  // the topic the user is currently on.
+  // Recent history (oldest→newest) of THIS conversation for continuity.
   const history = (
     await db
       .select({
@@ -109,12 +123,10 @@ export async function POST(req: Request) {
       })
       .from(chartChatMessages)
       .where(
-        topicStartedAt
-          ? and(
-              eq(chartChatMessages.userId, userId),
-              gte(chartChatMessages.createdAt, topicStartedAt),
-            )
-          : eq(chartChatMessages.userId, userId),
+        and(
+          eq(chartChatMessages.userId, userId),
+          eq(chartChatMessages.conversationId, conversation.id),
+        ),
       )
       .orderBy(desc(chartChatMessages.createdAt))
       .limit(HISTORY_LIMIT)
@@ -145,9 +157,14 @@ export async function POST(req: Request) {
   }
 
   // Persist the user's turn before we stream the answer.
-  await db
-    .insert(chartChatMessages)
-    .values({ userId, role: "user", content: message });
+  await db.insert(chartChatMessages).values({
+    userId,
+    conversationId: conversation.id,
+    role: "user",
+    content: message,
+  });
+  // First turn sets the switcher label; every turn bumps activity ordering.
+  await touchAskConversation(conversation.id, message).catch(() => {});
 
   // System prompt: chart grounding + long-term memory + style mirroring.
   // Stored portrait wins; for newcomers (no portrait yet) infer verbosity
@@ -261,6 +278,7 @@ export async function POST(req: Request) {
             .values({
               id: assistantMessageId,
               userId,
+              conversationId: conversation.id,
               role: "assistant",
               content: full,
             })
@@ -304,6 +322,7 @@ export async function POST(req: Request) {
       "Cache-Control": "no-cache, no-transform",
       "X-Accel-Buffering": "no",
       "X-Message-Id": assistantMessageId,
+      "X-Conversation-Id": conversation.id,
     },
   });
 }

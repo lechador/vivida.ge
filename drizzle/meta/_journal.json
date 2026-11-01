@@ -715,6 +715,13 @@
       "when": 1793568977325,
       "tag": "0101_giant_ben_grimm",
       "breakpoints": true
+    },
+    {
+      "idx": 102,
+      "version": "7",
+      "when": 1793569849825,
+      "tag": "0102_confused_exodus",
+      "breakpoints": true
     }
   ]
 }

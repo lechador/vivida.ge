@@ -1,7 +1,7 @@
-import { asc, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { charts, chartChatMessages, profiles } from "@/db/schema";
+import { charts, profiles } from "@/db/schema";
 import { requireUser } from "@/lib/auth-helpers";
 import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
@@ -9,7 +9,13 @@ import { AstroLockedMain } from "@/components/astro/astro-locked-main";
 import { InlineBirthDatePrompt } from "@/components/astro/inline-birth-date-prompt";
 import { ChartChat } from "@/components/ask/chart-chat";
 import type { AskMemoryView } from "@/components/ask/chart-chat";
-import { getAskMemory, getAskTopicStart } from "@/lib/ask-memory";
+import { getAskMemory } from "@/lib/ask-memory";
+import {
+  getAskConversation,
+  getConversationMessages,
+  listAskConversations,
+} from "@/lib/ask-conversations";
+import { conversationWhen } from "@/lib/ask-conversations-pure";
 import { markAskNudgesOpened } from "@/lib/ask-nudges";
 import {
   buildFollowUpQuestion,
@@ -30,14 +36,14 @@ export const dynamic = "force-dynamic";
 export default async function AskPage({
   searchParams,
 }: {
-  searchParams: Promise<{ starter?: string }>;
+  searchParams: Promise<{ starter?: string; c?: string }>;
 }) {
   const user = await requireUser("/ask");
-  const { starter } = await searchParams;
+  const { starter, c: conversationParam } = await searchParams;
   const locale = await getUserLocale(user.id);
   const en = locale !== "ka";
 
-  const [[chart], [profile], history] = await Promise.all([
+  const [[chart], [profile], conversations] = await Promise.all([
     db
       .select({ userId: charts.userId })
       .from(charts)
@@ -48,17 +54,7 @@ export default async function AskPage({
       .from(profiles)
       .where(eq(profiles.userId, user.id))
       .limit(1),
-    db
-      .select({
-        id: chartChatMessages.id,
-        role: chartChatMessages.role,
-        content: chartChatMessages.content,
-        createdAt: chartChatMessages.createdAt,
-      })
-      .from(chartChatMessages)
-      .where(eq(chartChatMessages.userId, user.id))
-      .orderBy(asc(chartChatMessages.createdAt))
-      .limit(50),
+    listAskConversations(user.id),
   ]);
 
   if (!chart)
@@ -86,16 +82,30 @@ export default async function AskPage({
     );
 
   const firstName = user.name?.split(" ")[0] ?? null;
-  // A "new topic" cut-off keeps earlier turns off the thread; the memory
-  // portrait is separate and survives it.
-  const topicStartedAt = await getAskTopicStart(user.id).catch(() => null);
-  const initialMessages = history
-    .filter((m) => !topicStartedAt || m.createdAt >= topicStartedAt)
-    .map((m) => ({
-      id: m.id,
-      role: m.role === "assistant" ? ("assistant" as const) : ("user" as const),
-      content: m.content,
-    }));
+  // Conversations are switchable topics; `?c=<id>` keeps the selected one
+  // across reloads. An id that is not the caller's falls back to the newest.
+  const requested = conversationParam
+    ? await getAskConversation(user.id, conversationParam).catch(() => null)
+    : null;
+  const active =
+    requested ??
+    (conversations[0]
+      ? await getAskConversation(user.id, conversations[0].id).catch(() => null)
+      : null);
+  const turns = active
+    ? await getConversationMessages(user.id, active.id).catch(() => [])
+    : [];
+  const initialMessages = turns.map((m) => ({
+    id: m.id,
+    role: m.role === "assistant" ? ("assistant" as const) : ("user" as const),
+    content: m.content,
+  }));
+  const now = new Date();
+  const conversationList = conversations.map((conversation) => ({
+    id: conversation.id,
+    title: conversation.title,
+    when: conversationWhen(conversation.updatedAt, now, locale),
+  }));
   const premium = await isPremiumUser(user.id);
 
   const storedMemory = await getAskMemory(user.id).catch(() => null);
@@ -166,11 +176,17 @@ export default async function AskPage({
         </header>
 
         <ChartChat
+          key={active?.id ?? "new"}
           initialMessages={initialMessages}
           initialStarter={normalizeChartStarter(starter)}
           firstName={firstName}
           locale={locale}
           premium={premium}
+          conversations={conversationList}
+          activeConversationId={active?.id ?? null}
+          isNewTopic={Boolean(
+            active?.isolatedMemory && initialMessages.length === 0,
+          )}
           followUp={followUp}
           topicStarters={topicStarters}
           initialMemory={initialMemory}
