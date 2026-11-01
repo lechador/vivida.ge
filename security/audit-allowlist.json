@@ -1,0 +1,11 @@
+{
+  "$comment": "Accepted production-dependency advisories for scripts/audit-prod.mjs. Each entry needs a reason, the package it applies to, and an expiry date. See README.md (npm run audit:prod).",
+  "entries": [
+    {
+      "id": "GHSA-mrhx-c7xc-m3w5",
+      "package": "zod",
+      "reason": "Zod <4.6.6 can exhaust memory while validating oversized constrained collections. Fixed only in zod 4.6.6+, but the crypto/wallet SDKs (Privy, appkit, WalletConnect, x402, Coinbase CDP) pin zod 3.x, and zod ships no 3.x patch. Our own schemas run on zod 4.6.7; the remaining 3.x copies sit inside client-side wallet SDKs parsing RPC payloads, so the exposure is a user-tab DoS and not remote input into server actions. Revisit when the wallet SDKs move to zod 4 or a 3.x fix ships.",
+      "expires": "2027-02-01"
+    }
+  ]
+}
