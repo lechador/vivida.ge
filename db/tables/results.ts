@@ -355,3 +355,51 @@ export const surveyResponses = pgTable(
 );
 
 export type SurveyResponseRow = typeof surveyResponses.$inferSelect;
+
+/**
+ * Per-answer feedback on AI output (👍/👎 + one short reason), one row per
+ * (user, surface, target). `surface` is 'ask' | 'tarot' | 'tarot_followup';
+ * `targetKey` identifies the answer inside that surface (chart_chat_message
+ * id, library_entry id, or `library_entry id:followup index`). No answer
+ * text is stored here, only the vote, so aggregates stay non-identifying.
+ * Re-voting upserts the same row.
+ */
+export const answerFeedback = pgTable(
+  "answer_feedback",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** 'ask' | 'tarot' | 'tarot_followup' (validated in lib/answer-feedback-pure). */
+    surface: text("surface").notNull(),
+    /** Which answer was rated, scoped by `surface`. */
+    targetKey: text("target_key").notNull(),
+    /** 'up' | 'down'. */
+    rating: text("rating").notNull(),
+    /** Down-vote reason: no_answer | incorrect | unclear | cut_off. */
+    reason: text("reason"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    uniqueIndex("answer_feedback_user_surface_target_uq").on(
+      t.userId,
+      t.surface,
+      t.targetKey,
+    ),
+    index("answer_feedback_surface_rating_idx").on(
+      t.surface,
+      t.rating,
+      t.reason,
+    ),
+  ],
+);
+
+export type AnswerFeedbackRow = typeof answerFeedback.$inferSelect;

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Brain, Lock, Send, Sparkles, X } from "lucide-react";
 
 import { CreditHint } from "@/components/credits/credit-hint";
+import { CREDIT_COST, FREE_ALLOWANCE } from "@/lib/credits-config";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import {
   normalizeAskDepth,
@@ -22,8 +23,14 @@ import {
   SynastryResultCard,
 } from "@/components/ask/synastry-cards";
 import { splitMarkers } from "@/lib/ask-synastry-pure";
+import { AnswerFeedback } from "@/components/feedback/answer-feedback";
 
-type Msg = { role: "user" | "assistant"; content: string };
+type Msg = {
+  /** chart_chat_message id (assistant turns), the feedback target. */
+  id?: string;
+  role: "user" | "assistant";
+  content: string;
+};
 
 /** Client-side composer cap, mirrors MAX_MESSAGE_LEN in app/api/ask/route.ts. */
 export const CHAT_MAX_INPUT_LEN = 4000;
@@ -160,7 +167,7 @@ export function ChartChat({
   }
   const [creditShortfall, setCreditShortfall] = useState({
     balance: 0,
-    cost: 2,
+    cost: CREDIT_COST.chat,
   });
   const listRef = useRef<HTMLDivElement>(null);
   const composerRef = useRef<HTMLTextAreaElement>(null);
@@ -255,7 +262,7 @@ export function ChartChat({
           }
           setCreditShortfall({
             balance: typeof data.balance === "number" ? data.balance : 0,
-            cost: typeof data.cost === "number" ? data.cost : 2,
+            cost: typeof data.cost === "number" ? data.cost : CREDIT_COST.chat,
           });
           trackEvent(ANALYTICS_EVENT.insufficientCredits, {
             product: "ai_chart_chat",
@@ -270,6 +277,15 @@ export function ChartChat({
         }
         setMessages((prev) => prev.slice(0, -1)); // drop empty assistant bubble
         return;
+      }
+      const assistantId = res.headers.get("x-message-id");
+      if (assistantId) {
+        setMessages((prev) => {
+          const copy = [...prev];
+          const last = copy[copy.length - 1];
+          if (last) copy[copy.length - 1] = { ...last, id: assistantId };
+          return copy;
+        });
       }
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -453,6 +469,15 @@ export function ChartChat({
                     <TypingDots />
                   </div>
                 )}
+                {m.id &&
+                  m.content &&
+                  !(sending && i === messages.length - 1) && (
+                    <AnswerFeedback
+                      surface="ask"
+                      targetKey={m.id}
+                      locale={locale}
+                    />
+                  )}
               </div>
             </div>
           ),
@@ -714,8 +739,8 @@ export function ChartChat({
           {!premium && (
             <CreditHint>
               {en
-                ? "2 free questions per day, then −2 credits"
-                : "დღეში 2 უფასო შეკითხვა, შემდეგ −2 კრედიტი"}
+                ? `${FREE_ALLOWANCE.chatPerDay} free question${FREE_ALLOWANCE.chatPerDay === 1 ? "" : "s"} per day, then −${CREDIT_COST.chat} credits`
+                : `დღეში ${FREE_ALLOWANCE.chatPerDay} უფასო შეკითხვა, შემდეგ −${CREDIT_COST.chat} კრედიტი`}
             </CreditHint>
           )}
         </div>

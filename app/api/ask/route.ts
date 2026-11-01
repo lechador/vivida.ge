@@ -189,6 +189,9 @@ export async function POST(req: Request) {
   ];
 
   const encoder = new TextEncoder();
+  // Pre-generated so the client can attach per-answer feedback to the exact
+  // persisted turn (returned as X-Message-Id below).
+  const assistantMessageId = crypto.randomUUID();
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       // `full` is what the user saw and what is persisted; the synastry
@@ -243,7 +246,12 @@ export async function POST(req: Request) {
         if (full.trim()) {
           const assistantMessages = await db
             .insert(chartChatMessages)
-            .values({ userId, role: "assistant", content: full })
+            .values({
+              id: assistantMessageId,
+              userId,
+              role: "assistant",
+              content: full,
+            })
             .returning({
               id: chartChatMessages.id,
               createdAt: chartChatMessages.createdAt,
@@ -283,6 +291,7 @@ export async function POST(req: Request) {
       "Content-Type": "text/plain; charset=utf-8",
       "Cache-Control": "no-cache, no-transform",
       "X-Accel-Buffering": "no",
+      "X-Message-Id": assistantMessageId,
     },
   });
 }

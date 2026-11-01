@@ -42,6 +42,7 @@ import {
 } from "@/lib/tarot/pending-question";
 import { normalizeTarotFollowupSuggestions } from "@/lib/tarot/followup-suggestions";
 import { ContextualPaywallActions } from "@/components/billing/contextual-paywall-actions";
+import { AnswerFeedback } from "@/components/feedback/answer-feedback";
 
 type SpreadCard = {
   slug: string;
@@ -523,6 +524,13 @@ export function TarotReader({
             <p className="mt-1.5 text-sm leading-relaxed text-foreground/90">
               {followup.answer}
             </p>
+            {reading.libraryId && (
+              <AnswerFeedback
+                surface="tarot_followup"
+                targetKey={`${reading.libraryId}:${index}`}
+                locale={locale}
+              />
+            )}
           </div>
         ))}
 
@@ -908,6 +916,13 @@ export function TarotReader({
                 <Sparkles className="mt-0.5 size-4 shrink-0" />
                 {reading.advice}
               </p>
+            )}
+            {reading.libraryId && (
+              <AnswerFeedback
+                surface="tarot"
+                targetKey={reading.libraryId}
+                locale={locale}
+              />
             )}
           </div>
 

@@ -50,6 +50,7 @@ export default async function AskPage({
       .limit(1),
     db
       .select({
+        id: chartChatMessages.id,
         role: chartChatMessages.role,
         content: chartChatMessages.content,
       })
@@ -85,6 +86,7 @@ export default async function AskPage({
 
   const firstName = user.name?.split(" ")[0] ?? null;
   const initialMessages = history.map((m) => ({
+    id: m.id,
     role: m.role === "assistant" ? ("assistant" as const) : ("user" as const),
     content: m.content,
   }));

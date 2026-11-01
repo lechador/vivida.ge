@@ -95,6 +95,7 @@ export const ANALYTICS_EVENT = {
   moonSectionSelected: "moon_section_selected",
   publicNextLinkSelected: "public_next_link_selected",
   contentFeedback: "content_feedback",
+  answerFeedback: "answer_feedback",
   onboardingResultViewed: "onboarding_result_viewed",
   navItemSelected: "nav_item_selected",
   emptyStateSeen: "empty_state_seen",
