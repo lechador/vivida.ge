@@ -2,13 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import {
-  ArrowRight,
-  CreditCard,
-  Crown,
-  Loader2,
-  Plus,
-} from "lucide-react";
+import { ArrowRight, CreditCard, Crown, Loader2, Plus } from "lucide-react";
 
 import {
   creditPacksForCountry,
@@ -16,7 +10,6 @@ import {
   formatBillingAmount,
   shouldShowPurchasePromotion,
 } from "@/lib/credits-config";
-import { USDC_CREDIT_PACKS, USDC_PREMIUM_PASS } from "@/lib/crypto-config";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import {
   DropdownMenu,
@@ -33,13 +26,11 @@ export function CreditBalanceMenu({
   locale,
   isPremium = false,
   countryCode,
-  crypto = false,
 }: {
   balance: number;
   locale: UserLocale;
   isPremium?: boolean;
   countryCode?: string | null;
-  crypto?: boolean;
 }) {
   const [pending, setPending] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
@@ -49,9 +40,7 @@ export function CreditBalanceMenu({
     credits: number;
     amountMinor: number;
     currency: string;
-  }[] = crypto
-    ? USDC_CREDIT_PACKS.map((pack) => ({ ...pack, currency: "usdc" }))
-    : creditPacksForCountry(countryCode);
+  }[] = creditPacksForCountry(countryCode);
   const featuredPro = featuredPremiumPlanForCountry(countryCode);
   const proMonths = featuredPro.intervalCount ?? 1;
 
@@ -155,15 +144,7 @@ export function CreditBalanceMenu({
                 </span>
               </>
             );
-            return crypto ? (
-              <Link
-                key={pack.id}
-                href={`/credits?pack=${pack.id}&product=header_menu`}
-                className={cardClass}
-              >
-                {cardBody}
-              </Link>
-            ) : (
+            return (
               <button
                 key={pack.id}
                 type="button"
@@ -187,15 +168,13 @@ export function CreditBalanceMenu({
             </span>
             <span className="min-w-0 flex-1">
               <span className="block text-xs font-semibold text-foreground">
-                {crypto
-                  ? "Vivida PRO · 30-day pass"
-                  : proMonths > 1
-                    ? en
-                      ? `${proMonths} months of Vivida PRO`
-                      : `${proMonths} თვე Vivida PRO`
-                    : en
-                      ? "Unlimited with PRO"
-                      : "ულიმიტო წვდომა PRO-თი"}
+                {proMonths > 1
+                  ? en
+                    ? `${proMonths} months of Vivida PRO`
+                    : `${proMonths} თვე Vivida PRO`
+                  : en
+                    ? "Unlimited with PRO"
+                    : "ულიმიტო წვდომა PRO-თი"}
               </span>
               <span className="block text-[10px] text-muted-foreground">
                 {en
@@ -205,29 +184,21 @@ export function CreditBalanceMenu({
             </span>
             <span className="shrink-0 text-right font-mono tabular-nums">
               <span className="block text-xs font-semibold text-primary">
-                {crypto
-                  ? formatBillingAmount(
-                      USDC_PREMIUM_PASS.amountMinor,
-                      "usdc",
-                      locale,
-                    )
-                  : formatBillingAmount(
-                      featuredPro.amountMinor,
-                      featuredPro.currency,
-                      locale,
-                    )}
+                {formatBillingAmount(
+                  featuredPro.amountMinor,
+                  featuredPro.currency,
+                  locale,
+                )}
               </span>
               <span className="block text-[9px] text-muted-foreground">
                 /
-                {crypto
-                  ? "30 days"
-                  : proMonths > 1
-                    ? en
-                      ? `${proMonths} mo`
-                      : `${proMonths} თვე`
-                    : en
-                      ? "mo"
-                      : "თვე"}
+                {proMonths > 1
+                  ? en
+                    ? `${proMonths} mo`
+                    : `${proMonths} თვე`
+                  : en
+                    ? "mo"
+                    : "თვე"}
               </span>
             </span>
             <ArrowRight className="size-3.5 shrink-0 text-primary" />

@@ -166,7 +166,6 @@ export default async function ReportPage({
                 locale={locale}
                 countryCode={userPrefs?.countryCode}
                 premium={premium}
-                crypto={cryptoPay}
               />
             </Suspense>
           </section>
@@ -182,7 +181,7 @@ export default async function ReportPage({
               <PremiumPlanCard
                 plan={premiumPlanForCountry("GB")!}
                 locale="en"
-                crypto={cryptoPay}
+                cryptoAvailable={cryptoPay}
               />
             </div>
           )}

@@ -7,43 +7,68 @@ import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
+import {
+  DEFAULT_OG_IMAGE,
+  ENGLISH_SITE_URL,
+  GEORGIAN_SITE_URL,
+  localizedAlternates,
+} from "@/lib/seo/locales";
 
-const SITE_URL = "https://www.vivida.ge";
 const PATH = "/mijachvulobis-testi";
-const TITLE = "მიჯაჭვულობის სტილის ტესტი, როგორ გიყვარს?";
-const DESCRIPTION =
+const TITLE_KA = "მიჯაჭვულობის სტილის ტესტი, როგორ გიყვარს?";
+const DESCRIPTION_KA =
   "გაიარე მიჯაჭვულობის 24-კითხვიანი ტესტი ქართულად. გაიგე შენი სტილი, უსაფრთხო, შფოთიანი, აცილებადი თუ შიშით-აცილებადი, და მიიღე პერსონალური განმარტება ურთიერთობებისთვის.";
+const TITLE_EN = "Attachment Style Test, How Do You Love?";
+const DESCRIPTION_EN =
+  "Take the free 24-question attachment style test. Discover whether your style is secure, anxious, avoidant, or fearful-avoidant, and get a personal guide for your relationships.";
 
-export const metadata: Metadata = {
-  title: { absolute: TITLE + ", Vivida" },
-  description: DESCRIPTION,
-  keywords: [
-    "მიჯაჭვულობის ტესტი",
-    "მიჯაჭვულობის სტილი",
-    "attachment test ქართულად",
-    "შფოთიანი მიჯაჭვულობა",
-    "აცილებადი მიჯაჭვულობა",
-    "ფსიქოლოგიური ტესტი ქართულად",
-    "ურთიერთობის ტესტი",
-  ],
-  alternates: { canonical: SITE_URL + PATH },
-  openGraph: {
-    type: "website",
-    url: SITE_URL + PATH,
-    title: TITLE,
-    description: DESCRIPTION,
-    siteName: "Vivida",
-    locale: "ka_GE",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: TITLE,
-    description: DESCRIPTION,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  const en = locale === "en";
+  const title = (en ? TITLE_EN : TITLE_KA) + ", Vivida";
+  const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
+  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  return {
+    title: { absolute: title },
+    description,
+    keywords: en
+      ? [
+          "attachment style test",
+          "attachment theory quiz",
+          "anxious attachment test",
+          "avoidant attachment test",
+          "relationship attachment quiz",
+        ]
+      : [
+          "მიჯაჭვულობის ტესტი",
+          "მიჯაჭვულობის სტილი",
+          "attachment test ქართულად",
+          "შფოთიანი მიჯაჭვულობა",
+          "აცილებადი მიჯაჭვულობა",
+          "ფსიქოლოგიური ტესტი ქართულად",
+          "ურთიერთობის ტესტი",
+        ],
+    alternates: localizedAlternates(PATH, PATH, en ? "en" : "ka"),
+    openGraph: {
+      images: [DEFAULT_OG_IMAGE],
+      type: "website",
+      url: `${siteUrl}${PATH}`,
+      title,
+      description,
+      siteName: "Vivida",
+      locale: en ? "en_US" : "ka_GE",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
 
-const FAQ = [
+const FAQ_KA = [
   {
     q: "რას ზომავს მიჯაჭვულობის ტესტი?",
     a: "ის ზომავს ორ განზომილებას: შფოთს (მიტოვების შიში, დადასტურების საჭიროება) და აცილებას (სიახლოვის დისკომფორტი, დამოუკიდებლობისკენ მიდრეკილება). ამ ორის კომბინაცია ოთხ სტილს იძლევა, უსაფრთხო, შფოთიანი, აცილებადი და შიშით-აცილებადი.",
@@ -62,35 +87,62 @@ const FAQ = [
   },
 ];
 
+const FAQ_EN = [
+  {
+    q: "What does the attachment test measure?",
+    a: "It measures two dimensions: anxiety (fear of abandonment, need for reassurance) and avoidance (discomfort with closeness, pull toward independence). Their combination gives four styles: secure, anxious, avoidant, and fearful-avoidant.",
+  },
+  {
+    q: "How is the result calculated?",
+    a: "Of the 24 statements, 12 measure anxiety and 12 measure avoidance. Each is scored from 1 to 5, some reverse-keyed. Each axis is normalized to 0–100, and your style is determined by the quadrant of the map.",
+  },
+  {
+    q: "Is this a psychological diagnosis?",
+    a: "No. The test is for self-reflection and understanding relationships. Attachment style is not a verdict — it shifts with life experience and bends toward security with conscious work.",
+  },
+  {
+    q: "Are my answers stored?",
+    a: "No. Your answers and result are computed right in your browser, never sent to Vivida's servers, and disappear when you refresh the page.",
+  },
+];
+
 export default async function AttachmentTestPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
+  const locale = await getRequestLocale();
+  const en = locale === "en";
+  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
+  const faq = en ? FAQ_EN : FAQ_KA;
   const ld = [
     {
       "@context": "https://schema.org",
       "@type": "Quiz",
-      name: "მიჯაჭვულობის სტილის ტესტი ქართულად",
-      description: DESCRIPTION,
-      inLanguage: "ka-GE",
-      url: SITE_URL + PATH,
+      name: en ? "Attachment Style Test" : "მიჯაჭვულობის სტილის ტესტი ქართულად",
+      description,
+      inLanguage: en ? "en" : "ka-GE",
+      url: `${siteUrl}${PATH}`,
       numberOfQuestions: 24,
       about: {
         "@type": "Thing",
-        name: "მიჯაჭვულობის სტილი",
+        name: en ? "Attachment style" : "მიჯაჭვულობის სტილი",
         alternateName: "Attachment style",
       },
     },
     breadcrumbLd([
-      { name: "მთავარი", url: SITE_URL },
-      { name: "ტესტები", url: SITE_URL + "/tests" },
-      { name: "მიჯაჭვულობის ტესტი", url: SITE_URL + PATH },
+      { name: en ? "Home" : "მთავარი", url: siteUrl },
+      { name: en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
+      {
+        name: en ? "Attachment Test" : "მიჯაჭვულობის ტესტი",
+        url: `${siteUrl}${PATH}`,
+      },
     ]),
-    faqLd(FAQ),
+    faqLd(faq),
   ];
 
   return (
     <main
-      lang="ka"
+      lang={locale}
       className="relative isolate flex min-h-screen flex-col overflow-hidden"
     >
       <div
@@ -106,7 +158,7 @@ export default async function AttachmentTestPage() {
       {authed ? (
         <AppHeader authed active="tests" />
       ) : (
-        <SmartHeader active="tests" />
+        <SmartHeader active="tests" locale={locale} georgianPath={PATH} />
       )}
 
       <section className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 pb-12 pt-5 sm:px-6 sm:pb-16 sm:pt-8">
@@ -115,94 +167,97 @@ export default async function AttachmentTestPage() {
             Vivida · Attachment Style Test
           </div>
           <h1 className="mt-1 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-            როგორ{" "}
+            {en ? "How do " : "როგორ"}{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-pink),var(--vivida-violet),var(--vivida-cyan))] bg-clip-text text-transparent">
-              გიყვარს?
+              {en ? "you love?" : "გიყვარს?"}
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-lg text-pretty text-sm leading-relaxed text-foreground/75 sm:text-base">
-            უპასუხე 24 მოკლე დებულებას და გაიგე შენი მიჯაჭვულობის სტილი, რატომ
-            ღელავ, რატომ დისტანცირდები და რა სჭირდება შენს ურთიერთობას.
+            {en
+              ? "Answer 24 short statements and discover your attachment style — why you worry, why you pull away, and what your relationships need."
+              : "უპასუხე 24 მოკლე დებულებას და გაიგე შენი მიჯაჭვულობის სტილი, რატომ ღელავ, რატომ დისტანცირდები და რა სჭირდება შენს ურთიერთობას."}
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1.5">
               <FileCheck2 className="size-3.5" />
-              24 კითხვა
+              {en ? "24 questions" : "24 კითხვა"}
             </span>
             <span className="inline-flex items-center gap-1.5">
               <Clock className="size-3.5" />
-              დაახლოებით 5 წუთი
+              {en ? "About 5 minutes" : "დაახლოებით 5 წუთი"}
             </span>
             <span className="inline-flex items-center gap-1.5">
               <ShieldCheck className="size-3.5" />
-              პასუხები არ ინახება
+              {en ? "Answers never stored" : "პასუხები არ ინახება"}
             </span>
           </div>
         </header>
 
-        <AttachmentTest />
+        <AttachmentTest locale={locale} />
       </section>
 
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-24 sm:px-6">
         <div className="rounded-3xl border border-border bg-card/40 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-xl font-semibold tracking-tight">
-            ოთხი სტილი მოკლედ
+            {en ? "The four styles in brief" : "ოთხი სტილი მოკლედ"}
           </h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <article className="rounded-2xl border border-border bg-background/30 p-4">
               <h3 className="text-sm font-semibold text-[var(--vivida-cyan)]">
-                ⚓ უსაფრთხო
+                ⚓ {en ? "Secure" : "უსაფრთხო"}
               </h3>
               <p className="mt-1.5 text-sm leading-relaxed text-foreground/80">
-                სიახლოვეც კომფორტულია და დამოუკიდებლობაც. კონფლიქტი პრობლემაა და
-                არა კატასტროფა.
+                {en
+                  ? "Both closeness and independence feel comfortable. Conflict is a problem, not a catastrophe."
+                  : "სიახლოვეც კომფორტულია და დამოუკიდებლობაც. კონფლიქტი პრობლემაა და არა კატასტროფა."}
               </p>
             </article>
             <article className="rounded-2xl border border-border bg-background/30 p-4">
               <h3 className="text-sm font-semibold text-[var(--vivida-pink)]">
-                🌊 შფოთიანი
+                🌊 {en ? "Anxious" : "შფოთიანი"}
               </h3>
               <p className="mt-1.5 text-sm leading-relaxed text-foreground/80">
-                კავშირი ძალიან მნიშვნელოვანია, ამიტომ დისტანცია მტკივნეულად
-                აღიქმება და დადასტურებაა საჭირო.
+                {en
+                  ? "Connection matters enormously, so distance hurts and reassurance is needed."
+                  : "კავშირი ძალიან მნიშვნელოვანია, ამიტომ დისტანცია მტკივნეულად აღიქმება და დადასტურებაა საჭირო."}
               </p>
             </article>
             <article className="rounded-2xl border border-border bg-background/30 p-4">
               <h3 className="text-sm font-semibold text-[oklch(0.82_0.16_85)]">
-                🏔️ აცილებადი
+                🏔️ {en ? "Avoidant" : "აცილებადი"}
               </h3>
               <p className="mt-1.5 text-sm leading-relaxed text-foreground/80">
-                დამოუკიდებლობა ძვირფასია, გადაჭარბებული სიახლოვე კი წნეხად
-                აღიქმება და სივრცეა საჭირო.
+                {en
+                  ? "Independence is precious; too much closeness feels like pressure, and space is needed."
+                  : "დამოუკიდებლობა ძვირფასია, გადაჭარბებული სიახლოვე კი წნეხად აღიქმება და სივრცეა საჭირო."}
               </p>
             </article>
             <article className="rounded-2xl border border-border bg-background/30 p-4">
               <h3 className="text-sm font-semibold text-[var(--vivida-violet)]">
-                🌗 შიშით-აცილებადი
+                🌗 {en ? "Fearful-avoidant" : "შიშით-აცილებადი"}
               </h3>
               <p className="mt-1.5 text-sm leading-relaxed text-foreground/80">
-                სიახლოვეც გინდა და გეშინია კიდეც, საქანელა მონატრებასა და
-                მოშორებას შორის.
+                {en
+                  ? "You want closeness and fear it too — a swing between missing and pulling away."
+                  : "სიახლოვეც გინდა და გეშინია კიდეც, საქანელა მონატრებასა და მოშორებას შორის."}
               </p>
             </article>
           </div>
 
           <h2 className="mt-7 text-xl font-semibold tracking-tight">
-            როგორ ითვლება ქულა?
+            {en ? "How is it scored?" : "როგორ ითვლება ქულა?"}
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            12 პუნქტი შფოთს ზომავს, 12, აცილებას. თითოეული 1–5 ქულაა, ნაწილი
-            შებრუნებულად ითვლება. თითო ღერძი 0–100-ზე ნორმდება, სტილი კი
-            კვადრანტით განისაზღვრება: ორივე 50-ზე დაბლა, უსაფრთხო; შფოთი 50-ზე
-            მაღლა, შფოთიანი; აცილება 50-ზე მაღლა, აცილებადი; ორივე მაღლა,
-            შიშით-აცილებადი.
+            {en
+              ? "Twelve items measure anxiety, twelve measure avoidance. Each scores 1–5, some reverse-keyed. Each axis is normalized to 0–100, and the style follows from the quadrant: both below 50, secure; anxiety above 50, anxious; avoidance above 50, avoidant; both high, fearful-avoidant."
+              : "12 პუნქტი შფოთს ზომავს, 12, აცილებას. თითოეული 1–5 ქულაა, ნაწილი შებრუნებულად ითვლება. თითო ღერძი 0–100-ზე ნორმდება, სტილი კი კვადრანტით განისაზღვრება: ორივე 50-ზე დაბლა, უსაფრთხო; შფოთი 50-ზე მაღლა, შფოთიანი; აცილება 50-ზე მაღლა, აცილებადი; ორივე მაღლა, შიშით-აცილებადი."}
           </p>
 
           <h2 className="mt-8 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            ხშირად დასმული კითხვები
+            {en ? "Frequently asked questions" : "ხშირად დასმული კითხვები"}
           </h2>
           <div className="mt-4 space-y-3">
-            {FAQ.map((item) => (
+            {faq.map((item) => (
               <details
                 key={item.q}
                 className="group rounded-2xl border border-border bg-background/30"

@@ -129,8 +129,8 @@ export default async function CreditsPage({
   // interface preference (an English-preference account on vivida.ge keeps
   // the card; a Georgian-preference account on vividaastro.com hides it).
   const hostEn = (await getRequestLocale()) === "en";
-  // English host pays by card (Stripe checkout is disabled there); the
-  // Georgian site keeps its Stripe surfaces untouched.
+  // Stripe is primary on both hosts; the English host additionally offers
+  // the USDC crypto rail as an alternative. KA never sees it.
   const cryptoPay = (await requestIsEnglishHost()) && isCryptoPayConfigured();
   const [
     balance,
@@ -208,7 +208,7 @@ export default async function CreditsPage({
               returnTo={returnTo}
               product={product}
               selectedPackId={selectedPackId}
-              crypto={cryptoPay}
+              cryptoAvailable={cryptoPay}
             />
           </div>
 
@@ -225,15 +225,6 @@ export default async function CreditsPage({
               </span>
               <span aria-hidden>→</span>
             </Link>
-          ) : showPurchasePromotions && cryptoPay ? (
-            <div id="pro-plan" className="mt-4 scroll-mt-20">
-              <PremiumPlanCard
-                plan={premiumPlan}
-                locale={locale}
-                placement="credits_hub"
-                crypto
-              />
-            </div>
           ) : showPurchasePromotions && offer ? (
             // The offer replaces the standard PRO card rather than sitting beside
             // it: two prices for the same thing is a reason to hesitate.
@@ -259,6 +250,7 @@ export default async function CreditsPage({
                 plan={premiumPlan}
                 locale={locale}
                 placement="credits_hub"
+                cryptoAvailable={cryptoPay}
               />
             </div>
           ) : null}
@@ -272,7 +264,6 @@ export default async function CreditsPage({
                 creditHref="#credit-packs"
                 proHref="#pro-plan"
                 balance={balance}
-                crypto={cryptoPay}
               />
             </div>
           )}

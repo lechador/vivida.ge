@@ -22,13 +22,11 @@ export async function ReportPdfPanel({
   locale = "ka",
   countryCode,
   premium = false,
-  crypto = false,
 }: {
   userId: string;
   locale?: UserLocale;
   countryCode?: string | null;
   premium?: boolean;
-  crypto?: boolean;
 }) {
   const en = locale !== "ka";
   const [report] = await db
@@ -141,7 +139,6 @@ export async function ReportPdfPanel({
           context="natal_report"
           compact
           balance={balance}
-          crypto={crypto}
         />
       )}
     </div>

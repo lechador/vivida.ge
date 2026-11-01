@@ -91,8 +91,8 @@ export default async function SubscriptionPage({
     getPremiumSubscription(user.id),
     isPremiumUser(user.id),
   ]);
-  // English host pays by card (Stripe checkout is off there); the Georgian
-  // site keeps its Stripe surfaces untouched.
+  // Stripe is primary on both hosts; the English host additionally offers
+  // a one-time USDC PRO pass as an alternative. KA never sees it.
   const cryptoPay = (await requestIsEnglishHost()) && isCryptoPayConfigured();
   const plan = premiumPlanForCountry(identity?.countryCode);
   const country = countryDisplayName(identity?.countryCode, locale);
@@ -271,7 +271,7 @@ export default async function SubscriptionPage({
                     placement="subscription_page_reactivation"
                     returnTo={returnTo}
                     product={product}
-                    crypto={cryptoPay}
+                    cryptoAvailable={cryptoPay}
                   />
                 </div>
               )}
@@ -314,7 +314,7 @@ export default async function SubscriptionPage({
               placement="subscription_page"
               returnTo={returnTo}
               product={product}
-              crypto={cryptoPay}
+              cryptoAvailable={cryptoPay}
             />
           )}
         </section>

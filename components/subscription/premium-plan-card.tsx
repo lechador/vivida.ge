@@ -38,7 +38,7 @@ export function PremiumPlanCard({
   placement = "premium_plan_card",
   returnTo,
   product,
-  crypto = false,
+  cryptoAvailable = false,
 }: {
   plan: PremiumPlan;
   locale: UserLocale;
@@ -46,8 +46,8 @@ export function PremiumPlanCard({
   placement?: string;
   returnTo?: string | null;
   product?: string | null;
-  /** English site: one-time card pass instead of a Stripe subscription. */
-  crypto?: boolean;
+  /** English site only: USDC 30-day pass as an alternative below Stripe. */
+  cryptoAvailable?: boolean;
 }) {
   const en = locale !== "ka";
   const [pending, setPending] = useState(false);
@@ -140,57 +140,6 @@ export function PremiumPlanCard({
     }
     setError(true);
     setPending(false);
-  }
-
-  // English site: crypto cannot auto-renew, so the card sells a one-time
-  // 30-day pass paid by card, no plan toggles, no renewal promise.
-  if (crypto && !active) {
-    return (
-      <section className="relative overflow-hidden rounded-3xl border border-[var(--vivida-gold)]/35 bg-gradient-to-br from-[var(--vivida-gold)]/14 via-card/70 to-[var(--vivida-violet)]/12 p-6 ring-1 ring-foreground/5 sm:p-8">
-        <div
-          aria-hidden
-          className="absolute -right-16 -top-20 size-56 rounded-full bg-[var(--vivida-gold)]/15 blur-3xl"
-        />
-        <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
-              <Crown className="size-4" /> Vivida PRO
-            </div>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-              Everything, without credit limits
-            </h2>
-            <ul className="mt-4 space-y-2 text-sm text-foreground/80">
-              {FEATURES_EN.map((feature) => (
-                <li key={feature} className="flex items-start gap-2">
-                  <Check className="mt-0.5 size-4 shrink-0 text-[var(--vivida-cyan)]" />
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="shrink-0 rounded-2xl border border-[var(--vivida-gold)]/25 bg-background/35 p-4 text-center sm:min-w-56">
-            <div className="text-3xl font-bold tracking-tight">
-              {formatBillingAmount(USDC_PREMIUM_PASS.amountMinor, "usdc", "en")}
-            </div>
-            <div className="text-xs text-muted-foreground">30-day pass</div>
-            <PayByCardButton
-              kind="premium_pass"
-              days={USDC_PREMIUM_PASS.days}
-              amountUsdcCents={USDC_PREMIUM_PASS.amountMinor}
-              product={product}
-              returnTo={returnTo}
-              className="mt-3 w-full"
-            >
-              Get 30 days of PRO
-            </PayByCardButton>
-            <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
-              One-time card payment. No auto-renewal, buy another pass whenever
-              you like.
-            </p>
-          </div>
-        </div>
-      </section>
-    );
   }
 
   return (
@@ -318,6 +267,29 @@ export function PremiumPlanCard({
                   ? "Renews automatically each month. Cancel anytime."
                   : "ყოველთვიურად ავტომატურად განახლდება. გაუქმება ნებისმიერ დროს შეგიძლია."}
             </p>
+          )}
+          {cryptoAvailable && !active && (
+            <div className="mt-4 border-t border-[var(--vivida-gold)]/20 pt-3">
+              <p className="text-[11px] text-muted-foreground">
+                Prefer crypto? One-time 30-day PRO pass, no auto-renewal:
+              </p>
+              <PayByCardButton
+                kind="premium_pass"
+                days={USDC_PREMIUM_PASS.days}
+                amountUsdcCents={USDC_PREMIUM_PASS.amountMinor}
+                product={product}
+                returnTo={returnTo}
+                variant="outline"
+                className="mt-2 w-full"
+              >
+                {formatBillingAmount(
+                  USDC_PREMIUM_PASS.amountMinor,
+                  "usdc",
+                  "en",
+                )}{" "}
+                USDC · 30 days
+              </PayByCardButton>
+            </div>
           )}
         </div>
       </div>

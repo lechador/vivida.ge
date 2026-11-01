@@ -105,8 +105,8 @@ export function ContextualPaywallActions({
    * One-tap Stripe Checkout for the priced pack, so the paywall no longer
    * detours through the credits hub (that hop was where most buyers left).
    * Any refusal or failure falls back to the hub with the pack preselected,
-   * never a dead button: `crypto_only` on the English host, a failed session,
-   * or no URL all land the user on a working payment surface.
+   * never a dead button: a failed session or no URL lands the user on a
+   * working payment surface.
    */
   async function startDirectCheckout(chosenPack: CreditPack = offer.pack) {
     if (pendingPackId) return;

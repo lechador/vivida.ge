@@ -2,11 +2,7 @@ import Link from "next/link";
 import { FileText, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  getRequestLocale,
-  requestIsEnglishHost,
-} from "@/lib/i18n/request-locale";
-import { isCryptoPayConfigured } from "@/lib/crypto-pay";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { CreditsVsPro } from "@/components/billing/credits-vs-pro";
 import { auth } from "@/auth";
 import { getBalance } from "@/lib/credits";
@@ -20,12 +16,7 @@ import { shouldShowPurchasePromotion } from "@/lib/billing-config";
  * are not repeatedly marketed to while reading public content.
  */
 export async function ReportPromo({ className }: { className?: string }) {
-  const [locale, session, hostEn] = await Promise.all([
-    getRequestLocale(),
-    auth(),
-    requestIsEnglishHost(),
-  ]);
-  const cryptoPay = hostEn && isCryptoPayConfigured();
+  const [locale, session] = await Promise.all([getRequestLocale(), auth()]);
   const userId = session?.user?.id;
   const [balance, premium] = userId
     ? await Promise.all([getBalance(userId), isPremiumUser(userId)])
@@ -86,7 +77,6 @@ export async function ReportPromo({ className }: { className?: string }) {
             compact
             balance={balance}
             isPremium={premium}
-            crypto={cryptoPay}
             experimentEnabled={Boolean(userId)}
           />
         </div>

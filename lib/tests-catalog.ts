@@ -70,7 +70,6 @@ export const TESTS: TestCatalogEntry[] = [
     metaKa: "10 კითხვა · ~2 წუთი · უფასო",
     metaEn: "10 questions · about 2 minutes · free",
     available: true,
-    locales: ["ka"],
   },
   {
     slug: "big-five",
@@ -119,7 +118,6 @@ export const TESTS: TestCatalogEntry[] = [
     metaKa: "24 კითხვა · ~5 წუთი · უფასო",
     metaEn: "24 questions · about 5 minutes · free",
     available: true,
-    locales: ["ka"],
   },
   {
     slug: "true-sign",

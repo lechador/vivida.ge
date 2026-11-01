@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  ATTACHMENT_OPTIONS,
   ATTACHMENT_QUESTIONS,
   type AttachmentQuestion,
 } from "@/lib/attachment/questions";
@@ -8,6 +9,7 @@ import {
   attachmentStyleFor,
   calculateAttachment,
   scoreAttachmentItem,
+  type AttachmentStyleKey,
 } from "@/lib/attachment/scoring";
 
 const straight = { reverse: false } as Pick<AttachmentQuestion, "reverse">;
@@ -100,4 +102,72 @@ describe("attachment scoring", () => {
     expect(result.partnerTipsKa.length).toBeGreaterThan(0);
     expect(result.nextStepsKa.length).toBeGreaterThan(0);
   });
+
+  it("has non-empty English text for all 24 questions", () => {
+    for (const q of ATTACHMENT_QUESTIONS) {
+      expect(q.textEn.trim().length).toBeGreaterThan(0);
+    }
+  });
+
+  it("has non-empty English labels for all answer options", () => {
+    expect(ATTACHMENT_OPTIONS).toHaveLength(5);
+    for (const option of ATTACHMENT_OPTIONS) {
+      expect(option.labelEn.trim().length).toBeGreaterThan(0);
+    }
+  });
+
+  it("returns full English content for every style", () => {
+    const styles: AttachmentStyleKey[] = [
+      "secure",
+      "anxious",
+      "avoidant",
+      "fearful",
+    ];
+    for (const style of styles) {
+      const result = calculateAttachment(answersForStyle(style));
+      expect(result.style).toBe(style);
+      expect(result.labelEn.length).toBeGreaterThan(3);
+      expect(result.summaryEn.length).toBeGreaterThan(50);
+      expect(result.strengthsEn.length).toBeGreaterThan(0);
+      expect(result.growthEn.length).toBeGreaterThan(0);
+      for (const card of [...result.strengthsEn, ...result.growthEn]) {
+        expect(card.title.length).toBeGreaterThan(2);
+        expect(card.text.length).toBeGreaterThan(20);
+      }
+      expect(result.partnerTipsEn.length).toBeGreaterThan(0);
+      expect(result.nextStepsEn.length).toBeGreaterThan(0);
+      for (const tip of [...result.partnerTipsEn, ...result.nextStepsEn]) {
+        expect(tip.length).toBeGreaterThan(20);
+      }
+    }
+  });
+
+  it("scores the same numbers in both languages", () => {
+    const anxious = calculateAttachment(answersForStyle("anxious"));
+    expect(anxious.anxiety).toBe(100);
+    expect(anxious.avoidance).toBe(0);
+    const avoidant = calculateAttachment(answersForStyle("avoidant"));
+    expect(avoidant.anxiety).toBe(0);
+    expect(avoidant.avoidance).toBe(100);
+    const secure = calculateAttachment(answersForStyle("secure"));
+    expect(secure.anxiety).toBe(0);
+    expect(secure.avoidance).toBe(0);
+    expect(secure.lean).toBe(false);
+  });
 });
+
+function answersForStyle(style: AttachmentStyleKey): Record<number, number> {
+  return Object.fromEntries(
+    ATTACHMENT_QUESTIONS.map((q) => {
+      const high =
+        style === "secure"
+          ? false
+          : style === "fearful"
+            ? true
+            : style === "anxious"
+              ? q.axis === "anxiety"
+              : q.axis === "avoidance";
+      return [q.id, high ? (q.reverse ? 1 : 5) : q.reverse ? 5 : 1];
+    }),
+  );
+}

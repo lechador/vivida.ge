@@ -18,9 +18,10 @@ import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
- * Credit top-up, Stripe Checkout on the Georgian site; on the English site
- * (`crypto`) a pack opens the card payment dialog instead, and the server
- * verifies the on-chain transfer before awarding the credits.
+ * Credit top-up. Stripe Checkout is the primary rail on both sites; on the
+ * English site (`cryptoAvailable`) the USDC packs ride below as an
+ * alternative, and the server verifies the on-chain transfer before
+ * awarding those credits.
  */
 export function TopUpCard({
   locale,
@@ -30,7 +31,7 @@ export function TopUpCard({
   returnTo,
   product,
   selectedPackId,
-  crypto = false,
+  cryptoAvailable = false,
 }: {
   locale: UserLocale;
   countryCode?: string | null;
@@ -39,8 +40,8 @@ export function TopUpCard({
   returnTo?: string | null;
   product?: string | null;
   selectedPackId?: "xs" | "s" | "m" | "l" | null;
-  /** English site: pay by card (Stripe is off there). */
-  crypto?: boolean;
+  /** English site only: show the USDC packs as an alternative below Stripe. */
+  cryptoAvailable?: boolean;
 }) {
   const en = locale !== "ka";
   const packs: readonly {
@@ -48,10 +49,8 @@ export function TopUpCard({
     credits: number;
     amountMinor: number;
     currency: string;
-  }[] = crypto
-    ? USDC_CREDIT_PACKS.map((pack) => ({ ...pack, currency: "usdc" }))
-    : creditPacksForCountry(countryCode);
-  const impulsePack = crypto ? null : impulsePackForCountry(countryCode);
+  }[] = creditPacksForCountry(countryCode);
+  const impulsePack = impulsePackForCountry(countryCode);
   const [pending, setPending] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const deficit =
@@ -168,11 +167,7 @@ export function TopUpCard({
         </div>
         <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
           <Check className="size-3.5 text-[var(--vivida-cyan)]" />
-          {crypto
-            ? "Pay by card"
-            : en
-              ? "Secure one-time payment"
-              : "ერთჯერადი უსაფრთხო გადახდა"}
+          {en ? "Secure one-time payment" : "ერთჯერადი უსაფრთხო გადახდა"}
         </span>
       </div>
       <h2 className="mt-2 text-xl font-semibold tracking-tight">
@@ -306,21 +301,7 @@ export function TopUpCard({
               </div>
             </>
           );
-          return crypto ? (
-            <PayByCardButton
-              key={p.id}
-              kind="credits"
-              packId={p.id}
-              credits={p.credits}
-              amountUsdcCents={p.amountMinor}
-              product={product}
-              returnTo={returnTo}
-              variant="ghost"
-              className={cardClass}
-            >
-              {cardBody}
-            </PayByCardButton>
-          ) : (
+          return (
             <button
               key={p.id}
               type="button"
@@ -334,12 +315,39 @@ export function TopUpCard({
         })}
       </div>
       <p className="mt-3 text-center text-xs text-muted-foreground">
-        {crypto
-          ? "Select a pack to pay by card."
-          : en
-            ? "Select a pack to continue to secure checkout."
-            : "ღილაკზე დაჭერით პირდაპირ გადახდაზე გადახვალ."}
+        {en
+          ? "Select a pack to continue to secure checkout."
+          : "ღილაკზე დაჭერით პირდაპირ გადახდაზე გადახვალ."}
       </p>
+      {cryptoAvailable && (
+        <div className="mt-5 border-t border-border/60 pt-4">
+          <p className="text-center text-xs text-muted-foreground">
+            Prefer crypto? Pay with USDC instead:
+          </p>
+          <div className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
+            {USDC_CREDIT_PACKS.map((pack) => (
+              <PayByCardButton
+                key={pack.id}
+                kind="credits"
+                packId={pack.id}
+                credits={pack.credits}
+                amountUsdcCents={pack.amountMinor}
+                product={product}
+                returnTo={returnTo}
+                variant="outline"
+                className="h-auto min-w-0 flex-col gap-0.5 px-2 py-3"
+              >
+                <span className="text-sm font-semibold tabular-nums">
+                  {pack.credits} credits
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {formatBillingAmount(pack.amountMinor, "usdc", locale)} USDC
+                </span>
+              </PayByCardButton>
+            ))}
+          </div>
+        </div>
+      )}
       {error && (
         <p role="alert" className="mt-2 text-center text-xs text-destructive">
           {error}

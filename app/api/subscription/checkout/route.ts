@@ -7,8 +7,6 @@ import {
 } from "@/lib/billing-config";
 import { getBillingIdentity, isPremiumUser } from "@/lib/premium";
 import { createPremiumCheckoutSession, isStripeConfigured } from "@/lib/stripe";
-import { requestHostIsEnglish } from "@/lib/i18n/request-locale";
-import { isCryptoPayConfigured } from "@/lib/crypto-pay";
 import {
   checkoutTrackingFromRequest,
   checkoutTrackingMetadata,
@@ -27,13 +25,9 @@ export async function POST(req: Request) {
   const userId = session?.user?.id;
   if (!userId)
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  // The English site pays in USDC on Solana (the crypto rail); Stripe
-  // checkout exists only on the Georgian site, but only once the crypto
-  // rail is actually configured, so a half-rolled-out deploy never leaves
-  // the English site with no working payment path.
-  if (requestHostIsEnglish(req) && isCryptoPayConfigured()) {
-    return NextResponse.json({ error: "crypto_only" }, { status: 403 });
-  }
+  // Stripe is the primary rail on BOTH hosts. The English host additionally
+  // offers a one-time USDC PRO pass (see /api/crypto/checkout); it no longer
+  // replaces the Stripe subscription there.
   if (!isStripeConfigured()) {
     return NextResponse.json({ error: "unavailable" }, { status: 503 });
   }

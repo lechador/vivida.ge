@@ -22,9 +22,11 @@ import {
   calculateRosenberg,
   type RosenbergResult,
 } from "@/lib/rosenberg/scoring";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 import { cn } from "@/lib/utils";
 
-export function RosenbergTest() {
+export function RosenbergTest({ locale = "ka" }: { locale?: UserLocale }) {
+  const en = locale === "en";
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [index, setIndex] = useState(0);
   const [result, setResult] = useState<RosenbergResult | null>(null);
@@ -104,20 +106,22 @@ export function RosenbergTest() {
                   <div className="text-4xl font-bold tabular-nums">
                     {result.score}
                   </div>
-                  <div className="text-xs text-muted-foreground">30-დან</div>
+                  <div className="text-xs text-muted-foreground">
+                    {en ? "of 30" : "30-დან"}
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className="min-w-0 text-center sm:text-left">
               <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                შენი შედეგი
+                {en ? "Your result" : "შენი შედეგი"}
               </div>
               <h2 className="mt-1 text-balance text-2xl font-semibold tracking-tight">
-                {result.labelKa}
+                {en ? result.labelEn : result.labelKa}
               </h2>
               <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-                {result.summaryKa}
+                {en ? result.summaryEn : result.summaryKa}
               </p>
             </div>
           </div>
@@ -126,10 +130,14 @@ export function RosenbergTest() {
         {result.strengths.length > 0 && (
           <ResultSection
             icon={<Check className="size-4" />}
-            eyebrow="რაც შენს პასუხებში საყრდენად ჩანს"
+            eyebrow={
+              en
+                ? "What reads as a strength in your answers"
+                : "რაც შენს პასუხებში საყრდენად ჩანს"
+            }
             items={result.strengths.map((item) => ({
-              title: item.themeKa,
-              text: item.strengthKa,
+              title: en ? item.themeEn : item.themeKa,
+              text: en ? item.strengthEn : item.strengthKa,
             }))}
             accent="var(--vivida-cyan)"
           />
@@ -138,10 +146,14 @@ export function RosenbergTest() {
         {result.reflections.length > 0 && (
           <ResultSection
             icon={<Heart className="size-4" />}
-            eyebrow="სად შეიძლება მეტი ყურადღება გამოგადგეს"
+            eyebrow={
+              en
+                ? "Where a little more attention may help"
+                : "სად შეიძლება მეტი ყურადღება გამოგადგეს"
+            }
             items={result.reflections.map((item) => ({
-              title: item.themeKa,
-              text: item.reflectionKa,
+              title: en ? item.themeEn : item.themeKa,
+              text: en ? item.reflectionEn : item.reflectionKa,
             }))}
             accent="var(--vivida-pink)"
           />
@@ -150,10 +162,10 @@ export function RosenbergTest() {
         <section className="rounded-3xl border border-border bg-card/50 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
           <div className="flex items-center gap-2 text-sm font-semibold">
             <Sparkles className="size-4 text-[var(--vivida-violet)]" />
-            ერთი პრაქტიკული ნაბიჯი
+            {en ? "One practical step" : "ერთი პრაქტიკული ნაბიჯი"}
           </div>
           <ul className="mt-4 space-y-3">
-            {result.nextStepsKa.map((step) => (
+            {(en ? result.nextStepsEn : result.nextStepsKa).map((step) => (
               <li
                 key={step}
                 className="flex gap-3 text-sm leading-relaxed text-foreground/85"
@@ -173,19 +185,20 @@ export function RosenbergTest() {
             className="gap-1.5"
           >
             <RotateCcw className="size-4" />
-            თავიდან გავლა
+            {en ? "Retake" : "თავიდან გავლა"}
           </Button>
           <Button asChild variant="ghost">
             <Link href="/tests">
-              სხვა ტესტები <ArrowRight className="size-4" />
+              {en ? "More tests" : "სხვა ტესტები"}{" "}
+              <ArrowRight className="size-4" />
             </Link>
           </Button>
         </div>
 
         <p className="mx-auto max-w-xl text-center text-xs leading-relaxed text-muted-foreground">
-          0–14, 15–25 და 26–30 დიაპაზონები მხოლოდ შედეგის გასაგებად
-          წარმოდგენილი საორიენტაციო აღწერებია და არა კლინიკური ზღვარი. ეს ტესტი
-          არ ადგენს დიაგნოზს და შენი პიროვნების ღირებულებას არ განსაზღვრავს.
+          {en
+            ? "The 0–14, 15–25 and 26–30 ranges are orienting descriptions to help you read your result, not clinical cutoffs. This test does not diagnose anything and does not define your worth as a person."
+            : "0–14, 15–25 და 26–30 დიაპაზონები მხოლოდ შედეგის გასაგებად წარმოდგენილი საორიენტაციო აღწერებია და არა კლინიკური ზღვარი. ეს ტესტი არ ადგენს დიაგნოზს და შენი პიროვნების ღირებულებას არ განსაზღვრავს."}
         </p>
       </div>
     );
@@ -196,7 +209,9 @@ export function RosenbergTest() {
       <div className="mb-7">
         <div className="mb-2 flex items-center justify-between text-xs font-medium text-muted-foreground">
           <span>
-            კითხვა {index + 1} / {ROSENBERG_QUESTIONS.length}
+            {en
+              ? `Question ${index + 1} of ${ROSENBERG_QUESTIONS.length}`
+              : `კითხვა ${index + 1} / ${ROSENBERG_QUESTIONS.length}`}
           </span>
           <span className="tabular-nums">{progress}%</span>
         </div>
@@ -210,15 +225,17 @@ export function RosenbergTest() {
 
       <div key={question.id} className="animate-in fade-in duration-300">
         <p className="text-balance text-xl font-medium leading-snug sm:min-h-16 sm:text-2xl">
-          {question.textKa}
+          {en ? question.textEn : question.textKa}
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          მონიშნე პასუხი, რომელიც ყველაზე ახლოსაა შენს ჩვეულ განცდასთან.
+          {en
+            ? "Choose the answer closest to how you usually feel."
+            : "მონიშნე პასუხი, რომელიც ყველაზე ახლოსაა შენს ჩვეულ განცდასთან."}
         </p>
 
         <div
           role="radiogroup"
-          aria-label="შენი პასუხი"
+          aria-label={en ? "Your answer" : "შენი პასუხი"}
           className="mt-6 grid gap-2.5"
         >
           {ROSENBERG_OPTIONS.map((option) => {
@@ -247,7 +264,7 @@ export function RosenbergTest() {
                 >
                   {selected && <Check className="size-3" />}
                 </span>
-                {option.labelKa}
+                {en ? option.labelEn : option.labelKa}
               </button>
             );
           })}
@@ -265,7 +282,7 @@ export function RosenbergTest() {
           className="gap-1"
         >
           <ChevronLeft className="size-4" />
-          წინა
+          {en ? "Back" : "წინა"}
         </Button>
 
         {isLast ? (
@@ -277,7 +294,7 @@ export function RosenbergTest() {
             disabled={current === undefined}
           >
             <Sparkles className="size-4" />
-            ნახე შედეგი
+            {en ? "See my result" : "ნახე შედეგი"}
           </Button>
         ) : (
           <Button
@@ -290,15 +307,16 @@ export function RosenbergTest() {
             }
             disabled={current === undefined}
           >
-            შემდეგი
+            {en ? "Next" : "შემდეგი"}
           </Button>
         )}
       </div>
 
       <div className="mt-6 flex items-start gap-2.5 border-t border-border/70 pt-5 text-xs leading-relaxed text-muted-foreground">
         <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[var(--vivida-cyan)]" />
-        პასუხები მხოლოდ ამ გვერდზე მუშავდება, ისინი Vivida-ს სერვერზე არ
-        იგზავნება და გვერდის განახლების შემდეგ ქრება.
+        {en
+          ? "Your answers are processed only on this page. They are not sent to Vivida's servers and disappear when you refresh."
+          : "პასუხები მხოლოდ ამ გვერდზე მუშავდება, ისინი Vivida-ს სერვერზე არ იგზავნება და გვერდის განახლების შემდეგ ქრება."}
       </div>
     </div>
   );

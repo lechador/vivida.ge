@@ -91,7 +91,7 @@ describe("POST /api/subscription/checkout", () => {
     expect(mocks.createCheckout).not.toHaveBeenCalled();
   });
 
-  it("refuses Stripe checkout on the English domain (crypto rail only)", async () => {
+  it("serves Stripe checkout on the English domain too (Stripe is primary, crypto is the alternative)", async () => {
     const response = await POST(
       new Request("https://vividaastro.com/api/subscription/checkout", {
         method: "POST",
@@ -100,9 +100,8 @@ describe("POST /api/subscription/checkout", () => {
       }),
     );
 
-    expect(response.status).toBe(403);
-    await expect(response.json()).resolves.toEqual({ error: "crypto_only" });
-    expect(mocks.createCheckout).not.toHaveBeenCalled();
+    expect(response.status).toBe(200);
+    expect(mocks.createCheckout).toHaveBeenCalled();
   });
 
   it("keeps Stripe on the English domain until the crypto rail is configured", async () => {

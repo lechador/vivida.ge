@@ -17,8 +17,6 @@ import { SearchBar } from "./search-bar";
 import { UserMenu } from "./user-menu";
 import { CreditBalanceMenu } from "@/components/credits/credit-balance-menu";
 import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
-import { requestIsEnglishHost } from "@/lib/i18n/request-locale";
-import { isCryptoPayConfigured } from "@/lib/crypto-pay";
 
 const PRIMARY_WORKSPACE_KEYS: NavActiveKey[] = [
   "today",
@@ -91,8 +89,6 @@ export async function AppHeader({
     }
   }
 
-  const englishHost = await requestIsEnglishHost();
-  const cryptoPay = englishHost && isCryptoPayConfigured();
   const en = locale !== "ka";
 
   const allItems = navItems(locale);
@@ -213,7 +209,6 @@ export async function AppHeader({
                   locale={locale}
                   isPremium={isPremium}
                   countryCode={residenceCountryCode}
-                  crypto={cryptoPay}
                 />
                 <NotificationsDropdown
                   initial={notifications}

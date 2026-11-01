@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { ROSENBERG_QUESTIONS } from "@/lib/rosenberg/questions";
+import {
+  ROSENBERG_OPTIONS,
+  ROSENBERG_QUESTIONS,
+} from "@/lib/rosenberg/questions";
 import {
   calculateRosenberg,
   rosenbergBand,
@@ -52,5 +55,50 @@ describe("Rosenberg scoring", () => {
     expect(() => calculateRosenberg({})).toThrow(/Missing Rosenberg answer/);
     expect(() => scoreRosenbergItem({ reverse: false }, 0)).toThrow(RangeError);
     expect(() => scoreRosenbergItem({ reverse: true }, 5)).toThrow(RangeError);
+  });
+
+  it("provides a complete English version of every question", () => {
+    expect(ROSENBERG_QUESTIONS).toHaveLength(10);
+    for (const question of ROSENBERG_QUESTIONS) {
+      expect(question.textEn.length).toBeGreaterThanOrEqual(10);
+      expect(question.themeEn.length).toBeGreaterThanOrEqual(10);
+      expect(question.strengthEn.length).toBeGreaterThanOrEqual(10);
+      expect(question.reflectionEn.length).toBeGreaterThanOrEqual(10);
+    }
+  });
+
+  it("labels every response option in English", () => {
+    expect(ROSENBERG_OPTIONS).toHaveLength(4);
+    for (const option of ROSENBERG_OPTIONS) {
+      expect(option.labelEn.length).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it("exposes English band content alongside the Georgian copy", () => {
+    const lowest = Object.fromEntries(
+      ROSENBERG_QUESTIONS.map((question) => [
+        question.id,
+        question.reverse ? 4 : 1,
+      ]),
+    );
+    const highest = Object.fromEntries(
+      ROSENBERG_QUESTIONS.map((question) => [
+        question.id,
+        question.reverse ? 1 : 4,
+      ]),
+    );
+    for (const answers of [lowest, highest]) {
+      const result = calculateRosenberg(answers);
+      expect(result.score).toBeGreaterThanOrEqual(0);
+      expect(result.score).toBeLessThanOrEqual(30);
+      expect(result.labelEn.length).toBeGreaterThanOrEqual(1);
+      expect(result.summaryEn.length).toBeGreaterThanOrEqual(10);
+      expect(result.nextStepsEn.length).toBeGreaterThanOrEqual(1);
+      for (const item of [...result.strengths, ...result.reflections]) {
+        expect(item.themeEn.length).toBeGreaterThanOrEqual(1);
+        expect(item.strengthEn.length).toBeGreaterThanOrEqual(10);
+        expect(item.reflectionEn.length).toBeGreaterThanOrEqual(10);
+      }
+    }
   });
 });

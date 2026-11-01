@@ -23,9 +23,11 @@ import {
   calculateAttachment,
   type AttachmentResult,
 } from "@/lib/attachment/scoring";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 import { cn } from "@/lib/utils";
 
-export function AttachmentTest() {
+export function AttachmentTest({ locale = "ka" }: { locale?: UserLocale }) {
+  const en = locale === "en";
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [index, setIndex] = useState(0);
   const [result, setResult] = useState<AttachmentResult | null>(null);
@@ -83,26 +85,26 @@ export function AttachmentTest() {
         <section className="overflow-hidden rounded-3xl border border-border bg-card/60 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <div className="text-center">
             <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              შენი შედეგი
+              {en ? "Your result" : "შენი შედეგი"}
             </div>
             <div className="mt-2 text-5xl">{result.glyph}</div>
             <h2 className="mt-2 text-balance text-2xl font-semibold tracking-tight">
-              {result.labelKa}
+              {en ? result.labelEn : result.labelKa}
             </h2>
             {result.lean && (
               <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted-foreground">
-                შენი ქულები ორი სტილის საზღვართან ახლოსაა, აღწერა შენს
-                დომინანტურ მხარეს ასახავს, მაგრამ მეზობელი სტილის თვისებებიც
-                გაქვს.
+                {en
+                  ? "Your scores sit close to the border of two styles — this describes your dominant side, but you also carry traits of the neighboring style."
+                  : "შენი ქულები ორი სტილის საზღვართან ახლოსაა, აღწერა შენს დომინანტურ მხარეს ასახავს, მაგრამ მეზობელი სტილის თვისებებიც გაქვს."}
               </p>
             )}
             <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-foreground/85">
-              {result.summaryKa}
+              {en ? result.summaryEn : result.summaryKa}
             </p>
           </div>
 
           <div className="mx-auto mt-6 max-w-md">
-            <AttachmentMap result={result} />
+            <AttachmentMap result={result} locale={locale} />
             <div className="mt-3 grid grid-cols-2 gap-3 text-center">
               <div className="rounded-2xl border border-border bg-background/35 p-3">
                 <div
@@ -112,7 +114,7 @@ export function AttachmentTest() {
                   {result.anxiety}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  შფოთი / 100-დან
+                  {en ? "Anxiety / of 100" : "შფოთი / 100-დან"}
                 </div>
               </div>
               <div className="rounded-2xl border border-border bg-background/35 p-3">
@@ -123,7 +125,7 @@ export function AttachmentTest() {
                   {result.avoidance}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  აცილება / 100-დან
+                  {en ? "Avoidance / of 100" : "აცილება / 100-დან"}
                 </div>
               </div>
             </div>
@@ -132,25 +134,27 @@ export function AttachmentTest() {
 
         <ResultSection
           icon={<Check className="size-4" />}
-          eyebrow="შენი ძლიერი მხარეები"
-          items={result.strengths}
+          eyebrow={en ? "Your strengths" : "შენი ძლიერი მხარეები"}
+          items={en ? result.strengthsEn : result.strengths}
           accent="var(--vivida-cyan)"
         />
 
         <ResultSection
           icon={<Sprout className="size-4" />}
-          eyebrow="სად შეიძლება ზრდა"
-          items={result.growth}
+          eyebrow={en ? "Where you can grow" : "სად შეიძლება ზრდა"}
+          items={en ? result.growthEn : result.growth}
           accent="var(--vivida-pink)"
         />
 
         <section className="rounded-3xl border border-border bg-card/50 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
           <div className="flex items-center gap-2 text-sm font-semibold">
             <Heart className="size-4 text-[var(--vivida-pink)]" />
-            გზამკვლევი პარტნიორისთვის, როგორ გაგიგოს უკეთ
+            {en
+              ? "A guide for your partner — how to understand you better"
+              : "გზამკვლევი პარტნიორისთვის, როგორ გაგიგოს უკეთ"}
           </div>
           <ul className="mt-4 space-y-3">
-            {result.partnerTipsKa.map((tip) => (
+            {(en ? result.partnerTipsEn : result.partnerTipsKa).map((tip) => (
               <li
                 key={tip}
                 className="flex gap-3 text-sm leading-relaxed text-foreground/85"
@@ -165,10 +169,12 @@ export function AttachmentTest() {
         <section className="rounded-3xl border border-border bg-card/50 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
           <div className="flex items-center gap-2 text-sm font-semibold">
             <Sparkles className="size-4 text-[var(--vivida-violet)]" />
-            პრაქტიკული ნაბიჯები შენთვის
+            {en
+              ? "Practical next steps for you"
+              : "პრაქტიკული ნაბიჯები შენთვის"}
           </div>
           <ul className="mt-4 space-y-3">
-            {result.nextStepsKa.map((step) => (
+            {(en ? result.nextStepsEn : result.nextStepsKa).map((step) => (
               <li
                 key={step}
                 className="flex gap-3 text-sm leading-relaxed text-foreground/85"
@@ -182,18 +188,21 @@ export function AttachmentTest() {
 
         <section className="rounded-3xl border border-[var(--vivida-violet)]/25 bg-[var(--vivida-violet)]/7 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl">
           <h3 className="text-base font-semibold tracking-tight">
-            გაიგე, როგორ ეწყობით ერთმანეთს
+            {en ? "See how you fit together" : "გაიგე, როგორ ეწყობით ერთმანეთს"}
           </h3>
           <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-foreground/75">
-            მიჯაჭვულობის სტილი ნახევარი სურათია, მეორე ნახევარი თქვენი ორი რუკის
-            კომბინაციაა.
+            {en
+              ? "Attachment style is half the picture — the other half is how your two maps combine."
+              : "მიჯაჭვულობის სტილი ნახევარი სურათია, მეორე ნახევარი თქვენი ორი რუკის კომბინაციაა."}
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2.5">
             <Button asChild variant="mystic">
-              <Link href="/synastry">შეამოწმე სინასტრია</Link>
+              <Link href="/synastry">
+                {en ? "Check your synastry" : "შეამოწმე სინასტრია"}
+              </Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/taro">სიყვარულის ტარო</Link>
+              <Link href="/taro">{en ? "Love tarot" : "სიყვარულის ტარო"}</Link>
             </Button>
           </div>
         </section>
@@ -206,19 +215,20 @@ export function AttachmentTest() {
             className="gap-1.5"
           >
             <RotateCcw className="size-4" />
-            თავიდან გავლა
+            {en ? "Retake" : "თავიდან გავლა"}
           </Button>
           <Button asChild variant="ghost">
             <Link href="/tests">
-              სხვა ტესტები <ArrowRight className="size-4" />
+              {en ? "More tests" : "სხვა ტესტები"}{" "}
+              <ArrowRight className="size-4" />
             </Link>
           </Button>
         </div>
 
         <p className="mx-auto max-w-xl text-center text-xs leading-relaxed text-muted-foreground">
-          ტესტი თვითრეფლექსიისთვისაა და დიაგნოზს არ ადგენს. სტილი რუკაა და არა
-          განაჩენი, ის ცხოვრების გამოცდილებით იცვლება და შეგნებული მუშაობით
-          უსაფრთხოსკენ იხრება.
+          {en
+            ? "This test is for self-reflection, not diagnosis. A style is a map, not a verdict — it shifts with life experience and bends toward security with conscious work."
+            : "ტესტი თვითრეფლექსიისთვისაა და დიაგნოზს არ ადგენს. სტილი რუკაა და არა განაჩენი, ის ცხოვრების გამოცდილებით იცვლება და შეგნებული მუშაობით უსაფრთხოსკენ იხრება."}
         </p>
       </div>
     );
@@ -229,7 +239,8 @@ export function AttachmentTest() {
       <div className="mb-7">
         <div className="mb-2 flex items-center justify-between text-xs font-medium text-muted-foreground">
           <span>
-            კითხვა {index + 1} / {ATTACHMENT_QUESTIONS.length}
+            {en ? "Question" : "კითხვა"} {index + 1} /{" "}
+            {ATTACHMENT_QUESTIONS.length}
           </span>
           <span className="tabular-nums">{progress}%</span>
         </div>
@@ -243,16 +254,17 @@ export function AttachmentTest() {
 
       <div key={question.id} className="animate-in fade-in duration-300">
         <p className="text-balance text-xl font-medium leading-snug sm:min-h-16 sm:text-2xl">
-          {question.textKa}
+          {en ? question.textEn : question.textKa}
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          უპასუხე ისე, როგორც ურთიერთობებში უმეტესად გრძნობ, არა იდეალური,
-          არამედ ჩვეული ვერსიით.
+          {en
+            ? "Answer as you most often feel in relationships — not the ideal version, the habitual one."
+            : "უპასუხე ისე, როგორც ურთიერთობებში უმეტესად გრძნობ, არა იდეალური, არამედ ჩვეული ვერსიით."}
         </p>
 
         <div
           role="radiogroup"
-          aria-label="შენი პასუხი"
+          aria-label={en ? "Your answer" : "შენი პასუხი"}
           className="mt-6 grid gap-2.5"
         >
           {ATTACHMENT_OPTIONS.map((option) => {
@@ -281,7 +293,7 @@ export function AttachmentTest() {
                 >
                   {selected && <Check className="size-3" />}
                 </span>
-                {option.labelKa}
+                {en ? option.labelEn : option.labelKa}
               </button>
             );
           })}
@@ -299,7 +311,7 @@ export function AttachmentTest() {
           className="gap-1"
         >
           <ChevronLeft className="size-4" />
-          წინა
+          {en ? "Back" : "წინა"}
         </Button>
 
         {isLast ? (
@@ -311,7 +323,7 @@ export function AttachmentTest() {
             disabled={current === undefined}
           >
             <Sparkles className="size-4" />
-            ნახე შედეგი
+            {en ? "See my result" : "ნახე შედეგი"}
           </Button>
         ) : (
           <Button
@@ -324,22 +336,30 @@ export function AttachmentTest() {
             }
             disabled={current === undefined}
           >
-            შემდეგი
+            {en ? "Next" : "შემდეგი"}
           </Button>
         )}
       </div>
 
       <div className="mt-6 flex items-start gap-2.5 border-t border-border/70 pt-5 text-xs leading-relaxed text-muted-foreground">
         <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[var(--vivida-cyan)]" />
-        პასუხები მხოლოდ ამ გვერდზე მუშავდება, ისინი Vivida-ს სერვერზე არ
-        იგზავნება და გვერდის განახლების შემდეგ ქრება.
+        {en
+          ? "Your answers are processed only on this page — they are never sent to Vivida's servers and disappear when you refresh the page."
+          : "პასუხები მხოლოდ ამ გვერდზე მუშავდება, ისინი Vivida-ს სერვერზე არ იგზავნება და გვერდის განახლების შემდეგ ქრება."}
       </div>
     </div>
   );
 }
 
 /** 2D რუკა: X = აცილება, Y = შფოთი. წერტილი = შენი პოზიცია. */
-function AttachmentMap({ result }: { result: AttachmentResult }) {
+function AttachmentMap({
+  result,
+  locale = "ka",
+}: {
+  result: AttachmentResult;
+  locale?: UserLocale;
+}) {
+  const en = locale === "en";
   // 0..100 → 8..152 SVG კოორდინატებში (160×160 viewBox, padding 8)
   const x = 8 + (result.avoidance / 100) * 144;
   const y = 8 + ((100 - result.anxiety) / 100) * 144;
@@ -347,7 +367,11 @@ function AttachmentMap({ result }: { result: AttachmentResult }) {
     <svg
       viewBox="0 0 160 160"
       role="img"
-      aria-label={`შფოთი ${result.anxiety}, აცილება ${result.avoidance}`}
+      aria-label={
+        en
+          ? `Anxiety ${result.anxiety}, avoidance ${result.avoidance}`
+          : `შფოთი ${result.anxiety}, აცილება ${result.avoidance}`
+      }
       className="mx-auto w-full max-w-60"
     >
       <rect
@@ -383,16 +407,16 @@ function AttachmentMap({ result }: { result: AttachmentResult }) {
         fill="oklch(0.82 0.16 85 / 0.16)"
       />
       <text x="20" y="26" fontSize="8" fill="currentColor" opacity="0.55">
-        შფოთიანი
+        {en ? "Anxious" : "შფოთიანი"}
       </text>
       <text x="92" y="26" fontSize="8" fill="currentColor" opacity="0.55">
-        შიში+აცილება
+        {en ? "Fearful-avoidant" : "შიში+აცილება"}
       </text>
       <text x="20" y="140" fontSize="8" fill="currentColor" opacity="0.55">
-        უსაფრთხო
+        {en ? "Secure" : "უსაფრთხო"}
       </text>
       <text x="92" y="140" fontSize="8" fill="currentColor" opacity="0.55">
-        აცილებადი
+        {en ? "Avoidant" : "აცილებადი"}
       </text>
       <line
         x1="80"
