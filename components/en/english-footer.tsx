@@ -173,7 +173,8 @@ export async function EnglishFooter() {
         </div>
       </div>
       <div className="border-t border-border/30 px-4 py-5 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Vivida. Made in Georgia.
+        © {new Date().getFullYear()} Vivida. Made in Georgia. Operated by
+        CoreShift Apps LLC.
       </div>
     </footer>
   );

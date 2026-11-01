@@ -183,6 +183,7 @@ export function SiteFooter({ locale = "ka" }: { locale?: UserLocale } = {}) {
         <div className="mx-auto flex w-full max-w-7xl flex-col-reverse items-start justify-between gap-3 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:px-6">
           <p>© {year} Vivida. ყველა უფლება დაცულია.</p>
           <p>დამზადებულია საქართველოში · ✦</p>
+          <p>ოპერირებს CoreShift Apps LLC</p>
         </div>
       </div>
     </footer>
