@@ -276,7 +276,7 @@ export function CommentSection({
             placeholder={en ? "Write a comment…" : "დაწერე კომენტარი..."}
             rows={2}
             maxLength={COMMENT_BODY_MAX + 20}
-            className="block w-full resize-none border-0 bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+            className="block w-full resize-none border-0 bg-transparent text-base leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:outline-none lg:text-sm"
             disabled={isPending}
           />
           <div className="mt-1.5 flex items-center justify-between gap-3">
@@ -483,7 +483,7 @@ function ReplyComposer({
         placeholder={en ? "Write a reply…" : "დაწერე პასუხი..."}
         rows={2}
         maxLength={COMMENT_BODY_MAX + 20}
-        className="block w-full resize-none border-0 bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+        className="block w-full resize-none border-0 bg-transparent text-base leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:outline-none lg:text-sm"
         disabled={isPending}
       />
       <div className="mt-1.5 flex items-center justify-between gap-3">

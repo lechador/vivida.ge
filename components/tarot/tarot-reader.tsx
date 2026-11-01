@@ -740,7 +740,7 @@ export function TarotReader({
                   ? "For example: What should I understand about this relationship?"
                   : "მაგ: რას მიპირებს ეს ურთიერთობა?"
               }
-              className="min-h-12 w-full rounded-md border border-border bg-background px-4 py-3 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
+              className="min-h-12 w-full rounded-md border border-border bg-background px-4 py-3 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary lg:text-[15px]"
             />
             <Button
               type="button"

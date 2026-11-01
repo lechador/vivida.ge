@@ -41,7 +41,7 @@ export function MarketingHeader({
         <MarketingHeaderNav active={active} />
 
         {/* Zone 3: Primary action */}
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <Link
             href="/login"
             className="hidden whitespace-nowrap text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline"
@@ -56,15 +56,17 @@ export function MarketingHeader({
 
       {/* Row 2: Persistent Celestial Context Strip + Slide-Over Almanac Drawer */}
       <div className="border-t border-border bg-[oklch(0.15_0.038_280)]">
-        <div className="mx-auto flex h-9 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-          <div className="flex min-w-0 items-center gap-3 font-mono text-[11px] tabular-nums text-muted-foreground">
-            <span className="uppercase tracking-[0.16em] text-primary">
+        <div className="mx-auto flex h-9 w-full max-w-7xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6">
+          <div className="flex min-w-0 flex-1 items-center gap-2 font-mono text-[11px] tabular-nums text-muted-foreground sm:gap-3">
+            {/* Decorative coordinates: first thing to go on a phone, so the
+                moon phase + language + drawer trigger keep one line. */}
+            <span className="hidden uppercase tracking-[0.16em] text-primary sm:inline">
               41°43′N · 44°47′E
             </span>
             {moonSnapshot && (
               <Link
                 href="/mtvaris-kalendari"
-                className="inline-flex items-center gap-2 truncate border-l border-border pl-3 transition-colors hover:text-foreground"
+                className="inline-flex min-w-0 items-center gap-2 truncate pl-0 transition-colors hover:text-foreground sm:border-l sm:border-border sm:pl-3"
               >
                 <LunarPhaseDisc
                   phaseAngle={moonSnapshot.phaseAngle}
@@ -85,7 +87,7 @@ export function MarketingHeader({
             )}
           </div>
 
-          <div className="flex shrink-0 items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <MarketingEnglishLink englishPath={englishPath} />
             <ObservatoryDrawer authed={false} locale="ka" />
           </div>

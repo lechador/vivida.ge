@@ -1,6 +1,13 @@
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
-export type RadarPoint = { key: string; label: string; score: number; hue: string };
+export type RadarPoint = {
+  key: string;
+  label: string;
+  /** Compact label for the radar axis; full name stays in the legend below. */
+  shortLabel?: string;
+  score: number;
+  hue: string;
+};
 
 /**
  * Generic N-spoke trait radar (pure SVG, server-safe). Each vertex is a trait
@@ -18,7 +25,9 @@ export function TraitRadar({
 }) {
   const cx = size / 2;
   const cy = size / 2;
-  const maxR = size * 0.29;
+  // Slightly smaller than the old 0.29 so the (abbreviated) axis labels have
+  // room inside the viewBox on narrow phones instead of being clipped.
+  const maxR = size * 0.26;
   const n = points.length;
 
   const at = (i: number, r: number) => {
@@ -39,16 +48,29 @@ export function TraitRadar({
       className="mx-auto h-auto w-full max-w-[360px]"
       role="img"
       aria-label={
-        locale !== "ka"
-          ? "Personality trait radar chart"
-          : "პიროვნების თვისებების რადარი"
+        (locale !== "ka"
+          ? "Personality trait radar chart: "
+          : "პიროვნების თვისებების რადარი: ") +
+        points.map((p) => `${p.label} ${p.score}`).join(", ")
       }
     >
       <defs>
         <linearGradient id="trait-radar-fill" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="oklch(0.78 0.18 305)" stopOpacity="0.45" />
-          <stop offset="55%" stopColor="oklch(0.75 0.20 350)" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="oklch(0.80 0.15 200)" stopOpacity="0.4" />
+          <stop
+            offset="0%"
+            stopColor="oklch(0.78 0.18 305)"
+            stopOpacity="0.45"
+          />
+          <stop
+            offset="55%"
+            stopColor="oklch(0.75 0.20 350)"
+            stopOpacity="0.35"
+          />
+          <stop
+            offset="100%"
+            stopColor="oklch(0.80 0.15 200)"
+            stopOpacity="0.4"
+          />
         </linearGradient>
       </defs>
 
@@ -90,7 +112,8 @@ export function TraitRadar({
 
       {points.map((p, i) => {
         const [x, y] = at(i, maxR + 24);
-        const anchor = Math.abs(x - cx) < 8 ? "middle" : x > cx ? "start" : "end";
+        const anchor =
+          Math.abs(x - cx) < 8 ? "middle" : x > cx ? "start" : "end";
         return (
           <g key={`l-${p.key}`}>
             <text
@@ -102,7 +125,7 @@ export function TraitRadar({
               fontWeight={600}
               fill="oklch(0.92 0.02 290)"
             >
-              {p.label}
+              {p.shortLabel ?? p.label}
             </text>
             <text
               x={x}

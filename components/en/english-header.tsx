@@ -32,7 +32,7 @@ export async function EnglishHeader({
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur-md">
       {/* Row 1: Strict 3-Zone Top Bar Contract */}
-      <div className="mx-auto flex h-15 w-full max-w-7xl items-center justify-between gap-8 px-4 sm:px-6">
+      <div className="mx-auto flex h-15 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:gap-8 sm:px-6">
         {/* Zone 1: Single-line Brand Wordmark */}
         <Link
           href={href("/")}
@@ -47,7 +47,7 @@ export async function EnglishHeader({
         {/* Zone 2: 5 concise single-line text navigation links */}
         <nav
           aria-label="Primary navigation"
-          className="hidden items-center gap-7 text-sm font-medium text-muted-foreground md:flex"
+          className="hidden items-center gap-7 text-sm font-medium text-muted-foreground lg:flex"
         >
           {NAV_ITEMS.map((item) => (
             <Link

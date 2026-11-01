@@ -220,23 +220,23 @@ export function HeroPreview({ locale = "ka" }: { locale?: "ka" | "en" }) {
     SPECIMEN_PLACEMENTS.find((p) => p.key === selectedKey) ??
     SPECIMEN_PLACEMENTS[0];
 
-  const modes: Array<{ id: DialMode; label: string }> = en
+  const modes: Array<{ id: DialMode; label: string; short: string }> = en
     ? [
-        { id: "natal", label: "01 · Natal Chart" },
-        { id: "transit", label: "02 · Live Sky" },
-        { id: "synastry", label: "03 · Synastry" },
+        { id: "natal", label: "01 · Natal Chart", short: "Natal" },
+        { id: "transit", label: "02 · Live Sky", short: "Live Sky" },
+        { id: "synastry", label: "03 · Synastry", short: "Synastry" },
       ]
     : [
-        { id: "natal", label: "01 · ნატალური" },
-        { id: "transit", label: "02 · დღის ცა" },
-        { id: "synastry", label: "03 · სინასტრია" },
+        { id: "natal", label: "01 · ნატალური", short: "ნატალური" },
+        { id: "transit", label: "02 · დღის ცა", short: "დღის ცა" },
+        { id: "synastry", label: "03 · სინასტრია", short: "სინასტრია" },
       ];
 
   return (
     <div className="flex h-full w-full flex-col justify-between bg-card p-5 sm:p-6">
       {/* Top Specimen Header + Mode Selector */}
       <div>
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3 text-xs text-muted-foreground">
+        <div className="flex flex-col gap-1 border-b border-border pb-3 text-xs text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-2">
           <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-primary">
             {en
               ? "Interactive Astrolabe · Specimen"
@@ -262,13 +262,14 @@ export function HeroPreview({ locale = "ka" }: { locale?: "ka" | "en" }) {
                 role="tab"
                 aria-selected={active}
                 onClick={() => setMode(m.id)}
-                className={`whitespace-nowrap rounded-md px-2 py-1.5 font-mono text-[11px] transition-colors ${
+                className={`whitespace-nowrap rounded-md px-1 py-1.5 font-mono text-[10px] transition-colors sm:px-2 sm:text-[11px] ${
                   active
                     ? "border border-primary/40 bg-secondary font-semibold text-primary shadow-2xs"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {m.label}
+                <span className="min-[380px]:hidden">{m.short}</span>
+                <span className="hidden min-[380px]:inline">{m.label}</span>
               </button>
             );
           })}

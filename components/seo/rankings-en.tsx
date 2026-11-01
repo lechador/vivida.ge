@@ -98,7 +98,7 @@ export function RankingsHubEn() {
                 <Link
                   key={topic.slug}
                   href={`/zodiac/reitingebi/${topic.slug}`}
-                  className="group flex items-center gap-4 rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 transition-colors hover:bg-card/80 sm:p-5"
+                  className="group flex min-w-0 items-center gap-4 rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 transition-colors hover:bg-card/80 sm:p-5"
                 >
                   <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-[var(--vivida-violet)]/10 text-2xl ring-1 ring-[var(--vivida-violet)]/20">
                     {topic.emoji}

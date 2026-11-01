@@ -19,9 +19,27 @@ export function BigFiveChart({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  // The full trait names live in the score bars immediately below the radar.
+  // Axis labels are abbreviated so long Georgian words ("კეთილსინდისიერება")
+  // do not overflow the SVG on a phone.
+  const SHORT_KA: Record<string, string> = {
+    openness: "ღიაობა",
+    conscientiousness: "სინდის.",
+    extraversion: "ექსტრავ.",
+    agreeableness: "თანხმ.",
+    neuroticism: "ნევროტ.",
+  };
+  const SHORT_EN: Record<string, string> = {
+    openness: "Openness",
+    conscientiousness: "Conscient.",
+    extraversion: "Extraver.",
+    agreeableness: "Agreeabl.",
+    neuroticism: "Neurotic.",
+  };
   const points: RadarPoint[] = result.traits.map((t) => ({
     key: t.key,
     label: en ? t.nameEn : t.nameKa,
+    shortLabel: (en ? SHORT_EN : SHORT_KA)[t.key],
     score: t.score,
     hue: t.hue,
   }));

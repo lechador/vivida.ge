@@ -77,6 +77,11 @@ export async function getResidenceCountryCode(
  */
 export function sameCountryFirst(countryCode: string | null | undefined) {
   const code = normalizeCountryCode(countryCode);
-  if (!code) return sql<boolean>`false`;
+  // Postgres rejects a bare boolean constant in ORDER BY ("non-integer
+  // constant in ORDER BY"), which made /feed, /people and the dashboard
+  // suggestions 500 for every viewer without a residence country. The cast
+  // keeps it an expression rather than an output-column position.
+  //
+  if (!code) return sql<boolean>`(false)::boolean`;
   return sql<boolean>`(${users.residenceCountryCode} = ${code})`;
 }

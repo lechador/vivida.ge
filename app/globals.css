@@ -178,7 +178,7 @@ html[lang="hy"] .locale-ka-only {
    */
   @media (max-width: 1023px) {
     body:has([data-mobile-tab-bar]):not(:has([data-no-body-bottom-pad])) {
-      padding-bottom: calc(4.5rem + max(env(safe-area-inset-bottom), 0px));
+      padding-bottom: calc(4.75rem + max(env(safe-area-inset-bottom), 0px));
     }
   }
 
@@ -207,11 +207,27 @@ html[lang="hy"] .locale-ka-only {
 }
 
 /*
+ * Use the dynamic viewport unit on mobile so a full-height page is not taller
+ * than the visible area while Safari/Chrome show their URL bar. `100vh`
+ * resolves to the *large* viewport on iOS and leaves a strip of dead scroll
+ * under short pages. Deliberately outside @layer base so it outranks the
+ * `min-h-screen` / `h-screen` utilities.
+ */
+@supports (height: 100dvh) {
+  .min-h-screen {
+    min-height: 100dvh;
+  }
+  .h-screen {
+    height: 100dvh;
+  }
+}
+
+/*
  * Floating bottom-corner affordances, the privacy re-open pill (left) and the
  * chat launcher (right). Both sit a few px off the bottom and both outrank or
  * tie the mobile tab bar in z-order, so on phones they covered its outermost
  * items and swallowed those taps. Lift them clear whenever the bar is mounted,
- * reusing the same 4.5rem + safe-area measure as the body padding above so the
+ * reusing the same 4.75rem + safe-area measure as the body padding above so the
  * two can't drift apart.
  *
  * Deliberately OUTSIDE @layer base: these override Tailwind's `bottom-3` /
@@ -221,7 +237,7 @@ html[lang="hy"] .locale-ka-only {
 @media (max-width: 1023px) {
   body:has([data-mobile-tab-bar]) [data-privacy-reopen],
   body:has([data-mobile-tab-bar]) [data-chat-launcher] {
-    bottom: calc(4.5rem + max(env(safe-area-inset-bottom), 0px) + 0.75rem);
+    bottom: calc(4.75rem + max(env(safe-area-inset-bottom), 0px) + 0.75rem);
   }
 }
 

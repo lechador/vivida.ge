@@ -168,7 +168,7 @@ export function ThematicHoroscopeHub({ theme }: { theme: HoroscopeTheme }) {
           <div className="text-4xl" aria-hidden>
             {cfg.glyph}
           </div>
-          <h1 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
+          <h1 className="mt-3 text-balance text-3xl font-semibold tracking-tight min-[380px]:text-4xl sm:text-5xl">
             {cfg.label}
           </h1>
           <p className="mt-4 text-pretty text-lg leading-8 text-foreground/80">
@@ -348,7 +348,7 @@ export function ThematicHoroscopeDetail({
               <p className="text-xs text-muted-foreground">
                 {ZODIAC_DATES[sign].rangeKa}
               </p>
-              <h1 className="mt-1 text-balance text-3xl font-semibold sm:text-4xl">
+              <h1 className="mt-1 text-balance text-2xl font-semibold min-[380px]:text-3xl sm:text-4xl">
                 {genitiveKa(sc.labelKa)} {cfg.label}
               </h1>
             </div>

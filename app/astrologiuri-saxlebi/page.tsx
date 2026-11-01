@@ -135,7 +135,7 @@ export default async function AstrologyHousesPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--vivida-violet)]">
             ნატალური რუკის გზამკვლევი
           </p>
-          <h1 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-6xl">
+          <h1 className="mt-3 text-balance text-3xl font-semibold tracking-tight min-[380px]:text-4xl sm:text-6xl">
             ასტროლოგიური სახლები,{" "}
             <span className="bg-gradient-to-r from-[var(--vivida-violet)] via-[var(--vivida-pink)] to-[var(--vivida-cyan)] bg-clip-text text-transparent">
               12 ცხოვრების სფერო

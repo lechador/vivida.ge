@@ -119,7 +119,7 @@ export async function AppHeader({
     <>
       <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur-md">
         {/* Row 1: Strict 3-Zone Top Bar Contract */}
-        <div className="mx-auto flex h-15 w-full max-w-7xl items-center justify-between gap-8 px-4 sm:px-6">
+        <div className="mx-auto flex h-15 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:gap-8 sm:px-6">
           {/* Zone 1: Single-line Brand Wordmark */}
           <div className="flex shrink-0 items-center gap-2.5">
             {userInfo && (
@@ -135,7 +135,7 @@ export async function AppHeader({
               className="inline-flex shrink-0 items-center gap-2.5 whitespace-nowrap"
             >
               <VividaMark size={28} id="app-header" className="shrink-0" />
-              <span className="font-display text-2xl font-medium tracking-tight text-foreground">
+              <span className="hidden font-display text-2xl font-medium tracking-tight text-foreground min-[380px]:inline">
                 Vivida
               </span>
             </Link>
@@ -144,7 +144,7 @@ export async function AppHeader({
           {/* Zone 2: 5 Concise Single-Line Workspace / Public Links */}
           <nav
             aria-label={en ? "Primary navigation" : "მთავარი ნავიგაცია"}
-            className="hidden items-center gap-7 text-sm font-medium text-muted-foreground md:flex"
+            className="hidden items-center gap-7 text-sm font-medium text-muted-foreground lg:flex"
           >
             {userInfo ? (
               primaryLinks.map((item) => {
@@ -204,12 +204,14 @@ export async function AppHeader({
             {userInfo ? (
               <>
                 <MobileSearch locale={locale} />
-                <CreditBalanceMenu
-                  balance={balance}
-                  locale={locale}
-                  isPremium={isPremium}
-                  countryCode={residenceCountryCode}
-                />
+                <span className="hidden min-[430px]:block">
+                  <CreditBalanceMenu
+                    balance={balance}
+                    locale={locale}
+                    isPremium={isPremium}
+                    countryCode={residenceCountryCode}
+                  />
+                </span>
                 <NotificationsDropdown
                   initial={notifications}
                   initialUnread={unread}

@@ -81,7 +81,7 @@ export function MundaneSkySection({
             {sky.aspects.map((a, i) => (
               <li
                 key={i}
-                className="flex items-center gap-2.5 rounded-lg border border-border bg-card px-3.5 py-2.5 text-xs shadow-2xs sm:text-sm"
+                className="flex min-w-0 items-center gap-2.5 rounded-lg border border-border bg-card px-3.5 py-2.5 text-xs shadow-2xs sm:text-sm"
               >
                 <span
                   aria-hidden

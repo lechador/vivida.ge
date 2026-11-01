@@ -34,7 +34,7 @@ export default async function PrivacyPage() {
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
           სამართლებრივი
         </div>
-        <h1 className="mb-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+        <h1 className="mb-3 text-balance text-2xl font-semibold tracking-tight min-[380px]:text-3xl sm:text-4xl">
           კონფიდენციალურობის პოლიტიკა
         </h1>
         <p className="text-sm text-muted-foreground">

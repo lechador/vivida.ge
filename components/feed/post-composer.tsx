@@ -74,7 +74,7 @@ export function PostComposer({
             placeholder={en ? "Share your thoughts" : PLACEHOLDER}
             rows={3}
             maxLength={POST_BODY_MAX + 50 /* let counter go red gently */}
-            className="block w-full resize-y rounded-xl border border-border/60 bg-background/40 px-3 py-2.5 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:border-[var(--vivida-violet)]/60 focus:outline-none focus:ring-1 focus:ring-[var(--vivida-violet)]/40"
+            className="block w-full resize-y rounded-xl border border-border/60 bg-background/40 px-3 py-2.5 text-base leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:border-[var(--vivida-violet)]/60 focus:outline-none focus:ring-1 focus:ring-[var(--vivida-violet)]/40 lg:text-sm"
             disabled={isPending}
           />
           <div className="mt-2 flex items-center justify-between gap-3">

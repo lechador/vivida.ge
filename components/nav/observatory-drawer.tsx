@@ -76,10 +76,13 @@ export function ObservatoryDrawer({
         <button
           type="button"
           aria-expanded={open}
-          className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-md border border-border bg-secondary/70 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-foreground shadow-2xs transition-colors hover:border-primary/60 hover:bg-secondary hover:text-primary"
+          aria-label={
+            triggerLabel ?? (en ? "All Instruments" : "ყველა ინსტრუმენტი")
+          }
+          className="inline-flex h-7 shrink-0 items-center gap-2 whitespace-nowrap rounded-md border border-border bg-secondary/70 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-foreground shadow-2xs transition-colors hover:border-primary/60 hover:bg-secondary hover:text-primary"
         >
           <Compass className="size-3.5 text-primary" />
-          <span>
+          <span className="hidden min-[360px]:inline">
             {triggerLabel ?? (en ? "All Instruments" : "ყველა ინსტრუმენტი")}
           </span>
         </button>

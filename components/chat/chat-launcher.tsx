@@ -1037,7 +1037,7 @@ function ChatView({
             placeholder={en ? "Write a message…" : "დაწერე…"}
             rows={1}
             disabled={isSending}
-            className="max-h-32 min-h-9 flex-1 resize-none rounded-xl border border-border bg-input/40 px-3 py-2 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-ring"
+            className="max-h-32 min-h-9 flex-1 resize-none rounded-xl border border-border bg-input/40 px-3 py-2 text-base outline-none placeholder:text-muted-foreground/60 focus:border-transparent focus:ring-2 focus:ring-ring lg:text-sm"
           />
           <button
             type="button"

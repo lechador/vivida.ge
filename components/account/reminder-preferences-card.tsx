@@ -195,7 +195,7 @@ export function ReminderPreferencesCard({
                 />
               </div>
               {topic.key === "transit" && (
-                <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="mt-3 flex flex-col items-start gap-1 text-xs text-muted-foreground sm:flex-row sm:items-center sm:gap-2">
                   <span>{en ? "Frequency" : "სიხშირე"}</span>
                   <select
                     value={prefs.transitCadence}
@@ -206,7 +206,7 @@ export function ReminderPreferencesCard({
                           event.target.value === "daily" ? "daily" : "weekly",
                       }))
                     }
-                    className="h-9 rounded-lg border border-border bg-background px-2 text-foreground"
+                    className="h-9 w-full min-w-0 rounded-lg border border-border bg-background px-2 text-base text-foreground sm:w-auto lg:text-xs"
                   >
                     <option value="weekly">
                       {en ? "Weekly" : "კვირაში ერთხელ"}
@@ -235,7 +235,7 @@ export function ReminderPreferencesCard({
                 localHour: Number(event.target.value),
               }))
             }
-            className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+            className="h-10 w-full rounded-lg border border-border bg-background px-3 text-base text-foreground lg:text-sm"
           >
             {Array.from({ length: 24 }, (_, hour) => (
               <option key={hour} value={hour}>
@@ -256,7 +256,7 @@ export function ReminderPreferencesCard({
                 weeklyDay: Number(event.target.value),
               }))
             }
-            className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+            className="h-10 w-full rounded-lg border border-border bg-background px-3 text-base text-foreground lg:text-sm"
           >
             {WEEKDAYS[locale].map((day, index) => (
               <option key={day} value={index}>

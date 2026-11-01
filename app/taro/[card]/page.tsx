@@ -354,7 +354,7 @@ export default async function TarotCardPage({
           {prev ? (
             <Link
               href={localizedHref(`/taro/${prev.slug}`, locale)}
-              className="group flex flex-1 items-center gap-3 rounded-2xl border border-border bg-card/55 p-4 transition-colors hover:bg-card/80"
+              className="group flex min-w-0 flex-1 items-center gap-3 rounded-2xl border border-border bg-card/55 p-4 transition-colors hover:bg-card/80"
             >
               <span className="text-2xl">{prev.glyph}</span>
               <span className="min-w-0">
@@ -370,7 +370,7 @@ export default async function TarotCardPage({
           {next ? (
             <Link
               href={localizedHref(`/taro/${next.slug}`, locale)}
-              className="group flex flex-1 items-center justify-end gap-3 rounded-2xl border border-border bg-card/55 p-4 text-right transition-colors hover:bg-card/80"
+              className="group flex min-w-0 flex-1 items-center justify-end gap-3 rounded-2xl border border-border bg-card/55 p-4 text-right transition-colors hover:bg-card/80"
             >
               <span className="min-w-0">
                 <span className="block text-[11px] text-muted-foreground">

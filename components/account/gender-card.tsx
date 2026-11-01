@@ -28,7 +28,7 @@ export function GenderCard({
   }
 
   return (
-    <div className="flex items-center justify-between gap-4">
+    <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
       <div className="min-w-0">
         <div className="text-sm font-medium">{en ? "Sex" : "სქესი"}</div>
         <div className="text-xs text-muted-foreground">
@@ -37,7 +37,12 @@ export function GenderCard({
             : "გამოიყენება მხოლოდ ანონიმური, ჯამური სტატისტიკისთვის."}
         </div>
       </div>
-      <div className={cn("flex gap-2", pending && "opacity-60")}>
+      <div
+        className={cn(
+          "flex w-full flex-col gap-2 min-[380px]:flex-row sm:w-auto",
+          pending && "opacity-60",
+        )}
+      >
         {(
           [
             { key: "female", label: en ? "Female" : "მდედრობითი", glyph: "♀" },

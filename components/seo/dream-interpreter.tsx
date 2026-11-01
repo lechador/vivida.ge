@@ -186,7 +186,7 @@ export function DreamInterpreter({
               ? "Last night I dreamed that I was… (who, where, what did you feel?)"
               : "გუშინ სიზმრად ვნახე, რომ… (ვინ, სად, რას გრძნობდი?)"
           }
-          className="mt-4 w-full resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-[15px] leading-relaxed outline-none placeholder:text-muted-foreground/70 focus-visible:border-[var(--vivida-violet)] focus-visible:ring-2 focus-visible:ring-[var(--vivida-violet)]/30"
+          className="mt-4 w-full resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-base leading-relaxed outline-none placeholder:text-muted-foreground/70 focus-visible:border-[var(--vivida-violet)] focus-visible:ring-2 focus-visible:ring-[var(--vivida-violet)]/30 lg:text-[15px]"
         />
 
         <div className="mt-2.5 flex flex-wrap gap-1.5">

@@ -55,7 +55,7 @@ export function SiteFooter({ locale = "ka" }: { locale?: UserLocale } = {}) {
   const year = new Date().getFullYear();
   return (
     <footer className="relative z-10 border-t border-border bg-background">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-12 sm:px-6 sm:py-16 md:flex-row md:items-start md:justify-between">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:flex-row lg:items-start lg:justify-between">
         {/* Brand block */}
         <div className="max-w-sm">
           <Link href="/" className="inline-flex items-center gap-2.5">
@@ -65,23 +65,23 @@ export function SiteFooter({ locale = "ka" }: { locale?: UserLocale } = {}) {
             </span>
           </Link>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            შენი პირადი ასტრონომიული და ასტროლოგიური ალმანახი. ზუსტი ეფემერიდები,
-            ნატალური რუკა, ყოველდღიური ტრანზიტები და თავსებადობა.
+            შენი პირადი ასტრონომიული და ასტროლოგიური ალმანახი. ზუსტი
+            ეფემერიდები, ნატალური რუკა, ყოველდღიური ტრანზიტები და თავსებადობა.
           </p>
         </div>
 
         {/* Links */}
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 md:gap-10">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-4 sm:gap-8 md:gap-10">
           <div>
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               პროდუქტი
             </h3>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2 text-[13px] sm:text-sm">
               {PRODUCT_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-foreground/85 transition-colors hover:text-foreground"
+                    className="break-words text-foreground/85 transition-colors hover:text-foreground"
                   >
                     {link.label}
                   </Link>
@@ -93,12 +93,12 @@ export function SiteFooter({ locale = "ka" }: { locale?: UserLocale } = {}) {
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               ისწავლე
             </h3>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2 text-[13px] sm:text-sm">
               {LEARN_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-foreground/85 transition-colors hover:text-foreground"
+                    className="break-words text-foreground/85 transition-colors hover:text-foreground"
                   >
                     {link.label}
                   </Link>
@@ -110,12 +110,12 @@ export function SiteFooter({ locale = "ka" }: { locale?: UserLocale } = {}) {
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               ხელსაწყოები
             </h3>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2 text-[13px] sm:text-sm">
               {TOOL_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-foreground/85 transition-colors hover:text-foreground"
+                    className="break-words text-foreground/85 transition-colors hover:text-foreground"
                   >
                     {link.label}
                   </Link>
@@ -123,16 +123,16 @@ export function SiteFooter({ locale = "ka" }: { locale?: UserLocale } = {}) {
               ))}
             </ul>
           </div>
-          <div>
+          <div className="col-span-2 min-[380px]:col-span-1">
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               სამართლებრივი
             </h3>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2 text-[13px] sm:text-sm">
               {LEGAL_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-foreground/85 transition-colors hover:text-foreground"
+                    className="break-words text-foreground/85 transition-colors hover:text-foreground"
                   >
                     {link.label}
                   </Link>

@@ -410,7 +410,7 @@ export default async function ZodiacSignSlugPage({
               <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
                 წლიური ჰოროსკოპი · {yearNum} · {dates.rangeKa}
               </div>
-              <h1 className="mt-1 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
+              <h1 className="mt-1 text-balance text-3xl font-semibold tracking-tight min-[380px]:text-4xl sm:text-5xl">
                 {c.labelKa}, {yearNum} წლის ჰოროსკოპი
               </h1>
               <p className="mt-3 max-w-xl text-pretty text-base text-foreground/85 sm:text-lg">

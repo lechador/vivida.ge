@@ -19,7 +19,7 @@ export function MarketingHeaderNav({ active }: { active?: string }) {
   return (
     <nav
       aria-label="მთავარი ნავიგაცია"
-      className="hidden items-center gap-7 text-sm font-medium text-muted-foreground md:flex"
+      className="hidden items-center gap-7 text-sm font-medium text-muted-foreground lg:flex"
     >
       {NAV_LINKS.map((item) => {
         const isCurrent =
@@ -59,7 +59,7 @@ export function MarketingEnglishLink({
     <a
       href={enHref}
       hrefLang="en"
-      className="whitespace-nowrap font-mono text-[11px] font-medium uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
+      className="inline-flex h-9 items-center px-1 font-mono text-[11px] font-medium uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
     >
       EN
     </a>

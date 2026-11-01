@@ -22,7 +22,7 @@ type Result = {
 
 /**
  * Mobile-only search trigger (icon button) + full-screen dialog with input
- * and live results. Shown md:hidden so the desktop SearchBar still owns
+ * and live results. Shown lg:hidden so the desktop SearchBar still owns
  * larger viewports.
  */
 export function MobileSearch({ locale = "ka" }: { locale?: UserLocale }) {
@@ -34,7 +34,7 @@ export function MobileSearch({ locale = "ka" }: { locale?: UserLocale }) {
         <button
           type="button"
           aria-label={locale !== "ka" ? "Search" : "ძებნა"}
-          className="grid size-10 shrink-0 place-items-center rounded-md border border-border bg-card text-foreground/85 transition-colors hover:border-primary/60 hover:bg-secondary hover:text-foreground md:hidden"
+          className="grid size-10 shrink-0 place-items-center rounded-md border border-border bg-card text-foreground/85 transition-colors hover:border-primary/60 hover:bg-secondary hover:text-foreground lg:hidden"
         >
           <Search className="size-4.5" />
         </button>

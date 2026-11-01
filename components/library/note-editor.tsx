@@ -47,7 +47,7 @@ export function LibraryNoteEditor({
             ? "What felt important in this reading?"
             : "რა იყო ამ კითხვაში შენთვის მნიშვნელოვანი?"
         }
-        className="mt-4 w-full resize-y rounded-2xl border border-border bg-background/35 px-4 py-3 text-sm leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:border-[var(--vivida-violet)]/55"
+        className="mt-4 w-full resize-y rounded-2xl border border-border bg-background/35 px-4 py-3 text-base leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:border-[var(--vivida-violet)]/55 lg:text-sm"
       />
       <div className="mt-3 flex items-center justify-between gap-3">
         <span className="text-xs tabular-nums text-muted-foreground">

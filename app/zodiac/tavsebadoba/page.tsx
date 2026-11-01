@@ -61,8 +61,18 @@ export default function CompatibilityHubPage() {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "ცის ნიშნები", item: `${SITE_URL}/zodiac` },
-      { "@type": "ListItem", position: 2, name: "თავსებადობა", item: `${SITE_URL}${PATH}` },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "ცის ნიშნები",
+        item: `${SITE_URL}/zodiac`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "თავსებადობა",
+        item: `${SITE_URL}${PATH}`,
+      },
     ],
   };
 
@@ -85,12 +95,20 @@ export default function CompatibilityHubPage() {
       <Starfield count={140} shooting={3} />
       <SmartHeader />
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+      />
 
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-6 flex items-center gap-2 text-xs text-muted-foreground">
-          <Link href="/zodiac" className="hover:text-foreground">ცის ნიშნები</Link>
+          <Link href="/zodiac" className="hover:text-foreground">
+            ცის ნიშნები
+          </Link>
           <span>/</span>
           <span className="text-foreground/80">თავსებადობა</span>
         </nav>
@@ -98,7 +116,7 @@ export default function CompatibilityHubPage() {
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
           ცის თავსებადობა
         </div>
-        <h1 className="mb-4 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
+        <h1 className="mb-4 text-balance text-2xl font-semibold tracking-tight min-[380px]:text-3xl sm:text-5xl">
           {c.h1}
         </h1>
         <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
@@ -129,7 +147,9 @@ export default function CompatibilityHubPage() {
             {c.howItWorks.title}
           </h2>
           <div className="space-y-4 text-pretty text-base leading-relaxed text-foreground/90">
-            {paragraphs(c.howItWorks.body).map((p, i) => <p key={i}>{p}</p>)}
+            {paragraphs(c.howItWorks.body).map((p, i) => (
+              <p key={i}>{p}</p>
+            ))}
           </div>
         </article>
 
@@ -138,7 +158,9 @@ export default function CompatibilityHubPage() {
             {c.elementsRule.title}
           </h2>
           <div className="space-y-4 text-pretty text-base leading-relaxed text-foreground/90">
-            {paragraphs(c.elementsRule.body).map((p, i) => <p key={i}>{p}</p>)}
+            {paragraphs(c.elementsRule.body).map((p, i) => (
+              <p key={i}>{p}</p>
+            ))}
           </div>
         </article>
 
@@ -147,7 +169,9 @@ export default function CompatibilityHubPage() {
             {c.beyondSun.title}
           </h2>
           <div className="space-y-4 text-pretty text-base leading-relaxed text-foreground/90">
-            {paragraphs(c.beyondSun.body).map((p, i) => <p key={i}>{p}</p>)}
+            {paragraphs(c.beyondSun.body).map((p, i) => (
+              <p key={i}>{p}</p>
+            ))}
           </div>
           <Button asChild variant="mystic" size="lg" className="mt-6">
             <Link href="/signup">
@@ -164,17 +188,26 @@ export default function CompatibilityHubPage() {
           </h2>
           <div className="space-y-3">
             {c.faq.map((item, i) => (
-              <details key={i} className="group rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors open:bg-card/80 sm:p-5">
+              <details
+                key={i}
+                className="group rounded-2xl border border-border bg-card/55 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors open:bg-card/80 sm:p-5"
+              >
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-4 text-base font-medium text-foreground">
                   <span>{item.q}</span>
-                  <span aria-hidden className="mt-1 shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-45">✦</span>
+                  <span
+                    aria-hidden
+                    className="mt-1 shrink-0 text-xs text-muted-foreground transition-transform group-open:rotate-45"
+                  >
+                    ✦
+                  </span>
                 </summary>
-                <p className="mt-3 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">{item.a}</p>
+                <p className="mt-3 text-pretty text-sm leading-relaxed text-foreground/85 sm:text-base">
+                  {item.a}
+                </p>
               </details>
             ))}
           </div>
         </section>
-
       </section>
 
       <SiteFooter />
@@ -212,7 +245,9 @@ function PairTable() {
           {ALL_SLUGS.map((rowSlug, ri) => {
             const rowSign = SIGNS_CONTENT[rowSlug];
             const rowMeta = signMetaBySlug(rowSlug);
-            const rowAccent = rowMeta ? signColor(rowMeta) : "var(--vivida-violet)";
+            const rowAccent = rowMeta
+              ? signColor(rowMeta)
+              : "var(--vivida-violet)";
             return (
               <tr key={rowSlug} className={ri % 2 === 0 ? "" : "bg-card/20"}>
                 <th
@@ -228,11 +263,21 @@ function PairTable() {
                   const slug = pairKey(rowSlug, colSlug);
                   const pair = PAIRS_CONTENT?.[slug];
                   if (!pair) {
-                    return <td key={colSlug} className="px-2 py-2 text-center text-muted-foreground/50 sm:px-3 sm:py-3">·</td>;
+                    return (
+                      <td
+                        key={colSlug}
+                        className="px-2 py-2 text-center text-muted-foreground/50 sm:px-3 sm:py-3"
+                      >
+                        ·
+                      </td>
+                    );
                   }
                   const sc = SCORE_COLOR[pair.overallScore];
                   return (
-                    <td key={colSlug} className="px-1 py-1 text-center sm:px-2 sm:py-2">
+                    <td
+                      key={colSlug}
+                      className="px-1 py-1 text-center sm:px-2 sm:py-2"
+                    >
                       <Link
                         href={`/zodiac/tavsebadoba/${slug}`}
                         className="grid h-7 w-full place-items-center rounded-md text-[10px] font-semibold transition-colors hover:opacity-80 sm:h-8 sm:text-xs"

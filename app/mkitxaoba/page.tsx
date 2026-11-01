@@ -5,7 +5,11 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
-import { FORTUNE_METHODS, MKITXAOBA_FAQ, MKITXAOBA_KEYWORDS_KA } from "@/lib/seo/fortune-telling";
+import {
+  FORTUNE_METHODS,
+  MKITXAOBA_FAQ,
+  MKITXAOBA_KEYWORDS_KA,
+} from "@/lib/seo/fortune-telling";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import { DEFAULT_OG_IMAGE } from "@/lib/seo/locales";
 
@@ -29,7 +33,11 @@ export const metadata: Metadata = {
     siteName: "Vivida",
     locale: "ka_GE",
   },
-  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 /**
@@ -103,15 +111,15 @@ export default function MkitxaobaPage() {
           </h1>
           <p className="mx-auto mt-3.5 max-w-xl text-pretty text-sm leading-relaxed text-foreground/80 sm:text-base">
             ტაროზე მკითხაობა, ჰოროსკოპი, ნატალური რუკა და ბედის რიცხვი, ერთ
-            ადგილას, ქართულად. აირჩიე მეთოდი, დაუსვი კითხვა და პასუხს იმავე
-            წუთს მიიღებ. დასაწყებად რეგისტრაცია არ გჭირდება.
+            ადგილას, ქართულად. აირჩიე მეთოდი, დაუსვი კითხვა და პასუხს იმავე წუთს
+            მიიღებ. დასაწყებად რეგისტრაცია არ გჭირდება.
           </p>
         </header>
 
         {/* Primary CTA, tarot is the method the query usually means. */}
         <Link
           href="/taro"
-          className="group flex items-center gap-4 rounded-2xl border border-[var(--vivida-violet)]/35 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-pink)]/12 p-5 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors hover:from-[var(--vivida-violet)]/22 sm:p-6"
+          className="group flex min-w-0 items-center gap-4 rounded-2xl border border-[var(--vivida-violet)]/35 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-pink)]/12 p-5 ring-1 ring-foreground/5 backdrop-blur-xl transition-colors hover:from-[var(--vivida-violet)]/22 sm:p-6"
         >
           <span className="text-3xl sm:text-4xl">🃏</span>
           <span className="min-w-0 flex-1">
@@ -189,8 +197,8 @@ export default function MkitxaobaPage() {
                 სუსტი კითხვა
               </div>
               <p className="mt-1 text-[13px] leading-relaxed text-foreground/85">
-                „დამირეკავს თუ არა ხვალ?“, დახურულია და მხოლოდ დიახ/არას
-                ითხოვს; პასუხიც ისეთივე ცარიელი დაბრუნდება.
+                „დამირეკავს თუ არა ხვალ?“, დახურულია და მხოლოდ დიახ/არას ითხოვს;
+                პასუხიც ისეთივე ცარიელი დაბრუნდება.
               </p>
             </div>
           </div>
@@ -243,7 +251,6 @@ export default function MkitxaobaPage() {
             <ArrowRight className="size-4" />
           </Link>
         </div>
-
       </section>
 
       <SiteFooter />

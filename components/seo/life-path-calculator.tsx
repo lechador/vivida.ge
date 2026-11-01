@@ -112,7 +112,7 @@ export function LifePathCalculator({
             value={date}
             onChange={(e) => setDate(e.target.value)}
             max={new Date().toISOString().slice(0, 10)}
-            className="h-12 w-full rounded-md border border-border bg-background px-4 font-mono text-sm tabular-nums text-foreground outline-none transition-colors focus:border-primary"
+            className="h-12 w-full rounded-md border border-border bg-background px-4 font-mono text-base tabular-nums text-foreground outline-none transition-colors focus:border-primary lg:text-sm"
           />
           <Button
             type="button"

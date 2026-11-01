@@ -158,7 +158,7 @@ export default async function LibraryPage({
                 placeholder={
                   en ? "Search your archive…" : "მოძებნე ბიბლიოთეკაში…"
                 }
-                className="h-10 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                className="h-10 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground lg:text-sm"
               />
             </label>
             <Button type="submit" size="default">

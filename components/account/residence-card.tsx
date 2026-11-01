@@ -75,7 +75,7 @@ export function ResidenceCard({
             id="residence-country"
             value={countryCode}
             onChange={(event) => setCountryCode(event.target.value)}
-            className="h-10 w-full rounded-lg border border-border bg-background/35 px-3 text-sm text-foreground outline-none transition-colors focus:border-[var(--vivida-violet)] focus:ring-2 focus:ring-[var(--vivida-violet)]/20"
+            className="h-10 w-full rounded-lg border border-border bg-background/35 px-3 text-base text-foreground outline-none transition-colors focus:border-[var(--vivida-violet)] focus:ring-2 focus:ring-[var(--vivida-violet)]/20 lg:text-sm"
           >
             <option value="" disabled>
               {en ? "Choose country" : "აირჩიე ქვეყანა"}

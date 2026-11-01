@@ -44,7 +44,7 @@ export function BigThreeCard({
   return (
     <div
       id={`planet-${kind}`}
-      className="scroll-mt-20 rounded-xl border border-border bg-card px-4 py-4 shadow-sm sm:px-5"
+      className="min-w-0 scroll-mt-20 rounded-xl border border-border bg-card px-4 py-4 shadow-sm sm:px-5"
     >
       <div className="flex items-center gap-2.5 border-b border-border/70 pb-3 text-sm">
         <span

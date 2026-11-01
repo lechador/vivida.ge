@@ -571,10 +571,13 @@ export function ChartChat({
             setMemoryOpen((v) => !v);
           }}
           aria-expanded={memoryOpen}
+          aria-label={en ? "Memory" : "მეხსიერება"}
           className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-sm border border-border bg-card px-2.5 py-1.5 text-[12px] text-muted-foreground transition-colors hover:text-foreground sm:px-3"
         >
           <Brain className="size-3.5" />
-          {en ? "Memory" : "მეხსიერება"}
+          <span className="hidden min-[360px]:inline">
+            {en ? "Memory" : "მეხსიერება"}
+          </span>
         </button>
       </div>
 

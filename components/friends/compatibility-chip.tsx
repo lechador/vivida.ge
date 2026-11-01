@@ -21,7 +21,7 @@ export function CompatibilityChip({
   const accent = synastryAccent(overall);
   return (
     <div
-      className="inline-flex shrink-0 items-center gap-1.5 rounded-full border bg-card/40 px-2 py-1 text-xs ring-1 ring-foreground/5 backdrop-blur"
+      className="hidden shrink-0 items-center gap-1.5 rounded-full border bg-card/40 px-2 py-1 text-xs ring-1 ring-foreground/5 backdrop-blur min-[380px]:inline-flex"
       style={{
         borderColor: `color-mix(in oklch, ${accent} 32%, transparent)`,
         boxShadow: `0 0 14px -8px ${accent}`,

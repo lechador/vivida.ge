@@ -130,7 +130,12 @@ export function NatalCta({
       >
         {desc}
       </p>
-      <Button asChild variant="mystic" size="lg" className="mt-6">
+      <Button
+        asChild
+        variant="mystic"
+        size="lg"
+        className="mt-6 h-auto min-h-11 w-full whitespace-normal px-5 py-2.5 text-center sm:w-auto"
+      >
         <Link href={ctaHref}>
           {ctaLabel} <ArrowRight className="size-4" />
         </Link>

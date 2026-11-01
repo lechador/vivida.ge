@@ -341,7 +341,7 @@ function TestCard({
 }) {
   const { Icon, color } = THEME[test.slug] ?? FALLBACK_THEME;
   return (
-    <article className="flex flex-col justify-between rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:border-primary/45 hover:bg-secondary/40 sm:p-7">
+    <article className="flex min-w-0 flex-col justify-between rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:border-primary/45 hover:bg-secondary/40 sm:p-7">
       <div>
         <div className="mb-4 flex items-center gap-3">
           <span

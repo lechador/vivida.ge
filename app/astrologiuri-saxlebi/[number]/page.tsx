@@ -157,7 +157,7 @@ export default async function HousePage({ params }: Props) {
           <div className="flex size-16 items-center justify-center rounded-2xl border border-[var(--vivida-violet)]/35 bg-[var(--vivida-violet)]/12 text-3xl font-semibold text-[var(--vivida-violet)]">
             {house.number}
           </div>
-          <h1 className="mt-5 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
+          <h1 className="mt-5 text-balance text-3xl font-semibold tracking-tight min-[380px]:text-4xl sm:text-5xl">
             {house.number}-ე სახლი ასტროლოგიაში: {house.name}
           </h1>
           <p className="mt-5 text-lg leading-8 text-foreground/80">

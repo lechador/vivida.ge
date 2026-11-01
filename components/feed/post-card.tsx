@@ -296,7 +296,7 @@ export function PostCard({
             onChange={(e) => setDraft(e.target.value)}
             rows={3}
             maxLength={POST_BODY_MAX + 50}
-            className="block w-full resize-y rounded-xl border border-border/60 bg-background/40 px-3 py-2.5 text-[15px] leading-relaxed text-foreground focus:border-[var(--vivida-violet)]/60 focus:outline-none focus:ring-1 focus:ring-[var(--vivida-violet)]/40"
+            className="block w-full resize-y rounded-xl border border-border/60 bg-background/40 px-3 py-2.5 text-base leading-relaxed text-foreground focus:border-[var(--vivida-violet)]/60 focus:outline-none focus:ring-1 focus:ring-[var(--vivida-violet)]/40 lg:text-[15px]"
             disabled={isPending}
           />
           <div className="mt-2 flex items-center justify-between gap-2">

@@ -288,7 +288,7 @@ function FriendRow({
   );
 
   return (
-    <li className="group flex items-center gap-4 rounded-2xl border border-border bg-card/65 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:bg-card/80 hover:ring-foreground/15">
+    <li className="group flex min-w-0 items-center gap-4 rounded-2xl border border-border bg-card/65 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:bg-card/80 hover:ring-foreground/15">
       {profileHref ? (
         <Link
           href={profileHref}

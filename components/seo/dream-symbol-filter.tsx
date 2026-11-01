@@ -51,7 +51,7 @@ export function DreamSymbolFilter() {
           onChange={(event) => update(event.target.value)}
           placeholder="მაგალითად: გველი ან gveli"
           autoComplete="off"
-          className="min-w-0 flex-1 rounded-xl border border-border bg-background/60 px-3 py-2.5 text-sm outline-none focus-visible:border-[var(--vivida-violet)] focus-visible:ring-2 focus-visible:ring-[var(--vivida-violet)]/30"
+          className="min-w-0 flex-1 rounded-xl border border-border bg-background/60 px-3 py-2.5 text-base outline-none focus-visible:border-[var(--vivida-violet)] focus-visible:ring-2 focus-visible:ring-[var(--vivida-violet)]/30 lg:text-sm"
         />
         {query && (
           <button

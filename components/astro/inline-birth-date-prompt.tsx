@@ -64,7 +64,7 @@ export function InlineBirthDatePrompt({ locale }: { locale: string }) {
               max={new Date().toISOString().slice(0, 10)}
               onChange={(e) => setValue(e.target.value)}
               aria-label={en ? "Birth date" : "დაბადების თარიღი"}
-              className="h-9 rounded-lg border border-border bg-background px-2 text-sm text-foreground"
+              className="h-9 rounded-lg border border-border bg-background px-2 text-base text-foreground lg:text-sm"
             />
             <button
               type="button"

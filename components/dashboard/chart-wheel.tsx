@@ -12,30 +12,27 @@ const SIZE = 480;
 const CX = SIZE / 2;
 const CY = SIZE / 2;
 
-const R_OUTER = 232;        // chart outer edge
-const R_ZODIAC_IN = 196;    // inner edge of zodiac band
-const R_HOUSE_OUT = 196;    // outer edge of house band (= inner zodiac)
-const R_HOUSE_IN = 144;     // inner edge of house band
-const R_PLANET = 116;       // planet glyph ring
-const R_ASPECT = 100;       // aspect lines drawn from this radius inward
-const R_TICK = 200;         // small tick marks at 5° intervals
+const R_OUTER = 232; // chart outer edge
+const R_ZODIAC_IN = 196; // inner edge of zodiac band
+const R_HOUSE_OUT = 196; // outer edge of house band (= inner zodiac)
+const R_HOUSE_IN = 144; // inner edge of house band
+const R_PLANET = 116; // planet glyph ring
+const R_ASPECT = 100; // aspect lines drawn from this radius inward
+const R_TICK = 200; // small tick marks at 5° intervals
 
 const ELEMENT_FILL: Record<string, string> = {
   ცეცხლი: "oklch(0.76 0.12 75 / 0.06)",
-  მიწა:   "oklch(0.68 0.08 145 / 0.05)",
-  ჰაერი:  "oklch(0.75 0.05 240 / 0.06)",
-  წყალი:  "oklch(0.62 0.08 255 / 0.07)",
+  მიწა: "oklch(0.68 0.08 145 / 0.05)",
+  ჰაერი: "oklch(0.75 0.05 240 / 0.06)",
+  წყალი: "oklch(0.62 0.08 255 / 0.07)",
 };
 
-const ASPECT_STYLE: Record<
-  string,
-  { stroke: string; dash?: string }
-> = {
+const ASPECT_STYLE: Record<string, { stroke: string; dash?: string }> = {
   conjunction: { stroke: "oklch(0.80 0.12 80 / 0.65)" },
-  sextile:     { stroke: "oklch(0.76 0.06 235 / 0.45)" },
-  trine:       { stroke: "oklch(0.80 0.12 80 / 0.50)" },
-  square:      { stroke: "oklch(0.68 0.12 35 / 0.45)", dash: "3 3" },
-  opposition:  { stroke: "oklch(0.68 0.12 35 / 0.55)", dash: "5 4" },
+  sextile: { stroke: "oklch(0.76 0.06 235 / 0.45)" },
+  trine: { stroke: "oklch(0.80 0.12 80 / 0.50)" },
+  square: { stroke: "oklch(0.68 0.12 35 / 0.45)", dash: "3 3" },
+  opposition: { stroke: "oklch(0.68 0.12 35 / 0.55)", dash: "5 4" },
 };
 
 const PLANET_ORDER = [
@@ -73,12 +70,7 @@ function polar(cx: number, cy: number, r: number, ang: number) {
  * (a1 should be the larger angle; a2 the smaller, i.e. moving with
  * increasing ecliptic longitude on the wheel.)
  */
-function sectorPath(
-  r1: number,
-  r2: number,
-  a1: number,
-  a2: number
-): string {
+function sectorPath(r1: number, r2: number, a1: number, a2: number): string {
   const span = (a1 - a2 + 360) % 360;
   const large = span > 180 ? 1 : 0;
   const p1 = polar(CX, CY, r2, a1); // outer start
@@ -100,7 +92,7 @@ function sectorPath(
  * any pair within ~7° of each other.
  */
 function staggerOffsets(
-  bodies: Array<{ key: string; longitude: number }>
+  bodies: Array<{ key: string; longitude: number }>,
 ): Record<string, number> {
   const sorted = [...bodies].sort((a, b) => a.longitude - b.longitude);
   const out: Record<string, number> = {};
@@ -131,26 +123,36 @@ export function ChartWheel({
   // any parent re-render.
   const { aspects, planetEntries, radialOffsets } = useMemo(() => {
     const aspects = detectAspects(chart.bodies);
-    const planetEntries = PLANET_ORDER
-      .filter((k) => chart.bodies[k])
-      .map((k) => ({ key: k, ...chart.bodies[k] }));
+    const planetEntries = PLANET_ORDER.filter((k) => chart.bodies[k]).map(
+      (k) => ({ key: k, ...chart.bodies[k] }),
+    );
     const radialOffsets = staggerOffsets(planetEntries);
     return { aspects, planetEntries, radialOffsets };
   }, [chart]);
 
   return (
     <svg
-      viewBox={`0 0 ${SIZE} ${SIZE}`}
+      viewBox={`-24 -24 ${SIZE + 48} ${SIZE + 48}`}
       width="100%"
       height="100%"
       role="img"
-      aria-label={locale !== "ka" ? "Natal chart wheel" : "ნატალური რუკის ბორბალი"}
+      aria-label={
+        locale !== "ka" ? "Natal chart wheel" : "ნატალური რუკის ბორბალი"
+      }
       className="select-none"
     >
       <defs>
         <radialGradient id="vivida-wheel-bg" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="oklch(0.18 0.04 280)" stopOpacity="0.95" />
-          <stop offset="60%" stopColor="oklch(0.13 0.03 280)" stopOpacity="0.7" />
+          <stop
+            offset="0%"
+            stopColor="oklch(0.18 0.04 280)"
+            stopOpacity="0.95"
+          />
+          <stop
+            offset="60%"
+            stopColor="oklch(0.13 0.03 280)"
+            stopOpacity="0.7"
+          />
           <stop offset="100%" stopColor="oklch(0.13 0.03 280 / 0)" />
         </radialGradient>
         <filter id="vivida-glow" x="-30%" y="-30%" width="160%" height="160%">
@@ -271,7 +273,7 @@ export function ChartWheel({
         {/* House numbers placed at sector midpoints */}
         {chart.houses.map((house, i) => {
           const next =
-            chart.houses.find((h) => h.number === ((house.number % 12) + 1)) ??
+            chart.houses.find((h) => h.number === (house.number % 12) + 1) ??
             chart.houses[(i + 1) % chart.houses.length];
           const startAng = clockAngle(house.cuspLongitude, ascLng);
           const endAng = clockAngle(next.cuspLongitude, ascLng);
@@ -307,8 +309,12 @@ export function ChartWheel({
 
         {/* AC / DC / IC / MC labels at the four cardinal axes */}
         {chart.houses
-          .filter((h) =>
-            h.number === 1 || h.number === 4 || h.number === 7 || h.number === 10
+          .filter(
+            (h) =>
+              h.number === 1 ||
+              h.number === 4 ||
+              h.number === 7 ||
+              h.number === 10,
           )
           .map((h) => {
             const a = clockAngle(h.cuspLongitude, ascLng);

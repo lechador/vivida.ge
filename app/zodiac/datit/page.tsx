@@ -130,7 +130,7 @@ export default async function ZodiacByDatePage() {
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
           მზის ნიშანი
         </div>
-        <h1 className="mb-4 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
+        <h1 className="mb-4 text-balance text-2xl font-semibold tracking-tight min-[380px]:text-3xl sm:text-5xl">
           {BY_DATE_CONTENT.h1}
         </h1>
         <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
@@ -179,12 +179,18 @@ export default async function ZodiacByDatePage() {
             ცის ნიშნების თარიღების ცხრილი
           </h2>
           <div className="overflow-hidden rounded-2xl border border-border bg-card/40 ring-1 ring-foreground/5">
-            <table className="w-full text-sm">
+            <table className="w-full text-[13px] sm:text-sm">
               <thead className="border-b border-border/60 bg-card/60 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-3 text-left font-medium">ნიშანი</th>
-                  <th className="px-4 py-3 text-left font-medium">თარიღი</th>
-                  <th className="px-4 py-3 text-left font-medium">ელემენტი</th>
+                  <th className="px-3 py-3 text-left font-medium sm:px-4">
+                    ნიშანი
+                  </th>
+                  <th className="px-3 py-3 text-left font-medium sm:px-4">
+                    თარიღი
+                  </th>
+                  <th className="hidden px-3 py-3 text-left font-medium min-[380px]:table-cell sm:px-4">
+                    ელემენტი
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -199,7 +205,7 @@ export default async function ZodiacByDatePage() {
                           : "border-b border-border/30 bg-card/20"
                       }
                     >
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-3 sm:px-4">
                         <Link
                           href={`/zodiac/${slug}`}
                           className="inline-flex items-center gap-2 text-foreground/90 hover:text-foreground"
@@ -207,11 +213,14 @@ export default async function ZodiacByDatePage() {
                           <span className="text-base">{c.symbol}</span>
                           <span className="font-medium">{c.labelKa}</span>
                         </Link>
+                        <span className="mt-0.5 block text-[11px] text-muted-foreground min-[380px]:hidden">
+                          {c.element}
+                        </span>
                       </td>
-                      <td className="px-4 py-3 text-foreground/80">
+                      <td className="px-3 py-3 text-foreground/80 sm:px-4">
                         {ZODIAC_DATES[slug].rangeKa}
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground">
+                      <td className="hidden px-3 py-3 text-muted-foreground min-[380px]:table-cell sm:px-4">
                         {c.element}
                       </td>
                     </tr>
@@ -267,7 +276,6 @@ export default async function ZodiacByDatePage() {
             ))}
           </div>
         </section>
-
       </section>
 
       <SiteFooter />

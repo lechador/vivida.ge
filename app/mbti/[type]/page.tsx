@@ -207,7 +207,12 @@ export default async function MbtiTypePage({
           <p className="mx-auto mt-3 max-w-md text-pretty text-sm text-foreground/80 sm:text-base">
             {tagline}
           </p>
-          <Button asChild variant="mystic" size="lg" className="mt-6">
+          <Button
+            asChild
+            variant="mystic"
+            size="lg"
+            className="mt-6 h-auto min-h-11 w-full whitespace-normal px-5 py-2.5 text-center sm:w-auto"
+          >
             <Link href={en ? "/personality-test" : "/pirovnebis-testi"}>
               <Sparkles className="size-4" />
               {en

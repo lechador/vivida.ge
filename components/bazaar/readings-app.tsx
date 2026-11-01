@@ -372,7 +372,7 @@ export function ReadingsApp() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search readings or readers…"
-              className="w-full rounded-xl border border-border/60 bg-card/40 px-4 py-2 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-[var(--vivida-cyan)]/60 sm:max-w-xs"
+              className="w-full rounded-xl border border-border/60 bg-card/40 px-4 py-2 text-base outline-none placeholder:text-muted-foreground/60 focus:border-[var(--vivida-cyan)]/60 sm:max-w-xs lg:text-sm"
             />
           </div>
 

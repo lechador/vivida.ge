@@ -291,11 +291,11 @@ export default async function PublicProfilePage({
             <div className="min-w-0">
               {/* Identity row: @handle + actions on the same line so the
                   name underneath gets the full width and never wraps awkwardly. */}
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                 <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
                   @{profile.username}
                 </div>
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
                   {isOwner ? (
                     <Button asChild variant="outline" size="sm">
                       <Link href="/account">

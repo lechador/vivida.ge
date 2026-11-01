@@ -151,7 +151,7 @@ export async function HoroscopeView({
                 <Calendar className="size-3.5" />
                 {periodLabel}
               </div>
-              <h1 className="mt-2 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+              <h1 className="mt-2 text-balance text-2xl font-semibold tracking-tight min-[380px]:text-3xl sm:text-4xl">
                 {sc.labelKa}, {periodLabelKa}
               </h1>
               {horoscope?.headline && (

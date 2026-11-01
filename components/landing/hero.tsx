@@ -59,10 +59,10 @@ export function Hero() {
         {/* Main 2-Column Stretched Split */}
         <div className="grid items-stretch divide-y divide-border lg:grid-cols-[1.12fr_0.88fr] lg:divide-x lg:divide-y-0">
           {/* Left Column: Editorial Proposition & Action */}
-          <div className="flex flex-col justify-between bg-[oklch(0.155_0.038_280)] p-6 sm:p-10 lg:p-12">
+          <div className="flex min-w-0 flex-col justify-between bg-[oklch(0.155_0.038_280)] p-6 sm:p-10 lg:p-12">
             <div>
               {/* Hairline Kicker */}
-              <div className="mb-6 flex items-center gap-3 font-mono text-xs font-medium uppercase tracking-[0.2em] text-[var(--vivida-cyan)]">
+              <div className="mb-6 flex flex-wrap items-center gap-3 font-mono text-xs font-medium uppercase tracking-[0.2em] text-[var(--vivida-cyan)]">
                 <span
                   aria-hidden
                   className="inline-block h-px w-8 bg-[var(--vivida-cyan)]/70"
@@ -70,7 +70,7 @@ export function Hero() {
                 <span>{c.kicker}</span>
               </div>
 
-              <h1 className="max-w-2xl text-balance text-4xl font-semibold leading-[1.06] tracking-tight text-foreground sm:text-5xl lg:text-[3.35rem]">
+              <h1 className="max-w-2xl text-balance text-[1.75rem] font-semibold leading-[1.06] tracking-tight text-foreground min-[380px]:text-4xl sm:text-5xl lg:text-[3.35rem]">
                 {c.headlinePre}{" "}
                 <span className="text-gradient-vivida">
                   {c.headlineGradient}
@@ -130,7 +130,7 @@ export function Hero() {
           </div>
 
           {/* Right Column: Interactive Astronomical Astrolabe Console */}
-          <div className="flex flex-col">
+          <div className="flex min-w-0 flex-col">
             <HeroPreview locale="ka" />
           </div>
         </div>

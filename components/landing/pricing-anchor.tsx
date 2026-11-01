@@ -58,7 +58,7 @@ export function PricingAnchor() {
           {/* Free tier */}
           <div className="flex flex-col justify-between rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8">
             <div>
-              <div className="flex items-baseline justify-between gap-4 border-b border-border pb-4">
+              <div className="flex min-w-0 flex-col gap-2 border-b border-border pb-4 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
                 <div>
                   <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--vivida-cyan)]">
                     TIER 01 · საბაზისო წვდომა
@@ -67,7 +67,7 @@ export function PricingAnchor() {
                     პირადი რუკა და დღის რიტმი
                   </h3>
                 </div>
-                <div className="text-right font-mono">
+                <div className="shrink-0 text-right font-mono">
                   <span className="text-2xl font-semibold tabular-nums text-foreground">
                     0 ₾
                   </span>
@@ -99,7 +99,7 @@ export function PricingAnchor() {
           {/* Pro / Credits tier */}
           <div className="flex flex-col justify-between rounded-xl border border-primary/50 bg-gradient-to-br from-primary/15 via-card to-[var(--vivida-cyan)]/10 p-6 shadow-md sm:p-8">
             <div>
-              <div className="flex items-baseline justify-between gap-4 border-b border-border pb-4">
+              <div className="flex min-w-0 flex-col gap-2 border-b border-border pb-4 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
                 <div>
                   <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
                     TIER 02 · VIVIDA PRO და კრედიტები
@@ -108,7 +108,7 @@ export function PricingAnchor() {
                     სრული ასტროლოგიური ლაბორატორია
                   </h3>
                 </div>
-                <div className="text-right font-mono">
+                <div className="shrink-0 text-right font-mono">
                   <span className="text-2xl font-semibold tabular-nums text-[var(--vivida-gold)]">
                     9 ₾-დან
                   </span>
