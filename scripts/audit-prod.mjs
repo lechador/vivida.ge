@@ -166,7 +166,7 @@ async function main() {
   }
 
   const reportedIds = new Set(advisories.map((advisory) => advisory.id));
-  for (const [id, entry] of allowlist) {
+  for (const id of allowlist.keys()) {
     if (!reportedIds.has(id)) {
       problems.push(
         `${id} is on the allowlist but is no longer reported; remove it.`,

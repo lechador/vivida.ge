@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { Clock, Loader2, Sparkles } from "lucide-react";
 
@@ -24,6 +24,11 @@ import {
 } from "@/lib/iq/adaptive";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
+// The seed below has no local state to subscribe to; useSyncExternalStore is
+// here purely for its server-snapshot distinction.
+const subscribeToClient = () => () => {};
+const randomAttemptSeed = () => Math.floor(Math.random() * 2 ** 31);
+
 /**
  * The timed, *adaptive* IQ test (computerised adaptive testing). One item per
  * screen; after each answer we re-estimate ability (EAP) and serve the item
@@ -46,8 +51,17 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
   const [submitting, setSubmitting] = useState(false);
   const submittedRef = useRef(false);
   // Per-attempt seed for option shuffling (see optionOrderFor): stable for
-  // the whole sitting, different on a retake.
-  const [attemptSeed] = useState(() => Math.floor(Math.random() * 2 ** 31));
+  // the whole sitting, different on a retake. This component is server
+  // rendered, and drawing the seed in the first render shuffled the options
+  // differently on the server and on the client, which React reports as a
+  // hydration mismatch (#418). The server snapshot pins the pre-hydration
+  // order to 0; the random seed takes over as soon as hydration is done.
+  const [seed] = useState(randomAttemptSeed);
+  const attemptSeed = useSyncExternalStore(
+    subscribeToClient,
+    () => seed,
+    () => 0,
+  );
 
   const step = administered.length; // 1-based count of items shown so far
   const q = administered[step - 1];
