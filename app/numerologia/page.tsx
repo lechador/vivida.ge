@@ -8,6 +8,10 @@ import {
   NUMEROLOGY_HUB_EN,
   NumerologyHubEn,
 } from "@/components/seo/numerology-en";
+import {
+  NUMEROLOGY_HUB_PL,
+  NumerologyHubPl,
+} from "@/components/seo/numerology-pl";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
@@ -66,6 +70,37 @@ const KA_METADATA: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return KA_METADATA;
+  if (locale === "pl") {
+    const path = "/numerologia";
+    const title = "Kalkulator Numerologiczny Online – Droga Życia | Vivida";
+    return {
+      title: { absolute: title },
+      description: NUMEROLOGY_HUB_PL.description,
+      keywords: [
+        "numerologia",
+        "liczba drogi życia",
+        "kalkulator numerologiczny",
+        "droga życia",
+        "liczby mistrzowskie",
+        "znaczenie liczb",
+      ],
+      alternates: localizedAlternates(path, path, "pl"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: "https://www.vividaastro.com/pl/numerologia",
+        title,
+        description: NUMEROLOGY_HUB_PL.description,
+        siteName: "Vivida",
+        locale: "pl_PL",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description: NUMEROLOGY_HUB_PL.description,
+      },
+    };
+  }
   if (locale === "en") {
     const path = "/numerologia";
     return {
@@ -99,6 +134,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function NumerologiaHubPage() {
   const locale = await getRequestLocale();
+  if (locale === "pl") return <NumerologyHubPl />;
   if (locale === "en") return <NumerologyHubEn />;
   const archetypes = Object.fromEntries(
     LIFE_PATH_NUMBERS.map((n) => [n, LIFE_PATH_CONTENT[n].archetypeKa]),

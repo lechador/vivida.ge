@@ -1,4 +1,11 @@
-import { bodyMeta, formatDegree, signByIndex, signColor } from "@/lib/zodiac";
+import {
+  bodyLabel,
+  bodyMeta,
+  formatDegree,
+  signByIndex,
+  signColor,
+  signLabel,
+} from "@/lib/zodiac";
 import type { NatalChartJson, PointJson } from "@/db/schema";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
@@ -31,11 +38,12 @@ export function PositionsTable({
   chart: NatalChartJson;
   locale?: UserLocale;
 }) {
+  const isPl = locale === "pl";
   const en = locale === "en";
-  const planetHeader = en ? "Planet" : "პლანეტა";
-  const signHeader = en ? "Sign" : "ნიშანი";
-  const degreeHeader = en ? "Degree" : "გრადუსი";
-  const houseHeader = en ? "House" : "სახლი";
+  const planetHeader = isPl ? "Planeta" : en ? "Planet" : "პლანეტა";
+  const signHeader = isPl ? "Znak" : en ? "Sign" : "ნიშანი";
+  const degreeHeader = isPl ? "Stopień" : en ? "Degree" : "გრადუსი";
+  const houseHeader = isPl ? "Dom" : en ? "House" : "სახლი";
 
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
@@ -55,10 +63,8 @@ export function PositionsTable({
           const sign = signByIndex(point.signIndex);
           const color = signColor(sign);
           const house = key === "ascendant" ? 1 : point.house;
-          const planetLabel = en
-            ? (meta?.labelEn ?? key)
-            : (meta?.labelKa ?? key);
-          const signLabel = en ? sign.labelEn : sign.labelKa;
+          const planetText = bodyLabel(key, locale);
+          const signText = signLabel(sign, locale);
 
           return (
             <li key={key}>
@@ -70,14 +76,14 @@ export function PositionsTable({
                   <span aria-hidden style={{ color }} className={GLYPH}>
                     {meta?.symbol ?? "?"}
                   </span>
-                  <span className="truncate">{planetLabel}</span>
+                  <span className="truncate">{planetText}</span>
                 </span>
 
                 <span className="flex min-w-0 items-center gap-2 text-foreground/85">
                   <span aria-hidden style={{ color }} className={GLYPH}>
                     {`${sign.symbol}︎`}
                   </span>
-                  <span className="truncate">{signLabel}</span>
+                  <span className="truncate">{signText}</span>
                 </span>
 
                 <span className="whitespace-nowrap text-right font-mono text-xs tabular-nums text-foreground/85">
@@ -119,7 +125,12 @@ export function HousesTable({
       {houses.map((h) => {
         const sign = signByIndex(h.signIndex);
         const color = signColor(sign);
-        const signLabel = locale === "en" ? sign.labelEn : sign.labelKa;
+        const signLabel =
+          locale === "pl"
+            ? sign.labelPl
+            : locale === "en"
+              ? sign.labelEn
+              : sign.labelKa;
         return (
           <a
             key={h.number}

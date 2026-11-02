@@ -9,12 +9,19 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  const en = locale !== "ka";
+  const pl = locale === "pl";
+  const en = locale === "en";
   return {
-    title: en ? "Your EQ Result" : "შენი EQ შედეგი",
-    description: en
-      ? "Your emotional intelligence score and five-domain emotional profile."
-      : "შენი ემოციური ინტელექტის ტესტის შედეგი, EQ ქულა და ემოციური რუკა ხუთ სფეროში.",
+    title: pl
+      ? "Twój wynik EQ | Vivida"
+      : en
+        ? "Your EQ Result"
+        : "შენი EQ შედეგი",
+    description: pl
+      ? "Twój wynik inteligencji emocjonalnej i 5-obszarowy profil emocjonalny."
+      : en
+        ? "Your emotional intelligence score and five-domain emotional profile."
+        : "შენი ემოციური ინტელექტის ტესტის შედეგი, EQ ქულა და ემოციური რუკა ხუთ სფეროში.",
     robots: { index: false, follow: false },
   };
 }

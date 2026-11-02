@@ -21,13 +21,38 @@ import { signColor } from "@/lib/zodiac";
 import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacHubEn } from "@/components/seo/zodiac-hub-en";
+import { ZodiacHubPl } from "@/components/seo/zodiac-hub-pl";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  const en = locale !== "ka";
+  if (locale === "pl") {
+    const title = "Znaki Zodiaku – Daty, Charakterystyka, Żywioły i Horoskop";
+    const description =
+      "Poznaj wszystkie 12 znaków zodiaku: ich daty, symbole, żywioły, cechy charakteru, miłość i dopasowanie partnerskie. Oblicz swój pełny kosmogram urodzeniowy w Vivida.";
+    return {
+      title: { absolute: title },
+      description,
+      alternates: localizedAlternates(PATH, PATH, "pl"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: "https://www.vividaastro.com/pl/znaki-zodiaku",
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "pl_PL",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+      },
+    };
+  }
+  const en = locale === "en";
   const title = en
     ? "The 12 Zodiac Signs, Dates, Traits and Meanings"
     : HUB_CONTENT.pageTitle;
@@ -84,7 +109,9 @@ const FAQ_LD = {
 };
 
 export default async function ZodiacHubPage() {
-  if ((await getRequestLocale()) !== "ka") return <ZodiacHubEn />;
+  const locale = await getRequestLocale();
+  if (locale === "pl") return <ZodiacHubPl />;
+  if (locale === "en") return <ZodiacHubEn />;
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-x-clip bg-background">
       <Starfield count={48} />

@@ -36,25 +36,82 @@ function starterPackUses(product: string, pack: CreditPack): number | null {
   return uses > 1 ? uses : null;
 }
 
-const OUTCOME: Record<string, { ka: string; en: string }> = {
-  tarot: { ka: "დამატებითი ტარო კითხვა", en: "more tarot readings" },
-  tarot_followup: { ka: "პასუხის დაზუსტება", en: "follow-up answers" },
-  tarot_love_5: { ka: "სიყვარულის ტარო განლაგება", en: "love tarot spread" },
-  tarot_yes_no: { ka: "დიახ/არა ტარო განლაგება", en: "yes/no tarot readings" },
-  natal_pdf: { ka: "სრული PDF ანგარიში", en: "the full PDF report" },
+const OUTCOME: Record<string, { ka: string; en: string; pl: string }> = {
+  tarot: {
+    ka: "დამატებითი ტარო კითხვა",
+    en: "more tarot readings",
+    pl: "dodatkowe rozkłady tarota",
+  },
+  tarot_followup: {
+    ka: "პასუხის დაზუსტება",
+    en: "follow-up answers",
+    pl: "doprecyzowanie odpowiedzi",
+  },
+  tarot_love_5: {
+    ka: "სიყვარულის ტარო განლაგება",
+    en: "love tarot spread",
+    pl: "rozkład miłosny tarota",
+  },
+  tarot_yes_no: {
+    ka: "დიახ/არა ტარო განლაგება",
+    en: "yes/no tarot readings",
+    pl: "rozkłady tarota Tak/Nie",
+  },
+  natal_pdf: {
+    ka: "სრული PDF ანგარიში",
+    en: "the full PDF report",
+    pl: "pełny raport PDF",
+  },
   synastry: {
     ka: "თავსებადობის სრული გახსნა",
     en: "the full compatibility reading",
+    pl: "pełna analiza zgodności",
   },
-  dream: { ka: "სიზმრის AI ახსნა", en: "AI dream interpretations" },
-  chat: { ka: "AI ჩატის გაგრძელება", en: "more AI chat messages" },
-  ai_chart_chat: { ka: "AI ჩატის გაგრძელება", en: "more AI chat messages" },
-  weekly: { ka: "7-დღიანი პროგნოზი", en: "the 7-day forecast" },
-  weekly_forecast: { ka: "7-დღიანი პროგნოზი", en: "the 7-day forecast" },
-  iq: { ka: "ტესტის სრული შედეგი", en: "the full test result" },
-  eq: { ka: "ტესტის სრული შედეგი", en: "the full test result" },
-  "big-five": { ka: "ტესტის სრული შედეგი", en: "the full test result" },
-  mbti: { ka: "ტესტის სრული შედეგი", en: "the full test result" },
+  dream: {
+    ka: "სიზმრის AI ახსნა",
+    en: "AI dream interpretations",
+    pl: "interpretacje snów AI",
+  },
+  chat: {
+    ka: "AI ჩატის გაგრძელება",
+    en: "more AI chat messages",
+    pl: "kolejne wiadomości na czacie AI",
+  },
+  ai_chart_chat: {
+    ka: "AI ჩატის გაგრძელება",
+    en: "more AI chat messages",
+    pl: "kolejne wiadomości na czacie AI",
+  },
+  weekly: {
+    ka: "7-დღიანი პროგნოზი",
+    en: "the 7-day forecast",
+    pl: "prognoza 7-dniowa",
+  },
+  weekly_forecast: {
+    ka: "7-დღიანი პროგნოზი",
+    en: "the 7-day forecast",
+    pl: "prognoza 7-dniowa",
+  },
+  iq: {
+    ka: "ტესტის სრული შედეგი",
+    en: "the full test result",
+    pl: "pełny wynik testu",
+  },
+  eq: {
+    ka: "ტესტის სრული შედეგი",
+    en: "the full test result",
+    pl: "pełny wynik testu",
+  },
+  "big-five": {
+    ka: "ტესტის სრული შედეგი",
+    en: "the full test result",
+    pl: "pełny wynik testu",
+  },
+  mbti: {
+    ka: "ტესტის სრული შედეგი",
+    en: "the full test result",
+    pl: "pełny wynik testu",
+  },
 };
 
 export type PaywallPrimaryOffer = {
@@ -79,25 +136,43 @@ export function paywallPrimaryOffer({
   countryCode?: string | null;
   locale: UserLocale;
 }): PaywallPrimaryOffer {
-  const en = locale === "en";
-  const pack = creditPacksForCountry(countryCode)[0];
+  const effectiveCountry = countryCode || (locale === "pl" ? "PL" : undefined);
+  const pack = creditPacksForCountry(effectiveCountry)[0];
   const price = formatBillingAmount(pack.amountMinor, pack.currency, locale);
   const uses = starterPackUses(product, pack);
-  const outcome =
-    OUTCOME[product] ??
-    (en ? { ka: "", en: "this result" } : { ka: "ეს შედეგი", en: "" });
+  const outcomeText =
+    OUTCOME[product]?.[locale] ??
+    (locale === "pl"
+      ? "ten wynik"
+      : locale === "en"
+        ? "this result"
+        : "ეს შედეგი");
 
-  const label = uses
-    ? en
-      ? `${uses} ${outcome.en}, ${price}`
-      : `${uses} ${outcome.ka}, ${price}`
-    : en
-      ? `Unlock ${outcome.en}, ${price}`
-      : `გახსენი ${outcome.ka}, ${price}`;
+  let label: string;
+  if (uses) {
+    if (locale === "pl") {
+      label = `${uses}x ${outcomeText}, ${price}`;
+    } else if (locale === "en") {
+      label = `${uses} ${outcomeText}, ${price}`;
+    } else {
+      label = `${uses} ${outcomeText}, ${price}`;
+    }
+  } else {
+    if (locale === "pl") {
+      label = `Odblokuj: ${outcomeText}, ${price}`;
+    } else if (locale === "en") {
+      label = `Unlock ${outcomeText}, ${price}`;
+    } else {
+      label = `გახსენი ${outcomeText}, ${price}`;
+    }
+  }
 
-  const detail = en
-    ? `${pack.credits} credits · one-time payment · no auto-renewal`
-    : `${pack.credits} კრედიტი · ერთჯერადი გადახდა · ავტოგანახლების გარეშე`;
+  const detail =
+    locale === "pl"
+      ? `${pack.credits} kredytów · płatność jednorazowa · bez autoodnawiania`
+      : locale === "en"
+        ? `${pack.credits} credits · one-time payment · no auto-renewal`
+        : `${pack.credits} კრედიტი · ერთჯერადი გადახდა · ავტოგანახლების გარეშე`;
 
   return { pack, label, detail };
 }
@@ -118,21 +193,31 @@ export function paywallImpulseOffer({
   locale: UserLocale;
   missing: number;
 }): PaywallPrimaryOffer | null {
-  const pack = impulsePackForCountry(countryCode);
+  const effectiveCountry = countryCode || (locale === "pl" ? "PL" : undefined);
+  const pack = impulsePackForCountry(effectiveCountry);
   if (missing > pack.credits) return null;
-  const en = locale === "en";
   const price = formatBillingAmount(pack.amountMinor, pack.currency, locale);
-  const outcome =
-    OUTCOME[product] ??
-    (en ? { ka: "", en: "this result" } : { ka: "ეს შედეგი", en: "" });
+  const outcomeText =
+    OUTCOME[product]?.[locale] ??
+    (locale === "pl"
+      ? "ten wynik"
+      : locale === "en"
+        ? "this result"
+        : "ეს შედეგი");
 
-  const label = en
-    ? `Quick unlock ${outcome.en} (${pack.credits} cr), ${price}`
-    : `სწრაფი გახსნა (${pack.credits} კრ.), ${price}`;
+  const label =
+    locale === "pl"
+      ? `Szybkie odblokowanie (${pack.credits} kred.), ${price}`
+      : locale === "en"
+        ? `Quick unlock ${outcomeText} (${pack.credits} cr), ${price}`
+        : `სწრაფი გახსნა (${pack.credits} კრ.), ${price}`;
 
-  const detail = en
-    ? `${pack.credits} credits · one-time · instant unlock`
-    : `${pack.credits} კრედიტი · ერთჯერადი გადახდა · მყისიერი გახსნა`;
+  const detail =
+    locale === "pl"
+      ? `${pack.credits} kredytów · jednorazowo · natychmiastowy dostęp`
+      : locale === "en"
+        ? `${pack.credits} credits · one-time · instant unlock`
+        : `${pack.credits} კრედიტი · ერთჯერადი გადახდა · მყისიერი გახსნა`;
 
   return { pack, label, detail };
 }

@@ -15,8 +15,12 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { moonPhaseInterpretationLibrary } from "@/db/schema";
-import type { PhaseKey } from "./moon-phase";
+import type { MoonPhaseSnapshot, PhaseKey } from "./moon-phase";
 import type { MoonPhaseReadingResult } from "./openrouter";
+import type { UserLocale } from "./i18n/user-locale";
+import { signByIndex } from "./zodiac";
+import { englishMoonPhaseReading } from "./moon-phase-en";
+import { polishMoonPhaseReading } from "./moon-phase-pl";
 
 export function moonPhaseLibraryKey(phase: PhaseKey, sign: string): string {
   return `${phase}:${sign}`;
@@ -25,7 +29,7 @@ export function moonPhaseLibraryKey(phase: PhaseKey, sign: string): string {
 /** Pure read, never generates. Admin edits reflect on the next new day. */
 export async function getMoonPhaseLibraryEntry(
   phase: PhaseKey,
-  sign: string
+  sign: string,
 ): Promise<MoonPhaseReadingResult | null> {
   const [row] = await db
     .select({
@@ -35,9 +39,27 @@ export async function getMoonPhaseLibraryEntry(
       themes: moonPhaseInterpretationLibrary.themes,
     })
     .from(moonPhaseInterpretationLibrary)
-    .where(eq(moonPhaseInterpretationLibrary.key, moonPhaseLibraryKey(phase, sign)))
+    .where(
+      eq(moonPhaseInterpretationLibrary.key, moonPhaseLibraryKey(phase, sign)),
+    )
     .limit(1);
   return row ?? null;
+}
+
+/**
+ * Returns localized moon phase reading:
+ * - for "pl": deterministic Polish reading via `polishMoonPhaseReading`
+ * - for "en": deterministic English reading via `englishMoonPhaseReading`
+ * - for "ka": loads from the collective Georgian library
+ */
+export async function getLocalizedMoonPhaseReading(
+  snapshot: MoonPhaseSnapshot,
+  locale: UserLocale = "ka",
+): Promise<MoonPhaseReadingResult | null> {
+  if (locale === "pl") return polishMoonPhaseReading(snapshot);
+  if (locale === "en") return englishMoonPhaseReading(snapshot);
+  const signKey = signByIndex(snapshot.signIndex).key;
+  return getMoonPhaseLibraryEntry(snapshot.phaseKey, signKey);
 }
 
 /**
@@ -48,7 +70,7 @@ export async function saveMoonPhaseLibraryEntry(
   phase: PhaseKey,
   sign: string,
   reading: MoonPhaseReadingResult,
-  model: string
+  model: string,
 ): Promise<void> {
   await db
     .insert(moonPhaseInterpretationLibrary)

@@ -4,8 +4,10 @@ import {
   ENGLISH_SITE_URL,
   ENGLISH_PUBLIC_ROUTES,
   GEORGIAN_SITE_URL,
+  POLISH_SITE_URL,
   isEnglishHost,
   localizedAlternates,
+  polishSiteHref,
   publicEnglishPath,
   siteOriginForHost,
 } from "@/lib/seo/locales";
@@ -19,6 +21,7 @@ describe("international SEO locale helpers", () => {
       languages: {
         "ka-GE": `${GEORGIAN_SITE_URL}/nataluri-ruka`,
         en: `${ENGLISH_SITE_URL}/natal-chart`,
+        "pl-PL": `${POLISH_SITE_URL}/horoskop-urodzeniowy`,
         "x-default": `${ENGLISH_SITE_URL}/natal-chart`,
       },
     });
@@ -30,8 +33,70 @@ describe("international SEO locale helpers", () => {
       languages: {
         "ka-GE": GEORGIAN_SITE_URL,
         en: ENGLISH_SITE_URL,
+        "pl-PL": POLISH_SITE_URL,
         "x-default": ENGLISH_SITE_URL,
       },
+    });
+  });
+
+  it("publishes Polish pages on clean vividaastro.com/pl URLs with canonical pl", () => {
+    expect(
+      localizedAlternates("/nataluri-ruka", "/nataluri-ruka", "pl"),
+    ).toEqual({
+      canonical: `${POLISH_SITE_URL}/horoskop-urodzeniowy`,
+      languages: {
+        "ka-GE": `${GEORGIAN_SITE_URL}/nataluri-ruka`,
+        en: `${ENGLISH_SITE_URL}/natal-chart`,
+        "pl-PL": `${POLISH_SITE_URL}/horoskop-urodzeniowy`,
+        "x-default": `${ENGLISH_SITE_URL}/natal-chart`,
+      },
+    });
+  });
+
+  it("resolves Polish site hrefs correctly", () => {
+    expect(polishSiteHref("/nataluri-ruka", true)).toBe(
+      "/pl/horoskop-urodzeniowy",
+    );
+    expect(polishSiteHref("/nataluri-ruka", false)).toBe(
+      "https://www.vividaastro.com/pl/horoskop-urodzeniowy",
+    );
+  });
+
+  it("upgrades detail slugs to English and Polish keyword slugs in localizedAlternates", () => {
+    const expectedLanguages = {
+      "ka-GE": `${GEORGIAN_SITE_URL}/sizmris-akhsna/gveli`,
+      en: `${ENGLISH_SITE_URL}/dream-meanings/snake`,
+      "pl-PL": `${POLISH_SITE_URL}/sennik/waz`,
+      "x-default": `${ENGLISH_SITE_URL}/dream-meanings/snake`,
+    };
+
+    expect(
+      localizedAlternates(
+        "/sizmris-akhsna/gveli",
+        "/sizmris-akhsna/gveli",
+        "ka",
+      ),
+    ).toEqual({
+      canonical: `${GEORGIAN_SITE_URL}/sizmris-akhsna/gveli`,
+      languages: expectedLanguages,
+    });
+
+    expect(
+      localizedAlternates(
+        "/dream-meanings/snake",
+        "/sizmris-akhsna/gveli",
+        "en",
+      ),
+    ).toEqual({
+      canonical: `${ENGLISH_SITE_URL}/dream-meanings/snake`,
+      languages: expectedLanguages,
+    });
+
+    expect(
+      localizedAlternates("/pl/sennik/waz", "/sizmris-akhsna/gveli", "pl"),
+    ).toEqual({
+      canonical: `${POLISH_SITE_URL}/sennik/waz`,
+      languages: expectedLanguages,
     });
   });
 

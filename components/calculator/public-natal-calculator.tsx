@@ -53,6 +53,14 @@ const ERRORS_EN: Record<string, string> = {
   rate_limited: "Too many requests in a short time. Please try again soon.",
   compute_failed: "We couldn't calculate the chart. Please try again.",
 };
+const ERRORS_PL: Record<string, string> = {
+  invalid_date: "Sprawdź datę urodzenia.",
+  invalid_time: "Sprawdź godzinę urodzenia.",
+  invalid_location: "Wybierz miasto urodzenia z listy.",
+  invalid_timezone: "Wybierz miasto urodzenia z listy.",
+  rate_limited: "Zbyt wiele zapytań w krótkim czasie. Spróbuj za chwilę.",
+  compute_failed: "Nie udało się obliczyć kosmogramu. Spróbuj ponownie.",
+};
 
 const CALCULATOR_ONBOARDING_PATH = "/onboarding?next=/report";
 
@@ -69,6 +77,18 @@ const SAMPLE_PLACE: GeocodeResult = {
   timezone: "Europe/London",
 };
 
+const SAMPLE_PLACE_PL: GeocodeResult = {
+  id: -2,
+  name: "Warszawa",
+  displayName: "Warszawa, Polska",
+  country: "Polska",
+  countryCode: "PL",
+  admin1: "Województwo mazowieckie",
+  latitude: 52.2297,
+  longitude: 21.0122,
+  timezone: "Europe/Warsaw",
+};
+
 export function PublicNatalCalculator({
   locale = "ka",
   acquisitionMode = false,
@@ -76,13 +96,14 @@ export function PublicNatalCalculator({
   locale?: UserLocale;
   acquisitionMode?: boolean;
 }) {
+  const isPl = locale === "pl";
   const en = locale === "en";
   const onboardingPath = acquisitionMode
     ? "/onboarding?fast=1&next=/report?offer=uk"
     : CALCULATOR_ONBOARDING_PATH;
   const signupHref = `/signup?next=${encodeURIComponent(onboardingPath)}`;
   const loginHref = `/login?next=${encodeURIComponent(onboardingPath)}`;
-  const errors = en ? ERRORS_EN : ERRORS;
+  const errors = isPl ? ERRORS_PL : en ? ERRORS_EN : ERRORS;
   const [day, setDay] = useState("");
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
@@ -101,7 +122,7 @@ export function PublicNatalCalculator({
     setHour("09");
     setMinute("30");
     setUnknownTime(false);
-    setPlace(SAMPLE_PLACE);
+    setPlace(isPl ? SAMPLE_PLACE_PL : SAMPLE_PLACE);
     setSampleNonce((n) => n + 1);
     setError(null);
   }
@@ -118,11 +139,20 @@ export function PublicNatalCalculator({
     const moon = chart.bodies.moon?.signIndex;
     const asc = chart.ascendant?.signIndex;
     if (sun == null || moon == null || asc == null) return;
-    const url = `${window.location.origin}${""}/nataluri-ruka?big=${sun}.${moon}.${asc}`;
+    const basePath = isPl
+      ? "/pl/horoskop-urodzeniowy"
+      : en
+        ? "/natal-chart"
+        : "/nataluri-ruka";
+    const url = `${window.location.origin}${basePath}?big=${sun}.${moon}.${asc}`;
     try {
       if (navigator.share) {
         await navigator.share({
-          title: en ? "My birth chart" : "ჩემი ნატალური რუკა",
+          title: isPl
+            ? "Mój horoskop urodzeniowy"
+            : en
+              ? "My birth chart"
+              : "ჩემი ნატალური რუკა",
           url,
         });
         trackEvent(ANALYTICS_EVENT.natalChartShared, { method: "native" });
@@ -173,9 +203,11 @@ export function PublicNatalCalculator({
       if (!res.ok || !data.chart) {
         setError(
           errors[data.error] ??
-            (en
-              ? "Something went wrong. Please try again."
-              : "რაღაც ვერ მოხერხდა. სცადე ხელახლა."),
+            (isPl
+              ? "Coś poszło nie tak. Spróbuj ponownie."
+              : en
+                ? "Something went wrong. Please try again."
+                : "რაღაც ვერ მოხერხდა. სცადე ხელახლა."),
         );
         return;
       }
@@ -203,9 +235,11 @@ export function PublicNatalCalculator({
       );
     } catch {
       setError(
-        en
-          ? "Network error. Please try again."
-          : "ქსელის შეცდომა. სცადე ხელახლა.",
+        isPl
+          ? "Błąd sieci. Spróbuj ponownie."
+          : en
+            ? "Network error. Please try again."
+            : "ქსელის შეცდომა. სცადე ხელახლა.",
       );
     } finally {
       setLoading(false);
@@ -236,28 +270,30 @@ export function PublicNatalCalculator({
         >
           {/* Date */}
           <div className="space-y-2">
-            <Label>{en ? "Birth date" : "დაბადების თარიღი"}</Label>
+            <Label>
+              {isPl ? "Data urodzenia" : en ? "Birth date" : "დაბადების თარიღი"}
+            </Label>
             <div className="grid grid-cols-3 gap-3">
               <NumField
                 value={day}
                 onChange={setDay}
                 max={2}
-                placeholder={en ? "Day" : "დღე"}
-                aria={en ? "Day" : "დღე"}
+                placeholder={isPl ? "Dzień" : en ? "Day" : "დღე"}
+                aria={isPl ? "Dzień" : en ? "Day" : "დღე"}
               />
               <NumField
                 value={month}
                 onChange={setMonth}
                 max={2}
-                placeholder={en ? "Month" : "თვე"}
-                aria={en ? "Month" : "თვე"}
+                placeholder={isPl ? "Miesiąc" : en ? "Month" : "თვე"}
+                aria={isPl ? "Miesiąc" : en ? "Month" : "თვე"}
               />
               <NumField
                 value={year}
                 onChange={setYear}
                 max={4}
-                placeholder={en ? "Year" : "წელი"}
-                aria={en ? "Year" : "წელი"}
+                placeholder={isPl ? "Rok" : en ? "Year" : "წელი"}
+                aria={isPl ? "Rok" : en ? "Year" : "წელი"}
               />
             </div>
           </div>
@@ -265,7 +301,13 @@ export function PublicNatalCalculator({
           {/* Time */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label>{en ? "Birth time" : "დაბადების დრო"}</Label>
+              <Label>
+                {isPl
+                  ? "Godzina urodzenia"
+                  : en
+                    ? "Birth time"
+                    : "დაბადების დრო"}
+              </Label>
               <button
                 type="button"
                 onClick={() => setUnknownTime((v) => !v)}
@@ -276,7 +318,11 @@ export function PublicNatalCalculator({
                 }`}
               >
                 {unknownTime ? "✓ " : ""}
-                {en ? "I don't know the exact time" : "არ ვიცი ზუსტი დრო"}
+                {isPl
+                  ? "Nie znam dokładnej godziny"
+                  : en
+                    ? "I don't know the exact time"
+                    : "არ ვიცი ზუსტი დრო"}
               </button>
             </div>
             <div
@@ -286,24 +332,26 @@ export function PublicNatalCalculator({
                 value={hour}
                 onChange={setHour}
                 max={2}
-                placeholder={en ? "Hour" : "საათი"}
-                aria={en ? "Hour" : "საათი"}
+                placeholder={isPl ? "Godzina" : en ? "Hour" : "საათი"}
+                aria={isPl ? "Godzina" : en ? "Hour" : "საათი"}
                 disabled={unknownTime}
               />
               <NumField
                 value={minute}
                 onChange={setMinute}
                 max={2}
-                placeholder={en ? "Minute" : "წუთი"}
-                aria={en ? "Minute" : "წუთი"}
+                placeholder={isPl ? "Minuta" : en ? "Minute" : "წუთი"}
+                aria={isPl ? "Minuta" : en ? "Minute" : "წუთი"}
                 disabled={unknownTime}
               />
             </div>
             {unknownTime && (
               <p className="text-xs text-muted-foreground">
-                {en
-                  ? "We'll use 12:00 noon. Most planetary signs will remain accurate, but the rising sign and houses may not be."
-                  : "დროს 12:00-ად ჩავთვლით, მზე და პლანეტები ზუსტი იქნება, ამომავალი და სახლები შესაძლოა არა."}
+                {isPl
+                  ? "Przyjmiemy godzinę 12:00. Większość znaków planetarnych pozostanie dokładna, lecz ascendent i domy mogą się różnić."
+                  : en
+                    ? "We'll use 12:00 noon. Most planetary signs will remain accurate, but the rising sign and houses may not be."
+                    : "დროს 12:00-ად ჩავთვლით, მზე და პლანეტები ზუსტი იქნება, ამომავალი და სახლები შესაძლოა არა."}
               </p>
             )}
           </div>
@@ -320,13 +368,15 @@ export function PublicNatalCalculator({
             <p className="text-sm text-[var(--vivida-pink)]">{error}</p>
           )}
 
-          {en && !chart && (
+          {(en || isPl) && !chart && (
             <button
               type="button"
               onClick={fillSample}
               className="w-full rounded-md border border-dashed border-border px-4 py-2.5 font-mono text-xs text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
             >
-              Try a sample · 14 Feb 1990 · 09:30 · London
+              {isPl
+                ? "Wypróbuj przykład · 14 lut 1990 · 09:30 · Warszawa"
+                : "Try a sample · 14 Feb 1990 · 09:30 · London"}
             </button>
           )}
 
@@ -337,12 +387,16 @@ export function PublicNatalCalculator({
               <Sparkles className="size-4" />
             )}
             {chart
-              ? en
-                ? "Calculate again"
-                : "ხელახლა გამოთვლა"
-              : en
-                ? "Calculate my chart"
-                : "გამოთვალე ჩემი რუკა"}
+              ? isPl
+                ? "Oblicz ponownie"
+                : en
+                  ? "Calculate again"
+                  : "ხელახლა გამოთვლა"
+              : isPl
+                ? "Oblicz mój kosmogram"
+                : en
+                  ? "Calculate my chart"
+                  : "გამოთვალე ჩემი რუკა"}
           </Button>
         </form>
       </div>
@@ -368,12 +422,16 @@ export function PublicNatalCalculator({
                 <Share2 className="size-4" />
               )}
               {copied
-                ? en
-                  ? "Link copied"
-                  : "ბმული დაკოპირდა"
-                : en
-                  ? "Share my chart"
-                  : "გააზიარე ჩემი რუკა"}
+                ? isPl
+                  ? "Link skopiowany"
+                  : en
+                    ? "Link copied"
+                    : "ბმული დაკოპირდა"
+                : isPl
+                  ? "Udostępnij kosmogram"
+                  : en
+                    ? "Share my chart"
+                    : "გააზიარე ჩემი რუკა"}
             </Button>
           </div>
 
@@ -387,11 +445,14 @@ export function PublicNatalCalculator({
                 <Lock className="size-4" />
               </div>
               <h3 className="text-balance text-2xl font-semibold text-foreground sm:text-3xl">
-                Save your chart & unlock personal readings
+                {isPl
+                  ? "Zapisz swój kosmogram i odblokuj osobiste interpretacje"
+                  : "Save your chart & unlock personal readings"}
               </h3>
               <p className="mx-auto mt-3 max-w-lg text-sm text-muted-foreground">
-                Create a free account to reveal what every placement means for
-                you, then choose PRO unlimited or pay-as-you-go credits.
+                {isPl
+                  ? "Załóż darmowe konto, aby odkryć znaczenie każdego układu planetarnego w Twoim horoskopie."
+                  : "Create a free account to reveal what every placement means for you, then choose PRO unlimited or pay-as-you-go credits."}
               </p>
               <div className="mt-5 flex flex-wrap justify-center gap-3">
                 <Button asChild size="lg">
@@ -403,29 +464,41 @@ export function PublicNatalCalculator({
                       })
                     }
                   >
-                    Save my chart free
+                    {isPl ? "Zapisz kosmogram za darmo" : "Save my chart free"}
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg">
-                  <Link href={loginHref}>Log in</Link>
+                  <Link href={loginHref}>
+                    {isPl ? "Zaloguj się" : "Log in"}
+                  </Link>
                 </Button>
               </div>
               <p className="mt-3 font-mono text-xs text-muted-foreground">
-                Free account · No card required
+                {isPl
+                  ? "Darmowe konto · Bez karty"
+                  : "Free account · No card required"}
               </p>
             </div>
           )}
 
           <section>
             <h3 className="mb-3 font-mono text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              {en ? "Planet positions" : "პლანეტების პოზიციები"}
+              {isPl
+                ? "Pozycje planet"
+                : en
+                  ? "Planet positions"
+                  : "პლანეტების პოზიციები"}
             </h3>
             <PositionsTable chart={chart} locale={locale} />
           </section>
 
           <section>
             <h3 className="mb-3 font-mono text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              {en ? "12 houses" : "12 სახლი"}
+              {isPl
+                ? "12 domów astrologicznych"
+                : en
+                  ? "12 houses"
+                  : "12 სახლი"}
             </h3>
             <div className="rounded-md border border-border bg-card px-4 py-3 sm:px-5">
               <HousesTable chart={chart} locale={locale} />
@@ -434,7 +507,7 @@ export function PublicNatalCalculator({
 
           <section>
             <h3 className="mb-3 font-mono text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              {en ? "Aspects" : "ასპექტები"}
+              {isPl ? "Aspekty planetarne" : en ? "Aspects" : "ასპექტები"}
             </h3>
             <AspectCards chart={chart} locale={locale} />
           </section>
@@ -446,14 +519,18 @@ export function PublicNatalCalculator({
                 <Lock className="size-4" />
               </div>
               <h3 className="text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-                {en
-                  ? "What does this mean for you?"
-                  : "რას ნიშნავს ეს შენთვის?"}
+                {isPl
+                  ? "Co to oznacza dla Ciebie?"
+                  : en
+                    ? "What does this mean for you?"
+                    : "რას ნიშნავს ეს შენთვის?"}
               </h3>
               <p className="mx-auto mt-3 max-w-lg text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
-                {en
-                  ? "These are the precise placements in your chart. Create a free account to unlock personal interpretations for every planet, house, and aspect, plus AI insights and a complete PDF report."
-                  : "ეს არის შენი რუკის სუფთა მონაცემები. დარეგისტრირდი უფასოდ და ნახე თითოეული პლანეტის, სახლისა და ასპექტის პერსონალური ინტერპრეტაცია, AI ანალიზი და სრული PDF ანგარიში."}
+                {isPl
+                  ? "To są dokładne pozycje planet w Twoim kosmogramie. Załóż darmowe konto, aby odblokować osobiste interpretacje dla każdej planety, domu i aspektu, a także wskazówki astrologa AI i kompletny raport PDF."
+                  : en
+                    ? "These are the precise placements in your chart. Create a free account to unlock personal interpretations for every planet, house, and aspect, plus AI insights and a complete PDF report."
+                    : "ეს არის შენი რუკის სუფთა მონაცემები. დარეგისტრირდი უფასოდ და ნახე თითოეული პლანეტის, სახლისა და ასპექტის პერსონალური ინტერპრეტაცია, AI ანალიზი და სრული PDF ანგარიში."}
               </p>
               <div className="mt-6 flex flex-wrap justify-center gap-3">
                 <Button asChild size="lg">
@@ -465,11 +542,17 @@ export function PublicNatalCalculator({
                       })
                     }
                   >
-                    {en ? "Create free account" : "უფასო რეგისტრაცია"}
+                    {isPl
+                      ? "Załóż darmowe konto"
+                      : en
+                        ? "Create free account"
+                        : "უფასო რეგისტრაცია"}
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg">
-                  <Link href={loginHref}>{en ? "Log in" : "შესვლა"}</Link>
+                  <Link href={loginHref}>
+                    {isPl ? "Zaloguj się" : en ? "Log in" : "შესვლა"}
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -483,7 +566,11 @@ export function PublicNatalCalculator({
 
           <div className="border-t border-border pt-6 text-center">
             <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-              {en ? "Or keep exploring for free" : "ან განაგრძე უფასოდ"}
+              {isPl
+                ? "Lub odkrywaj dalej za darmo"
+                : en
+                  ? "Or keep exploring for free"
+                  : "ან განაგრძე უფასოდ"}
             </p>
             <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
               {sunSlug && sunSign && (
@@ -493,8 +580,12 @@ export function PublicNatalCalculator({
                     className="inline-flex items-center gap-1.5 font-medium text-foreground hover:text-primary hover:underline"
                   >
                     <span aria-hidden>{sunSign.symbol}</span>
-                    {en ? sunSign.labelEn : sunSign.labelKa},{" "}
-                    {en ? "your sign" : "შენი ნიშანი"}
+                    {isPl
+                      ? sunSign.labelPl
+                      : en
+                        ? sunSign.labelEn
+                        : sunSign.labelKa}
+                    , {isPl ? "Twój znak" : en ? "your sign" : "შენი ნიშანი"}
                   </Link>
                   <span aria-hidden>·</span>
                 </>
@@ -503,14 +594,22 @@ export function PublicNatalCalculator({
                 href={localizedHref("/horoskopi", locale)}
                 className="hover:text-foreground hover:underline"
               >
-                {en ? "Daily horoscope" : "დღის ჰოროსკოპი"}
+                {isPl
+                  ? "Horoskop dzienny"
+                  : en
+                    ? "Daily horoscope"
+                    : "დღის ჰოროსკოპი"}
               </Link>
               <span aria-hidden>·</span>
               <Link
                 href={localizedHref("/zodiac/tavsebadoba", locale)}
                 className="hover:text-foreground hover:underline"
               >
-                {en ? "Compatibility" : "თავსებადობა"}
+                {isPl
+                  ? "Horoskop partnerski"
+                  : en
+                    ? "Compatibility"
+                    : "თავსებადობა"}
               </Link>
             </div>
           </div>
@@ -529,6 +628,7 @@ function HoroscopeEmailCapture({
   big: string | null;
   locale?: UserLocale;
 }) {
+  const isPl = locale === "pl";
   const en = locale === "en";
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">(
@@ -554,13 +654,17 @@ function HoroscopeEmailCapture({
         setStatus("error");
         setMsg(
           data.error === "rate_limited"
-            ? en
-              ? "Too many requests. Please try again soon."
-              : "ბევრი მოთხოვნა. სცადე ცოტა ხანში."
+            ? isPl
+              ? "Zbyt wiele zapytań. Spróbuj za chwilę."
+              : en
+                ? "Too many requests. Please try again soon."
+                : "ბევრი მოთხოვნა. სცადე ცოტა ხანში."
             : (typeof data.error === "string" && data.error) ||
-                (en
-                  ? "It didn't work. Please try again."
-                  : "ვერ მოხერხდა. სცადე ხელახლა."),
+                (isPl
+                  ? "Nie udało się zapisać. Spróbuj ponownie."
+                  : en
+                    ? "It didn't work. Please try again."
+                    : "ვერ მოხერხდა. სცადე ხელახლა."),
         );
         return;
       }
@@ -571,9 +675,11 @@ function HoroscopeEmailCapture({
     } catch {
       setStatus("error");
       setMsg(
-        en
-          ? "Network error. Please try again."
-          : "ქსელის შეცდომა. სცადე ხელახლა.",
+        isPl
+          ? "Błąd sieci. Spróbuj ponownie."
+          : en
+            ? "Network error. Please try again."
+            : "ქსელის შეცდომა. სცადე ხელახლა.",
       );
     }
   }
@@ -582,9 +688,11 @@ function HoroscopeEmailCapture({
     return (
       <div className="flex items-center justify-center gap-2 rounded-md border border-border bg-card px-5 py-4 text-center text-sm text-foreground/90">
         <Check className="size-4 shrink-0 text-primary" />
-        {en
-          ? "Subscribed! Your first horoscope is on its way."
-          : "გამოწერილია! პირველი ჰოროსკოპი უკვე იგზავნება ელფოსტაზე."}
+        {isPl
+          ? "Zapisano! Twój pierwszy horoskop jest już w drodze na e-mail."
+          : en
+            ? "Subscribed! Your first horoscope is on its way."
+            : "გამოწერილია! პირველი ჰოროსკოპი უკვე იგზავნება ელფოსტაზე."}
       </div>
     );
   }
@@ -600,22 +708,32 @@ function HoroscopeEmailCapture({
       <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
         <Mail className="size-4 text-primary" />
         <span>
-          {en
-            ? "Get your daily horoscope in your inbox"
-            : "მიიღე ყოველდღიური ჰოროსკოპი მეილზე"}
+          {isPl
+            ? "Odbieraj codzienny horoskop na e-mail"
+            : en
+              ? "Get your daily horoscope in your inbox"
+              : "მიიღე ყოველდღიური ჰოროსკოპი მეილზე"}
         </span>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
-        {en
-          ? "Free forever · No spam · One-click unsubscribe."
-          : "უფასოა · სპამის გარეშე · გაუქმება ნებისმიერ დროს."}
+        {isPl
+          ? "Zawsze za darmo · Bez spamu · Wypisz się jednym kliknięciem."
+          : en
+            ? "Free forever · No spam · One-click unsubscribe."
+            : "უფასოა · სპამის გარეშე · გაუქმება ნებისმიერ დროს."}
       </p>
       <div className="mt-3 flex flex-col gap-2 sm:flex-row">
         <Input
           type="email"
           required
           autoComplete="email"
-          placeholder={en ? "Your email address" : "შენი ელფოსტა"}
+          placeholder={
+            isPl
+              ? "Twój adres e-mail"
+              : en
+                ? "Your email address"
+                : "შენი ელფოსტა"
+          }
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={status === "loading"}
@@ -632,7 +750,7 @@ function HoroscopeEmailCapture({
           ) : (
             <Sparkles className="size-4" />
           )}
-          {en ? "Subscribe" : "გამოწერა"}
+          {isPl ? "Zapisz się" : en ? "Subscribe" : "გამოწერა"}
         </Button>
       </div>
       {msg && (
@@ -687,6 +805,7 @@ function BigThree({
   chart: NatalChartJson;
   locale?: UserLocale;
 }) {
+  const isPl = locale === "pl";
   const en = locale === "en";
   const items: {
     label: string;
@@ -694,17 +813,17 @@ function BigThree({
     point: PointJson | undefined;
   }[] = [
     {
-      label: en ? "Sun" : "მზე",
+      label: isPl ? "Słońce" : en ? "Sun" : "მზე",
       glyph: "☉",
       point: chart.bodies.sun,
     },
     {
-      label: en ? "Moon" : "მთვარე",
+      label: isPl ? "Księżyc" : en ? "Moon" : "მთვარე",
       glyph: "☽",
       point: chart.bodies.moon,
     },
     {
-      label: en ? "Rising" : "ამომავალი",
+      label: isPl ? "Ascendent" : en ? "Rising" : "ამომავალი",
       glyph: "AC",
       point: chart.ascendant,
     },
@@ -725,7 +844,7 @@ function BigThree({
                 {sign.symbol}
               </span>
               <span className="text-lg font-semibold tracking-tight text-foreground">
-                {en ? sign.labelEn : sign.labelKa}
+                {isPl ? sign.labelPl : en ? sign.labelEn : sign.labelKa}
               </span>
             </div>
             <div className="mt-1 font-mono text-xs tabular-nums text-muted-foreground">
@@ -747,6 +866,7 @@ function BigThreeSynthesisTeaser({
   locale?: UserLocale;
   signupHref: string;
 }) {
+  const isPl = locale === "pl";
   const en = locale === "en";
   const sun =
     chart.bodies.sun != null ? signByIndex(chart.bodies.sun.signIndex) : null;
@@ -756,42 +876,54 @@ function BigThreeSynthesisTeaser({
     chart.ascendant != null ? signByIndex(chart.ascendant.signIndex) : null;
   if (!sun || !moon || !asc) return null;
 
-  const sunName = en ? sun.labelEn : sun.labelKa;
-  const moonName = en ? moon.labelEn : moon.labelKa;
-  const ascName = en ? asc.labelEn : asc.labelKa;
+  const sunName = isPl ? sun.labelPl : en ? sun.labelEn : sun.labelKa;
+  const moonName = isPl ? moon.labelPl : en ? moon.labelEn : moon.labelKa;
+  const ascName = isPl ? asc.labelPl : en ? asc.labelEn : asc.labelKa;
   const chartSignupHref = `/signup?next=${encodeURIComponent("/onboarding?next=/chart")}`;
 
   return (
     <div className="rounded-md border border-primary/35 bg-card p-5 sm:p-6">
       <div className="flex items-center justify-between gap-2">
         <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
-          {en
-            ? "YOUR BIG THREE SYNTHESIS · PREVIEW"
-            : "შენი დიდი სამეულის სინთეზი · წინასწარი მიმოხილვა"}
+          {isPl
+            ? "SYNTEZA WIELKIEJ TRÓJKI · PODGLĄD"
+            : en
+              ? "YOUR BIG THREE SYNTHESIS · PREVIEW"
+              : "შენი დიდი სამეულის სინთეზი · წინასწარი მიმოხილვა"}
         </span>
         <span className="inline-flex items-center gap-1 font-mono text-[11px] text-muted-foreground">
           <Lock className="size-3 text-primary" />
-          {en ? "Personal reading" : "პირადი ინტერპრეტაცია"}
+          {isPl
+            ? "Osobista interpretacja"
+            : en
+              ? "Personal reading"
+              : "პირადი ინტერპრეტაცია"}
         </span>
       </div>
       <p className="mt-2.5 text-pretty text-sm leading-relaxed text-foreground/90 sm:text-base">
-        {en
-          ? `Your chart combines a ${sunName} Sun, ${moonName} Moon, and ${ascName} Rising — a rare signature where your outer presence (${ascName}) and inner emotional world (${moonName}) pull your core ${sunName} drive in two distinct directions.`
-          : `შენს რუკაში ერთიანდება მზე — ${sunName}, მთვარე — ${moonName} და ამომავალი — ${ascName}: ეს კომბინაცია ქმნის უნიკალურ დინამიკას შენს გარეგან იმიჯსა (${ascName}) და შინაგან ემოციურ სამყაროს (${moonName}) შორის.`}
+        {isPl
+          ? `W Twoim kosmogramie łączą się Słońce w znaku ${sunName}, Księżyc w znaku ${moonName} oraz Ascendent w znaku ${ascName} — to unikalna sygnatura, w której Twój zewnętrzny styl bycia (${ascName}) oraz wewnętrzny świat emocji (${moonName}) nadają Twojej sile życiowej (${sunName}) wielowymiarowy kierunek.`
+          : en
+            ? `Your chart combines a ${sunName} Sun, ${moonName} Moon, and ${ascName} Rising — a rare signature where your outer presence (${ascName}) and inner emotional world (${moonName}) pull your core ${sunName} drive in two distinct directions.`
+            : `შენს რუკაში ერთიანდება მზე — ${sunName}, მთვარე — ${moonName} და ამომავალი — ${ascName}: ეს კომბინაცია ქმნის უნიკალურ დინამიკას შენს გარეგან იმიჯსა (${ascName}) და შინაგან ემოციურ სამყაროს (${moonName}) შორის.`}
       </p>
       <div
         aria-hidden
         className="mt-2.5 space-y-1.5 select-none text-xs leading-relaxed text-foreground/70 blur-[5px] sm:text-sm"
       >
         <p>
-          {en
-            ? "In relationships and career decisions, this specific Sun–Moon angle explains why you crave both emotional certainty and personal autonomy at pivotal turning points."
-            : "ურთიერთობებსა და კარიერულ გადაწყვეტილებებში მზე–მთვარის ეს კონფიგურაცია ხსნის, თუ რატომ გჭირდება ერთდროულად ემოციური სიმყარე და სრული დამოუკიდებლობა."}
+          {isPl
+            ? "W relacjach i kluczowych wyborach życiowych ta konfiguracja Słońca i Księżyca wyjaśnia, dlaczego w momentach zwrotnych potrzebujesz jednocześnie emocjonalnego bezpieczeństwa i pełnej niezależności."
+            : en
+              ? "In relationships and career decisions, this specific Sun–Moon angle explains why you crave both emotional certainty and personal autonomy at pivotal turning points."
+              : "ურთიერთობებსა და კარიერულ გადაწყვეტილებებში მზე–მთვარის ეს კონფიგურაცია ხსნის, თუ რატომ გჭირდება ერთდროულად ემოციური სიმყარე და სრული დამოუკიდებლობა."}
         </p>
         <p>
-          {en
-            ? "Your dominant house placements and 2026–2027 transits reveal the exact months when your personal and financial potential reaches its peak."
-            : "შენი დომინანტური სახლები და 2026–2027 წლების ტრანზიტები აჩვენებს ზუსტ პერიოდებს, როდის აღწევს პიკს შენი პირადი და ფინანსური პოტენციალი."}
+          {isPl
+            ? "Twoje dominujące domy astrologiczne oraz tranzyty planet na lata 2026–2027 wskazują dokładne miesiące, w których Twój osobisty i zawodowy potencjał osiągnie szczyt."
+            : en
+              ? "Your dominant house placements and 2026–2027 transits reveal the exact months when your personal and financial potential reaches its peak."
+              : "შენი დომინანტური სახლები და 2026–2027 წლების ტრანზიტები აჩვენებს ზუსტ პერიოდებს, როდის აღწევს პიკს შენი პირადი და ფინანსური პოტენციალი."}
         </p>
       </div>
       <div className="mt-4 flex flex-wrap items-center gap-2.5 border-t border-border pt-4">
@@ -805,9 +937,11 @@ function BigThreeSynthesisTeaser({
             }
           >
             <Sparkles className="size-4" />
-            {en
-              ? "Unlock full chart & AI astrologer"
-              : "გახსენი სრული ანალიზი და AI ასტროლოგი"}
+            {isPl
+              ? "Odblokuj pełny kosmogram i astrologa AI"
+              : en
+                ? "Unlock full chart & AI astrologer"
+                : "გახსენი სრული ანალიზი და AI ასტროლოგი"}
           </Link>
         </Button>
         <Button asChild variant="outline" size="default">
@@ -819,9 +953,11 @@ function BigThreeSynthesisTeaser({
               })
             }
           >
-            {en
-              ? "Get 10+ page personal PDF book"
-              : "მიიღე 10+ გვერდიანი პირადი PDF წიგნი"}
+            {isPl
+              ? "Pobierz 10+ stronicową księgę PDF"
+              : en
+                ? "Get 10+ page personal PDF book"
+                : "მიიღე 10+ გვერდიანი პირადი PDF წიგნი"}
           </Link>
         </Button>
       </div>
@@ -838,6 +974,7 @@ function PlacePicker({
   onChange: (v: GeocodeResult | null) => void;
   locale?: UserLocale;
 }) {
+  const isPl = locale === "pl";
   const en = locale === "en";
   const [query, setQuery] = useState(value?.displayName ?? "");
   const [results, setResults] = useState<GeocodeResult[]>([]);
@@ -889,14 +1026,18 @@ function PlacePicker({
   return (
     <div className="space-y-2" ref={wrapRef}>
       <Label htmlFor="calc-place">
-        {en ? "Birth city" : "დაბადების ქალაქი"}
+        {isPl ? "Miasto urodzenia" : en ? "Birth city" : "დაბადების ქალაქი"}
       </Label>
       <div className="relative">
         <MapPin className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           id="calc-place"
           placeholder={
-            en ? "London, Paris, New York…" : "თბილისი, ბათუმი, ქუთაისი…"
+            isPl
+              ? "Warszawa, Kraków, Wrocław…"
+              : en
+                ? "London, Paris, New York…"
+                : "თბილისი, ბათუმი, ქუთაისი…"
           }
           className="pl-9 pr-10 text-base"
           value={query}
@@ -912,7 +1053,7 @@ function PlacePicker({
         ) : value ? (
           <button
             type="button"
-            aria-label={en ? "Clear" : "წაშლა"}
+            aria-label={isPl ? "Wyczyść" : en ? "Clear" : "წაშლა"}
             onClick={() => {
               onChange(null);
               setQuery("");

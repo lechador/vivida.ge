@@ -80,6 +80,12 @@ export function nudgeCopy(
   firstName: string | null = null,
 ): NudgeCopy {
   const l = loop.trim().slice(0, 60);
+  if (locale === "pl") {
+    return {
+      title: firstName ? `${firstName}, pamiętasz o tym?` : "Pamiętasz o tym?",
+      body: `Jak wygląda sytuacja z: „${l}”? Twój astrolog czeka.`,
+    };
+  }
   if (locale === "en") {
     return {
       title: firstName ? `${firstName}, remember this?` : "Remember this?",

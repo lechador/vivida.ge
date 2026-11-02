@@ -9,10 +9,15 @@ import {
 import { authConfig } from "@/auth.config";
 import { signedInLandingTarget } from "@/lib/landing-redirect";
 import { isEnglishHost } from "@/lib/seo/locales";
-import { upgradeEnglishDetailSlug } from "@/lib/seo/en-slugs";
+import {
+  upgradeEnglishDetailSlug,
+  upgradePolishDetailSlug,
+} from "@/lib/seo/en-slugs";
 import {
   internationalInternalPath,
   internationalPublicPath,
+  polishInternalPath,
+  polishPublicPath,
 } from "@/lib/seo/public-paths";
 
 const { auth } = NextAuth(authConfig);
@@ -75,6 +80,46 @@ function internationalEnglishRouting(
 }
 
 /**
+ * Route Polish URLs under `/pl` on vividaastro.com via internal rewrite to the
+ * shared tree, setting `x-vivida-locale: pl` on the rewritten request and
+ * `vivida_lang=pl` cookie on the response.
+ */
+function internationalPolishRouting(
+  request: NextRequest,
+): NextResponse | undefined {
+  const host =
+    request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  if (!isEnglishHost(host)) return undefined;
+
+  const { pathname } = request.nextUrl;
+  if (pathname !== "/pl" && !pathname.startsWith("/pl/")) return undefined;
+
+  const stripped = pathname === "/pl" ? "/" : pathname.slice(3);
+  const cleanPlPath = upgradePolishDetailSlug(polishPublicPath(stripped));
+  if (cleanPlPath !== pathname && cleanPlPath.startsWith("/pl")) {
+    const target = request.nextUrl.clone();
+    target.pathname = cleanPlPath;
+    return NextResponse.redirect(target, 308);
+  }
+
+  const internalPath = polishInternalPath(pathname);
+  const destination = request.nextUrl.clone();
+  destination.pathname = internalPath;
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-vivida-locale", "pl");
+
+  const response = NextResponse.rewrite(destination, {
+    request: { headers: requestHeaders },
+  });
+  response.cookies.set("vivida_lang", "pl", {
+    path: "/",
+    sameSite: "lax",
+  });
+  return response;
+}
+
+/**
  * Send a signed-in visitor from the marketing landing into the app.
  *
  * Runs ahead of the locale rules because language routing is irrelevant once
@@ -122,6 +167,7 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
   return (
     signedInLandingRedirect(request) ??
     retiredArmenianRedirect(request) ??
+    internationalPolishRouting(request) ??
     internationalEnglishRouting(request)
   );
 }

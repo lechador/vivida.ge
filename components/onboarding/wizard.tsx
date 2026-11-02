@@ -259,7 +259,11 @@ export function OnboardingWizard({
     const timeRes = validateTime(data.time);
     if (!date || !timeRes.ok || !data.place) {
       setError(
-        en ? "Please complete every field." : "გთხოვ, ყველა ველი შეავსო.",
+        locale === "pl"
+          ? "Proszę wypełnić wszystkie pola."
+          : en
+            ? "Please complete every field."
+            : "გთხოვ, ყველა ველი შეავსო.",
       );
       return;
     }
@@ -294,8 +298,12 @@ export function OnboardingWizard({
         } else {
           setDuplicateAccount(result.code === "duplicate_account");
           setError(
-            result.code === "duplicate_account" && en
-              ? "An account with these details already exists. Sign in to your existing account or contact support."
+            result.code === "duplicate_account"
+              ? locale === "pl"
+                ? "Konto z tymi danymi już istnieje. Zaloguj się na istniejące konto lub skontaktuj się ze wsparciem."
+                : en
+                  ? "An account with these details already exists. Sign in to your existing account or contact support."
+                  : result.error
               : result.error,
           );
         }
@@ -313,9 +321,11 @@ export function OnboardingWizard({
 
       {dateLocked && (
         <p className="mb-6 rounded-xl border border-border/60 bg-card/40 px-4 py-3 text-center text-sm text-muted-foreground">
-          {en
-            ? "Your birth date is fixed when you register and cannot be changed. You can still update the time and place."
-            : "დაბადების თარიღი ფიქსირდება რეგისტრაციაზე და ვერ შეიცვლება. დროის და ადგილის შესწორება შესაძლებელია."}
+          {locale === "pl"
+            ? "Data urodzenia jest ustalana podczas rejestracji i nie można jej zmienić. Nadal możesz zaktualizować godzinę i miejsce."
+            : en
+              ? "Your birth date is fixed when you register and cannot be changed. You can still update the time and place."
+              : "დაბადების თარიღი ფიქსირდება რეგისტრაციაზე და ვერ შეიცვლება. დროის და ადგილის შესწორება შესაძლებელია."}
         </p>
       )}
 
@@ -376,7 +386,11 @@ export function OnboardingWizard({
                 disabled={isPending}
                 onClick={() => startTransition(() => signOutAction("/login"))}
               >
-                {en ? "Sign in to existing account" : "ძველ ანგარიშში შესვლა"}
+                {locale === "pl"
+                  ? "Zaloguj się na istniejące konto"
+                  : en
+                    ? "Sign in to existing account"
+                    : "ძველ ანგარიშში შესვლა"}
               </Button>
             )}
           </div>
@@ -385,14 +399,18 @@ export function OnboardingWizard({
         {possibleDuplicate && (
           <div className="mt-6 rounded-xl border border-amber-400/40 bg-amber-400/10 p-4 text-sm">
             <p className="font-medium">
-              {en
-                ? "You may already have an account"
-                : "შესაძლოა, ანგარიში უკვე გაქვს"}
+              {locale === "pl"
+                ? "Możliwe, że masz już konto"
+                : en
+                  ? "You may already have an account"
+                  : "შესაძლოა, ანგარიში უკვე გაქვს"}
             </p>
             <p className="mt-2 text-muted-foreground">
-              {en
-                ? "We found a verified account with the same name and birth details. Sign in to your existing account if it is yours. If these details belong to someone else, you can continue."
-                : "ამ სახელითა და დაბადების მონაცემებით დადასტურებული ანგარიში ვიპოვეთ. თუ შენია, შედი ძველ ანგარიშში. თუ მონაცემები სხვა ადამიანს ეკუთვნის, შეგიძლია გააგრძელო."}
+              {locale === "pl"
+                ? "Znaleźliśmy zweryfikowane konto z tym samym imieniem i danymi urodzenia. Zaloguj się na swoje istniejące konto, jeśli należy do Ciebie. Jeśli te dane należą do kogoś innego, możesz kontynuować."
+                : en
+                  ? "We found a verified account with the same name and birth details. Sign in to your existing account if it is yours. If these details belong to someone else, you can continue."
+                  : "ამ სახელითა და დაბადების მონაცემებით დადასტურებული ანგარიში ვიპოვეთ. თუ შენია, შედი ძველ ანგარიშში. თუ მონაცემები სხვა ადამიანს ეკუთვნის, შეგიძლია გააგრძელო."}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <Button
@@ -401,7 +419,11 @@ export function OnboardingWizard({
                 disabled={isPending}
                 onClick={() => startTransition(() => signOutAction("/login"))}
               >
-                {en ? "Sign in to existing account" : "ძველ ანგარიშში შესვლა"}
+                {locale === "pl"
+                  ? "Zaloguj się na istniejące konto"
+                  : en
+                    ? "Sign in to existing account"
+                    : "ძველ ანგარიშში შესვლა"}
               </Button>
               <Button
                 type="button"
@@ -409,7 +431,11 @@ export function OnboardingWizard({
                 disabled={isPending}
                 onClick={() => submit(true)}
               >
-                {en ? "Continue with this account" : "ამ ანგარიშით გაგრძელება"}
+                {locale === "pl"
+                  ? "Kontynuuj z tym kontem"
+                  : en
+                    ? "Continue with this account"
+                    : "ამ ანგარიშით გაგრძელება"}
               </Button>
             </div>
           </div>
@@ -424,7 +450,7 @@ export function OnboardingWizard({
             className={step === 0 ? "invisible" : ""}
           >
             <ArrowLeft />
-            {en ? "Back" : "უკან"}
+            {locale === "pl" ? "Wstecz" : en ? "Back" : "უკან"}
           </Button>
 
           <Button
@@ -438,16 +464,20 @@ export function OnboardingWizard({
               <>
                 <Sparkles />
                 {isPending
-                  ? en
-                    ? "Drawing your chart…"
-                    : "ვხატავთ შენს რუკას…"
-                  : en
-                    ? "Show me my chart"
-                    : "მაჩვენე ჩემი რუკა"}
+                  ? locale === "pl"
+                    ? "Rysujemy Twój kosmogram…"
+                    : en
+                      ? "Drawing your chart…"
+                      : "ვხატავთ შენს რუკას…"
+                  : locale === "pl"
+                    ? "Pokaż mój kosmogram"
+                    : en
+                      ? "Show me my chart"
+                      : "მაჩვენე ჩემი რუკა"}
               </>
             ) : (
               <>
-                {en ? "Continue" : "გაგრძელება"}
+                {locale === "pl" ? "Kontynuuj" : en ? "Continue" : "გაგრძელება"}
                 <ArrowRight />
               </>
             )}
@@ -460,9 +490,11 @@ export function OnboardingWizard({
               href={next ?? "/dashboard"}
               className="text-sm text-muted-foreground underline-offset-2 hover:underline"
             >
-              {en
-                ? "Skip for now, I'll add this later"
-                : "გამოტოვე, მოგვიანებით შევავსებ"}
+              {locale === "pl"
+                ? "Pomiń na razie, uzupełnię to później"
+                : en
+                  ? "Skip for now, I'll add this later"
+                  : "გამოტოვე, მოგვიანებით შევავსებ"}
             </Link>
           </p>
         )}

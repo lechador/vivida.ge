@@ -52,14 +52,18 @@ export async function ReportPdfPanel({
             <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-[var(--vivida-cyan)]" />
             <div>
               <h3 className="text-lg font-semibold">
-                {en
-                  ? "Your complete report is ready"
-                  : "შენი სრული ანგარიში მზადაა"}
+                {locale === "pl"
+                  ? "Twój pełny raport jest gotowy"
+                  : en
+                    ? "Your complete report is ready"
+                    : "შენი სრული ანგარიში მზადაა"}
               </h3>
               <p className="mt-0.5 text-sm text-foreground/75">
-                {en
-                  ? "Download your PDF whenever you need it."
-                  : "ჩამოტვირთე PDF, ხელმისაწვდომია ნებისმიერ დროს."}
+                {locale === "pl"
+                  ? "Pobierz plik PDF w dowolnym momencie."
+                  : en
+                    ? "Download your PDF whenever you need it."
+                    : "ჩამოტვირთე PDF, ხელმისაწვდომია ნებისმიერ დროს."}
               </p>
             </div>
           </div>
@@ -67,7 +71,11 @@ export async function ReportPdfPanel({
             <Button asChild variant="mystic" size="lg">
               <ReportDownloadButton reportId={report.id} locale={locale}>
                 <Download className="size-4" />
-                {en ? "Download PDF" : "ჩამოტვირთე PDF"}
+                {locale === "pl"
+                  ? "Pobierz PDF"
+                  : en
+                    ? "Download PDF"
+                    : "ჩამოტვირთე PDF"}
               </ReportDownloadButton>
             </Button>
             <SendReportEmailButton reportId={report.id} locale={locale} />
@@ -92,27 +100,39 @@ export async function ReportPdfPanel({
             <div>
               <h3 className="text-lg font-semibold">
                 {failed
-                  ? en
-                    ? "Generation was interrupted"
-                    : "გენერაცია შეფერხდა"
-                  : en
-                    ? "Your report is being prepared"
-                    : "შენი ანგარიში მზადდება"}
+                  ? locale === "pl"
+                    ? "Generowanie zostało przerwane"
+                    : en
+                      ? "Generation was interrupted"
+                      : "გენერაცია შეფერხდა"
+                  : locale === "pl"
+                    ? "Twój raport jest przygotowywany"
+                    : en
+                      ? "Your report is being prepared"
+                      : "შენი ანგარიში მზადდება"}
               </h3>
               <p className="mt-0.5 text-sm text-foreground/75">
                 {failed
-                  ? en
-                    ? "Try again, there is no additional charge."
-                    : "სცადე ხელახლა, დამატებითი გადახდა საჭირო არ არის."
-                  : en
-                    ? "This usually takes less than a minute."
-                    : "ეს ჩვეულებრივ ერთ წუთზე ნაკლებს ანდომებს."}
+                  ? locale === "pl"
+                    ? "Spróbuj ponownie, bez dodatkowych opłat."
+                    : en
+                      ? "Try again, there is no additional charge."
+                      : "სცადე ხელახლა, დამატებითი გადახდა საჭირო არ არის."
+                  : locale === "pl"
+                    ? "Zajmuje to zwykle mniej niż minutę."
+                    : en
+                      ? "This usually takes less than a minute."
+                      : "ეს ჩვეულებრივ ერთ წუთზე ნაკლებს ანდომებს."}
               </p>
             </div>
           </div>
           <Button asChild variant="outline" size="lg">
             <Link href={`/reports/${report.id}`}>
-              {en ? "View status" : "ნახე სტატუსი"}
+              {locale === "pl"
+                ? "Zobacz status"
+                : en
+                  ? "View status"
+                  : "ნახე სტატუსი"}
             </Link>
           </Button>
         </div>

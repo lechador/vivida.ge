@@ -31,7 +31,13 @@ export function PartnerCard({
     e.preventDefault();
     e.stopPropagation();
     if (
-      !window.confirm(locale !== "ka" ? `Remove ${name}?` : `წავშალოთ ${name}?`)
+      !window.confirm(
+        locale === "pl"
+          ? `Usunąć profil: ${name}?`
+          : locale !== "ka"
+            ? `Remove ${name}?`
+            : `წავშალოთ ${name}?`,
+      )
     )
       return;
     startTransition(async () => {
@@ -58,7 +64,11 @@ export function PartnerCard({
           {connected && (
             <span className="inline-flex shrink-0 items-center gap-1 font-mono text-[10px] font-medium uppercase tracking-wider text-[var(--vivida-cyan)]">
               <Link2 className="size-2.5" aria-hidden />
-              {locale !== "ka" ? "Connected" : "ერთად"}
+              {locale === "pl"
+                ? "Połączono"
+                : locale !== "ka"
+                  ? "Connected"
+                  : "ერთად"}
             </span>
           )}
         </div>
@@ -72,8 +82,16 @@ export function PartnerCard({
           onClick={onDelete}
           disabled={isPending}
           className="relative grid size-8 shrink-0 place-items-center rounded-sm text-muted-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive"
-          aria-label={locale !== "ka" ? `Remove ${name}` : `წაშლა, ${name}`}
-          title={locale !== "ka" ? "Remove" : "წაშლა"}
+          aria-label={
+            locale === "pl"
+              ? `Usuń: ${name}`
+              : locale !== "ka"
+                ? `Remove ${name}`
+                : `წაშლა, ${name}`
+          }
+          title={
+            locale === "pl" ? "Usuń" : locale !== "ka" ? "Remove" : "წაშლა"
+          }
         >
           <Trash2 className="size-4" />
         </button>

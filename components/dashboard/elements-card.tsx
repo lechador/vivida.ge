@@ -18,6 +18,12 @@ const ELEMENT_EN: Record<Element, string> = {
   ჰაერი: "Air",
   წყალი: "Water",
 };
+const ELEMENT_PL: Record<Element, string> = {
+  ცეცხლი: "Ogień",
+  მიწა: "Ziemia",
+  ჰაერი: "Powietrze",
+  წყალი: "Woda",
+};
 
 export function ElementsCard({
   chart,
@@ -59,7 +65,11 @@ export function ElementsCard({
                     : "text-foreground/85"
                 }
               >
-                {locale !== "ka" ? ELEMENT_EN[el] : el}
+                {locale === "pl"
+                  ? ELEMENT_PL[el]
+                  : locale !== "ka"
+                    ? ELEMENT_EN[el]
+                    : el}
               </span>
             </span>
             <span className="font-mono text-xs font-semibold tabular-nums text-muted-foreground">

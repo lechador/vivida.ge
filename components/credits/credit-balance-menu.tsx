@@ -48,7 +48,13 @@ export function CreditBalanceMenu({
     return (
       <Link
         href="/subscription"
-        aria-label={en ? "Open PRO subscription" : "PRO გამოწერის გახსნა"}
+        aria-label={
+          locale === "pl"
+            ? "Otwórz subskrypcję PRO"
+            : en
+              ? "Open PRO subscription"
+              : "PRO გამოწერის გახსნა"
+        }
         className="inline-flex h-10 items-center gap-1.5 rounded-md border border-primary/50 bg-primary/10 px-3 font-mono text-xs font-semibold tracking-wider text-primary transition-colors hover:bg-primary/20"
       >
         <Crown className="size-3.5" />
@@ -85,7 +91,7 @@ export function CreditBalanceMenu({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label={`${en ? "Credits" : "კრედიტები"}: ${balance}. ${en ? "Top up" : "ბალანსის შევსება"}`}
+          aria-label={`${locale === "pl" ? "Kredyty" : en ? "Credits" : "კრედიტები"}: ${balance}. ${locale === "pl" ? "Doładuj" : en ? "Top up" : "ბალანსის შევსება"}`}
           className="group inline-flex h-10 items-center gap-2 rounded-md border border-border bg-card px-3 font-mono text-xs font-medium tabular-nums text-foreground transition-colors hover:border-primary/60 hover:bg-secondary"
         >
           <span className="text-primary">✦</span>
@@ -102,15 +108,23 @@ export function CreditBalanceMenu({
           <div>
             <div className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
               <CreditCard className="size-3.5" />
-              {en ? "Quick top-up" : "სწრაფი შევსება"}
+              {locale === "pl"
+                ? "Szybkie doładowanie"
+                : en
+                  ? "Quick top-up"
+                  : "სწრაფი შევსება"}
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              {en ? "Choose a credit pack" : "აირჩიე კრედიტების პაკეტი"}
+              {locale === "pl"
+                ? "Wybierz pakiet kredytów"
+                : en
+                  ? "Choose a credit pack"
+                  : "აირჩიე კრედიტების პაკეტი"}
             </p>
           </div>
           <div className="border border-border bg-secondary/50 px-2.5 py-1 text-right">
             <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              {en ? "Balance" : "ბალანსი"}
+              {locale === "pl" ? "Saldo" : en ? "Balance" : "ბალანსი"}
             </div>
             <div className="font-mono text-sm font-semibold tabular-nums text-primary">
               {balance}
@@ -126,7 +140,7 @@ export function CreditBalanceMenu({
               <>
                 {index === 0 && (
                   <span className="mb-1 font-mono text-[9px] font-semibold uppercase tracking-widest text-primary">
-                    {en ? "Popular" : "რჩეული"}
+                    {locale === "pl" ? "Popularny" : en ? "Popular" : "რჩეული"}
                   </span>
                 )}
                 {pending === pack.id ? (
@@ -137,7 +151,7 @@ export function CreditBalanceMenu({
                   </span>
                 )}
                 <span className="text-[10px] text-muted-foreground">
-                  {en ? "credits" : "კრედიტი"}
+                  {locale === "pl" ? "kredytów" : en ? "credits" : "კრედიტი"}
                 </span>
                 <span className="mt-1 font-mono text-xs font-medium tabular-nums text-primary">
                   {formatBillingAmount(pack.amountMinor, pack.currency, locale)}
@@ -169,17 +183,23 @@ export function CreditBalanceMenu({
             <span className="min-w-0 flex-1">
               <span className="block text-xs font-semibold text-foreground">
                 {proMonths > 1
-                  ? en
-                    ? `${proMonths} months of Vivida PRO`
-                    : `${proMonths} თვე Vivida PRO`
-                  : en
-                    ? "Unlimited with PRO"
-                    : "ულიმიტო წვდომა PRO-თი"}
+                  ? locale === "pl"
+                    ? `${proMonths} miesiące Vivida PRO`
+                    : en
+                      ? `${proMonths} months of Vivida PRO`
+                      : `${proMonths} თვე Vivida PRO`
+                  : locale === "pl"
+                    ? "Nielimitowany dostęp z PRO"
+                    : en
+                      ? "Unlimited with PRO"
+                      : "ულიმიტო წვდომა PRO-თი"}
               </span>
               <span className="block text-[10px] text-muted-foreground">
-                {en
-                  ? "Every feature, without credit limits"
-                  : "ყველა ფუნქცია კრედიტების ლიმიტის გარეშე"}
+                {locale === "pl"
+                  ? "Wszystkie funkcje, bez limitu kredytów"
+                  : en
+                    ? "Every feature, without credit limits"
+                    : "ყველა ფუნქცია კრედიტების ლიმიტის გარეშე"}
               </span>
             </span>
             <span className="shrink-0 text-right font-mono tabular-nums">
@@ -193,12 +213,16 @@ export function CreditBalanceMenu({
               <span className="block text-[9px] text-muted-foreground">
                 /
                 {proMonths > 1
-                  ? en
-                    ? `${proMonths} mo`
-                    : `${proMonths} თვე`
-                  : en
-                    ? "mo"
-                    : "თვე"}
+                  ? locale === "pl"
+                    ? `${proMonths} mies.`
+                    : en
+                      ? `${proMonths} mo`
+                      : `${proMonths} თვე`
+                  : locale === "pl"
+                    ? "mies."
+                    : en
+                      ? "mo"
+                      : "თვე"}
               </span>
             </span>
             <ArrowRight className="size-3.5 shrink-0 text-primary" />
@@ -207,9 +231,11 @@ export function CreditBalanceMenu({
 
         {failed && (
           <p role="alert" className="mt-2 text-center text-xs text-destructive">
-            {en
-              ? "Could not start payment. Please try again."
-              : "გადახდა ვერ დაიწყო. სცადე თავიდან."}
+            {locale === "pl"
+              ? "Nie udało się rozpocząć płatności. Spróbuj ponownie."
+              : en
+                ? "Could not start payment. Please try again."
+                : "გადახდა ვერ დაიწყო. სცადე თავიდან."}
           </p>
         )}
 
@@ -217,7 +243,11 @@ export function CreditBalanceMenu({
           href="/credits"
           className="mt-2 flex items-center justify-center gap-1.5 rounded-sm border-t border-border/70 pt-2.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
-          {en ? "Credits and rewards" : "კრედიტები და ბონუსები"}
+          {locale === "pl"
+            ? "Kredyty i nagrody"
+            : en
+              ? "Credits and rewards"
+              : "კრედიტები და ბონუსები"}
           <ArrowRight className="size-3.5" />
         </Link>
       </DropdownMenuContent>

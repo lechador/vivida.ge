@@ -1,7 +1,12 @@
 import Image from "next/image";
 
 import type { MbtiScoresJson } from "@/db/schema";
-import { AXIS_LABEL_EN, AXIS_LABEL_KA, type MbtiAxis } from "@/lib/mbti-questions";
+import {
+  AXIS_LABEL_EN,
+  AXIS_LABEL_KA,
+  AXIS_LABEL_PL,
+  type MbtiAxis,
+} from "@/lib/mbti-questions";
 import { mbtiCharacterSrc } from "@/lib/mbti-characters";
 import { cn } from "@/lib/utils";
 
@@ -56,7 +61,13 @@ export function MbtiResultView({
         {AXES.map((axis) => {
           const s = scores[axis];
           if (!s) return null; // pre-Identity rows have no AT bar
-          const [firstKa, secondKa] = (locale !== "ka" ? AXIS_LABEL_EN : AXIS_LABEL_KA)[axis];
+          const axisLabels =
+            locale === "pl"
+              ? AXIS_LABEL_PL
+              : locale === "en"
+                ? AXIS_LABEL_EN
+                : AXIS_LABEL_KA;
+          const [firstKa, secondKa] = axisLabels[axis];
           const firstLetter = axis[0];
           const winnerIsFirst = s.letter === firstLetter;
           // pct is the winner's strength; render as the first-pole share.
@@ -67,7 +78,7 @@ export function MbtiResultView({
                 <span
                   className={cn(
                     "font-medium",
-                    winnerIsFirst ? "text-foreground" : "text-muted-foreground"
+                    winnerIsFirst ? "text-foreground" : "text-muted-foreground",
                   )}
                 >
                   {firstKa} {winnerIsFirst && `· ${s.pct}%`}
@@ -75,7 +86,9 @@ export function MbtiResultView({
                 <span
                   className={cn(
                     "font-medium",
-                    !winnerIsFirst ? "text-foreground" : "text-muted-foreground"
+                    !winnerIsFirst
+                      ? "text-foreground"
+                      : "text-muted-foreground",
                   )}
                 >
                   {!winnerIsFirst && `${s.pct}% ·`} {secondKa}

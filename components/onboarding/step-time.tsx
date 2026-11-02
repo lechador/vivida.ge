@@ -19,20 +19,31 @@ export function StepTime({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
+  const pl = locale === "pl";
   const minuteRef = useRef<HTMLInputElement>(null);
 
-  const headingText = en
-    ? "The exact time matters too."
-    : "ზუსტი დროც მნიშვნელოვანია.";
-  const descText = en
-    ? "Your birth time reveals your rising sign and houses, the chart's deepest layer."
-    : "დაბადების დრო ხსნის შენს ამომავალ ნიშანსა და სახლებს, რუკის ყველაზე ღრმა შრეს.";
-  const hourLabel = en ? "Hour" : "საათი";
-  const minuteLabel = en ? "Minute" : "წუთი";
-  const unknownLabel = en ? "I don't know the exact time" : "არ ვიცი ზუსტი დრო";
-  const unknownHint = en
-    ? "We'll use 12:00 in this case. Your Sun and most planets will remain accurate, but your rising sign and houses may not be."
-    : "ამ შემთხვევაში, დროს 12:00-ად ჩავთვლით. შენი მზე და პლანეტების უმეტესობა ზუსტი იქნება, თუმცა ამომავალი ნიშანი და სახლები, შესაძლოა, არ იყოს ზუსტი.";
+  const headingText = pl
+    ? "Dokładna godzina też ma znaczenie."
+    : en
+      ? "The exact time matters too."
+      : "ზუსტი დროც მნიშვნელოვანია.";
+  const descText = pl
+    ? "Godzina urodzenia ujawnia Twój ascendent i domy – najgłębszą warstwę kosmogramu."
+    : en
+      ? "Your birth time reveals your rising sign and houses, the chart's deepest layer."
+      : "დაბადების დრო ხსნის შენს ამომავალ ნიშანსა და სახლებს, რუკის ყველაზე ღრმა შრეს.";
+  const hourLabel = pl ? "Godzina" : en ? "Hour" : "საათი";
+  const minuteLabel = pl ? "Minuta" : en ? "Minute" : "წუთი";
+  const unknownLabel = pl
+    ? "Nie znam dokładnej godziny"
+    : en
+      ? "I don't know the exact time"
+      : "არ ვიცი ზუსტი დრო";
+  const unknownHint = pl
+    ? "W takim przypadku przyjmiemy godzinę 12:00. Twoje Słońce i większość planet pozostaną dokładne, ale ascendent i domy mogą się różnić."
+    : en
+      ? "We'll use 12:00 in this case. Your Sun and most planets will remain accurate, but your rising sign and houses may not be."
+      : "ამ შემთხვევაში, დროს 12:00-ად ჩავთვლით. შენი მზე და პლანეტების უმეტესობა ზუსტი იქნება, თუმცა ამომავალი ნიშანი და სახლები, შესაძლოა, არ იყოს ზუსტი.";
 
   return (
     <div className="space-y-6">

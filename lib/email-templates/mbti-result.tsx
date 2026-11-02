@@ -1,6 +1,11 @@
 import { Button, Heading, Text } from "@react-email/components";
 
-import { EmailLayout, buttonStyle, mutedStyle, paragraphStyle } from "./_layout";
+import {
+  EmailLayout,
+  buttonStyle,
+  mutedStyle,
+  paragraphStyle,
+} from "./_layout";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
@@ -23,12 +28,30 @@ export function MbtiResultEmail({
   excerpt: string;
   locale?: UserLocale;
 }) {
+  const pl = locale === "pl";
   const en = locale === "en";
-  const greeting = en
-    ? (name ? `${name}, your result is ready!` : "Your result is ready!")
-    : (name ? `${name}, შენი შედეგი მზადაა!` : "შენი შედეგი მზადაა!");
+  const greeting = pl
+    ? name
+      ? `${name}, Twój wynik jest gotowy!`
+      : "Twój wynik jest gotowy!"
+    : en
+      ? name
+        ? `${name}, your result is ready!`
+        : "Your result is ready!"
+      : name
+        ? `${name}, შენი შედეგი მზადაა!`
+        : "შენი შედეგი მზადაა!";
   return (
-    <EmailLayout preview={en ? `Your type is ${mbtiType}, ${archetypeNameGe}` : `შენი ტიპია ${mbtiType}, ${archetypeNameGe}`}>
+    <EmailLayout
+      locale={locale}
+      preview={
+        pl
+          ? `Twój typ to ${mbtiType}, ${archetypeNameGe}`
+          : en
+            ? `Your type is ${mbtiType}, ${archetypeNameGe}`
+            : `შენი ტიპია ${mbtiType}, ${archetypeNameGe}`
+      }
+    >
       <Heading
         as="h1"
         style={{
@@ -40,7 +63,11 @@ export function MbtiResultEmail({
           margin: "0 0 16px",
         }}
       >
-        {en ? "Your Astro-MBTI result" : "Astro-MBTI შედეგი"}
+        {pl
+          ? "Twój wynik Astro-MBTI"
+          : en
+            ? "Your Astro-MBTI result"
+            : "Astro-MBTI შედეგი"}
       </Heading>
 
       <Text style={paragraphStyle}>{greeting}</Text>
@@ -74,13 +101,19 @@ export function MbtiResultEmail({
       <Text style={paragraphStyle}>{excerpt}</Text>
 
       <Button href={resultUrl} style={buttonStyle}>
-        {en ? "View your full profile" : "ნახე სრული ანალიზი"}
+        {pl
+          ? "Zobacz pełny profil"
+          : en
+            ? "View your full profile"
+            : "ნახე სრული ანალიზი"}
       </Button>
 
       <Text style={mutedStyle}>
-        {en
-          ? "This result is also saved to your profile. If you have a question, reply to this email."
-          : "შედეგი ხელმისაწვდომია შენს პროფილზეც. თუ შეკითხვა გაქვს, უპასუხე ამ წერილს."}
+        {pl
+          ? "Wynik jest również zapisany na Twoim profilu. Jeśli masz pytania, po prostu odpowiedz na tę wiadomość."
+          : en
+            ? "This result is also saved to your profile. If you have a question, reply to this email."
+            : "შედეგი ხელმისაწვდომია შენს პროფილზეც. თუ შეკითხვა გაქვს, უპასუხე ამ წერილს."}
       </Text>
     </EmailLayout>
   );

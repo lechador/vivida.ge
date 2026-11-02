@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { DREAMS_HUB_EN, DreamsHubEn } from "@/components/seo/dreams-en";
+import { DREAMS_HUB_PL, DreamsHubPl } from "@/components/seo/dreams-pl";
 import { DreamInterpreter } from "@/components/seo/dream-interpreter";
 import { PaidNextStep } from "@/components/seo/paid-next-step";
 import { DreamSymbolFilter } from "@/components/seo/dream-symbol-filter";
@@ -69,6 +70,36 @@ const KA_METADATA: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return KA_METADATA;
+  if (locale === "pl") {
+    const path = "/sizmris-akhsna";
+    const title = "Sennik Online – Znaczenie Snów i Interpretacja AI | Vivida";
+    return {
+      title: { absolute: title },
+      description: DREAMS_HUB_PL.description,
+      keywords: [
+        "sennik",
+        "sennik online",
+        "znaczenie snów",
+        "interpretacja snów",
+        "symbole senne",
+      ],
+      alternates: localizedAlternates(path, path, "pl"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: "https://www.vividaastro.com/pl/sennik",
+        title,
+        description: DREAMS_HUB_PL.description,
+        siteName: "Vivida",
+        locale: "pl_PL",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description: DREAMS_HUB_PL.description,
+      },
+    };
+  }
   if (locale === "en") {
     const path = "/sizmris-akhsna";
     return {
@@ -104,6 +135,7 @@ export default async function DreamsHubPage() {
   const locale = await getRequestLocale();
   const session = await auth();
   const authed = !!session?.user?.id;
+  if (locale === "pl") return <DreamsHubPl authed={authed} />;
   if (locale === "en") return <DreamsHubEn authed={authed} />;
   const groups = dreamsByLetter();
 

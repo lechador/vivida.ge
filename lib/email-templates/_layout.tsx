@@ -29,6 +29,7 @@ export function EmailLayout({
   unsubscribeUrl?: string;
   locale?: UserLocale;
 }) {
+  const pl = locale === "pl";
   const en = locale === "en";
   return (
     <Html lang={locale}>
@@ -92,9 +93,11 @@ export function EmailLayout({
                 margin: 0,
               }}
             >
-              {en
-                ? "This email was sent automatically by Vivida. If you did not create an account, you can ignore this message."
-                : "ეს წერილი ავტომატურად გამოიგზავნა vivida.ge-დან. თუ არ დარეგისტრირებულხარ, უგულებელყავი ეს შეტყობინება."}
+              {pl
+                ? "Ta wiadomość została wysłana automatycznie przez Vivida. Jeśli nie zakładałeś konta, możesz ją zignorować."
+                : en
+                  ? "This email was sent automatically by Vivida. If you did not create an account, you can ignore this message."
+                  : "ეს წერილი ავტომატურად გამოიგზავნა vivida.ge-დან. თუ არ დარეგისტრირებულხარ, უგულებელყავი ეს შეტყობინება."}
             </Text>
             {unsubscribeUrl ? (
               <Text
@@ -109,7 +112,11 @@ export function EmailLayout({
                   href={unsubscribeUrl}
                   style={{ color: "#c4b5fd", textDecoration: "underline" }}
                 >
-                  {en ? "Unsubscribe" : "გამოწერის გაუქმება"}
+                  {pl
+                    ? "Wypisz się z subskrypcji"
+                    : en
+                      ? "Unsubscribe"
+                      : "გამოწერის გაუქმება"}
                 </a>
               </Text>
             ) : null}

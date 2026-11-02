@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { EnglishFooter } from "@/components/en/english-footer";
+import { PolishFooter } from "@/components/pl/polish-footer";
 import { InstallAppButton } from "@/components/pwa/install-button";
 import type { UserLocale } from "@/lib/i18n/locale";
 
@@ -50,6 +51,7 @@ const LEGAL_LINKS = [
  * they have their own bottom UI density and the chat launcher.
  */
 export function SiteFooter({ locale = "ka" }: { locale?: UserLocale } = {}) {
+  if (locale === "pl") return <PolishFooter />;
   if (locale === "en") return <EnglishFooter />;
 
   const year = new Date().getFullYear();

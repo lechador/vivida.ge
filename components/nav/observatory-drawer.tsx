@@ -40,6 +40,29 @@ const PUBLIC_ALMANAC_LINKS_EN = [
   { href: "/articles", label: "Editorial Archive", code: "08" },
 ];
 
+const PUBLIC_ALMANAC_LINKS_PL = [
+  { href: "/pl/horoskop-dzienny", label: "Horoskop dzienny", code: "01" },
+  {
+    href: "/pl/horoskop-urodzeniowy",
+    label: "Horoskop urodzeniowy",
+    code: "02",
+  },
+  { href: "/pl/tarot", label: "Tarot 3 kart online", code: "03" },
+  {
+    href: "/pl/kalendarz-ksiezycowy",
+    label: "Kalendarz księżycowy",
+    code: "04",
+  },
+  { href: "/pl/numerologia", label: "Numerologia i Droga Życia", code: "05" },
+  {
+    href: "/pl/horoskop-partnerski",
+    label: "Synastria i horoskop partnerski",
+    code: "06",
+  },
+  { href: "/pl/tests", label: "Testy psychologiczne", code: "07" },
+  { href: "/pl/sennik", label: "Sennik online", code: "08" },
+];
+
 /**
  * Slide-Over Architectural Observatory Drawer.
  * Triggered from the Persistent Celestial Context Strip on both desktop and mobile,
@@ -61,8 +84,13 @@ export function ObservatoryDrawer({
   triggerLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const en = locale !== "ka";
-  const almanacLinks = en ? PUBLIC_ALMANAC_LINKS_EN : PUBLIC_ALMANAC_LINKS_KA;
+  const isPl = locale === "pl";
+  const en = locale === "en";
+  const almanacLinks = isPl
+    ? PUBLIC_ALMANAC_LINKS_PL
+    : en
+      ? PUBLIC_ALMANAC_LINKS_EN
+      : PUBLIC_ALMANAC_LINKS_KA;
 
   function closeDrawer() {
     startTransition(() => {
@@ -70,20 +98,24 @@ export function ObservatoryDrawer({
     });
   }
 
+  const defaultTrigger = isPl
+    ? "Wszystkie narzędzia"
+    : en
+      ? "All Instruments"
+      : "ყველა ინსტრუმენტი";
+
   return (
     <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
       <DialogPrimitive.Trigger asChild>
         <button
           type="button"
           aria-expanded={open}
-          aria-label={
-            triggerLabel ?? (en ? "All Instruments" : "ყველა ინსტრუმენტი")
-          }
+          aria-label={triggerLabel ?? defaultTrigger}
           className="inline-flex h-7 shrink-0 items-center gap-2 whitespace-nowrap rounded-md border border-border bg-secondary/70 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-foreground shadow-2xs transition-colors hover:border-primary/60 hover:bg-secondary hover:text-primary"
         >
           <Compass className="size-3.5 text-primary" />
           <span className="hidden min-[360px]:inline">
-            {triggerLabel ?? (en ? "All Instruments" : "ყველა ინსტრუმენტი")}
+            {triggerLabel ?? defaultTrigger}
           </span>
         </button>
       </DialogPrimitive.Trigger>
@@ -100,7 +132,7 @@ export function ObservatoryDrawer({
               {/* Top Architectural Header */}
               <div className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-background/60 px-5">
                 <Link
-                  href={authed ? "/dashboard" : "/"}
+                  href={authed ? "/dashboard" : isPl ? "/pl" : "/"}
                   onClick={closeDrawer}
                   className="inline-flex items-center gap-2.5"
                 >
@@ -109,11 +141,13 @@ export function ObservatoryDrawer({
                     Vivida
                   </span>
                   <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
-                    · {en ? "Index" : "ინდექსი"}
+                    · {isPl ? "Spis" : en ? "Index" : "ინდექსი"}
                   </span>
                 </Link>
                 <DialogPrimitive.Close
-                  aria-label={en ? "Close drawer" : "დახურვა"}
+                  aria-label={
+                    isPl ? "Zamknij" : en ? "Close drawer" : "დახურვა"
+                  }
                   className="grid size-8 place-items-center rounded-md border border-border bg-secondary/50 text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
                 >
                   <X className="size-4" />
@@ -121,7 +155,11 @@ export function ObservatoryDrawer({
               </div>
 
               <DialogPrimitive.Title className="sr-only">
-                {en ? "Observatory Navigation" : "ობსერვატორიის ნავიგაცია"}
+                {isPl
+                  ? "Nawigacja obserwatorium"
+                  : en
+                    ? "Observatory Navigation"
+                    : "ობსერვატორიის ნავიგაცია"}
               </DialogPrimitive.Title>
 
               <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
@@ -140,9 +178,11 @@ export function ObservatoryDrawer({
                 <div>
                   <div className="mb-2.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--vivida-cyan)]">
                     <span>
-                      {en
-                        ? `${authed ? "02" : "01"} · Celestial Almanac`
-                        : `${authed ? "02" : "01"} · ასტრონომიული ალმანახი`}
+                      {isPl
+                        ? `${authed ? "02" : "01"} · Almanach astronomiczny`
+                        : en
+                          ? `${authed ? "02" : "01"} · Celestial Almanac`
+                          : `${authed ? "02" : "01"} · ასტრონომიული ალმანახი`}
                     </span>
                     <span>{almanacLinks.length}</span>
                   </div>
@@ -178,12 +218,14 @@ export function ObservatoryDrawer({
                       onClick={closeDrawer}
                       className="font-medium text-muted-foreground transition-colors hover:text-foreground"
                     >
-                      {en
-                        ? "Account & settings →"
-                        : "ანგარიში და პარამეტრები →"}
+                      {isPl
+                        ? "Konto i ustawienia →"
+                        : en
+                          ? "Account & settings →"
+                          : "ანგარიში და პარამეტრები →"}
                     </Link>
                     <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                      41°43′N · 44°47′E
+                      {isPl ? "52°14′N · 21°01′E" : "41°43′N · 44°47′E"}
                     </span>
                   </div>
                 ) : (
@@ -193,7 +235,7 @@ export function ObservatoryDrawer({
                       onClick={closeDrawer}
                       className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
                     >
-                      {en ? "Sign in" : "შესვლა"}
+                      {isPl ? "Zaloguj się" : en ? "Sign in" : "შესვლა"}
                     </Link>
                     <Link
                       href="/signup"
@@ -201,7 +243,11 @@ export function ObservatoryDrawer({
                       className="inline-flex items-center gap-1.5 rounded-sm bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                     >
                       <span>
-                        {en ? "Create Free Chart" : "შექმენი რუკა უფასოდ"}
+                        {isPl
+                          ? "Utwórz darmowy kosmogram"
+                          : en
+                            ? "Create Free Chart"
+                            : "შექმენი რუკა უფასოდ"}
                       </span>
                       <ArrowUpRight className="size-3.5" />
                     </Link>

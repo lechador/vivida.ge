@@ -21,6 +21,7 @@ import {
 } from "@/lib/moon-phase-library";
 import { signByIndex } from "@/lib/zodiac";
 import { englishMoonPhaseReading } from "@/lib/moon-phase-en";
+import { polishMoonPhaseReading } from "@/lib/moon-phase-pl";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { claimGeneration, releaseGeneration } from "@/lib/generation-lock";
 
@@ -68,6 +69,30 @@ export async function ensureMoonPhase(
     };
   }
 
+  if (locale === "pl") {
+    const reading = polishMoonPhaseReading(snapshot);
+    return {
+      date: today,
+      phaseKey: snapshot.phaseKey,
+      phaseLabelKa: snapshot.phaseLabelKa,
+      signEn: snapshot.signEn,
+      signKa: snapshot.signKa,
+      signIndex: snapshot.signIndex,
+      phaseAngle: snapshot.phaseAngle,
+      illumination: snapshot.illumination,
+      ageDays: snapshot.ageDays,
+      headline: reading.headline,
+      summary: reading.summary,
+      body: reading.body,
+      themes: reading.themes,
+      promptVersion: MOON_PHASE_PROMPT_VERSION,
+      model: "deterministic-pl",
+      language: "pl",
+      createdAt: now,
+      snapshot,
+    };
+  }
+
   const [existing] = await db
     .select()
     .from(moonPhases)
@@ -84,65 +109,45 @@ export async function ensureMoonPhase(
   }
 
   try {
+    // Fast path: the reading is fully determined by (phase, sign), so copy
+    // today's combo from the pre-generated library, no AI call.
+    const signKey = signByIndex(snapshot.signIndex).key;
+    let reading = await getMoonPhaseLibraryEntry(snapshot.phaseKey, signKey);
+    let model = "library";
 
-  // Fast path: the reading is fully determined by (phase, sign), so copy
-  // today's combo from the pre-generated library, no AI call.
-  const signKey = signByIndex(snapshot.signIndex).key;
-  let reading = await getMoonPhaseLibraryEntry(snapshot.phaseKey, signKey);
-  let model = "library";
+    if (!reading) {
+      if (!isOpenRouterConfigured()) {
+        // No API key, return what we have if anything, else null. The UI can
+        // then render a placeholder using just the live snapshot.
+        return existing ? { ...existing, snapshot } : null;
+      }
 
-  if (!reading) {
-    if (!isOpenRouterConfigured()) {
-      // No API key, return what we have if anything, else null. The UI can
-      // then render a placeholder using just the live snapshot.
-      return existing ? { ...existing, snapshot } : null;
+      reading = await generateMoonPhaseReading({
+        phaseLabelKa: snapshot.phaseLabelKa,
+        phaseKey: snapshot.phaseKey,
+        signKa: snapshot.signKa,
+        signEn: snapshot.signEn,
+        illumination: snapshot.illumination,
+        ageDays: snapshot.ageDays,
+        phaseAngle: snapshot.phaseAngle,
+      });
+      if (!reading) return existing ? { ...existing, snapshot } : null;
+      model = OPENROUTER_MODEL;
+
+      // Self-heal: this one-off reading IS the library entry for this combo,
+      // save it so the same (phase, sign) never generates twice.
+      void saveMoonPhaseLibraryEntry(
+        snapshot.phaseKey,
+        signKey,
+        reading,
+        OPENROUTER_MODEL,
+      ).catch(() => {});
     }
 
-    reading = await generateMoonPhaseReading({
-      phaseLabelKa: snapshot.phaseLabelKa,
-      phaseKey: snapshot.phaseKey,
-      signKa: snapshot.signKa,
-      signEn: snapshot.signEn,
-      illumination: snapshot.illumination,
-      ageDays: snapshot.ageDays,
-      phaseAngle: snapshot.phaseAngle,
-    });
-    if (!reading) return existing ? { ...existing, snapshot } : null;
-    model = OPENROUTER_MODEL;
-
-    // Self-heal: this one-off reading IS the library entry for this combo,
-    // save it so the same (phase, sign) never generates twice.
-    void saveMoonPhaseLibraryEntry(
-      snapshot.phaseKey,
-      signKey,
-      reading,
-      OPENROUTER_MODEL
-    ).catch(() => {});
-  }
-
-  const [inserted] = await db
-    .insert(moonPhases)
-    .values({
-      date: today,
-      phaseKey: snapshot.phaseKey,
-      phaseLabelKa: snapshot.phaseLabelKa,
-      signEn: snapshot.signEn,
-      signKa: snapshot.signKa,
-      signIndex: snapshot.signIndex,
-      phaseAngle: snapshot.phaseAngle,
-      illumination: snapshot.illumination,
-      ageDays: snapshot.ageDays,
-      headline: reading.headline,
-      summary: reading.summary,
-      body: reading.body,
-      themes: reading.themes,
-      promptVersion: MOON_PHASE_PROMPT_VERSION,
-      model,
-      language: "ka",
-    })
-    .onConflictDoUpdate({
-      target: moonPhases.date,
-      set: {
+    const [inserted] = await db
+      .insert(moonPhases)
+      .values({
+        date: today,
         phaseKey: snapshot.phaseKey,
         phaseLabelKa: snapshot.phaseLabelKa,
         signEn: snapshot.signEn,
@@ -158,11 +163,30 @@ export async function ensureMoonPhase(
         promptVersion: MOON_PHASE_PROMPT_VERSION,
         model,
         language: "ka",
-      },
-    })
-    .returning();
+      })
+      .onConflictDoUpdate({
+        target: moonPhases.date,
+        set: {
+          phaseKey: snapshot.phaseKey,
+          phaseLabelKa: snapshot.phaseLabelKa,
+          signEn: snapshot.signEn,
+          signKa: snapshot.signKa,
+          signIndex: snapshot.signIndex,
+          phaseAngle: snapshot.phaseAngle,
+          illumination: snapshot.illumination,
+          ageDays: snapshot.ageDays,
+          headline: reading.headline,
+          summary: reading.summary,
+          body: reading.body,
+          themes: reading.themes,
+          promptVersion: MOON_PHASE_PROMPT_VERSION,
+          model,
+          language: "ka",
+        },
+      })
+      .returning();
 
-  return inserted ? { ...inserted, snapshot } : null;
+    return inserted ? { ...inserted, snapshot } : null;
   } finally {
     await releaseGeneration(lockKey).catch(() => {});
   }

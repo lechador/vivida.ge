@@ -33,7 +33,14 @@ import { isCryptoPayConfigured } from "@/lib/crypto-pay";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  return { title: locale !== "ka" ? "My natal chart" : "ჩემი რუკა" };
+  return {
+    title:
+      locale === "pl"
+        ? "Mój kosmogram"
+        : locale !== "ka"
+          ? "My natal chart"
+          : "ჩემი რუკა",
+  };
 }
 
 export default async function ReportPage({
@@ -73,14 +80,18 @@ export default async function ReportPage({
       <AstroLockedMain
         active="report"
         title={
-          en
-            ? "A natal chart needs your birth details"
-            : "ნატალური რუკა დაბადების მონაცემებს საჭიროებს"
+          locale === "pl"
+            ? "Kosmogram urodzeniowy wymaga Twoich danych urodzenia"
+            : en
+              ? "A natal chart needs your birth details"
+              : "ნატალური რუკა დაბადების მონაცემებს საჭიროებს"
         }
         description={
-          en
-            ? "Add your birth date, time and place to calculate your personal cosmic map."
-            : "შეავსე დაბადების თარიღი, დრო და ადგილი, რომ შედგეს შენი პერსონალური კოსმიური რუკა."
+          locale === "pl"
+            ? "Dodaj datę, godzinę i miejsce urodzenia, aby wyznaczyć Twoją osobistą mapę nieba."
+            : en
+              ? "Add your birth date, time and place to calculate your personal cosmic map."
+              : "შეავსე დაბადების თარიღი, დრო და ადგილი, რომ შედგეს შენი პერსონალური კოსმიური რუკა."
         }
         next="/report"
         locale={locale}
@@ -104,7 +115,9 @@ export default async function ReportPage({
         <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 pt-8 sm:px-6 sm:pb-24 sm:pt-10">
           <header className="mb-8 border-b border-border pb-6">
             <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
-              NATAL EPHEMERIS RECORD · ნატალური რუკა
+              {locale === "pl"
+                ? "REJESTR EFEMERYD URODZENIOWYCH · KOSMOGRAM"
+                : "NATAL EPHEMERIS RECORD · ნატალური რუკა"}
             </div>
             <div className="mt-2 flex flex-wrap items-baseline justify-between gap-4">
               <h1
@@ -114,28 +127,43 @@ export default async function ReportPage({
                     : "text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-5xl"
                 }
               >
-                {en
-                  ? firstName
-                    ? `${firstName}'s `
-                    : "Your "
-                  : `${firstName ?? "ვარსკვლავო"}-ის `}
-                <span className="text-primary">
-                  {en ? "natal chart" : "კოსმიური რუკა"}
-                </span>
+                {locale === "pl" ? (
+                  <>
+                    {firstName ? `Kosmogram: ` : "Twój "}
+                    <span className="text-primary">
+                      {firstName ? firstName : "kosmogram urodzeniowy"}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    {en
+                      ? firstName
+                        ? `${firstName}'s `
+                        : "Your "
+                      : `${firstName ?? "ვარსკვლავო"}-ის `}
+                    <span className="text-primary">
+                      {en ? "natal chart" : "კოსმიური რუკა"}
+                    </span>
+                  </>
+                )}
               </h1>
               <a
                 href="#pdf-report"
                 className="font-mono text-xs uppercase tracking-wider text-muted-foreground underline underline-offset-4 transition-colors hover:text-primary"
               >
-                {en
-                  ? "PDF dossier & downloads ↓"
-                  : "PDF ანგარიში და ჩამოტვირთვა ↓"}
+                {locale === "pl"
+                  ? "Dossier PDF i pobieranie ↓"
+                  : en
+                    ? "PDF dossier & downloads ↓"
+                    : "PDF ანგარიში და ჩამოტვირთვა ↓"}
               </a>
             </div>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
-              {en
-                ? "The sky at your birth moment, calculated and interpreted layer by layer."
-                : "ცა შენი დაბადების წამში, დეტალურად გათვლილი და ახსნილი."}
+              {locale === "pl"
+                ? "Układ nieba w chwili Twoich narodzin, obliczony i zinterpretowany warstwa po warstwie."
+                : en
+                  ? "The sky at your birth moment, calculated and interpreted layer by layer."
+                  : "ცა შენი დაბადების წამში, დეტალურად გათვლილი და ახსნილი."}
             </p>
           </header>
 
@@ -158,7 +186,11 @@ export default async function ReportPage({
               ARCHIVE & PRINT · PDF DOSSIER
             </div>
             <h2 className="mb-4 text-xl font-semibold text-foreground">
-              {en ? "Your PDF report" : "შენი PDF ანგარიში"}
+              {locale === "pl"
+                ? "Twój raport PDF"
+                : en
+                  ? "Your PDF report"
+                  : "შენი PDF ანგარიში"}
             </h2>
             <Suspense fallback={null}>
               <ReportPdfPanel
@@ -193,39 +225,69 @@ export default async function ReportPage({
                   OBSERVATORY COORDINATES
                 </div>
                 <h2 className="mt-0.5 text-lg font-semibold text-foreground">
-                  {en ? "Your birth details" : "შენი დაბადების მონაცემები"}
+                  {locale === "pl"
+                    ? "Twoje dane urodzenia"
+                    : en
+                      ? "Your birth details"
+                      : "შენი დაბადების მონაცემები"}
                 </h2>
               </div>
               <Button asChild variant="outline" size="sm">
                 <Link href="/onboarding">
                   <Pencil className="size-3.5" />
-                  {en ? "Edit" : "რედაქტირება"}
+                  {locale === "pl" ? "Edytuj" : en ? "Edit" : "რედაქტირება"}
                 </Link>
               </Button>
             </div>
             <dl className="grid grid-cols-1 gap-x-8 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
               <Field
-                label={en ? "Date of birth" : "დაბადების თარიღი"}
+                label={
+                  locale === "pl"
+                    ? "Data urodzenia"
+                    : en
+                      ? "Date of birth"
+                      : "დაბადების თარიღი"
+                }
                 value={profile.dateOfBirth}
                 mono
               />
               <Field
-                label={en ? "Time of birth" : "დაბადების დრო"}
+                label={
+                  locale === "pl"
+                    ? "Godzina urodzenia"
+                    : en
+                      ? "Time of birth"
+                      : "დაბადების დრო"
+                }
                 value={
                   profile.timeOfBirth
                     ? profile.timeOfBirth.slice(0, 5)
-                    : en
-                      ? "Unknown (12:00 used)"
-                      : "უცნობია (გამოყენებულია 12:00)"
+                    : locale === "pl"
+                      ? "Nieznana (przyjęto 12:00)"
+                      : en
+                        ? "Unknown (12:00 used)"
+                        : "უცნობია (გამოყენებულია 12:00)"
                 }
                 mono
               />
               <Field
-                label={en ? "Place of birth" : "დაბადების ადგილი"}
+                label={
+                  locale === "pl"
+                    ? "Miejsce urodzenia"
+                    : en
+                      ? "Place of birth"
+                      : "დაბადების ადგილი"
+                }
                 value={profile.cityName}
               />
               <Field
-                label={en ? "Time zone" : "დროის სარტყელი"}
+                label={
+                  locale === "pl"
+                    ? "Strefa czasowa"
+                    : en
+                      ? "Time zone"
+                      : "დროის სარტყელი"
+                }
                 value={profile.timezone}
                 mono
               />
@@ -233,17 +295,23 @@ export default async function ReportPage({
             {(profile.latitude != null || profile.longitude != null) && (
               <details className="group mt-5 border-t border-border pt-4 text-xs text-muted-foreground">
                 <summary className="cursor-pointer select-none font-mono uppercase tracking-wider transition-colors hover:text-foreground">
-                  {en ? "Geodetic coordinates" : "ტექნიკური კოორდინატები"}
+                  {locale === "pl"
+                    ? "Współrzędne geograficzne"
+                    : en
+                      ? "Geodetic coordinates"
+                      : "ტექნიკური კოორდინატები"}
                 </summary>
                 <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1 font-mono tabular-nums">
                   {profile.latitude != null && (
                     <span>
-                      {en ? "LAT" : "განედი"}: {profile.latitude.toFixed(4)}°
+                      {locale === "pl" ? "SZER" : en ? "LAT" : "განედი"}:{" "}
+                      {profile.latitude.toFixed(4)}°
                     </span>
                   )}
                   {profile.longitude != null && (
                     <span>
-                      {en ? "LON" : "გრძედი"}: {profile.longitude.toFixed(4)}°
+                      {locale === "pl" ? "DŁUG" : en ? "LON" : "გრძედი"}:{" "}
+                      {profile.longitude.toFixed(4)}°
                     </span>
                   )}
                 </div>

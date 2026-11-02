@@ -34,7 +34,11 @@ export function CosmicLoader({
   const content = (
     <div className="relative flex w-full max-w-md flex-col items-center justify-center px-6 py-10 text-center">
       <SpinningChart />
-      {progressive ? <ProgressiveStatus locale={locale} /> : <SimpleStatus locale={locale} />}
+      {progressive ? (
+        <ProgressiveStatus locale={locale} />
+      ) : (
+        <SimpleStatus locale={locale} />
+      )}
     </div>
   );
 
@@ -66,7 +70,11 @@ function SimpleStatus({ locale }: { locale: UserLocale }) {
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className="mt-8 text-base text-foreground/85 sm:text-lg"
     >
-      {locale !== "ka" ? "Calculating the stars…" : "ვარსკვლავებს ვითვლით…"}
+      {locale === "pl"
+        ? "Obliczamy układ gwiazd…"
+        : locale !== "ka"
+          ? "Calculating the stars…"
+          : "ვარსკვლავებს ვითვლით…"}
     </motion.p>
   );
 }
@@ -92,6 +100,12 @@ const STAGES_EN: Array<{ at: number; label: string }> = [
   { at: 0.6, label: "Finding your big three…" },
   { at: 0.85, label: "Preparing your dashboard…" },
 ];
+const STAGES_PL: Array<{ at: number; label: string }> = [
+  { at: 0, label: "Otwieramy Twój moment narodzin…" },
+  { at: 0.3, label: "Obliczamy pozycje planet…" },
+  { at: 0.6, label: "Wyznaczamy Twoją Wielką Trójkę…" },
+  { at: 0.85, label: "Przygotowujemy Twój panel…" },
+];
 
 function ProgressiveStatus({ locale }: { locale: UserLocale }) {
   const [progress, setProgress] = useState(0);
@@ -115,10 +129,11 @@ function ProgressiveStatus({ locale }: { locale: UserLocale }) {
   }, []);
 
   // Pick the highest stage whose threshold the bar has crossed.
-  const stages = locale !== "ka" ? STAGES_EN : STAGES;
+  const stages =
+    locale === "pl" ? STAGES_PL : locale !== "ka" ? STAGES_EN : STAGES;
   const stage = stages.reduce(
     (best, s) => (progress / 100 >= s.at ? s : best),
-    stages[0]
+    stages[0],
   );
 
   return (
@@ -247,9 +262,7 @@ function SpinningChart() {
       </svg>
 
       {/* Center sparkle */}
-      <div
-        className="vivida-pulse-soft pointer-events-none absolute inset-0 grid place-items-center"
-      >
+      <div className="vivida-pulse-soft pointer-events-none absolute inset-0 grid place-items-center">
         <span
           className="text-3xl"
           style={{

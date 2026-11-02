@@ -25,20 +25,27 @@ export function WelcomeEmail({
   dashboardUrl: string;
   locale?: UserLocale;
 }) {
+  const pl = locale === "pl";
   const en = locale === "en";
   const greeting = name
-    ? en
-      ? `Welcome, ${name}!`
-      : `კეთილი იყოს მობრძანება, ${name}!`
-    : en
-      ? "Welcome!"
-      : "კეთილი იყოს მობრძანება!";
+    ? pl
+      ? `Witaj, ${name}!`
+      : en
+        ? `Welcome, ${name}!`
+        : `კეთილი იყოს მობრძანება, ${name}!`
+    : pl
+      ? "Witaj!"
+      : en
+        ? "Welcome!"
+        : "კეთილი იყოს მობრძანება!";
   return (
     <EmailLayout
       preview={
-        en
-          ? "Your cosmic journey begins, Vivida"
-          : "შენი კოსმიური მოგზაურობა იწყება, Vivida"
+        pl
+          ? "Twoja kosmiczna podróż się zaczyna · Vivida"
+          : en
+            ? "Your cosmic journey begins, Vivida"
+            : "შენი კოსმიური მოგზაურობა იწყება, Vivida"
       }
       locale={locale}
     >
@@ -53,18 +60,24 @@ export function WelcomeEmail({
           margin: "0 0 16px",
         }}
       >
-        {en ? "Your cosmic journey begins" : "შენი კოსმიური მოგზაურობა იწყება"}
+        {pl
+          ? "Twoja kosmiczna podróż się zaczyna"
+          : en
+            ? "Your cosmic journey begins"
+            : "შენი კოსმიური მოგზაურობა იწყება"}
       </Heading>
 
       <Text style={paragraphStyle}>{greeting}</Text>
       <Text style={paragraphStyle}>
-        {en
-          ? "Your natal chart and daily horoscope are ready to explore. Your first compatibility comparison and tarot reading are free; further readings and some other actions use credits. Your starting credits are in your account."
-          : "შენი ნატალური რუკა და ყოველდღიური ჰოროსკოპი ხელმისაწვდომია უფასოდ. თავსებადობის პირველი შედარება და ტაროს პირველი კითხვა უფასოა; მომდევნო კითხვები და ზოგი სხვა მოქმედება კრედიტებს იყენებს. საწყისი კრედიტები შენს ანგარიშზეა."}
+        {pl
+          ? "Twój horoskop urodzeniowy i codzienny horoskop są już gotowe do odkrycia. Pierwsze porównanie kompatybilności i rozkład tarota są bezpłatne; dalsze interpretacje i zaawansowane analizy korzystają z kredytów. Twoje powitalne kredyty czekają na koncie."
+          : en
+            ? "Your natal chart and daily horoscope are ready to explore. Your first compatibility comparison and tarot reading are free; further readings and some other actions use credits. Your starting credits are in your account."
+            : "შენი ნატალური რუკა და ყოველდღიური ჰოროსკოპი ხელმისაწვდომია უფასოდ. თავსებადობის პირველი შედარება და ტაროს პირველი კითხვა უფასოა; მომდევნო კითხვები და ზოგი სხვა მოქმედება კრედიტებს იყენებს. საწყისი კრედიტები შენს ანგარიშზეა."}
       </Text>
 
       <Text style={{ ...paragraphStyle, fontWeight: 600, color: "#ffffff" }}>
-        {en ? "Available now:" : "ხელმისაწვდომია:"}
+        {pl ? "Dostępne od zaraz:" : en ? "Available now:" : "ხელმისაწვდომია:"}
       </Text>
       <ul
         style={{
@@ -76,39 +89,73 @@ export function WelcomeEmail({
         }}
       >
         <li>
-          <strong>{en ? "Natal chart" : "ნატალური რუკა"}</strong>,{" "}
-          {en
-            ? "complete interpretations of planets, houses, and aspects"
-            : "სრული ინტერპრეტაცია, პლანეტები, სახლები და ასპექტები"}
+          <strong>
+            {pl ? "Horoskop urodzeniowy" : en ? "Natal chart" : "ნატალური რუკა"}
+          </strong>
+          ,{" "}
+          {pl
+            ? "kompletna interpretacja planet, domów i aspektów"
+            : en
+              ? "complete interpretations of planets, houses, and aspects"
+              : "სრული ინტერპრეტაცია, პლანეტები, სახლები და ასპექტები"}
         </li>
         <li>
-          <strong>{en ? "Daily horoscope" : "ყოველდღიური ჰოროსკოპი"}</strong>,{" "}
-          {en
-            ? "personalized to your chart"
-            : "შენს რუკაზე მორგებული, AI-ით გენერირებული"}
+          <strong>
+            {pl
+              ? "Codzienny horoskop"
+              : en
+                ? "Daily horoscope"
+                : "ყოველდღიური ჰოროსკოპი"}
+          </strong>
+          ,{" "}
+          {pl
+            ? "spersonalizowany pod Twój kosmogram"
+            : en
+              ? "personalized to your chart"
+              : "შენს რუკაზე მორგებული, AI-ით გენერირებული"}
         </li>
         <li>
-          <strong>{en ? "Compatibility" : "თავსებადობა"}</strong>,{" "}
-          {en
-            ? "compare charts with friends and partners"
-            : "შეადარე თავი მეგობრებს, პარტნიორებს, ცნობილ ადამიანებს"}
+          <strong>
+            {pl ? "Kompatybilność" : en ? "Compatibility" : "თავსებადობა"}
+          </strong>
+          ,{" "}
+          {pl
+            ? "porównaj kosmogramy z bliskimi i partnerem"
+            : en
+              ? "compare charts with friends and partners"
+              : "შეადარე თავი მეგობრებს, პარტნიორებს, ცნობილ ადამიანებს"}
         </li>
         <li>
-          <strong>{en ? "Cosmic events" : "კოსმიური მოვლენები"}</strong>,{" "}
-          {en
-            ? "new moons, retrogrades, and transits"
-            : "ახალმთვარეები, რეტროგრადები, ტრანზიტები"}
+          <strong>
+            {pl
+              ? "Wydarzenia kosmiczne"
+              : en
+                ? "Cosmic events"
+                : "კოსმიური მოვლენები"}
+          </strong>
+          ,{" "}
+          {pl
+            ? "nowie, pełnie, retrogradacje i tranzyty"
+            : en
+              ? "new moons, retrogrades, and transits"
+              : "ახალმთვარეები, რეტროგრადები, ტრანზიტები"}
         </li>
       </ul>
 
       <Button href={dashboardUrl} style={buttonStyle}>
-        {en ? "Open your chart" : "ნახე შენი რუკა"}
+        {pl
+          ? "Otwórz swój kosmogram"
+          : en
+            ? "Open your chart"
+            : "ნახე შენი რუკა"}
       </Button>
 
       <Text style={mutedStyle}>
-        {en
-          ? "If you have a question, simply reply to this email."
-          : "თუ შეკითხვა გაქვს, უბრალოდ უპასუხე ამ წერილს."}
+        {pl
+          ? "Jeśli masz jakiekolwiek pytania, po prostu odpowiedz na tę wiadomość."
+          : en
+            ? "If you have a question, simply reply to this email."
+            : "თუ შეკითხვა გაქვს, უბრალოდ უპასუხე ამ წერილს."}
       </Text>
     </EmailLayout>
   );

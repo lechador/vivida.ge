@@ -4,8 +4,10 @@ import {
   EQ_BAND_META,
   EQ_DOMAIN_INTERP,
   EQ_DOMAIN_INTERP_EN,
+  EQ_DOMAIN_INTERP_PL,
   EQ_DOMAIN_TIP,
   EQ_DOMAIN_TIP_EN,
+  EQ_DOMAIN_TIP_PL,
   type EqResult,
 } from "@/lib/eq/scoring";
 import { EqRadar } from "@/components/eq/eq-radar";
@@ -23,16 +25,28 @@ export function EqProfile({
   result: EqResult;
   locale?: UserLocale;
 }) {
-  const en = locale !== "ka";
+  const pl = locale === "pl";
+  const en = locale === "en";
   const top = result.domains.find((d) => d.key === result.topKey)!;
   const low = result.domains.find((d) => d.key === result.lowKey)!;
+
+  const interp = pl
+    ? EQ_DOMAIN_INTERP_PL
+    : en
+      ? EQ_DOMAIN_INTERP_EN
+      : EQ_DOMAIN_INTERP;
+  const tip = pl ? EQ_DOMAIN_TIP_PL : en ? EQ_DOMAIN_TIP_EN : EQ_DOMAIN_TIP;
 
   return (
     <div className="space-y-5">
       {/* Radar */}
       <div className="rounded-3xl border border-border bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-7">
         <h2 className="mb-2 text-center text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          {en ? "Your emotional profile" : "შენი ემოციური რუკა"}
+          {pl
+            ? "Twój profil emocjonalny"
+            : en
+              ? "Your emotional profile"
+              : "შენი ემოციური რუკა"}
         </h2>
         <EqRadar domains={result.domains} locale={locale} />
       </div>
@@ -42,27 +56,27 @@ export function EqProfile({
         <div className="rounded-2xl border border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/8 p-4 ring-1 ring-foreground/5">
           <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-[var(--vivida-cyan)]">
             <ArrowUpRight className="size-4" />
-            {en ? "Your strength" : "შენი ძალა"}
+            {pl ? "Twoja siła" : en ? "Your strength" : "შენი ძალა"}
           </div>
           <div className="mt-1.5 flex items-center gap-2 text-lg font-semibold">
             <span>{top.glyph}</span>
-            {en ? top.nameEn : top.nameKa}
+            {pl ? (top.namePl ?? top.nameEn) : en ? top.nameEn : top.nameKa}
           </div>
           <p className="mt-1 text-sm leading-relaxed text-foreground/85">
-            {(en ? EQ_DOMAIN_INTERP_EN : EQ_DOMAIN_INTERP)[top.key][top.band]}
+            {interp[top.key][top.band]}
           </p>
         </div>
         <div className="rounded-2xl border border-[var(--vivida-pink)]/30 bg-[var(--vivida-pink)]/8 p-4 ring-1 ring-foreground/5">
           <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-[var(--vivida-pink)]">
             <Sprout className="size-4" />
-            {en ? "Growth opportunity" : "ზრდის სივრცე"}
+            {pl ? "Obszar rozwoju" : en ? "Growth opportunity" : "ზრდის სივრცე"}
           </div>
           <div className="mt-1.5 flex items-center gap-2 text-lg font-semibold">
             <span>{low.glyph}</span>
-            {en ? low.nameEn : low.nameKa}
+            {pl ? (low.namePl ?? low.nameEn) : en ? low.nameEn : low.nameKa}
           </div>
           <p className="mt-1 text-sm leading-relaxed text-foreground/85">
-            {(en ? EQ_DOMAIN_TIP_EN : EQ_DOMAIN_TIP)[low.key]}
+            {tip[low.key]}
           </p>
         </div>
       </div>
@@ -79,10 +93,14 @@ export function EqProfile({
                 <span className="text-xl">{d.glyph}</span>
                 <div>
                   <h3 className="font-semibold leading-tight">
-                    {en ? d.nameEn : d.nameKa}
+                    {pl ? (d.namePl ?? d.nameEn) : en ? d.nameEn : d.nameKa}
                   </h3>
                   <p className="text-[11px] text-muted-foreground">
-                    {en ? d.taglineEn : d.taglineKa}
+                    {pl
+                      ? (d.taglinePl ?? d.taglineEn)
+                      : en
+                        ? d.taglineEn
+                        : d.taglineKa}
                   </p>
                 </div>
               </div>
@@ -100,9 +118,12 @@ export function EqProfile({
                     background: `color-mix(in oklch, ${EQ_BAND_META[d.band].hue} 16%, transparent)`,
                   }}
                 >
-                  {en
-                    ? EQ_BAND_META[d.band].labelEn
-                    : EQ_BAND_META[d.band].labelKa}
+                  {pl
+                    ? (EQ_BAND_META[d.band].labelPl ??
+                      EQ_BAND_META[d.band].labelEn)
+                    : en
+                      ? EQ_BAND_META[d.band].labelEn
+                      : EQ_BAND_META[d.band].labelKa}
                 </div>
               </div>
             </div>
@@ -118,11 +139,11 @@ export function EqProfile({
             </div>
 
             <p className="mt-3 text-sm leading-relaxed text-foreground/90">
-              {(en ? EQ_DOMAIN_INTERP_EN : EQ_DOMAIN_INTERP)[d.key][d.band]}
+              {interp[d.key][d.band]}
             </p>
             <p className="mt-2 flex gap-1.5 text-xs leading-relaxed text-muted-foreground">
               <span aria-hidden>💡</span>
-              {(en ? EQ_DOMAIN_TIP_EN : EQ_DOMAIN_TIP)[d.key]}
+              {tip[d.key]}
             </p>
           </article>
         ))}

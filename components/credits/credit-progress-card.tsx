@@ -25,29 +25,44 @@ export function CreditProgressCard({
   const en = locale === "en";
   const progress = nextUnlockProgress(balance);
   const percent = Math.min(100, (progress.current / progress.target) * 100);
-  const dateLabel = en
-    ? new Intl.DateTimeFormat("en-GB", {
-        day: "numeric",
-        month: "long",
-        timeZone: "UTC",
-      }).format(new Date(`${nextMonthlyDate}T00:00:00Z`))
-    : kaLongDate(nextMonthlyDate).replace(/,? \d{4}$/, "");
+  const dateLabel =
+    locale === "pl"
+      ? new Intl.DateTimeFormat("pl-PL", {
+          day: "numeric",
+          month: "long",
+          timeZone: "UTC",
+        }).format(new Date(`${nextMonthlyDate}T00:00:00Z`))
+      : en
+        ? new Intl.DateTimeFormat("en-GB", {
+            day: "numeric",
+            month: "long",
+            timeZone: "UTC",
+          }).format(new Date(`${nextMonthlyDate}T00:00:00Z`))
+        : kaLongDate(nextMonthlyDate).replace(/,? \d{4}$/, "");
 
   return (
     <section className="rounded-3xl border border-[var(--vivida-violet)]/30 bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
-            {en ? "Next unlock" : "შემდეგი გახსნა"}
+            {locale === "pl"
+              ? "Następne odblokowanie"
+              : en
+                ? "Next unlock"
+                : "შემდეგი გახსნა"}
           </p>
           <h2 className="mt-1 text-base font-semibold">
             {progress.complete
-              ? en
-                ? "Enough for any single feature"
-                : "ნებისმიერი ერთი ფუნქციისთვის საკმარისია"
-              : en
-                ? `${progress.missing} more credits to the next tier`
-                : `კიდევ ${progress.missing} კრედიტი შემდეგ დონემდე`}
+              ? locale === "pl"
+                ? "Wystarczająco na dowolną pojedynczą funkcję"
+                : en
+                  ? "Enough for any single feature"
+                  : "ნებისმიერი ერთი ფუნქციისთვის საკმარისია"
+              : locale === "pl"
+                ? `Jeszcze ${progress.missing} kredytów do kolejnego poziomu`
+                : en
+                  ? `${progress.missing} more credits to the next tier`
+                  : `კიდევ ${progress.missing} კრედიტი შემდეგ დონემდე`}
           </h2>
         </div>
         <Sparkles className="size-5 shrink-0 text-[var(--vivida-cyan)]" />
@@ -64,30 +79,40 @@ export function CreditProgressCard({
         </span>
         <span>
           {progress.target === 5
-            ? en
+            ? locale === "pl"
               ? "test / PDF"
-              : "ტესტი / PDF"
-            : en
-              ? "tarot / weekly"
-              : "ტარო / კვირა"}
+              : en
+                ? "test / PDF"
+                : "ტესტი / PDF"
+            : locale === "pl"
+              ? "tarot / prognoza tygodniowa"
+              : en
+                ? "tarot / weekly"
+                : "ტარო / კვირა"}
         </span>
       </div>
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
         <div className="flex items-center gap-2 rounded-2xl border border-border/60 bg-background/35 p-3 text-xs text-muted-foreground">
           <CalendarDays className="size-4 shrink-0 text-[var(--vivida-violet)]" />
           {monthlyPausedReason === "inactivity"
-            ? en
-              ? "Monthly bonus is for active accounts, open today's horoscope to qualify"
-              : "თვის ბონუსი აქტიურ ანგარიშებს ერიცხება, გახსენი დღევანდელი ჰოროსკოპი"
-            : en
-              ? `Next free +${MONTHLY_BONUS}: ${dateLabel}`
-              : `შემდეგი უფასო +${MONTHLY_BONUS}: ${dateLabel}`}
+            ? locale === "pl"
+              ? "Miesięczny bonus przysługuje aktywnym kontom — otwórz dzisiejszy horoskop, aby go otrzymać"
+              : en
+                ? "Monthly bonus is for active accounts, open today's horoscope to qualify"
+                : "თვის ბონუსი აქტიურ ანგარიშებს ერიცხება, გახსენი დღევანდელი ჰოროსკოპი"
+            : locale === "pl"
+              ? `Kolejne darmowe +${MONTHLY_BONUS}: ${dateLabel}`
+              : en
+                ? `Next free +${MONTHLY_BONUS}: ${dateLabel}`
+                : `შემდეგი უფასო +${MONTHLY_BONUS}: ${dateLabel}`}
         </div>
         <div className="flex items-center gap-2 rounded-2xl border border-border/60 bg-background/35 p-3 text-xs text-muted-foreground">
           <MessageCircle className="size-4 shrink-0 text-[var(--vivida-cyan)]" />
-          {en
-            ? "First feed post: +1 per week"
-            : "ფიდის პირველი პოსტი: კვირაში +1"}
+          {locale === "pl"
+            ? "Pierwszy post na tablicy: +1 w tygodniu"
+            : en
+              ? "First feed post: +1 per week"
+              : "ფიდის პირველი პოსტი: კვირაში +1"}
         </div>
       </div>
     </section>

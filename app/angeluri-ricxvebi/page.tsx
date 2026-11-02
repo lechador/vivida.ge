@@ -9,6 +9,10 @@ import {
   ANGEL_HUB_EN,
   AngelNumbersHubEn,
 } from "@/components/seo/angel-numbers-en";
+import {
+  ANGEL_HUB_PL,
+  AngelNumbersHubPl,
+} from "@/components/seo/angel-numbers-pl";
 
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ANGEL_FAQ, ANGEL_NUMBERS } from "@/lib/seo/angel-numbers";
@@ -66,6 +70,37 @@ const KA_METADATA: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return KA_METADATA;
+  if (locale === "pl") {
+    const path = "/angeluri-ricxvebi";
+    const title =
+      "Liczby Anielskie – Znaczenie 111, 222, 333, 444, 11:11 | Vivida";
+    return {
+      title: { absolute: title },
+      description: ANGEL_HUB_PL.description,
+      keywords: [
+        "liczby anielskie",
+        "znaczenie 111",
+        "znaczenie 222",
+        "godzina 11 11 znaczenie",
+        "powtarzające się cyfry na zegarze",
+      ],
+      alternates: localizedAlternates(path, path, "pl"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: "https://www.vividaastro.com/pl/liczby-anielskie",
+        title,
+        description: ANGEL_HUB_PL.description,
+        siteName: "Vivida",
+        locale: "pl_PL",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description: ANGEL_HUB_PL.description,
+      },
+    };
+  }
   if (locale === "en") {
     const path = "/angeluri-ricxvebi";
     return {
@@ -100,6 +135,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function AngelNumbersHubPage() {
   const locale = await getRequestLocale();
+  if (locale === "pl") return <AngelNumbersHubPl />;
   if (locale === "en") return <AngelNumbersHubEn />;
   const ld = [
     articleLd({
@@ -259,7 +295,6 @@ export default async function AngelNumbersHubPage() {
             <ArrowRight className="size-4" />
           </Link>
         </div>
-
       </section>
 
       <SiteFooter />

@@ -53,14 +53,16 @@ import { normalizeReturnPath } from "@/lib/safe-return-path";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  const en = locale !== "ka";
-  return { title: en ? "Credits" : "კრედიტები", robots: { index: false } };
+  const title =
+    locale === "pl" ? "Kredyty" : locale === "en" ? "Credits" : "კრედიტები";
+  return { title, robots: { index: false } };
 }
 export const dynamic = "force-dynamic";
 
 const SITE_URL: Record<UserLocale, string> = {
   ka: "https://www.vivida.ge",
   en: "https://www.vividaastro.com",
+  pl: "https://www.vividaastro.com/pl",
 };
 
 /**
@@ -167,12 +169,18 @@ export default async function CreditsPage({
   // one-time backfill /subscription does.
   let identity = storedIdentity;
   if (identity && !identity.countryCode) {
-    const detected = countryCodeFromHeaders(await headers());
+    const detected =
+      countryCodeFromHeaders(await headers()) ||
+      (locale === "pl" ? "PL" : null);
     await setResidenceCountryIfMissing(user.id, detected);
     identity = { ...identity, countryCode: detected };
+  } else if (identity && !identity.countryCode && locale === "pl") {
+    identity = { ...identity, countryCode: "PL" };
   }
+  const effectiveCountry =
+    identity?.countryCode || (locale === "pl" ? "PL" : undefined);
   const link = `${SITE_URL[locale]}/?ref=${ref.code}`;
-  const premiumPlan = premiumPlanForCountry(identity?.countryCode);
+  const premiumPlan = premiumPlanForCountry(effectiveCountry);
   const showPurchasePromotions = shouldShowPurchasePromotion({
     isPremium: premium,
     balance,
@@ -202,7 +210,7 @@ export default async function CreditsPage({
           <div id="credit-packs" className="scroll-mt-20">
             <TopUpCard
               locale={locale}
-              countryCode={identity?.countryCode}
+              countryCode={effectiveCountry}
               balance={balance}
               neededCredits={neededCredits}
               returnTo={returnTo}
@@ -219,9 +227,11 @@ export default async function CreditsPage({
             >
               <span className="flex items-center gap-3 font-semibold">
                 <Crown className="size-5 text-[var(--vivida-gold)]" />
-                {en
-                  ? "Manage your Vivida PRO subscription"
-                  : "Vivida PRO გამოწერის მართვა"}
+                {locale === "pl"
+                  ? "Zarządzaj swoją subskrypcją Vivida PRO"
+                  : en
+                    ? "Manage your Vivida PRO subscription"
+                    : "Vivida PRO გამოწერის მართვა"}
               </span>
               <span aria-hidden>→</span>
             </Link>
@@ -233,12 +243,17 @@ export default async function CreditsPage({
                 plan={offer.plan}
                 months={offer.months}
                 deadlineLabel={
-                  locale === "ka"
-                    ? kaDayMonthGenitive(offer.endsAt)
-                    : new Intl.DateTimeFormat("en-GB", {
+                  locale === "pl"
+                    ? new Intl.DateTimeFormat("pl-PL", {
                         day: "numeric",
                         month: "long",
                       }).format(offer.endsAt)
+                    : locale === "ka"
+                      ? kaDayMonthGenitive(offer.endsAt)
+                      : new Intl.DateTimeFormat("en-GB", {
+                          day: "numeric",
+                          month: "long",
+                        }).format(offer.endsAt)
                 }
                 standardPlan={premiumPlan}
                 locale={locale}
@@ -259,7 +274,7 @@ export default async function CreditsPage({
             <div className="mt-4">
               <CreditsVsPro
                 locale={locale}
-                countryCode={identity?.countryCode}
+                countryCode={effectiveCountry}
                 placement="credits_hub_comparison"
                 creditHref="#credit-packs"
                 proHref="#pro-plan"
@@ -272,7 +287,11 @@ export default async function CreditsPage({
           <div className="mt-4">
             <div className="rounded-3xl border border-border bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
               <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                {en ? "Your balance" : "შენი ბალანსი"}
+                {locale === "pl"
+                  ? "Twoje saldo"
+                  : en
+                    ? "Your balance"
+                    : "შენი ბალანსი"}
               </div>
               <div className="mt-2 flex items-center justify-center gap-2">
                 <Sparkles className="size-7 text-[var(--vivida-cyan)]" />
@@ -281,12 +300,14 @@ export default async function CreditsPage({
                 </span>
               </div>
               <div className="mt-1 text-sm text-muted-foreground">
-                {en ? "credits" : "კრედიტი"}
+                {locale === "pl" ? "kredytów" : en ? "credits" : "კრედიტი"}
               </div>
               <p className="mx-auto mt-3 max-w-md text-sm text-foreground/75">
-                {en
-                  ? "Use credits to unlock full test results, compatibility readings, AI chat, forecasts, and reports. Invite friends or top up your balance."
-                  : "კრედიტებით ხსნი ტესტების სრულ შედეგებს, სინასტრიებს, AI-ჩატს, პროგნოზებსა და რეპორტებს. მოიწვიე მეგობრები ან შეავსე ბალანსი."}
+                {locale === "pl"
+                  ? "Wykorzystaj kredyty, aby odblokować pełne wyniki testów, analizy zgodności partnerskiej, czat AI, prognozy i raporty. Zaproś znajomych lub doładuj saldo."
+                  : en
+                    ? "Use credits to unlock full test results, compatibility readings, AI chat, forecasts, and reports. Invite friends or top up your balance."
+                    : "კრედიტებით ხსნი ტესტების სრულ შედეგებს, სინასტრიებს, AI-ჩატს, პროგნოზებსა და რეპორტებს. მოიწვიე მეგობრები ან შეავსე ბალანსი."}
               </p>
             </div>
           </div>
@@ -295,7 +316,7 @@ export default async function CreditsPage({
             <div className="mt-4">
               <SpendAnchor
                 spend={recentSpend}
-                countryCode={identity?.countryCode}
+                countryCode={effectiveCountry}
                 locale={locale}
               />
             </div>
@@ -312,11 +333,14 @@ export default async function CreditsPage({
             />
           </div>
 
-          {!hostEn && !fromPaywall && phoneGiftCardEligible(giftState) && (
-            <div className="mt-4">
-              <PhoneGiftCard locale={locale} />
-            </div>
-          )}
+          {locale === "ka" &&
+            !hostEn &&
+            !fromPaywall &&
+            phoneGiftCardEligible(giftState) && (
+              <div className="mt-4">
+                <PhoneGiftCard locale={locale} />
+              </div>
+            )}
 
           <div className="mt-4">
             <CreditHistory

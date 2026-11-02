@@ -47,19 +47,29 @@ export function ForgotPasswordForm({ locale = "ka" }: { locale?: UserLocale }) {
         </div>
         <div>
           <h3 className="text-lg font-semibold tracking-tight">
-            {en ? "Check your inbox" : "შეამოწმე საფოსტო ყუთი"}
+            {locale === "pl"
+              ? "Sprawdź swoją skrzynkę"
+              : en
+                ? "Check your inbox"
+                : "შეამოწმე საფოსტო ყუთი"}
           </h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            {en
-              ? "If this email is in our system, we've sent a password reset link."
-              : "თუ ეს ელფოსტა ჩვენი სისტემაშია, ახლა გამოგიგზავნეთ ლინკი პაროლის აღსადგენად."}
+            {locale === "pl"
+              ? "Jeśli ten e-mail znajduje się w naszym systemie, wysłaliśmy link do zresetowania hasła."
+              : en
+                ? "If this email is in our system, we've sent a password reset link."
+                : "თუ ეს ელფოსტა ჩვენი სისტემაშია, ახლა გამოგიგზავნეთ ლინკი პაროლის აღსადგენად."}
           </p>
         </div>
         <Link
           href="/login"
           className="inline-block text-sm text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
         >
-          {en ? "← Back to sign in" : "← ანგარიშის შესვლა"}
+          {locale === "pl"
+            ? "← Powrót do logowania"
+            : en
+              ? "← Back to sign in"
+              : "← ანგარიშის შესვლა"}
         </Link>
       </div>
     );
@@ -68,13 +78,17 @@ export function ForgotPasswordForm({ locale = "ka" }: { locale?: UserLocale }) {
   return (
     <form onSubmit={submit} className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        {en
-          ? "Enter your email and we'll send you a link to choose a new password."
-          : "შეიყვანე შენი ელფოსტა. გამოგიგზავნით ლინკს ახალი პაროლის დასაყენებლად."}
+        {locale === "pl"
+          ? "Wpisz swój adres e-mail, a wyślemy Ci link do ustawienia nowego hasła."
+          : en
+            ? "Enter your email and we'll send you a link to choose a new password."
+            : "შეიყვანე შენი ელფოსტა. გამოგიგზავნით ლინკს ახალი პაროლის დასაყენებლად."}
       </p>
 
       <div className="space-y-1.5">
-        <Label htmlFor="email">{en ? "Email" : "ელფოსტა"}</Label>
+        <Label htmlFor="email">
+          {locale === "pl" ? "E-mail" : en ? "Email" : "ელფოსტა"}
+        </Label>
         <Input
           id="email"
           name="email"
@@ -108,12 +122,16 @@ export function ForgotPasswordForm({ locale = "ka" }: { locale?: UserLocale }) {
       >
         {isPending && <Loader2 className="size-4 animate-spin" />}
         {isPending
-          ? en
-            ? "Sending…"
-            : "ვაგზავნი…"
-          : en
-            ? "Send reset link"
-            : "ლინკის გამოგზავნა"}
+          ? locale === "pl"
+            ? "Wysyłanie…"
+            : en
+              ? "Sending…"
+              : "ვაგზავნი…"
+          : locale === "pl"
+            ? "Wyślij link do resetu"
+            : en
+              ? "Send reset link"
+              : "ლინკის გამოგზავნა"}
       </Button>
     </form>
   );

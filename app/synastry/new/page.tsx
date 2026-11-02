@@ -14,7 +14,14 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  return { title: en ? "Add a partner" : "ახალი პარტნიორი" };
+  return {
+    title:
+      locale === "pl"
+        ? "Dodaj partnera"
+        : en
+          ? "Add a partner"
+          : "ახალი პარტნიორი",
+  };
 }
 
 export default async function NewPartnerPage() {
@@ -48,18 +55,22 @@ export default async function NewPartnerPage() {
           className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-3.5" />
-          {en ? "Back" : "უკან"}
+          {locale === "pl" ? "Wstecz" : en ? "Back" : "უკან"}
         </Link>
 
         <h1 className="mb-2 text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-          {en
-            ? "Whose chart would you like to compare?"
-            : "ვისთან გინდა შეადარო ცა?"}
+          {locale === "pl"
+            ? "Z czyim kosmogramem chcesz porównać swój?"
+            : en
+              ? "Whose chart would you like to compare?"
+              : "ვისთან გინდა შეადარო ცა?"}
         </h1>
         <p className="mb-8 text-sm text-muted-foreground">
-          {en
-            ? "Enter their birth details. This can be a romantic partner, family member, old friend, or anyone you're curious about."
-            : "ჩაწერე პარტნიორის დაბადების მონაცემები. პარტნიორი ვინც არ უნდა იყოს, საყვარელი, ოჯახის წევრი, ძველი მეგობარი ან ვინც გაინტერესებს."}
+          {locale === "pl"
+            ? "Wprowadź dane urodzenia tej osoby. Może to być partner, członek rodziny, przyjaciel lub ktokolwiek, kto Cię ciekawi."
+            : en
+              ? "Enter their birth details. This can be a romantic partner, family member, old friend, or anyone you're curious about."
+              : "ჩაწერე პარტნიორის დაბადების მონაცემები. პარტნიორი ვინც არ უნდა იყოს, საყვარელი, ოჯახის წევრი, ძველი მეგობარი ან ვინც გაინტერესებს."}
         </p>
 
         <PartnerForm locale={locale} />

@@ -117,9 +117,11 @@ export async function refreshAskMemory(
       ? `OLD PORTRAIT:\n${existing.summary.slice(0, MAX_SUMMARY_CHARS)}\nOld traits: ${JSON.stringify(existing.traits ?? {})}\n\n`
       : "No old portrait yet, create the first one.\n\n";
     const langLine =
-      locale === "en"
-        ? "Write summary, tone, topics and notes in English."
-        : "Write summary, tone, topics and notes in Georgian.";
+      locale === "pl"
+        ? "Write summary, tone, topics and notes in Polish."
+        : locale === "en"
+          ? "Write summary, tone, topics and notes in English."
+          : "Write summary, tone, topics and notes in Georgian.";
 
     const { OPENROUTER_MODEL } = await import("@/lib/openrouter");
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {

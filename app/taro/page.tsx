@@ -36,6 +36,17 @@ const DESCRIPTION_KA =
 const TITLE_EN = "Free Online Tarot Reading, Three-Card Spread";
 const DESCRIPTION_EN =
   "Ask a question and receive a personal three-card tarot reading. Explore clear upright and reversed meanings for all 78 cards of the full deck.";
+const TITLE_PL = "Tarot Online – Darmowe Stawianie Tarota AI | Vivida";
+const DESCRIPTION_PL =
+  "Postaw darmowy tarot online: zadaj pytanie i otrzymaj osobistą interpretację rozkładu 3 kart. Poznaj znaczenie wszystkich 78 kart tarota.";
+const KEYWORDS_PL = [
+  "tarot online",
+  "darmowy tarot",
+  "stawianie tarota",
+  "tarot 3 karty",
+  "znaczenie kart tarota",
+  "tarot miłosny",
+];
 
 const FAQ_KA = [
   {
@@ -75,35 +86,65 @@ const FAQ_EN = [
   },
 ];
 
+const FAQ_PL = [
+  {
+    q: "Jak działa tarot online w serwisie Vivida?",
+    a: "Wpisz swoje pytanie, a my wylosujemy rozkład 3 kart (źródło, teraźniejszość, droga przed Tobą). Astrolog AI tworzy osobistą interpretację łączącą każdą kartę i jej układ bezpośrednio z Twoją sytuacją.",
+  },
+  {
+    q: "Ile kosztuje postawienie tarota?",
+    a: `Pierwsze pytanie jest całkowicie bezpłatne. Każdy kolejny rozkład kosztuje ${CREDIT_COST.tarot} kredytów, które otrzymujesz przy rejestracji lub możesz dokupić w dowolnym momencie.`,
+  },
+  {
+    q: "Czy tarot naprawdę przepowiada przyszłość?",
+    a: "Tarot to przede wszystkim narzędzie głębokiej refleksji i wglądu w ukryte wzorce, a nie sztywna przepowiednia. Pomaga spojrzeć na wybory z nowej perspektywy — decyzje zawsze należą do Ciebie.",
+  },
+  {
+    q: "Jakich kart używa Vivida?",
+    a: "Pełnej talii 78 kart: 22 Wielkich Arkanów oraz 56 Małych Arkanów (Kielichy, Miecze, Buławy, Monety). Każda karta zawiera interpretację w pozycji prostej i odwróconej.",
+  },
+];
+
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
 
+  const isPl = locale === "pl";
   const en = locale === "en";
-  const title = en ? TITLE_EN : TITLE_KA;
-  const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
-  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  const title = isPl ? TITLE_PL : en ? TITLE_EN : TITLE_KA;
+  const description = isPl
+    ? DESCRIPTION_PL
+    : en
+      ? DESCRIPTION_EN
+      : DESCRIPTION_KA;
+  const siteUrl = isPl || en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
   return {
     title: { absolute: title },
     description,
-    keywords: en
-      ? [
-          "online tarot reading",
-          "free tarot reading",
-          "three card tarot",
-          "Major Arcana meanings",
-          "tarot card meanings",
-        ]
-      : [
-          "ტარო",
-          "ტარო ქართულად",
-          "ტაროზე მკითხაობა",
-          "ონლაინ ტარო",
-          "ტარო კითხვა",
-          "ტაროს გაშლა",
-          "ტარო კარტები",
-          "უფასო ტარო",
-        ],
-    alternates: localizedAlternates("/taro", "/taro", en ? "en" : "ka"),
+    keywords: isPl
+      ? KEYWORDS_PL
+      : en
+        ? [
+            "online tarot reading",
+            "free tarot reading",
+            "three card tarot",
+            "Major Arcana meanings",
+            "tarot card meanings",
+          ]
+        : [
+            "ტარო",
+            "ტარო ქართულად",
+            "ტაროზე მკითხაობა",
+            "ონლაინ ტარო",
+            "ტარო კითხვა",
+            "ტაროს გაშლა",
+            "ტარო კარტები",
+            "უფასო ტარო",
+          ],
+    alternates: localizedAlternates(
+      isPl ? "/pl/tarot" : en ? "/tarot" : "/taro",
+      "/taro",
+      locale,
+    ),
     openGraph: {
       images: [DEFAULT_OG_IMAGE],
       type: "website",
@@ -111,7 +152,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       siteName: "Vivida",
-      locale: en ? "en_US" : "ka_GE",
+      locale: isPl ? "pl_PL" : en ? "en_US" : "ka_GE",
     },
     twitter: { card: "summary_large_image", title, description },
   };
@@ -126,11 +167,16 @@ export default async function TaroHubPage() {
     userId ? getBillingIdentity(userId) : null,
     userId ? isPremiumUser(userId) : false,
   ]);
+  const isPl = locale === "pl";
   const en = locale === "en";
-  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
-  const title = en ? TITLE_EN : TITLE_KA;
-  const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
-  const faq = en ? FAQ_EN : FAQ_KA;
+  const siteUrl = isPl || en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  const title = isPl ? TITLE_PL : en ? TITLE_EN : TITLE_KA;
+  const description = isPl
+    ? DESCRIPTION_PL
+    : en
+      ? DESCRIPTION_EN
+      : DESCRIPTION_KA;
+  const faq = isPl ? FAQ_PL : en ? FAQ_EN : FAQ_KA;
   const [profile] = userId
     ? await db
         .select({ dateOfBirth: profiles.dateOfBirth })
@@ -148,9 +194,12 @@ export default async function TaroHubPage() {
       datePublished: "2026-07-14T00:00:00.000Z",
     }),
     breadcrumbLd([
-      { name: en ? "Home" : "მთავარი", url: siteUrl },
       {
-        name: en ? "Tarot" : "ტარო",
+        name: isPl ? "Start" : en ? "Home" : "მთავარი",
+        url: isPl ? `${siteUrl}/pl` : siteUrl,
+      },
+      {
+        name: isPl ? "Tarot" : en ? "Tarot" : "ტარო",
         url: `${siteUrl}${localizedHref("/taro", locale)}`,
       },
     ]),
@@ -158,7 +207,7 @@ export default async function TaroHubPage() {
     {
       "@context": "https://schema.org",
       "@type": "ItemList",
-      itemListElement: tarotDetailDeck(en ? "en" : "ka").map((c, i) => ({
+      itemListElement: tarotDetailDeck(locale).map((c, i) => ({
         "@type": "ListItem",
         position: i + 1,
         url: `${siteUrl}${localizedHref(`/taro/${c.slug}`, locale)}`,
@@ -203,25 +252,34 @@ export default async function TaroHubPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-8 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-          <Link href="/" className="hover:text-foreground">
-            {en ? "Home" : "მთავარი"}
+          <Link href={isPl ? "/pl" : "/"} className="hover:text-foreground">
+            {isPl ? "Start" : en ? "Home" : "მთავარი"}
           </Link>
           <span>/</span>
-          <span className="text-foreground/80">{en ? "Tarot" : "ტარო"}</span>
+          <span className="text-foreground/80">
+            {isPl ? "Tarot" : en ? "Tarot" : "ტარო"}
+          </span>
         </nav>
 
         <header className="mb-8 border-b border-border pb-8">
           <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
-            {en
-              ? "Online Tarot · Three-Card Spread"
-              : "ონლაინ ტარო · ტაროზე მკითხაობა"}
+            {isPl
+              ? "Tarot Online · Rozkład 3 Kart"
+              : en
+                ? "Online Tarot · Three-Card Spread"
+                : "ონლაინ ტარო · ტაროზე მკითხაობა"}
           </div>
           <h1 className="font-display mt-2 text-balance text-4xl font-normal leading-[1.06] tracking-[-0.02em] sm:text-5xl">
-            {en ? "Read the " : "ტარო"}{" "}
-            <Accent>{en ? "cards" : "ქართულად"}</Accent>
+            {isPl ? "Postaw karty " : en ? "Read the " : "ტარო"}{" "}
+            <Accent>{isPl ? "tarota" : en ? "cards" : "ქართულად"}</Accent>
           </h1>
           <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-muted-foreground sm:text-base">
-            {en ? (
+            {isPl ? (
+              <>
+                Zadaj pytanie i otrzymaj wnikliwy, osobisty rozkład trzech kart.{" "}
+                {!premium && "Pierwsze pytanie jest darmowe."}
+              </>
+            ) : en ? (
               <>
                 Ask a question and receive a thoughtful, personal three-card
                 reading. {!premium && "Your first reading is free."}
@@ -248,21 +306,25 @@ export default async function TaroHubPage() {
         <section className="mt-16">
           <div className="mb-4 flex items-baseline justify-between gap-4">
             <h2 className="font-display text-2xl font-normal tracking-tight">
-              {en
-                ? "The full tarot deck · 78 cards"
-                : "ტაროს სრული დასტა · 78 კარტი"}
+              {isPl
+                ? "Pełna talia tarota · 78 kart"
+                : en
+                  ? "The full tarot deck · 78 cards"
+                  : "ტაროს სრული დასტა · 78 კარტი"}
             </h2>
             <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-              78 Cards
+              {isPl ? "78 kart" : "78 Cards"}
             </span>
           </div>
           <p className="mb-5 text-sm text-muted-foreground">
-            {en
-              ? "Explore the upright and reversed meaning of every card."
-              : "აღმოაჩინე თითო კარტის მნიშვნელობა, პირდაპირი და შებრუნებული."}
+            {isPl
+              ? "Poznaj znaczenie każdej karty w pozycji prostej i odwróconej."
+              : en
+                ? "Explore the upright and reversed meaning of every card."
+                : "აღმოაჩინე თითო კარტის მნიშვნელობა, პირდაპირი და შებრუნებული."}
           </p>
           <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-            {tarotDetailDeck(en ? "en" : "ka").map((c: TarotDetailCard) => {
+            {tarotDetailDeck(locale).map((c: TarotDetailCard) => {
               const name = c.name;
               const keywords = c.keywords;
               return (
@@ -291,7 +353,11 @@ export default async function TaroHubPage() {
         {/* FAQ */}
         <section className="mt-16">
           <h2 className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Frequently asked questions" : "ხშირად დასმული კითხვები"}
+            {isPl
+              ? "Często zadawane pytania"
+              : en
+                ? "Frequently asked questions"
+                : "ხშირად დასმული კითხვები"}
           </h2>
           <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card shadow-sm">
             {faq.map((item) => (
@@ -315,20 +381,42 @@ export default async function TaroHubPage() {
           <div className="mt-16 flex flex-col justify-between gap-6 rounded-xl border border-primary/35 bg-card p-6 shadow-sm sm:flex-row sm:items-center sm:p-8">
             <div className="max-w-xl">
               <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
-                {en ? "Natal Ephemeris" : "ნატალური ასტროლოგია"}
+                {isPl
+                  ? "Astrologia Urodzeniowa"
+                  : en
+                    ? "Natal Ephemeris"
+                    : "ნატალური ასტროლოგია"}
               </p>
               <h2 className="font-display mt-2 text-balance text-2xl font-normal tracking-tight sm:text-3xl">
-                {en ? "Cards and stars, together" : "ტაროც და ვარსკვლავებიც"}
+                {isPl
+                  ? "Karty i gwiazdy razem"
+                  : en
+                    ? "Cards and stars, together"
+                    : "ტაროც და ვარსკვლავებიც"}
               </h2>
               <p className="mt-2 text-pretty text-sm leading-relaxed text-muted-foreground">
-                {en
-                  ? "Your natal chart adds a deeper, lasting picture: the Moon, Venus, the planets and all twelve houses. Create yours for free."
-                  : "შენი ნატალური რუკა ტაროზე ღრმა და მუდმივ სურათს ხატავს, მთვარე, ვენერა, ცის 12 სახლი. შექმენი უფასოდ."}
+                {isPl
+                  ? "Twój horoskop urodzeniowy tworzy głębszy, trwały obraz: Księżyc, Wenus, planety i 12 domów astrologicznych. Oblicz swój kosmogram za darmo."
+                  : en
+                    ? "Your natal chart adds a deeper, lasting picture: the Moon, Venus, the planets and all twelve houses. Create yours for free."
+                    : "შენი ნატალური რუკა ტაროზე ღრმა და მუდმივ სურათს ხატავს, მთვარე, ვენერა, ცის 12 სახლი. შექმენი უფასოდ."}
               </p>
             </div>
             <Button asChild size="lg" className="shrink-0">
-              <Link href={en ? "/natal-chart" : "/nataluri-ruka"}>
-                {en ? "Create my natal chart" : "ჩემი ნატალური რუკა"}
+              <Link
+                href={
+                  isPl
+                    ? "/pl/horoskop-urodzeniowy"
+                    : en
+                      ? "/natal-chart"
+                      : "/nataluri-ruka"
+                }
+              >
+                {isPl
+                  ? "Oblicz mój kosmogram"
+                  : en
+                    ? "Create my natal chart"
+                    : "ჩემი ნატალური რუკა"}
                 <ArrowRight className="size-4" />
               </Link>
             </Button>

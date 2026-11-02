@@ -15,7 +15,8 @@ import type { Metadata } from "next";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   return {
-    title: locale !== "ka" ? "Sign in" : "შესვლა",
+    title:
+      locale === "pl" ? "Logowanie" : locale !== "ka" ? "Sign in" : "შესვლა",
     // Auth utility page, keep it crawlable for link equity but out of the
     // index (it was ranking in site: queries on both hosts with thin copy).
     robots: { index: false, follow: true },
@@ -25,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: localizedAlternates(
       "/login",
       "/login",
-      locale !== "ka" ? "en" : "ka",
+      locale === "pl" ? "pl" : locale !== "ka" ? "en" : "ka",
     ),
   };
 }
@@ -48,18 +49,36 @@ export default async function LoginPage({
   return (
     <AuthLayout
       locale={locale}
-      title={en ? "Welcome back" : "კეთილი იყოს შენი დაბრუნება"}
+      title={
+        locale === "pl"
+          ? "Witaj ponownie"
+          : en
+            ? "Welcome back"
+            : "კეთილი იყოს შენი დაბრუნება"
+      }
       subtitle={
-        en ? "Step back into your cosmic map." : "შემოდი შენს კოსმიურ რუკაში."
+        locale === "pl"
+          ? "Wróć do swojej kosmicznej mapy."
+          : en
+            ? "Step back into your cosmic map."
+            : "შემოდი შენს კოსმიურ რუკაში."
       }
       footer={
         <>
-          {en ? "New to Vivida?" : "ჯერ არ გაქვს ანგარიში?"}{" "}
+          {locale === "pl"
+            ? "Nowy w Vivida?"
+            : en
+              ? "New to Vivida?"
+              : "ჯერ არ გაქვს ანგარიში?"}{" "}
           <Link
             href={dest ? `/signup?next=${encodeURIComponent(dest)}` : "/signup"}
             className="text-foreground underline underline-offset-2 hover:underline"
           >
-            {en ? "Create an account" : "დარეგისტრირდი"}
+            {locale === "pl"
+              ? "Zarejestruj się"
+              : en
+                ? "Create an account"
+                : "დარეგისტრირდი"}
           </Link>
         </>
       }

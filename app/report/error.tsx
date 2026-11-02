@@ -80,8 +80,15 @@ export default function ReportError({
         <>
           <Loader2 className="size-8 animate-spin text-[var(--vivida-violet)]" />
           <p className="mt-4 text-sm text-muted-foreground">
-            <span className="locale-ka-only">შენი რუკა მზადდება, ერთი წამი…</span>
-            <span className="locale-en-only">Your chart is being prepared, one moment…</span>
+            <span className="locale-ka-only">
+              შენი რუკა მზადდება, ერთი წამი…
+            </span>
+            <span className="locale-en-only">
+              Your chart is being prepared, one moment…
+            </span>
+            <span className="locale-pl-only">
+              Twój kosmogram jest przygotowywany, chwileczkę…
+            </span>
           </p>
         </>
       ) : (
@@ -92,13 +99,21 @@ export default function ReportError({
           <h2 className="mt-4 text-xl font-semibold tracking-tight">
             <span className="locale-ka-only">რუკა ვერ ჩაიტვირთა</span>
             <span className="locale-en-only">Your chart could not load</span>
+            <span className="locale-pl-only">
+              Nie udało się załadować kosmogramu
+            </span>
           </h2>
           <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">
             <span className="locale-ka-only">
               შესაძლოა ჯერ მზადდება. სცადე ხელახლა, ჩვეულებრივ მაშინვე ეშველება.
             </span>
             <span className="locale-en-only">
-              It may still be generating. Try again, this usually resolves immediately.
+              It may still be generating. Try again, this usually resolves
+              immediately.
+            </span>
+            <span className="locale-pl-only">
+              Być może wciąż trwa jego generowanie. Spróbuj ponownie, to zwykle
+              pomaga od razu.
             </span>
           </p>
           <button
@@ -109,6 +124,7 @@ export default function ReportError({
             <RotateCcw className="size-4" />
             <span className="locale-ka-only">ხელახლა ცდა</span>
             <span className="locale-en-only">Try again</span>
+            <span className="locale-pl-only">Spróbuj ponownie</span>
           </button>
         </>
       )}

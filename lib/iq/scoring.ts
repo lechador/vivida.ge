@@ -2,6 +2,7 @@ import {
   IQ_ITEMS,
   DOMAIN_LABELS_EN,
   DOMAIN_LABELS_KA,
+  DOMAIN_LABELS_PL,
   type IqDomain,
   type IqItem,
 } from "@/lib/iq/items";
@@ -76,6 +77,7 @@ export type IqDomainScore = {
   domain: IqDomain;
   labelKa: string;
   labelEn: string;
+  labelPl: string;
   correct: number;
   total: number;
   /** 0–100 percent correct within the domain. */
@@ -96,6 +98,8 @@ export type IqResult = {
     descKa: string;
     labelEn: string;
     descEn: string;
+    labelPl: string;
+    descPl: string;
   };
   correct: number;
   total: number;
@@ -169,7 +173,14 @@ export function estimateTheta(
 
 const BANDS: Record<
   IqBandKey,
-  { labelKa: string; descKa: string; labelEn: string; descEn: string }
+  {
+    labelKa: string;
+    descKa: string;
+    labelEn: string;
+    descEn: string;
+    labelPl: string;
+    descPl: string;
+  }
 > = {
   very_high: {
     labelKa: "ძალიან მაღალი",
@@ -178,6 +189,9 @@ const BANDS: Record<
     labelEn: "Very high",
     descEn:
       "Only a small share of the population reaches this range, indicating exceptional performance on abstract reasoning tasks.",
+    labelPl: "Bardzo wysoki",
+    descPl:
+      "Tylko niewielki odsetek populacji osiąga ten wynik, co wskazuje na wybitne zdolności myślenia abstrakcyjnego.",
   },
   high: {
     labelKa: "მაღალი",
@@ -186,6 +200,9 @@ const BANDS: Record<
     labelEn: "High",
     descEn:
       "A result clearly above the population average, with strong logical and analytical performance.",
+    labelPl: "Wysoki",
+    descPl:
+      "Wynik wyraźnie powyżej średniej, świadczący o wysokich zdolnościach logicznych i analitycznych.",
   },
   above: {
     labelKa: "საშუალოზე მაღალი",
@@ -194,6 +211,9 @@ const BANDS: Record<
     labelEn: "Above average",
     descEn:
       "An above-average result, suggesting confidence with complex and unfamiliar reasoning problems.",
+    labelPl: "Powyżej średniej",
+    descPl:
+      "Wynik powyżej przeciętnej, oznaczający dobrą sprawność w rozwiązywaniu złożonych zadań logicznych.",
   },
   average: {
     labelKa: "საშუალო",
@@ -202,6 +222,9 @@ const BANDS: Record<
     labelEn: "Average",
     descEn:
       "Most people fall within this range, reflecting a balanced performance across reasoning tasks.",
+    labelPl: "Średni",
+    descPl:
+      "Większość populacji mieści się w tym przedziale, co odzwierciedla zrównoważone zdolności poznawcze.",
   },
   below: {
     labelKa: "საშუალოზე დაბალი",
@@ -210,6 +233,9 @@ const BANDS: Record<
     labelEn: "Below average",
     descEn:
       "Some task types may benefit from more time or practice. A single result does not define your ability.",
+    labelPl: "Poniżej średniej",
+    descPl:
+      "Pewne typy zadań mogą wymagać więcej wprawy lub czasu. Pojedynczy test nie definiuje Twoich możliwości.",
   },
   low: {
     labelKa: "დაბალი",
@@ -218,6 +244,9 @@ const BANDS: Record<
     labelEn: "Low",
     descEn:
       "One online attempt is affected by many factors, so avoid drawing broad conclusions from this score alone.",
+    labelPl: "Niski",
+    descPl:
+      "Wynik pojedynczego testu online zależy od wielu czynników, nie należy wyciągać z niego pochopnych wniosków.",
   },
 };
 
@@ -238,6 +267,8 @@ export function iqBand(iq: number): {
   descKa: string;
   labelEn: string;
   descEn: string;
+  labelPl: string;
+  descPl: string;
 } {
   const key = bandFor(iq);
   return { key, ...BANDS[key] };
@@ -284,6 +315,7 @@ export function scoreIq(answers: Record<string, number>): IqResult {
       domain: d,
       labelKa: DOMAIN_LABELS_KA[d],
       labelEn: DOMAIN_LABELS_EN[d],
+      labelPl: DOMAIN_LABELS_PL[d],
       correct: c,
       total: t,
       pct: t > 0 ? Math.round((c / t) * 100) : 0,

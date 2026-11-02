@@ -56,6 +56,38 @@ const METADATA_KA: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   if (locale === "ka") return METADATA_KA;
+  if (locale === "pl") {
+    const title = "Jakim znakiem zodiaku naprawdę jesteś? Quiz | Vivida";
+    const description =
+      "Odpowiedz na 12 pytań i sprawdź, który znak zodiaku najlepiej pasuje do Twojego charakteru. Szybki i darmowy quiz online.";
+    const url = `${ENGLISH_SITE_URL}/pl/quiz/prawdziwy-znak-zodiaku`;
+    return {
+      title: { absolute: title },
+      description,
+      keywords: [
+        "quiz jaki znak zodiaku",
+        "jakim znakiem zodiaku jestem",
+        "test znaku zodiaku",
+        "darmowy quiz astrologiczny",
+        "prawdziwy znak zodiaku quiz",
+      ],
+      alternates: localizedAlternates(
+        "/quiz/namdvili-nishani",
+        "/quiz/namdvili-nishani",
+        "pl",
+      ),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "pl_PL",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
   const title = "Which Zodiac Sign Matches Your Personality? Quiz";
   const description =
     "Answer 12 playful questions to discover which zodiac sign’s element and modality best match your personality. Free and instant.";
@@ -91,12 +123,26 @@ export default async function TrueSignQuizPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
   const locale = await getRequestLocale();
+  const pl = locale === "pl";
   const en = locale === "en";
-  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
-  const title = en ? "Which Zodiac Sign Matches Your Personality?" : TITLE;
-  const description = en
-    ? "Answer 12 playful questions to discover which zodiac sign’s element and modality best match your personality."
-    : DESCRIPTION;
+  const siteUrl = pl
+    ? `${ENGLISH_SITE_URL}/pl`
+    : en
+      ? ENGLISH_SITE_URL
+      : GEORGIAN_SITE_URL;
+  const pageUrl = pl
+    ? `${ENGLISH_SITE_URL}/pl/quiz/prawdziwy-znak-zodiaku`
+    : `${siteUrl}/quiz/namdvili-nishani`;
+  const title = pl
+    ? "Jakim znakiem zodiaku naprawdę jesteś?"
+    : en
+      ? "Which Zodiac Sign Matches Your Personality?"
+      : TITLE;
+  const description = pl
+    ? `Odpowiedz na ${TS_QUESTION_COUNT} pytań i sprawdź, który znak zodiaku najlepiej pasuje do Twojego charakteru.`
+    : en
+      ? "Answer 12 playful questions to discover which zodiac sign’s element and modality best match your personality."
+      : DESCRIPTION;
 
   const ld = [
     {
@@ -104,21 +150,31 @@ export default async function TrueSignQuizPage() {
       "@type": "Quiz",
       name: title,
       description,
-      inLanguage: en ? "en" : "ka-GE",
-      url: `${siteUrl}/quiz/namdvili-nishani`,
+      inLanguage: pl ? "pl-PL" : en ? "en" : "ka-GE",
+      url: pageUrl,
       numberOfQuestions: TS_QUESTION_COUNT,
       about: {
         "@type": "Thing",
-        name: en ? "Zodiac signs" : "ზოდიაქოს ნიშნები",
-        alternateName: en ? "zodiac" : "ზოდიაქო",
+        name: pl ? "Znaki zodiaku" : en ? "Zodiac signs" : "ზოდიაქოს ნიშნები",
+        alternateName: pl ? "zodiak" : en ? "zodiac" : "ზოდიაქო",
       },
     },
     breadcrumbLd([
-      { name: en ? "Home" : "მთავარი", url: siteUrl },
-      { name: en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
       {
-        name: en ? "Zodiac personality quiz" : "რომელი ნიშანი ხარ",
-        url: `${siteUrl}/quiz/namdvili-nishani`,
+        name: pl ? "Strona główna" : en ? "Home" : "მთავარი",
+        url: pl ? `${ENGLISH_SITE_URL}/pl` : siteUrl,
+      },
+      {
+        name: pl ? "Testy" : en ? "Tests" : "ტესტები",
+        url: pl ? `${ENGLISH_SITE_URL}/pl/tests` : `${siteUrl}/tests`,
+      },
+      {
+        name: pl
+          ? "Quiz prawdziwy znak"
+          : en
+            ? "Zodiac personality quiz"
+            : "რომელი ნიშანი ხარ",
+        url: pageUrl,
       },
     ]),
   ];
@@ -151,16 +207,26 @@ export default async function TrueSignQuizPage() {
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <header className="mb-6 text-center">
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            Vivida Quiz
+            {pl ? "Quiz Vivida" : "Vivida Quiz"}
           </div>
           <h1 className="mt-1 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-            {en ? "Which zodiac sign" : "რომელი ნიშანი ხარ"}{" "}
+            {pl
+              ? "Jakim znakiem zodiaku"
+              : en
+                ? "Which zodiac sign"
+                : "რომელი ნიშანი ხარ"}{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {en ? "matches your personality?" : "სინამდვილეში?"}
+              {pl
+                ? "naprawdę jesteś?"
+                : en
+                  ? "matches your personality?"
+                  : "სინამდვილეში?"}
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm text-foreground/80 sm:text-base">
-            {en ? (
+            {pl ? (
+              `Odpowiedz na ${TS_QUESTION_COUNT} pytań i dowiedz się, jaka energia zodiaku najbardziej odpowiada Twojej osobowości, nawet jeśli różni się od Twojego znaku urodzenia.`
+            ) : en ? (
               `Answer ${TS_QUESTION_COUNT} questions to discover which zodiac sign’s energy best matches your character, even if it differs from your birth sign.`
             ) : (
               <>
@@ -176,10 +242,22 @@ export default async function TrueSignQuizPage() {
 
         <div className="mt-12 rounded-3xl border border-border bg-card/40 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-lg font-semibold tracking-tight">
-            {en ? "How does the quiz work?" : "როგორ მუშაობს ტესტი?"}
+            {pl
+              ? "Jak działa ten quiz?"
+              : en
+                ? "How does the quiz work?"
+                : "როგორ მუშაობს ტესტი?"}
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            {en ? (
+            {pl ? (
+              <>
+                Każdy znak zodiaku łączy <strong>żywioł</strong> (Ogień, Ziemia,
+                Powietrze lub Woda) oraz <strong>jakość</strong> (Kardynalna,
+                Stała lub Zmienna). Twoje odpowiedzi pozwalają określić
+                dominującą parę, której przecięcie wskazuje jeden z dwunastu
+                znaków zodiaku.
+              </>
+            ) : en ? (
               <>
                 Every zodiac sign combines an <strong>element</strong> (Fire,
                 Earth, Air or Water) with a <strong>modality</strong> (Cardinal,
@@ -199,7 +277,14 @@ export default async function TrueSignQuizPage() {
             )}
           </p>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            {en ? (
+            {pl ? (
+              <>
+                Pamiętaj: to quiz o charakterze rozrywkowym. Twój rzeczywisty{" "}
+                <strong>znak urodzenia</strong> wynika z daty i godziny Twoich
+                narodzin, co możesz sprawdzić w bezpłatnym horoskopie
+                urodzeniowym.
+              </>
+            ) : en ? (
               <>
                 Remember: this is an entertainment quiz. Your actual{" "}
                 <strong>birth sign</strong> is determined by your date and time
@@ -213,7 +298,6 @@ export default async function TrueSignQuizPage() {
               </>
             )}
           </p>
-
         </div>
       </section>
       <SiteFooter locale={locale} />

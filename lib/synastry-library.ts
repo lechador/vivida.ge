@@ -82,12 +82,27 @@ export function allSynastryOverlayCombos(): SynastryOverlayCombo[] {
 }
 
 import synastryLibEn from "./seo/synastry-library-en.json";
+import synastryLibPl from "./seo/synastry-library-pl.json";
+
+/**
+ * Batched read for Polish: Map of key → Polish text from pre-generated JSON.
+ */
+export function getSynastryLibraryEntriesPl(
+  keys: string[],
+): Map<string, string> {
+  const dict = synastryLibPl as Record<string, string>;
+  const out = new Map<string, string>();
+  for (const k of keys) {
+    if (dict[k]) out.set(k, dict[k]);
+  }
+  return out;
+}
 
 /**
  * Batched read for English: Map of key → English text from pre-generated JSON.
  */
 export function getSynastryLibraryEntriesEn(
-  keys: string[]
+  keys: string[],
 ): Map<string, string> {
   const dict = synastryLibEn as Record<string, string>;
   const out = new Map<string, string>();
@@ -97,6 +112,8 @@ export function getSynastryLibraryEntriesEn(
   return out;
 }
 
+export { synastryLibEn, synastryLibPl };
+
 /**
  * Batched read: Map of key → Georgian text for the requested keys. Pure read,
  * never generates. Resilient: if the table doesn't exist yet (migration not
@@ -104,7 +121,7 @@ export function getSynastryLibraryEntriesEn(
  * just without the deep texts.
  */
 export async function getSynastryLibraryEntries(
-  keys: string[]
+  keys: string[],
 ): Promise<Map<string, string>> {
   if (keys.length === 0 || !process.env.DATABASE_URL) return new Map();
   try {
@@ -136,12 +153,18 @@ export async function getSynastryInterpretationsFor(
     topAspects: { a: string; b: string; kind: AspectKind }[];
     breakdown: { topOverlays: { body: string; house: number }[] };
   },
-  locale: UserLocale = "ka"
+  locale: UserLocale = "ka",
 ): Promise<Record<string, string>> {
   const keys = [
     ...result.topAspects.map((x) => synastryAspectKey(x.a, x.b, x.kind)),
-    ...result.breakdown.topOverlays.map((o) => synastryOverlayKey(o.body, o.house)),
+    ...result.breakdown.topOverlays.map((o) =>
+      synastryOverlayKey(o.body, o.house),
+    ),
   ];
+  if (locale === "pl") {
+    const map = getSynastryLibraryEntriesPl([...new Set(keys)]);
+    return Object.fromEntries(map);
+  }
   if (locale === "en") {
     const map = getSynastryLibraryEntriesEn([...new Set(keys)]);
     return Object.fromEntries(map);
@@ -162,7 +185,7 @@ export const SYNASTRY_LIBRARY_SYSTEM_PROMPT =
 export function buildSynastryAspectPrompt(
   a: string,
   b: string,
-  kind: AspectKind
+  kind: AspectKind,
 ): string {
   const same = a === b;
   const pair = same
@@ -180,7 +203,10 @@ export function buildSynastryAspectPrompt(
 }
 
 /** User prompt for one house-overlay combo. */
-export function buildSynastryOverlayPrompt(body: string, house: number): string {
+export function buildSynastryOverlayPrompt(
+  body: string,
+  house: number,
+): string {
   return (
     `დაწერე სინასტრიის ინტერპრეტაცია: ერთის ${bodyLabel(body)} ხვდება მეორის ${HOUSE_LABEL_KA[house]} სახლში.\n\n` +
     "მოთხოვნები:\n" +

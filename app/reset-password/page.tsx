@@ -5,7 +5,14 @@ import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  return { title: locale !== "ka" ? "New password" : "ახალი პაროლი" };
+  return {
+    title:
+      locale === "pl"
+        ? "Nowe hasło"
+        : locale !== "ka"
+          ? "New password"
+          : "ახალი პაროლი",
+  };
 }
 
 export default async function ResetPasswordPage({
@@ -19,11 +26,19 @@ export default async function ResetPasswordPage({
   return (
     <AuthLayout
       locale={locale}
-      title={en ? "Choose a new password" : "ახალი პაროლი"}
+      title={
+        locale === "pl"
+          ? "Wybierz nowe hasło"
+          : en
+            ? "Choose a new password"
+            : "ახალი პაროლი"
+      }
       subtitle={
-        en
-          ? "Set a new password for your account."
-          : "დააყენე ახალი პაროლი ანგარიშისთვის."
+        locale === "pl"
+          ? "Ustaw nowe hasło dla swojego konta."
+          : en
+            ? "Set a new password for your account."
+            : "დააყენე ახალი პაროლი ანგარიშისთვის."
       }
     >
       <ResetPasswordForm token={token ?? ""} locale={locale} />

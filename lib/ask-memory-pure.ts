@@ -40,40 +40,60 @@ export function buildMemoryBlock(
   const traitBits: string[] = [];
   if (t.verbosity)
     traitBits.push(
-      locale === "en"
-        ? `prefers ${t.verbosity} answers`
-        : `უპირატესობა: ${t.verbosity === "short" ? "მოკლე" : t.verbosity === "detailed" ? "დეტალური" : "საშუალო"} პასუხები`,
+      locale === "pl"
+        ? t.verbosity === "short"
+          ? "preferuje zwięzłe odpowiedzi"
+          : t.verbosity === "detailed"
+            ? "preferuje szczegółowe odpowiedzi"
+            : "preferuje odpowiedzi średniej długości"
+        : locale === "en"
+          ? `prefers ${t.verbosity} answers`
+          : `უპირატესობა: ${t.verbosity === "short" ? "მოკლე" : t.verbosity === "detailed" ? "დეტალური" : "საშუალო"} პასუხები`,
     );
   if (t.tone)
-    traitBits.push(locale === "en" ? `tone: ${t.tone}` : `ტონი: ${t.tone}`);
+    traitBits.push(
+      locale === "pl"
+        ? `ton: ${t.tone}`
+        : locale === "en"
+          ? `tone: ${t.tone}`
+          : `ტონი: ${t.tone}`,
+    );
   // A fresh topic keeps the person's durable style but not the story they just
   // left: recurring topics, short-lived notes and open threads are the parts
   // that would drag the previous subject into unrelated answers.
   if (!isolated && t.topics?.length)
     traitBits.push(
-      locale === "en"
-        ? `recurring topics: ${t.topics.join(", ")}`
-        : `მუდმივი თემები: ${t.topics.join(", ")}`,
+      locale === "pl"
+        ? `powracające tematy: ${t.topics.join(", ")}`
+        : locale === "en"
+          ? `recurring topics: ${t.topics.join(", ")}`
+          : `მუდმივი თემები: ${t.topics.join(", ")}`,
     );
   if (!isolated && t.notes) traitBits.push(t.notes.slice(0, 300));
   if (!isolated && t.openLoops?.length) {
     traitBits.push(
-      locale === "en"
-        ? `open threads (gently ask about one at most occasionally, never every message): ${t.openLoops.join("; ")}`
-        : `ღია თემები (შესაძლოა ერთზე ნაზად იკითხო ხოლმე, არა ყოველ პასუხში): ${t.openLoops.join("; ")}`,
+      locale === "pl"
+        ? `otwarte wątki (od czasu do czasu możesz delikatnie nawiązać do jednego, nie w każdej wiadomości): ${t.openLoops.join("; ")}`
+        : locale === "en"
+          ? `open threads (gently ask about one at most occasionally, never every message): ${t.openLoops.join("; ")}`
+          : `ღია თემები (შესაძლოა ერთზე ნაზად იკითხო ხოლმე, არა ყოველ პასუხში): ${t.openLoops.join("; ")}`,
     );
   }
   const traitsLine = traitBits.length > 0 ? traitBits.join("; ") : "";
   const body = [...parts, traitsLine].filter(Boolean).join("\n");
   if (!body) return "";
   if (isolated) {
-    return locale === "en"
-      ? `Background about this person from earlier conversations. They just started a new topic, so use this only to match their tone and level of detail. Do NOT bring up earlier topics, people or open threads unless the person mentions them first:\n${body}`
-      : `ფონური ინფორმაცია ამ ადამიანზე წინა საუბრებიდან. მან ახლახან ახალი თემა დაიწყო, ამიტომ გამოიყენე ეს მხოლოდ ტონისა და დეტალურობის შესაბამისად. არ ახსენო წინა თემები, ადამიანები ან ღია საკითხები, სანამ თავად არ მოიხსენიებს:\n${body}`;
+    return locale === "pl"
+      ? `Informacje o tej osobie z wcześniejszych rozmów. Właśnie rozpoczęła nowy temat, więc użyj tego tylko po to, aby dopasować ton i poziom szczegółowości. NIE nawiązuj do wcześniejszych tematów, osób ani otwartych wątków, chyba że rozmówca sam o nich wspomni:\n${body}`
+      : locale === "en"
+        ? `Background about this person from earlier conversations. They just started a new topic, so use this only to match their tone and level of detail. Do NOT bring up earlier topics, people or open threads unless the person mentions them first:\n${body}`
+        : `ფონური ინფორმაცია ამ ადამიანზე წინა საუბრებიდან. მან ახლახან ახალი თემა დაიწყო, ამიტომ გამოიყენე ეს მხოლოდ ტონისა და დეტალურობის შესაბამისად. არ ახსენო წინა თემები, ადამიანები ან ღია საკითხები, სანამ თავად არ მოიხსენიებს:\n${body}`;
   }
-  return locale === "en"
-    ? `What you remember about this person (from earlier conversations, refer back to it naturally, never recite it verbatim):\n${body}`
-    : `რას გახსოვს ამ ადამიანზე (წინა საუბრებიდან, გამოიყენე ბუნებრივად, ნუ ჩამოთვლი სიტყვა-სიტყვით):\n${body}`;
+  return locale === "pl"
+    ? `Co pamiętasz o tej osobie (z wcześniejszych rozmów — używaj naturalnie, nigdy nie recytuj dosłownie):\n${body}`
+    : locale === "en"
+      ? `What you remember about this person (from earlier conversations, refer back to it naturally, never recite it verbatim):\n${body}`
+      : `რას გახსოვს ამ ადამიანზე (წინა საუბრებიდან, გამოიყენე ბუნებრივად, ნუ ჩამოთვლი სიტყვა-სიტყვით):\n${body}`;
 }
 
 /** Guard the LLM merge output before persisting, junk in, junk out otherwise. */
@@ -134,14 +154,18 @@ export function depthInstruction(
   locale: UserLocale = "ka",
 ): string {
   if (depth === "short") {
-    return locale === "en"
-      ? "The person asked for a brief answer: reply in 1–2 short paragraphs, essentials only."
-      : "ადამიანმა მოკლე პასუხი მთხოვა: უპასუხე 1-2 მოკლე აბზაცით, მხოლოდ მთავარი.";
+    return locale === "pl"
+      ? "Użytkownik poprosił o zwięzłą odpowiedź: odpowiedz w 1–2 krótkich akapitach, same konkrety."
+      : locale === "en"
+        ? "The person asked for a brief answer: reply in 1–2 short paragraphs, essentials only."
+        : "ადამიანმა მოკლე პასუხი მთხოვა: უპასუხე 1-2 მოკლე აბზაცით, მხოლოდ მთავარი.";
   }
   if (depth === "detailed") {
-    return locale === "en"
-      ? "The person asked for a detailed answer: you may use the full 4 paragraphs with concrete examples."
-      : "ადამიანმა დეტალური პასუხი მთხოვა: გამოიყენე სრული 4 აბზაცი კონკრეტული მაგალითებით.";
+    return locale === "pl"
+      ? "Użytkownik poprosił o szczegółową odpowiedź: możesz wykorzystać pełne 4 akapity z konkretnymi przykładami."
+      : locale === "en"
+        ? "The person asked for a detailed answer: you may use the full 4 paragraphs with concrete examples."
+        : "ადამიანმა დეტალური პასუხი მთხოვა: გამოიყენე სრული 4 აბზაცი კონკრეტული მაგალითებით.";
   }
   return "";
 }
@@ -168,6 +192,17 @@ const CRISIS_EN = [
   "end my life",
   "don't want to live",
   "do not want to live",
+];
+
+const CRISIS_PL = [
+  "zabić się",
+  "odebrać sobie życie",
+  "samobój",
+  "nie chcę żyć",
+  "chcę umrzeć",
+  "koniec mojego życia",
+  "nie mam po co żyć",
+  "nie mam siły żyć",
 ];
 
 const SUPPORT_KA = [
@@ -211,18 +246,41 @@ const SUPPORT_EN = [
   "i'm scared",
 ];
 
+const SUPPORT_PL = [
+  "źle się czuję",
+  "czuję się fatalnie",
+  "jestem wykończony",
+  "jestem wykończona",
+  "wypalenie",
+  "płaczę",
+  "chce mi się płakać",
+  "lęk",
+  "stany lękowe",
+  "depresja",
+  "jestem sam",
+  "jestem sama",
+  "nie mogę spać",
+  "nie mam już sił",
+  "załamana",
+  "załamany",
+  "pęka mi serce",
+  "boję się",
+];
+
 /** Keyword scan of one user message. Crisis wins over support. */
 export function detectDistress(message: string): DistressLevel {
   const text = message.toLowerCase();
   if (
     CRISIS_KA.some((k) => text.includes(k)) ||
-    CRISIS_EN.some((k) => text.includes(k))
+    CRISIS_EN.some((k) => text.includes(k)) ||
+    CRISIS_PL.some((k) => text.includes(k))
   ) {
     return "crisis";
   }
   if (
     SUPPORT_KA.some((k) => text.includes(k)) ||
-    SUPPORT_EN.some((k) => text.includes(k))
+    SUPPORT_EN.some((k) => text.includes(k)) ||
+    SUPPORT_PL.some((k) => text.includes(k))
   ) {
     return "support";
   }
@@ -235,14 +293,18 @@ export function distressInstruction(
   locale: UserLocale = "ka",
 ): string {
   if (level === "crisis") {
-    return locale === "en"
-      ? "The person may be in crisis. First respond with care: acknowledge their pain, urge them to reach out right now to someone they trust or a mental-health professional. No astrology lecture, no platitudes, no medical claims. Keep it short."
-      : "ადამიანი შესაძლოა კრიზისშია. პირველ რიგში მზრუნველობით უპასუხე: აღიარე მისი ტკივილი, ურჩიე ახლავე დაუკავშირდეს სანდო ადამიანს ან ფსიქიკური ჯანმრთელობის სპეციალისტს. არა ასტროლოგიური ლექცია, არა ბანალური ფრაზები, არა სამედიცინო მტკიცებები. მოკლედ.";
+    return locale === "pl"
+      ? "Rozmówca może przeżywać kryzys emocjonalny. Przede wszystkim odpowiedz z troską: doceń jego ból, zachęć do natychmiastowego kontaktu z bliską osobą lub specjalistą ds. zdrowia psychicznego. Bez wykładu z astrologii, bez banałów, bez porad medycznych. Odpowiedz krótko."
+      : locale === "en"
+        ? "The person may be in crisis. First respond with care: acknowledge their pain, urge them to reach out right now to someone they trust or a mental-health professional. No astrology lecture, no platitudes, no medical claims. Keep it short."
+        : "ადამიანი შესაძლოა კრიზისშია. პირველ რიგში მზრუნველობით უპასუხე: აღიარე მისი ტკივილი, ურჩიე ახლავე დაუკავშირდეს სანდო ადამიანს ან ფსიქიკური ჯანმრთელობის სპეციალისტს. არა ასტროლოგიური ლექცია, არა ბანალური ფრაზები, არა სამედიცინო მტკიცებები. მოკლედ.";
   }
   if (level === "support") {
-    return locale === "en"
-      ? "The person's message sounds heavy or vulnerable. Start with one warm validating sentence before any astrology. Keep the answer shorter than usual and gentle, no pep-talk clichés."
-      : "ადამიანის შეტყობინება მძიმე ან მოწყვლადია. ასტროლოგიამდე დაიწყე ერთი თბილი, დამადასტურებელი წინადადებით. პასუხი ჩვეულებრივზე მოკლე და ნაზი, გამამხნევებელი კლიშეების გარეშე.";
+    return locale === "pl"
+      ? "Wiadomość użytkownika brzmi ciężko lub bezbronnie. Przed jakąkolwiek astrologią zacznij od jednego ciepłego, wspierającego zdania. Odpowiedź powinna być krótsza niż zwykle i delikatna, bez pustych frazesów motywacyjnych."
+      : locale === "en"
+        ? "The person's message sounds heavy or vulnerable. Start with one warm validating sentence before any astrology. Keep the answer shorter than usual and gentle, no pep-talk clichés."
+        : "ადამიანის შეტყობინება მძიმე ან მოწყვლადია. ასტროლოგიამდე დაიწყე ერთი თბილი, დამადასტურებელი წინადადებით. პასუხი ჩვეულებრივზე მოკლე და ნაზი, გამამხნევებელი კლიშეების გარეშე.";
   }
   return "";
 }
@@ -255,6 +317,7 @@ export function buildFollowUpQuestion(
   locale: UserLocale = "ka",
 ): string {
   const loop = openLoop.trim().slice(0, 60);
+  if (locale === "pl") return `Jak wygląda sytuacja z: „${loop}”?`;
   return locale === "en"
     ? `How's the "${loop}" situation going?`
     : `როგორ მიდის „${loop}“-ის ამბავი?`;
@@ -268,6 +331,8 @@ export function buildTopicStarter(
   locale: UserLocale = "ka",
 ): TopicStarter {
   const t = topic.trim().slice(0, 40);
+  if (locale === "pl")
+    return { label: t, prompt: `Co mój horoskop mówi o: ${t}?` };
   return locale === "en"
     ? { label: t, prompt: `What does my chart say about ${t}?` }
     : { label: t, prompt: `რას ამბობს ჩემი რუკა „${t}“-ზე?` };

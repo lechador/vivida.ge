@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 .locale-en-only,
+.locale-pl-only,
 .locale-am-only {
   display: none;
 }
@@ -10,6 +11,14 @@ html[lang="en"] .locale-en-only {
 }
 
 html[lang="en"] .locale-ka-only {
+  display: none;
+}
+
+html[lang="pl"] .locale-pl-only {
+  display: inline;
+}
+
+html[lang="pl"] .locale-ka-only {
   display: none;
 }
 

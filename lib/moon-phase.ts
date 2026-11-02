@@ -10,6 +10,7 @@
 
 import { computeTransits } from "./transits";
 import { signFromLongitude } from "./zodiac";
+import type { UserLocale } from "./i18n/user-locale";
 
 const SYNODIC_MONTH_DAYS = 29.530588853;
 
@@ -48,6 +49,23 @@ export const PHASE_LABEL_EN: Record<PhaseKey, string> = {
   waning_crescent: "Waning Crescent",
 };
 
+export const PHASE_LABEL_PL: Record<PhaseKey, string> = {
+  new_moon: "Nów Księżyca",
+  waxing_crescent: "Przybywający Sierp",
+  first_quarter: "Pierwsza Kwadra",
+  waxing_gibbous: "Przybywający Księżyc Garbaty",
+  full_moon: "Pełnia Księżyca",
+  waning_gibbous: "Ubywający Księżyc Garbaty",
+  last_quarter: "Ostatnia Kwadra",
+  waning_crescent: "Ubywający Sierp",
+};
+
+export function phaseLabel(phaseKey: PhaseKey, locale: UserLocale): string {
+  if (locale === "pl") return PHASE_LABEL_PL[phaseKey];
+  if (locale === "en") return PHASE_LABEL_EN[phaseKey];
+  return PHASE_LABEL_KA[phaseKey];
+}
+
 export type MoonPhaseSnapshot = {
   /** 0..360, sun→moon angular separation. */
   phaseAngle: number;
@@ -57,10 +75,12 @@ export type MoonPhaseSnapshot = {
   sunLongitude: number;
   signEn: string;
   signKa: string;
+  signPl?: string;
   signIndex: number;
   signSymbol: string;
   phaseKey: PhaseKey;
   phaseLabelKa: string;
+  phaseLabelPl?: string;
   /** 0..1, fraction of disk illuminated. */
   illumination: number;
   /** 0..29.53, days since previous new moon. */
@@ -110,10 +130,12 @@ export function computeMoonPhase(date: Date): MoonPhaseSnapshot | null {
     sunLongitude: sun.longitude,
     signEn: sign.labelEn,
     signKa: sign.labelKa,
+    signPl: sign.labelPl,
     signIndex: sign.index,
     signSymbol: sign.symbol,
     phaseKey,
     phaseLabelKa: PHASE_LABEL_KA[phaseKey],
+    phaseLabelPl: PHASE_LABEL_PL[phaseKey],
     illumination: illuminationFromAngle(phaseAngle),
     ageDays: ageDaysFromAngle(phaseAngle),
   };

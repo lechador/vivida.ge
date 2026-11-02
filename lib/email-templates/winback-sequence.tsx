@@ -23,11 +23,19 @@ export function WinbackSequenceEmail({
   unsubscribeUrl: string;
   locale?: UserLocale;
 }) {
+  const pl = locale === "pl";
   const en = locale === "en";
-  const body = en ? step.bodyEn : step.bodyKa;
+  const body = pl ? step.bodyPl : en ? step.bodyEn : step.bodyKa;
+  const preview = pl
+    ? step.preheaderPl
+    : en
+      ? step.preheaderEn
+      : step.preheaderKa;
+  const heading = pl ? step.subjectPl : en ? step.subjectEn : step.subjectKa;
+  const cta = pl ? step.ctaPl : en ? step.ctaEn : step.ctaKa;
   return (
     <EmailLayout
-      preview={en ? step.preheaderEn : step.preheaderKa}
+      preview={preview}
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
     >
@@ -48,7 +56,7 @@ export function WinbackSequenceEmail({
             margin: "0 0 10px",
           }}
         >
-          {en ? step.subjectEn : step.subjectKa}
+          {heading}
         </Heading>
       </Section>
 
@@ -63,7 +71,7 @@ export function WinbackSequenceEmail({
 
       <Section style={{ textAlign: "center", padding: "10px 0 8px" }}>
         <Button href={ctaUrl} style={buttonStyle}>
-          {en ? step.ctaEn : step.ctaKa}
+          {cta}
         </Button>
       </Section>
     </EmailLayout>

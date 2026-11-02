@@ -29,7 +29,14 @@ import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  return { title: locale !== "ka" ? "Ask your chart" : "ჰკითხე ვარსკვლავებს" };
+  return {
+    title:
+      locale === "pl"
+        ? "Zapytaj swój kosmogram"
+        : locale !== "ka"
+          ? "Ask your chart"
+          : "ჰკითხე ვარსკვლავებს",
+  };
 }
 export const dynamic = "force-dynamic";
 
@@ -62,14 +69,18 @@ export default async function AskPage({
       <AstroLockedMain
         active="ask"
         title={
-          en
-            ? "Your astrologer needs a natal chart"
-            : "ასტროლოგი ნატალურ რუკას საჭიროებს"
+          locale === "pl"
+            ? "Twój astrolog potrzebuje kosmogramu urodzeniowego"
+            : en
+              ? "Your astrologer needs a natal chart"
+              : "ასტროლოგი ნატალურ რუკას საჭიროებს"
         }
         description={
-          en
-            ? "Add your birth details to consult an astrologer grounded in your natal chart."
-            : "შეავსე დაბადების მონაცემები, რომ ესაუბრო ასტროლოგს, რომელიც შენს რუკას იცნობს."
+          locale === "pl"
+            ? "Uzupełnij dane urodzenia, aby skonsultować się z astrologiem na podstawie Twojego kosmogramu."
+            : en
+              ? "Add your birth details to consult an astrologer grounded in your natal chart."
+              : "შეავსე დაბადების მონაცემები, რომ ესაუბრო ასტროლოგს, რომელიც შენს რუკას იცნობს."
         }
         next="/ask"
         locale={locale}
@@ -153,7 +164,9 @@ export default async function AskPage({
               thread height; the app header breadcrumb already names the
               section, so it stays a desktop flourish. */}
           <div className="hidden font-mono text-[10px] uppercase tracking-[0.2em] text-primary sm:block">
-            OBSERVATORY CONSULTATION · პირადი კონსულტაცია
+            {locale === "pl"
+              ? "KONSULTACJA W OBSERWATORIUM · PRZESTRZEŃ OSOBISTA"
+              : "OBSERVATORY CONSULTATION · პირადი კონსულტაცია"}
           </div>
           <h1
             className={
@@ -162,17 +175,28 @@ export default async function AskPage({
                 : "mt-1 text-balance text-xl font-semibold tracking-tight text-foreground sm:text-3xl"
             }
           >
-            {en ? "Ask your " : "ჰკითხე "}
-            <span className="text-primary">
-              {en ? "natal chart" : "ვარსკვლავებს"}
-            </span>
+            {locale === "pl" ? (
+              <>
+                Zapytaj swój <span className="text-primary">kosmogram</span>
+              </>
+            ) : en ? (
+              <>
+                Ask your <span className="text-primary">natal chart</span>
+              </>
+            ) : (
+              <>
+                ჰკითხე <span className="text-primary">ვარსკვლავებს</span>
+              </>
+            )}
           </h1>
           {/* The transcript's own intro explains the tool on phones; the
               long subtitle is only worth its vertical space on desktop. */}
           <p className="mt-1 hidden text-xs text-muted-foreground sm:block sm:text-sm">
-            {en
-              ? "Personal astrological consultation grounded in your exact planets, houses, and aspects."
-              : "შენი ნატალური რუკის პერსონალური ასტროლოგი, ეფუძნება შენს რეალურ პლანეტებსა და სახლებს."}
+            {locale === "pl"
+              ? "Osobista konsultacja astrologiczna oparta na Twoich dokładnych planetach, domach i aspektach."
+              : en
+                ? "Personal astrological consultation grounded in your exact planets, houses, and aspects."
+                : "შენი ნატალური რუკის პერსონალური ასტროლოგი, ეფუძნება შენს რეალურ პლანეტებსა და სახლებს."}
           </p>
         </header>
 

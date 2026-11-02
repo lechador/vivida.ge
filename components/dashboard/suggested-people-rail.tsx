@@ -109,7 +109,10 @@ export function SuggestedPeopleRail({
       const next = el.scrollLeft + e.deltaY;
       // Only intercept if we can actually consume the scroll, otherwise
       // let the page scroll vertically as the user expects.
-      if ((e.deltaY > 0 && el.scrollLeft >= max) || (e.deltaY < 0 && el.scrollLeft <= 0)) {
+      if (
+        (e.deltaY > 0 && el.scrollLeft >= max) ||
+        (e.deltaY < 0 && el.scrollLeft <= 0)
+      ) {
         return;
       }
       e.preventDefault();
@@ -159,7 +162,11 @@ export function SuggestedPeopleRail({
           href="/people"
           className="text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
-          {locale !== "ka" ? "View all →" : "ყველა →"}
+          {locale === "pl"
+            ? "Zobacz wszystkich →"
+            : locale !== "ka"
+              ? "View all →"
+              : "ყველა →"}
         </Link>
       </div>
 
@@ -167,10 +174,12 @@ export function SuggestedPeopleRail({
         <button
           type="button"
           onClick={() => scrollByAmount(-1)}
-          aria-label={locale !== "ka" ? "Previous" : "უკან"}
+          aria-label={
+            locale === "pl" ? "Wstecz" : locale !== "ka" ? "Previous" : "უკან"
+          }
           className={cn(
             "absolute left-0 top-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background/90 p-2 text-foreground shadow-lg backdrop-blur transition-opacity hover:bg-background sm:flex",
-            canLeft ? "opacity-100" : "pointer-events-none opacity-0"
+            canLeft ? "opacity-100" : "pointer-events-none opacity-0",
           )}
         >
           <ChevronLeft className="size-4" />
@@ -178,10 +187,12 @@ export function SuggestedPeopleRail({
         <button
           type="button"
           onClick={() => scrollByAmount(1)}
-          aria-label={locale !== "ka" ? "Next" : "წინ"}
+          aria-label={
+            locale === "pl" ? "Dalej" : locale !== "ka" ? "Next" : "წინ"
+          }
           className={cn(
             "absolute right-0 top-1/2 z-10 hidden translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background/90 p-2 text-foreground shadow-lg backdrop-blur transition-opacity hover:bg-background sm:flex",
-            canRight ? "opacity-100" : "pointer-events-none opacity-0"
+            canRight ? "opacity-100" : "pointer-events-none opacity-0",
           )}
         >
           <ChevronRight className="size-4" />
@@ -191,14 +202,14 @@ export function SuggestedPeopleRail({
           aria-hidden
           className={cn(
             "pointer-events-none absolute inset-y-0 left-0 z-[1] w-10 bg-gradient-to-r from-background to-transparent transition-opacity",
-            canLeft ? "opacity-100" : "opacity-0"
+            canLeft ? "opacity-100" : "opacity-0",
           )}
         />
         <div
           aria-hidden
           className={cn(
             "pointer-events-none absolute inset-y-0 right-0 z-[1] w-10 bg-gradient-to-l from-background to-transparent transition-opacity",
-            canRight ? "opacity-100" : "opacity-0"
+            canRight ? "opacity-100" : "opacity-0",
           )}
         />
 
@@ -211,7 +222,11 @@ export function SuggestedPeopleRail({
           className="-mx-4 flex gap-3 overflow-x-auto overscroll-x-contain scroll-smooth px-4 pb-2 [scrollbar-width:none] [&.is-dragging]:scroll-auto [&.is-dragging_*]:pointer-events-none [&::-webkit-scrollbar]:hidden sm:-mx-6 sm:cursor-grab sm:select-none sm:px-6 sm:[&.is-dragging]:cursor-grabbing sm:[&_img]:select-none"
         >
           {suggestions.map((person) => (
-            <SuggestedPersonCard key={person.userId} person={person} locale={locale} />
+            <SuggestedPersonCard
+              key={person.userId}
+              person={person}
+              locale={locale}
+            />
           ))}
         </div>
       </div>

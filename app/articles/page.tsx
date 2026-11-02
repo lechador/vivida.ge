@@ -39,6 +39,17 @@ const COPY = {
     all: "All",
     empty: "Articles in this category are coming soon.",
   },
+  pl: {
+    title: "Artykuły o psychologii, rozwoju osobistym i astrologii",
+    description:
+      "Wartościowe lektury o psychologii, relacjach, rozwoju osobistym i astrologii z praktycznym spojrzeniem.",
+    eyebrow: "Vivida Journal",
+    heading: "Myśli dla bardziej świadomego życia",
+    intro:
+      "Psychologia, filozofia, relacje, rozwój osobisty i astrologia — głębokie perspektywy na co dzień.",
+    all: "Wszystkie",
+    empty: "Artykuły w tej kategorii pojawią się wkrótce.",
+  },
 } as const;
 
 export async function generateMetadata(): Promise<Metadata> {

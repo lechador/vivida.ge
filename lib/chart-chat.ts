@@ -35,6 +35,14 @@ const ASPECT_KA: Record<string, string> = {
   opposition: "ოპოზიცია",
 };
 
+const ASPECT_PL: Record<string, string> = {
+  conjunction: "koniunkcja",
+  sextile: "sekstyl",
+  square: "kwadratura",
+  trine: "trygon",
+  opposition: "opozycja",
+};
+
 const PLANET_ORDER = [
   "mercury",
   "venus",
@@ -97,7 +105,13 @@ const OUTER_EPHEMERIS_SEGMENTS: ReadonlyArray<{
   { body: "pluto", signIndex: 10, start: "2024-11-19", end: "2043-03-08" },
 ];
 
-function bodyLabel(key: string, en: boolean): string {
+function bodyLabel(key: string, enOrLocale: boolean | UserLocale): string {
+  if (enOrLocale === "pl") {
+    if (key === "ascendant") return "Ascendent";
+    if (key === "midheaven") return "Medium Coeli (MC)";
+    return bodyMeta(key)?.labelPl ?? key;
+  }
+  const en = enOrLocale === true || enOrLocale === "en";
   if (en) return key[0].toUpperCase() + key.slice(1);
   if (key === "ascendant") return "ასცენდენტი";
   if (key === "midheaven") return "მედიუმ ცელი (MC)";
@@ -119,8 +133,10 @@ function housesForSign(signIndex: number, houses: HouseJson[]): number[] {
 function interceptedSignsInHouse(
   startLng: number,
   endLng: number,
-  en: boolean,
+  localeOrEn: UserLocale | boolean,
 ): string[] {
+  const loc: UserLocale =
+    typeof localeOrEn === "boolean" ? (localeOrEn ? "en" : "ka") : localeOrEn;
   const norm = (x: number) => ((x % 360) + 360) % 360;
   const a = norm(startLng);
   const b = norm(endLng);
@@ -134,25 +150,38 @@ function interceptedSignsInHouse(
     const dEnd = (sEnd - a + 360) % 360;
     if (dStart > 0 && dEnd > dStart && dEnd < arcLen) {
       const meta = signByIndex(s);
-      out.push(en ? meta.labelEn : meta.labelKa);
+      out.push(
+        loc === "pl"
+          ? meta.labelPl
+          : loc === "en"
+            ? meta.labelEn
+            : meta.labelKa,
+      );
     }
   }
   return out;
 }
 
-function formatHousesBlock(chart: NatalChartJson, en: boolean): string[] {
-  const houses = [...chart.houses].sort((a, b) => a.number - b.number);
+function formatHousesBlock(
+  chart: NatalChartJson,
+  localeOrEn: UserLocale | boolean,
+): string[] {
+  const loc: UserLocale =
+    typeof localeOrEn === "boolean" ? (localeOrEn ? "en" : "ka") : localeOrEn;
+  const houses = [...(chart.houses ?? [])].sort((a, b) => a.number - b.number);
   if (houses.length === 0) return [];
   const occupants: Record<number, string[]> = {};
   for (const [k, body] of Object.entries(chart.bodies)) {
     if (body?.house) {
-      (occupants[body.house] ??= []).push(bodyLabel(k, en));
+      (occupants[body.house] ??= []).push(bodyLabel(k, loc));
     }
   }
   const lines: string[] = [
-    en
-      ? "House cusps (Placidus, exact spans & occupants):"
-      : "სახლების კუსპიდები (Placidus, ზუსტი საზღვრები და პლანეტები სახლებში):",
+    loc === "pl"
+      ? "Wierzchołki domów (Placidus, dokładne granice i planety w domach):"
+      : loc === "en"
+        ? "House cusps (Placidus, exact spans & occupants):"
+        : "სახლების კუსპიდები (Placidus, ზუსტი საზღვრები და პლანეტები სახლებში):",
   ];
   for (let i = 0; i < houses.length; i++) {
     const h = houses[i];
@@ -168,33 +197,47 @@ function formatHousesBlock(chart: NatalChartJson, en: boolean): string[] {
         )
       : "";
     const intercepted = next
-      ? interceptedSignsInHouse(h.cuspLongitude, next.cuspLongitude, en)
+      ? interceptedSignsInHouse(h.cuspLongitude, next.cuspLongitude, loc)
       : [];
     const interceptedNote =
       intercepted.length > 0
-        ? en
-          ? ` (intercepted sign inside house ${h.number}: ${intercepted.join(", ")})`
-          : ` (ჩართული ნიშანი მე-${h.number} სახლში: ${intercepted.join(", ")})`
+        ? loc === "pl"
+          ? ` (znak przechwycony w domu ${h.number}: ${intercepted.join(", ")})`
+          : loc === "en"
+            ? ` (intercepted sign inside house ${h.number}: ${intercepted.join(", ")})`
+            : ` (ჩართული ნიშანი მე-${h.number} სახლში: ${intercepted.join(", ")})`
         : "";
     const occ = occupants[h.number]?.length
-      ? en
-        ? ` — planets: ${occupants[h.number].join(", ")}`
-        : ` — პლანეტები: ${occupants[h.number].join(", ")}`
+      ? loc === "pl"
+        ? ` — planety: ${occupants[h.number].join(", ")}`
+        : loc === "en"
+          ? ` — planets: ${occupants[h.number].join(", ")}`
+          : ` — პლანეტები: ${occupants[h.number].join(", ")}`
       : "";
+    const signName = (s: typeof startSign) =>
+      loc === "pl" ? s.labelPl : loc === "en" ? s.labelEn : s.labelKa;
     lines.push(
-      en
-        ? `- House ${h.number}: ${startSign.labelEn} ${startDeg} → ${endSign.labelEn} ${endDeg}${interceptedNote}${occ}`
-        : `- მე-${h.number} სახლი: ${startSign.labelKa} ${startDeg} → ${endSign.labelKa} ${endDeg}${interceptedNote}${occ}`,
+      loc === "pl"
+        ? `- Dom ${h.number}: ${signName(startSign)} ${startDeg} → ${signName(endSign)} ${endDeg}${interceptedNote}${occ}`
+        : loc === "en"
+          ? `- House ${h.number}: ${startSign.labelEn} ${startDeg} → ${endSign.labelEn} ${endDeg}${interceptedNote}${occ}`
+          : `- მე-${h.number} სახლი: ${startSign.labelKa} ${startDeg} → ${endSign.labelKa} ${endDeg}${interceptedNote}${occ}`,
     );
   }
   // Keep the compact single-line summary too so existing substring checks stay happy.
   lines.push(
-    (en ? "House signs: " : "სახლების ნიშნები: ") +
+    (loc === "pl"
+      ? "Znaki w domach: "
+      : loc === "en"
+        ? "House signs: "
+        : "სახლების ნიშნები: ") +
       houses
-        .map(
-          (h) =>
-            `${h.number}-${en ? signByIndex(h.signIndex).labelEn : signByIndex(h.signIndex).labelKa}`,
-        )
+        .map((h) => {
+          const s = signByIndex(h.signIndex);
+          const name =
+            loc === "pl" ? s.labelPl : loc === "en" ? s.labelEn : s.labelKa;
+          return `${h.number}-${name}`;
+        })
         .join(", "),
   );
   return lines;
@@ -202,23 +245,29 @@ function formatHousesBlock(chart: NatalChartJson, en: boolean): string[] {
 
 function buildTransitsAndEphemerisBlock(
   chart: NatalChartJson,
-  en: boolean,
+  localeOrEn: UserLocale | boolean,
   now: Date = new Date(),
 ): string[] {
+  const loc: UserLocale =
+    typeof localeOrEn === "boolean" ? (localeOrEn ? "en" : "ka") : localeOrEn;
   const lines: string[] = [];
   const todayIso = now.toISOString().slice(0, 10);
   lines.push(
-    en
-      ? `\nCurrent date (UTC): ${todayIso}`
-      : `\nდღევანდელი თარიღი: ${todayIso}`,
+    loc === "pl"
+      ? `\nData bieżąca (UTC): ${todayIso}`
+      : loc === "en"
+        ? `\nCurrent date (UTC): ${todayIso}`
+        : `\nდღევანდელი თარიღი: ${todayIso}`,
   );
 
   try {
     const transits = computeTransits(now);
     lines.push(
-      en
-        ? "Today's live sky transits (with the user's natal house):"
-        : "დღევანდელი ცის ტრანზიტები (მომხმარებლის ნატალურ სახლებში):",
+      loc === "pl"
+        ? "Dzisiejsze tranzyty na niebie (w domach horoskopu użytkownika):"
+        : loc === "en"
+          ? "Today's live sky transits (with the user's natal house):"
+          : "დღევანდელი ცის ტრანზიტები (მომხმარებლის ნატალურ სახლებში):",
     );
     for (const key of TRANSIT_PLANET_ORDER) {
       const t = transits[key];
@@ -227,13 +276,19 @@ function buildTransitsAndEphemerisBlock(
       const deg = formatDegree(t.longitude - sign.index * 30);
       const h = houseOfLongitude(t.longitude, chart.houses);
       const hNote = h
-        ? en
-          ? `, in natal house ${h}`
-          : `, ნატალურ მე-${h} სახლში`
+        ? loc === "pl"
+          ? `, w ${h}. domu horoskopu`
+          : loc === "en"
+            ? `, in natal house ${h}`
+            : `, ნატალურ მე-${h} სახლში`
         : "";
-      lines.push(
-        `- ${bodyLabel(key, en)}: ${en ? sign.labelEn : sign.labelKa} ${deg}${hNote}`,
-      );
+      const signName =
+        loc === "pl"
+          ? sign.labelPl
+          : loc === "en"
+            ? sign.labelEn
+            : sign.labelKa;
+      lines.push(`- ${bodyLabel(key, loc)}: ${signName} ${deg}${hNote}`);
     }
 
     const natalPoints: Record<string, { longitude: number }> = {};
@@ -249,16 +304,25 @@ function buildTransitsAndEphemerisBlock(
     const cross = detectCrossAspects(transits, natalPoints).slice(0, 6);
     if (cross.length > 0) {
       lines.push(
-        en
-          ? "Active transit-to-natal aspects today:"
-          : "დღეს აქტიური ტრანზიტული ასპექტები ნატალურ რუკასთან:",
+        loc === "pl"
+          ? "Aktywne tranzyty do horoskopu urodzeniowego dzisiaj:"
+          : loc === "en"
+            ? "Active transit-to-natal aspects today:"
+            : "დღეს აქტიური ტრანზიტული ასპექტები ნატალურ რუკასთან:",
       );
       for (const c of cross) {
-        const aspectName = en ? c.kind : (ASPECT_KA[c.kind] ?? c.kind);
+        const aspectName =
+          loc === "pl"
+            ? (ASPECT_PL[c.kind] ?? c.kind)
+            : loc === "en"
+              ? c.kind
+              : (ASPECT_KA[c.kind] ?? c.kind);
         lines.push(
-          en
-            ? `- Transiting ${bodyLabel(c.transit, true)} ${aspectName} natal ${bodyLabel(c.natal, true)} (orb ${c.orb.toFixed(1)}°)`
-            : `- ტრანზიტული ${bodyLabel(c.transit, false)} ${aspectName} ნატალურ ${bodyLabel(c.natal, false)}-თან (ორბი ${c.orb.toFixed(1)}°)`,
+          loc === "pl"
+            ? `- Tranzytujący ${bodyLabel(c.transit, loc)} ${aspectName} urodzeniowy ${bodyLabel(c.natal, loc)} (orba ${c.orb.toFixed(1)}°)`
+            : loc === "en"
+              ? `- Transiting ${bodyLabel(c.transit, loc)} ${aspectName} natal ${bodyLabel(c.natal, loc)} (orb ${c.orb.toFixed(1)}°)`
+              : `- ტრანზიტული ${bodyLabel(c.transit, loc)} ${aspectName} ნატალურ ${bodyLabel(c.natal, loc)}-თან (ორბი ${c.orb.toFixed(1)}°)`,
         );
       }
     }
@@ -267,21 +331,27 @@ function buildTransitsAndEphemerisBlock(
   }
 
   lines.push(
-    en
-      ? "Verified Tropical Ephemeris calendar (2024–2030) for outer planets & which natal houses they transit:"
-      : "უზუსტესი ტროპიკული ეფემერიდების კალენდარი (2024–2030) ნელი პლანეტებისთვის და რომელ ნატალურ სახლს გადიან:",
+    loc === "pl"
+      ? "Zweryfikowany kalendarz efemeryd tropikalnych (2024–2030) dla planet powolnych i tranzytowanych domów:"
+      : loc === "en"
+        ? "Verified Tropical Ephemeris calendar (2024–2030) for outer planets & which natal houses they transit:"
+        : "უზუსტესი ტროპიკული ეფემერიდების კალენდარი (2024–2030) ნელი პლანეტებისთვის და რომელ ნატალურ სახლს გადიან:",
   );
   for (const seg of OUTER_EPHEMERIS_SEGMENTS) {
     const sign = signByIndex(seg.signIndex);
     const hs = housesForSign(seg.signIndex, chart.houses);
     const houseNote =
       hs.length > 0
-        ? en
-          ? ` → transits natal house ${hs.join("/")}`
-          : ` → გადის ნატალურ მე-${hs.join("/მე-")} სახლს`
+        ? loc === "pl"
+          ? ` → tranzytuje dom ${hs.join("/")}`
+          : loc === "en"
+            ? ` → transits natal house ${hs.join("/")}`
+            : ` → გადის ნატალურ მე-${hs.join("/მე-")} სახლს`
         : "";
+    const signName =
+      loc === "pl" ? sign.labelPl : loc === "en" ? sign.labelEn : sign.labelKa;
     lines.push(
-      `- ${bodyLabel(seg.body, en)}: ${en ? sign.labelEn : sign.labelKa} (${seg.start} .. ${seg.end})${houseNote}`,
+      `- ${bodyLabel(seg.body, loc)}: ${signName} (${seg.start} .. ${seg.end})${houseNote}`,
     );
   }
 
@@ -436,7 +506,6 @@ export function buildMentionedChartsContext(
   locale: UserLocale = "ka",
 ): string {
   if (!messages || messages.length === 0) return "";
-  const en = locale === "en";
   const found = new Map<
     string,
     { date: string; time: string | null; cityIdx: number }
@@ -532,10 +601,16 @@ export function buildMentionedChartsContext(
 
   if (found.size === 0) return "";
 
+  const loc = locale;
+  const pl = loc === "pl";
+  const en = loc === "en";
+
   const blocks: string[] = [
-    en
-      ? "\nComputed ephemeris chart(s) for birth date(s) mentioned in the conversation (use these exact positions, never guess):"
-      : "\nჩატში ნახსენები სხვა ადამიან(ებ)ის ზუსტი გამოთვლილი რუკა ეფემერიდებით (გამოიყენე მხოლოდ ეს ზუსტი მონაცემები):",
+    pl
+      ? "\nObliczone kosmogramy z efemeryd dla dat urodzenia wspomnianych w rozmowie (używaj tych dokładnych pozycji):"
+      : en
+        ? "\nComputed ephemeris chart(s) for birth date(s) mentioned in the conversation (use these exact positions, never guess):"
+        : "\nჩატში ნახსენები სხვა ადამიან(ებ)ის ზუსტი გამოთვლილი რუკა ეფემერიდებით (გამოიყენე მხოლოდ ეს ზუსტი მონაცემები):",
   ];
 
   for (const item of Array.from(found.values()).slice(-3)) {
@@ -553,53 +628,71 @@ export function buildMentionedChartsContext(
       const asc = computed.ascendant;
       const timeLabel = item.time
         ? item.time
-        : en
-          ? "time unknown (noon used; Ascendant/houses approximate)"
-          : "დრო უცნობია (12:00 გამოყენებულია; ასცენდენტი/სახლები პირობითია)";
+        : pl
+          ? "godzina nieznana (użyto 12:00; Ascendent i domy są przybliżone)"
+          : en
+            ? "time unknown (noon used; Ascendant/houses approximate)"
+            : "დრო უცნობია (12:00 გამოყენებულია; ასცენდენტი/სახლები პირობითია)";
       blocks.push(
-        en
-          ? `• Birth data: ${item.date}, ${timeLabel}, ${city.labelEn}`
-          : `• მონაცემები: ${item.date}, ${timeLabel}, ${city.labelKa}`,
+        pl
+          ? `• Dane urodzenia: ${item.date}, ${timeLabel}, ${city.labelEn}`
+          : en
+            ? `• Birth data: ${item.date}, ${timeLabel}, ${city.labelEn}`
+            : `• მონაცემები: ${item.date}, ${timeLabel}, ${city.labelKa}`,
       );
       const sunHouse = sun.house
-        ? en
-          ? ` (house ${sun.house})`
-          : ` (მე-${sun.house} სახლი)`
+        ? pl
+          ? ` (dom ${sun.house})`
+          : en
+            ? ` (house ${sun.house})`
+            : ` (მე-${sun.house} სახლი)`
         : "";
       const moonHouse = moon.house
-        ? en
-          ? ` (house ${moon.house})`
-          : ` (მე-${moon.house} სახლი)`
+        ? pl
+          ? ` (dom ${moon.house})`
+          : en
+            ? ` (house ${moon.house})`
+            : ` (მე-${moon.house} სახლი)`
         : "";
       blocks.push(
-        en
-          ? `  Big three: Sun ${signByIndex(sun.signIndex).labelEn} ${formatDegree(sun.signDegree)}${sunHouse}, Moon ${signByIndex(moon.signIndex).labelEn} ${formatDegree(moon.signDegree)}${moonHouse}, Ascendant ${signByIndex(asc.signIndex).labelEn} ${formatDegree(asc.signDegree)}`
-          : `  დიდი სამეული: მზე ${signByIndex(sun.signIndex).labelKa} ${formatDegree(sun.signDegree)}${sunHouse}, მთვარე ${signByIndex(moon.signIndex).labelKa} ${formatDegree(moon.signDegree)}${moonHouse}, ამომავალი ${signByIndex(asc.signIndex).labelKa} ${formatDegree(asc.signDegree)}`,
+        pl
+          ? `  Wielka trójka: Słońce ${signByIndex(sun.signIndex).labelPl} ${formatDegree(sun.signDegree)}${sunHouse}, Księżyc ${signByIndex(moon.signIndex).labelPl} ${formatDegree(moon.signDegree)}${moonHouse}, Ascendent ${signByIndex(asc.signIndex).labelPl} ${formatDegree(asc.signDegree)}`
+          : en
+            ? `  Big three: Sun ${signByIndex(sun.signIndex).labelEn} ${formatDegree(sun.signDegree)}${sunHouse}, Moon ${signByIndex(moon.signIndex).labelEn} ${formatDegree(moon.signDegree)}${moonHouse}, Ascendant ${signByIndex(asc.signIndex).labelEn} ${formatDegree(asc.signDegree)}`
+            : `  დიდი სამეული: მზე ${signByIndex(sun.signIndex).labelKa} ${formatDegree(sun.signDegree)}${sunHouse}, მთვარე ${signByIndex(moon.signIndex).labelKa} ${formatDegree(moon.signDegree)}${moonHouse}, ამომავალი ${signByIndex(asc.signIndex).labelKa} ${formatDegree(asc.signDegree)}`,
       );
       const planetParts: string[] = [];
       for (const k of PLANET_ORDER) {
         const p = computed.bodies[k];
         if (!p) continue;
         const sign = signByIndex(p.signIndex);
-        const h = p.house ? (en ? ` H${p.house}` : ` მე-${p.house} სახლი`) : "";
+        const h = p.house
+          ? pl
+            ? ` dom ${p.house}`
+            : en
+              ? ` H${p.house}`
+              : ` მე-${p.house} სახლი`
+          : "";
         const r = p.retrograde ? " (R)" : "";
+        const signName = pl ? sign.labelPl : en ? sign.labelEn : sign.labelKa;
         planetParts.push(
-          `${bodyLabel(k, en)}: ${en ? sign.labelEn : sign.labelKa} ${formatDegree(p.signDegree)}${h}${r}`,
+          `${bodyLabel(k, loc)}: ${signName} ${formatDegree(p.signDegree)}${h}${r}`,
         );
       }
       blocks.push(
-        `  ${en ? "Planets" : "პლანეტები"}: ${planetParts.join("; ")}`,
+        `  ${pl ? "Planety" : en ? "Planets" : "პლანეტები"}: ${planetParts.join("; ")}`,
       );
       const sortedH = [...computed.houses].sort((a, b) => a.number - b.number);
       blocks.push(
-        `  ${en ? "Houses" : "სახლები"}: ` +
+        `  ${pl ? "Domy" : en ? "Houses" : "სახლები"}: ` +
           sortedH
             .map((h) => {
               const s = signByIndex(h.signIndex);
               const deg = formatDegree(
                 (((h.cuspLongitude % 360) + 360) % 360) - h.signIndex * 30,
               );
-              return `${h.number}-${en ? s.labelEn : s.labelKa} ${deg}`;
+              const signName = pl ? s.labelPl : en ? s.labelEn : s.labelKa;
+              return `${h.number}-${signName} ${deg}`;
             })
             .join(", "),
       );
@@ -618,7 +711,9 @@ export function buildChartContext(
   locale: UserLocale = "ka",
   now: Date = new Date(),
 ): string {
-  const en = locale === "en";
+  const loc = locale;
+  const en = loc === "en";
+  const pl = loc === "pl";
   const lines: string[] = [];
 
   const sun = chart.bodies.sun;
@@ -626,80 +721,115 @@ export function buildChartContext(
   const asc = chart.ascendant;
   const mc = chart.midheaven;
   const sunHouse = sun.house
-    ? en
-      ? ` (house ${sun.house})`
-      : ` (მე-${sun.house} სახლი)`
+    ? pl
+      ? ` (dom ${sun.house})`
+      : en
+        ? ` (house ${sun.house})`
+        : ` (მე-${sun.house} სახლი)`
     : "";
   const moonHouse = moon.house
-    ? en
-      ? ` (house ${moon.house})`
-      : ` (მე-${moon.house} სახლი)`
+    ? pl
+      ? ` (dom ${moon.house})`
+      : en
+        ? ` (house ${moon.house})`
+        : ` (მე-${moon.house} სახლი)`
     : "";
   const mcNote = mc
-    ? en
-      ? `, Midheaven (MC) in ${signByIndex(mc.signIndex).labelEn} ${formatDegree(mc.signDegree)} (house 10)`
-      : `, მედიუმ ცელი (MC) ${signByIndex(mc.signIndex).labelKa} ${formatDegree(mc.signDegree)} (მე-10 სახლი)`
+    ? pl
+      ? `, Medium Coeli (MC) w ${signByIndex(mc.signIndex).labelPl} ${formatDegree(mc.signDegree)} (dom 10)`
+      : en
+        ? `, Midheaven (MC) in ${signByIndex(mc.signIndex).labelEn} ${formatDegree(mc.signDegree)} (house 10)`
+        : `, მედიუმ ცელი (MC) ${signByIndex(mc.signIndex).labelKa} ${formatDegree(mc.signDegree)} (მე-10 სახლი)`
     : "";
   lines.push(
-    en
-      ? `Big three: Sun in ${signByIndex(sun.signIndex).labelEn} ${formatDegree(sun.signDegree)}${sunHouse}, ` +
+    pl
+      ? `Wielka trójka: Słońce w ${signByIndex(sun.signIndex).labelPl} ${formatDegree(sun.signDegree)}${sunHouse}, ` +
+          `Księżyc w ${signByIndex(moon.signIndex).labelPl} ${formatDegree(moon.signDegree)}${moonHouse}, ` +
+          `Ascendent w ${signByIndex(asc.signIndex).labelPl} ${formatDegree(asc.signDegree)} (1. dom)${mcNote}`
+      : en
+        ? `Big three: Sun in ${signByIndex(sun.signIndex).labelEn} ${formatDegree(sun.signDegree)}${sunHouse}, ` +
           `Moon in ${signByIndex(moon.signIndex).labelEn} ${formatDegree(moon.signDegree)}${moonHouse}, ` +
           `Ascendant in ${signByIndex(asc.signIndex).labelEn} ${formatDegree(asc.signDegree)} (house 1)${mcNote}`
-      : `დიდი სამეული: მზე ${signByIndex(sun.signIndex).labelKa} ${formatDegree(sun.signDegree)}${sunHouse}, ` +
+        : `დიდი სამეული: მზე ${signByIndex(sun.signIndex).labelKa} ${formatDegree(sun.signDegree)}${sunHouse}, ` +
           `მთვარე ${signByIndex(moon.signIndex).labelKa} ${formatDegree(moon.signDegree)}${moonHouse}, ` +
           `ამომავალი ${signByIndex(asc.signIndex).labelKa} ${formatDegree(asc.signDegree)} (1-ლი სახლი)${mcNote}`,
   );
 
-  lines.push(en ? "Planets:" : "პლანეტები:");
+  lines.push(pl ? "Planety:" : en ? "Planets:" : "პლანეტები:");
   for (const key of PLANET_ORDER) {
     const p = chart.bodies[key];
     if (!p) continue;
-    const label = bodyLabel(key, en);
+    const label = bodyLabel(key, loc);
     const house = p.house
-      ? en
-        ? `, house ${p.house}`
-        : `, მე-${p.house} სახლი`
+      ? pl
+        ? `, dom ${p.house}`
+        : en
+          ? `, house ${p.house}`
+          : `, მე-${p.house} სახლი`
       : "";
-    const retro = p.retrograde ? (en ? ", retrograde" : ", რეტროგრადი") : "";
+    const retro = p.retrograde
+      ? pl
+        ? ", retrogradacja"
+        : en
+          ? ", retrograde"
+          : ", რეტროგრადი"
+      : "";
     const sign = signByIndex(p.signIndex);
+    const signName = pl ? sign.labelPl : en ? sign.labelEn : sign.labelKa;
     lines.push(
-      `- ${label}: ${en ? sign.labelEn : sign.labelKa} ${formatDegree(p.signDegree)}${house}${retro}`,
+      `- ${label}: ${signName} ${formatDegree(p.signDegree)}${house}${retro}`,
     );
   }
 
-  lines.push(...formatHousesBlock(chart, en));
+  lines.push(...formatHousesBlock(chart, loc));
 
   const ep = salience.elements.percentages;
   lines.push(
-    en
-      ? `Elements: fire ${Math.round(ep["ცეცხლი"])}%, earth ${Math.round(ep["მიწა"])}%, ` +
+    pl
+      ? `Żywioły: ogień ${Math.round(ep["ცეცხლი"])}%, ziemia ${Math.round(ep["მიწა"])}%, ` +
+          `powietrze ${Math.round(ep["ჰაერი"])}%, woda ${Math.round(ep["წყალი"])}%`
+      : en
+        ? `Elements: fire ${Math.round(ep["ცეცხლი"])}%, earth ${Math.round(ep["მიწა"])}%, ` +
           `air ${Math.round(ep["ჰაერი"])}%, water ${Math.round(ep["წყალი"])}%`
-      : `ელემენტები: ცეცხლი ${Math.round(ep["ცეცხლი"])}%, მიწა ${Math.round(ep["მიწა"])}%, ` +
+        : `ელემენტები: ცეცხლი ${Math.round(ep["ცეცხლი"])}%, მიწა ${Math.round(ep["მიწა"])}%, ` +
           `ჰაერი ${Math.round(ep["ჰაერი"])}%, წყალი ${Math.round(ep["წყალი"])}% ` +
           `(დომინანტი: ${salience.elements.dominant})`,
   );
   const mp = salience.modality.percentages;
   lines.push(
-    en
-      ? `Modalities: cardinal ${Math.round(mp["კარდინალური"])}%, ` +
+    pl
+      ? `Jakości: kardynalna ${Math.round(mp["კარდინალური"])}%, ` +
+          `stała ${Math.round(mp["ფიქსირებული"])}%, zmienna ${Math.round(mp["მუტაბელური"])}%`
+      : en
+        ? `Modalities: cardinal ${Math.round(mp["კარდინალური"])}%, ` +
           `fixed ${Math.round(mp["ფიქსირებული"])}%, mutable ${Math.round(mp["მუტაბელური"])}%`
-      : `მოდალობა: კარდინალური ${Math.round(mp["კარდინალური"])}%, ` +
+        : `მოდალობა: კარდინალური ${Math.round(mp["კარდინალური"])}%, ` +
           `ფიქსირებული ${Math.round(mp["ფიქსირებული"])}%, ` +
           `მუტაბელური ${Math.round(mp["მუტაბელური"])}% (დომინანტი: ${salience.modality.dominant})`,
   );
 
   if (salience.tightestAspects.length > 0) {
     lines.push(
-      en ? "Major aspects (tightest):" : "მთავარი ასპექტები (ყველაზე მჭიდრო):",
+      pl
+        ? "Główne aspekty (najściślejsze):"
+        : en
+          ? "Major aspects (tightest):"
+          : "მთავარი ასპექტები (ყველაზე მჭიდრო):",
     );
     for (const a of salience.tightestAspects.slice(0, 10)) {
+      const aspectName = pl
+        ? (ASPECT_PL[a.kind] ?? a.kind)
+        : en
+          ? a.kind
+          : (ASPECT_KA[a.kind] ?? a.kind);
+      const orbLabel = pl ? "orba" : en ? "orb" : "ორბი";
       lines.push(
-        `- ${a.aLabel} ${en ? a.kind : (ASPECT_KA[a.kind] ?? a.kind)} ${a.bLabel} (${en ? "orb" : "ორბი"} ${a.orb.toFixed(1)}°)`,
+        `- ${a.aLabel} ${aspectName} ${a.bLabel} (${orbLabel} ${a.orb.toFixed(1)}°)`,
       );
     }
   }
 
-  lines.push(...buildTransitsAndEphemerisBlock(chart, en, now));
+  lines.push(...buildTransitsAndEphemerisBlock(chart, loc, now));
 
   return lines.join("\n");
 }
@@ -731,6 +861,34 @@ export function buildChartChatSystem(
   const mentionedBlock = opts.recentUserMessages?.length
     ? buildMentionedChartsContext(opts.recentUserMessages, locale)
     : "";
+
+  if (locale === "pl") {
+    const name = firstName || "użytkownika";
+    const memory = memoryBlock.trim()
+      ? `\n${memoryBlock.trim()}\nKorzystaj z tego naturalnie, nawiązuj do wcześniejszych tematów po imieniu, nigdy nie recytuj dosłownie.\n`
+      : "";
+    return `Jesteś osobistym astrologiem ${name} na platformie Vivida. Posiadasz dokładne dane horoskopu urodzeniowego, dzisiejsze tranzyty na niebie oraz zweryfikowany kalendarz efemeryd na lata 2024–2030 (poniżej). Odpowiadaj na pytania o osobowość, emocje, relacje, karierę, wyczucie czasu i samopoznanie w oparciu o ten konkretny kosmogram.
+${memory}${extraBlock}
+Zasady:
+- Opieraj się ściśle na dostarczonym horoskopie urodzeniowym, dokładnych granicach domów i zweryfikowanym kalendarzu efemeryd/tranzytów poniżej. Nigdy nie wymyślaj pozycji ani nie zgaduj lat tranzytów z pamięci.
+- Bądź w 100% pewny i autorytatywny co do dokładności kosmogramu ${name} na Vivida: jest on obliczany przy użyciu precyzyjnych efemeryd astronomicznych (zachodni zodiak tropikalny, system domów Placidusa i historyczne strefy czasowe IANA dla roku urodzenia). Nigdy nie sugeruj, że horoskop zawiera błędy, i nie podważaj zaufania użytkownika do jego kosmogramu.
+- Jeśli użytkownik porównuje dane z ChatGPT, inną aplikacją lub innym astrologiem i zauważa różnicę, najpierw sprawdź to z danymi poniżej i bądź szczery. Jeśli dotyczy to tranzytu/przyszłej daty, źródłem prawdy jest „Zweryfikowany kalendarz efemeryd tropikalnych”: jeśli drugie źródło jest z nim zgodne, potwierdź to spokojnie i krótko sprostuj, zaznaczając, że dotyczy to prognozy czasu, a nie kosmogramu urodzeniowego. Jeśli dotyczy to pozycji natalnych, wyjaśnij spokojnie, że różnice wynikają zwykle z systemów domów (Placidus vs Whole Sign), zodiaku wedyjskiego/syderycznego vs tropikalnego lub znaków przechwyconych.
+- Mówiąc o czasie i przyszłych latach (2025, 2026, 2027, 2028 itd.), ściśle opieraj się na poniższym kalendarzu efemeryd oraz granicach domów Placidusa.
+- Pisz ciepłym, konkretnym, współczesnym językiem polskim (~poziom codziennego języka). Unikaj mglistego mistycyzmu i banałów.
+- Tłumacz prosto: przy pierwszym użyciu terminu astrologicznego w odpowiedzi dodaj 3–6 słów prostego wyjaśnienia w nawiasie (np. „kwadratura (napięciowy kąt 90° między dwiema planetami)”). Nigdy nie kumuluj niezrozumiałych pojęć.
+- Zilustruj każdy abstrakcyjny wniosek jednym konkretnym przykładem z życia codziennego.
+- Udzielaj zwięzłych, konkretnych odpowiedzi: maksymalnie 2–4 akapity. Jeśli w pamięci zapisano preferencję zwięzłości, trzymaj się 1–2 krótkich akapitów; przy preferencji szczegółowości możesz wykorzystać pełne 4 akapity. Wskaż konkretną planetę, znak, dom lub aspekt będący podstawą interpretacji.
+- Dopasuj się do rozmówcy: na krótkie/proste pytania odpowiadaj krótko i prosto; przy rozbudowanych możesz wejść głębiej.
+- Zwracaj się bezpośrednio na «Ty», ciepłym i partnerskim tonem.
+- Jeśli pytanie jest niejasne, zadaj jedno krótkie pytanie doprecyzowujące.
+- Jeśli pytanie w ogóle nie dotyczy astrologii, horoskopu ani życia użytkownika, delikatnie skieruj rozmowę na właściwy tor.
+- Nigdy nie wydawaj dyrektyw medycznych, prawnych ani finansowych. Astrologia jest narzędziem autorefleksji, a nie wyrocznią czy profesjonalną poradą.
+- Zawsze odpowiadaj w języku polskim, nawet jeśli wcześniejsza historia rozmowy zawiera inny język.
+
+Kosmogram ${name}:
+${buildChartContext(chart, salience, "pl", opts.now)}${mentionedBlock}
+${guide}`;
+  }
 
   if (locale === "en") {
     const name = firstName || "the user";

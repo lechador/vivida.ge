@@ -1,6 +1,7 @@
 /** Client-safe, country-aware product catalogue. Stripe IDs never come from clients. */
 
-export type BillingCurrency = "gel" | "gbp" | "usd" | "cad" | "aud" | "nzd";
+export type BillingCurrency =
+  "gel" | "gbp" | "usd" | "cad" | "aud" | "nzd" | "pln";
 
 export type CreditPack = {
   id: "xs" | "s" | "m" | "l";
@@ -120,12 +121,20 @@ const NZ_CREDIT_PACKS: readonly StandardCreditPack[] = [
   { id: "l", credits: 180, amountMinor: 1899, currency: "nzd" },
 ];
 
+/** Poland one-time alternatives to the 39,99 zł/month unlimited plan. */
+const PL_CREDIT_PACKS: readonly StandardCreditPack[] = [
+  { id: "s", credits: 30, amountMinor: 1299, currency: "pln" },
+  { id: "m", credits: 75, amountMinor: 2499, currency: "pln" },
+  { id: "l", credits: 180, amountMinor: 4999, currency: "pln" },
+];
+
 const CREDIT_PACKS_BY_COUNTRY: Record<string, readonly StandardCreditPack[]> = {
   AU: AU_CREDIT_PACKS,
   CA: CA_CREDIT_PACKS,
   GB: GB_CREDIT_PACKS,
   GE: GE_CREDIT_PACKS,
   NZ: NZ_CREDIT_PACKS,
+  PL: PL_CREDIT_PACKS,
   US: US_CREDIT_PACKS,
 };
 
@@ -145,6 +154,7 @@ const IMPULSE_PACK_BY_COUNTRY: Record<string, CreditPack> = {
   CA: { id: "xs", credits: 12, amountMinor: 249, currency: "cad" },
   AU: { id: "xs", credits: 12, amountMinor: 299, currency: "aud" },
   NZ: { id: "xs", credits: 12, amountMinor: 349, currency: "nzd" },
+  PL: { id: "xs", credits: 12, amountMinor: 799, currency: "pln" },
 };
 
 export function impulsePackForCountry(
@@ -170,6 +180,14 @@ export const PREMIUM_PLANS_BY_COUNTRY: Record<string, PremiumPlan> = {
     currency: "gel",
     interval: "month",
     stripeLookupKey: "vivida_premium_ge_monthly_1990_v1",
+  },
+  PL: {
+    key: "premium_pl_monthly",
+    countryCode: "PL",
+    amountMinor: 3999,
+    currency: "pln",
+    interval: "month",
+    stripeLookupKey: "vivida_premium_pl_monthly_3999_v1",
   },
   US: {
     key: "premium_us_monthly",
@@ -428,6 +446,7 @@ const CURRENCY_SYMBOL: Record<string, string> = {
   cad: "CA$",
   aud: "A$",
   nzd: "NZ$",
+  pln: "zł",
 };
 
 /**
@@ -474,6 +493,11 @@ export function formatBillingAmount(
       maximumFractionDigits: 2,
     }).format(amount);
     return `$${digits}`;
+  }
+
+  if (code === "pln") {
+    const digits = (amountMinor / 100).toFixed(2).replace(".", ",");
+    return `${digits} zł`;
   }
 
   // Browsers ship no `ka` locale data, so an Intl call under it resolves

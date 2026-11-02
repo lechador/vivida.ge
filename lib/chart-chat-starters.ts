@@ -22,6 +22,12 @@ const STARTERS: Record<UserLocale, Record<ChartStarterId, string>> = {
     relationships: "What am I like in relationships?",
     career: "What kind of career suits me?",
   },
+  pl: {
+    strengths: "Jakie są moje najmocniejsze strony?",
+    emotions: "Co mój Księżyc mówi o moich emocjach?",
+    relationships: "Jaki/jaka jestem w relacjach?",
+    career: "Jaka kariera najlepiej do mnie pasuje?",
+  },
 };
 
 export function normalizeChartStarter(

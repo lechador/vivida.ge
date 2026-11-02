@@ -59,9 +59,11 @@ export function DailyDashboard({
     return (
       <div className="space-y-6">
         <div className="rounded-md border border-border bg-card p-6 text-center text-sm text-muted-foreground">
-          {en
-            ? "Could not load. Please refresh the page."
-            : "ვერ ჩაიტვირთა, გთხოვ, გადატვირთო გვერდი."}
+          {locale === "pl"
+            ? "Nie udało się załadować. Odśwież stronę."
+            : en
+              ? "Could not load. Please refresh the page."
+              : "ვერ ჩაიტვირთა, გთხოვ, გადატვირთო გვერდი."}
         </div>
       </div>
     );
@@ -95,14 +97,22 @@ export function DailyDashboard({
           <div className="flex items-center gap-2.5 text-xs font-medium uppercase tracking-[0.2em] text-primary">
             <span aria-hidden className="inline-block h-px w-6 bg-primary/70" />
             <span>
-              {en ? "Primary Natal Axis (Big Three)" : "შენი დიდი სამეული"}
+              {locale === "pl"
+                ? "Główna oś urodzeniowa (Wielka Trójka)"
+                : en
+                  ? "Primary Natal Axis (Big Three)"
+                  : "შენი დიდი სამეული"}
             </span>
           </div>
           <Link
             href="/report"
             className="font-mono text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
-            {en ? "Full Ephemeris & Chart →" : "სრული ნატალური რუკა →"}
+            {locale === "pl"
+              ? "Pełne efemerydy i kosmogram →"
+              : en
+                ? "Full Ephemeris & Chart →"
+                : "სრული ნატალური რუკა →"}
           </Link>
         </header>
         <MiniBigThree chart={chart.data} locale={locale} />
@@ -124,20 +134,34 @@ export function DailyDashboard({
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-              {en ? "Astronomical Natal Chart" : "პერსონალური ეფემერიდა"}
+              {locale === "pl"
+                ? "Astronomiczny kosmogram urodzeniowy"
+                : en
+                  ? "Astronomical Natal Chart"
+                  : "პერსონალური ეფემერიდა"}
             </div>
             <h3 className="mt-1.5 text-lg font-semibold tracking-tight text-foreground sm:text-xl">
-              {en ? "Your complete natal chart" : "შენი სრული ნატალური რუკა"}
+              {locale === "pl"
+                ? "Twój pełny kosmogram urodzeniowy"
+                : en
+                  ? "Your complete natal chart"
+                  : "შენი სრული ნატალური რუკა"}
             </h3>
             <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              {en
-                ? "Chart wheel, personal analysis, twelve houses, aspects and every planet in one place, with complete English interpretations."
-                : "ცის რუკის ბორბალი, ღრმა ანალიზი, 12 სახლი, ასპექტები და ყველა პლანეტის გრადუსული მდებარეობა ერთ სივრცეში."}
+              {locale === "pl"
+                ? "Koło kosmogramu, osobista analiza, dwanaście domów, aspekty i każda planeta w jednym miejscu z pełną interpretacją."
+                : en
+                  ? "Chart wheel, personal analysis, twelve houses, aspects and every planet in one place, with complete English interpretations."
+                  : "ცის რუკის ბორბალი, ღრმა ანალიზი, 12 სახლი, ასპექტები და ყველა პლანეტის გრადუსული მდებარეობა ერთ სივრცეში."}
             </p>
           </div>
           <Button asChild variant="default" size="lg" className="shrink-0">
             <Link href="/report">
-              {en ? "Open natal chart" : "ნახე სრული რუკა"}
+              {locale === "pl"
+                ? "Otwórz kosmogram"
+                : en
+                  ? "Open natal chart"
+                  : "ნახე სრული რუკა"}
               <ArrowRight className="size-4" />
             </Link>
           </Button>
@@ -199,9 +223,11 @@ function DashboardExtrasSection({
     <HoroscopeLoading locale={locale} />
   ) : extras.daily ? null : canDaily ? (
     <div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground shadow-sm">
-      {en
-        ? "Today's horoscope is being prepared. Try again shortly."
-        : "დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში."}
+      {locale === "pl"
+        ? "Dzisiejszy horoskop jest przygotowywany. Spróbuj ponownie za chwilę."
+        : en
+          ? "Today's horoscope is being prepared. Try again shortly."
+          : "დღევანდელი ჰოროსკოპი მზადდება. სცადე ცოტა ხანში."}
     </div>
   ) : null;
 

@@ -8,7 +8,12 @@ import type { Metadata } from "next";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   return {
-    title: locale !== "ka" ? "Reset password" : "პაროლის აღდგენა",
+    title:
+      locale === "pl"
+        ? "Reset hasła"
+        : locale !== "ka"
+          ? "Reset password"
+          : "პაროლის აღდგენა",
     // Auth utility page, out of the index, links still followed.
     robots: { index: false, follow: true },
   };
@@ -20,15 +25,21 @@ export default async function ForgotPasswordPage() {
   return (
     <AuthLayout
       locale={locale}
-      title={en ? "Reset your password" : "პაროლის აღდგენა"}
+      title={
+        locale === "pl"
+          ? "Zresetuj swoje hasło"
+          : en
+            ? "Reset your password"
+            : "პაროლის აღდგენა"
+      }
       footer={
         <>
-          {en ? "Remember it?" : "გახსოვს?"}{" "}
+          {locale === "pl" ? "Pamiętasz je?" : en ? "Remember it?" : "გახსოვს?"}{" "}
           <Link
             href="/login"
             className="text-foreground underline-offset-2 hover:underline"
           >
-            {en ? "Sign in" : "შესვლა"}
+            {locale === "pl" ? "Zaloguj się" : en ? "Sign in" : "შესვლა"}
           </Link>
         </>
       }

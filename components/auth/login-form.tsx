@@ -96,9 +96,11 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
         }
       } catch {
         setError(
-          en
-            ? "Could not sign in. Please try again."
-            : "შესვლა ვერ მოხერხდა. სცადე ხელახლა.",
+          locale === "pl"
+            ? "Nie udało się zalogować. Spróbuj ponownie."
+            : en
+              ? "Could not sign in. Please try again."
+              : "შესვლა ვერ მოხერხდა. სცადე ხელახლა.",
         );
       } finally {
         // Turnstile tokens are single-use, including when credentials fail.
@@ -119,18 +121,22 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
         if (result.ok) {
           setCodeError(null);
           setResentMsg(
-            en
-              ? "Check your inbox, a new code and link have been sent."
-              : "შემოწმე საფოსტო ყუთი, ახალი კოდი და ლინკი გაიგზავნა.",
+            locale === "pl"
+              ? "Sprawdź swoją skrzynkę, wysłaliśmy nowy kod i link."
+              : en
+                ? "Check your inbox, a new code and link have been sent."
+                : "შემოწმე საფოსტო ყუთი, ახალი კოდი და ლინკი გაიგზავნა.",
           );
         } else {
           setCodeError(result.error);
         }
       } catch {
         setCodeError(
-          en
-            ? "Could not send a new code. Please try again."
-            : "ახალი კოდის გაგზავნა ვერ მოხერხდა. სცადე ხელახლა.",
+          locale === "pl"
+            ? "Nie udało się wysłać nowego kodu. Spróbuj ponownie."
+            : en
+              ? "Could not send a new code. Please try again."
+              : "ახალი კოდის გაგზავნა ვერ მოხერხდა. სცადე ხელახლა.",
         );
       }
     });
@@ -162,9 +168,11 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
         }
       } catch {
         setCodeError(
-          en
-            ? "Could not verify the code. Please try again."
-            : "კოდის შემოწმება ვერ მოხერხდა. სცადე ხელახლა.",
+          locale === "pl"
+            ? "Nie udało się zweryfikować kodu. Spróbuj ponownie."
+            : en
+              ? "Could not verify the code. Please try again."
+              : "კოდის შემოწმება ვერ მოხერხდა. სცადე ხელახლა.",
         );
       }
     });
@@ -216,25 +224,33 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
           {verified && (
             <div className="flex items-start gap-2 rounded-lg border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/10 px-3 py-2 text-sm text-[var(--vivida-cyan)]">
               <CheckCircle2 className="mt-0.5 size-4 shrink-0" />
-              {en
-                ? "Your email is verified. Sign in to continue."
-                : "ელფოსტა დადასტურებულია. შედი ანგარიშში."}
+              {locale === "pl"
+                ? "Twój e-mail został zweryfikowany. Zaloguj się, aby kontynuować."
+                : en
+                  ? "Your email is verified. Sign in to continue."
+                  : "ელფოსტა დადასტურებულია. შედი ანგარიშში."}
             </div>
           )}
           {verifyError && (
             <div className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {verifyError === "expired"
-                ? en
-                  ? "This link has expired. Request a new one after signing in."
-                  : "ლინკი ვადაგასულია. შესვლის შემდეგ მოითხოვე ახალი ანგარიშის გვერდიდან."
-                : en
-                  ? "This link is invalid or has already been used."
-                  : "ლინკი არასწორია ან უკვე გამოყენებულია."}
+                ? locale === "pl"
+                  ? "Ten link wygasł. Poproś o nowy po zalogowaniu."
+                  : en
+                    ? "This link has expired. Request a new one after signing in."
+                    : "ლინკი ვადაგასულია. შესვლის შემდეგ მოითხოვე ახალი ანგარიშის გვერდიდან."
+                : locale === "pl"
+                  ? "Ten link jest nieprawidłowy lub został już wykorzystany."
+                  : en
+                    ? "This link is invalid or has already been used."
+                    : "ლინკი არასწორია ან უკვე გამოყენებულია."}
             </div>
           )}
 
           <div className="space-y-1.5">
-            <Label htmlFor="email">{en ? "Email" : "ელფოსტა"}</Label>
+            <Label htmlFor="email">
+              {locale === "pl" ? "E-mail" : en ? "Email" : "ელფოსტა"}
+            </Label>
             <Input
               id="email"
               name="email"
@@ -248,12 +264,18 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
           </div>
           <div className="space-y-1.5">
             <div className="flex items-baseline justify-between">
-              <Label htmlFor="password">{en ? "Password" : "პაროლი"}</Label>
+              <Label htmlFor="password">
+                {locale === "pl" ? "Hasło" : en ? "Password" : "პაროლი"}
+              </Label>
               <Link
                 href="/forgot-password"
                 className="text-xs text-muted-foreground transition-colors hover:text-foreground"
               >
-                {en ? "Forgot it?" : "დაგავიწყდა?"}
+                {locale === "pl"
+                  ? "Zapomniałeś hasła?"
+                  : en
+                    ? "Forgot it?"
+                    : "დაგავიწყდა?"}
               </Link>
             </div>
             <Input
@@ -281,9 +303,11 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
                 htmlFor="login-code"
                 className="text-xs text-muted-foreground"
               >
-                {en
-                  ? "Enter the 6-digit code sent to your email"
-                  : "შეიყვანე ელფოსტაზე გამოგზავნილი 6-ნიშნა კოდი"}
+                {locale === "pl"
+                  ? "Wpisz 6-cyfrowy kod wysłany na Twój adres e-mail"
+                  : en
+                    ? "Enter the 6-digit code sent to your email"
+                    : "შეიყვანე ელფოსტაზე გამოგზავნილი 6-ნიშნა კოდი"}
               </Label>
               <div className="flex gap-2">
                 <Input
@@ -308,6 +332,8 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
                 >
                   {codePending ? (
                     <Loader2 className="size-4 animate-spin" />
+                  ) : locale === "pl" ? (
+                    "Weryfikuj"
                   ) : en ? (
                     "Verify"
                   ) : (
@@ -325,21 +351,27 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
                 className="text-xs text-muted-foreground underline-offset-2 hover:underline disabled:opacity-60"
               >
                 {resendPending
-                  ? en
-                    ? "Sending…"
-                    : "ვაგზავნი…"
-                  : en
-                    ? "Didn't receive it? Send again"
-                    : "ვერ მიიღე? ხელახლა გამოგზავნა"}
+                  ? locale === "pl"
+                    ? "Wysyłanie…"
+                    : en
+                      ? "Sending…"
+                      : "ვაგზავნი…"
+                  : locale === "pl"
+                    ? "Nie otrzymałeś? Wyślij ponownie"
+                    : en
+                      ? "Didn't receive it? Send again"
+                      : "ვერ მიიღე? ხელახლა გამოგზავნა"}
               </button>
             </div>
           )}
 
           {codeVerified && (
             <div className="rounded-lg border border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/10 px-3 py-2 text-sm text-[var(--vivida-cyan)]">
-              {en
-                ? "Your email is verified. You can sign in now."
-                : "ელფოსტა დადასტურდა. ახლა დააჭირე „შესვლას“."}
+              {locale === "pl"
+                ? "Twój e-mail został zweryfikowany. Możesz się teraz zalogować."
+                : en
+                  ? "Your email is verified. You can sign in now."
+                  : "ელფოსტა დადასტურდა. ახლა დააჭირე „შესვლას“."}
             </div>
           )}
           {resentMsg && (
@@ -363,12 +395,16 @@ export function LoginForm({ locale = "ka" }: { locale?: UserLocale }) {
           >
             {isPending && <Loader2 className="size-4 animate-spin" />}
             {isPending
-              ? en
-                ? "Signing in…"
-                : "შესვლა…"
-              : en
-                ? "Sign in"
-                : "შესვლა"}
+              ? locale === "pl"
+                ? "Logowanie…"
+                : en
+                  ? "Signing in…"
+                  : "შესვლა…"
+              : locale === "pl"
+                ? "Zaloguj się"
+                : en
+                  ? "Sign in"
+                  : "შესვლა"}
           </Button>
         </form>
       )}

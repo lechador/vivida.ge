@@ -39,6 +39,13 @@ const ASPECT_EN: Record<string, string> = {
   trine: "trine",
   opposition: "opposition",
 };
+const ASPECT_PL: Record<string, string> = {
+  conjunction: "koniunkcja",
+  sextile: "sekstyl",
+  square: "kwadratura",
+  trine: "trygon",
+  opposition: "opozycja",
+};
 
 function oneLiner(body: string, limit = 150): string {
   const flat = body.replace(/\s+/g, " ").trim();
@@ -65,13 +72,20 @@ export function ProDailyBrief({
   const band = dayScoreBand(score, locale);
   const question = proRitualQuestion(dateIso, locale);
   const top = transits.slice(0, 3);
-  const date = en
-    ? new Intl.DateTimeFormat("en", {
-        day: "numeric",
-        month: "long",
-        timeZone: "UTC",
-      }).format(new Date(`${dateIso}T00:00:00Z`))
-    : kaLongDate(dateIso);
+  const date =
+    locale === "pl"
+      ? new Intl.DateTimeFormat("pl", {
+          day: "numeric",
+          month: "long",
+          timeZone: "UTC",
+        }).format(new Date(`${dateIso}T00:00:00Z`))
+      : en
+        ? new Intl.DateTimeFormat("en", {
+            day: "numeric",
+            month: "long",
+            timeZone: "UTC",
+          }).format(new Date(`${dateIso}T00:00:00Z`))
+        : kaLongDate(dateIso);
 
   const [answer, setAnswer] = useState("");
   const [saved, setSaved] = useState(false);
@@ -109,7 +123,13 @@ export function ProDailyBrief({
 
   return (
     <section
-      aria-label={en ? "Your PRO day" : "შენი PRO დღე"}
+      aria-label={
+        locale === "pl"
+          ? "Twój dzień PRO"
+          : en
+            ? "Your PRO day"
+            : "შენი PRO დღე"
+      }
       className="rounded-xl border border-[var(--vivida-gold)]/40 bg-card p-6 shadow-sm sm:p-7"
     >
       <header className="flex items-center justify-between gap-4 border-b border-border pb-4">
@@ -119,7 +139,11 @@ export function ProDailyBrief({
           </span>
           <div>
             <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--vivida-gold)]">
-              {en ? "Your PRO Day" : "შენი PRO დღე"}
+              {locale === "pl"
+                ? "Twój dzień PRO"
+                : en
+                  ? "Your PRO Day"
+                  : "შენი PRO დღე"}
             </h2>
             <p className="mt-0.5 font-mono text-xs tabular-nums text-muted-foreground">
               {date}
@@ -134,7 +158,11 @@ export function ProDailyBrief({
             </span>
           </div>
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-            {en ? "Day Index" : "დღის ინდექსი"}
+            {locale === "pl"
+              ? "Indeks dnia"
+              : en
+                ? "Day Index"
+                : "დღის ინდექსი"}
           </div>
         </div>
       </header>
@@ -157,16 +185,28 @@ export function ProDailyBrief({
       {top.length > 0 && (
         <div className="mt-5">
           <h3 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Today's Transits" : "დღის ტრანზიტები"}
+            {locale === "pl"
+              ? "Dzisiejsze tranzyty"
+              : en
+                ? "Today's Transits"
+                : "დღის ტრანზიტები"}
           </h3>
           <ul className="mt-2.5 divide-y divide-border overflow-hidden rounded-lg border border-border bg-background/70">
             {top.map((t, i) => {
               const transitBody = BODIES[t.transit];
               const natalBody = BODIES[t.natal];
               const transitName =
-                (en ? transitBody?.labelEn : transitBody?.labelKa) ?? t.transit;
+                (locale === "pl"
+                  ? transitBody?.labelPl
+                  : en
+                    ? transitBody?.labelEn
+                    : transitBody?.labelKa) ?? t.transit;
               const natalName =
-                (en ? natalBody?.labelEn : natalBody?.labelKa) ?? t.natal;
+                (locale === "pl"
+                  ? natalBody?.labelPl
+                  : en
+                    ? natalBody?.labelEn
+                    : natalBody?.labelKa) ?? t.natal;
               return (
                 <li key={i} className="relative p-4">
                   <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs">
@@ -180,7 +220,12 @@ export function ProDailyBrief({
                       {natalName}
                     </span>
                     <span className="text-muted-foreground">
-                      · {(en ? ASPECT_EN : ASPECT_KA)[t.kind] ?? t.kind}
+                      ·{" "}
+                      {(locale === "pl"
+                        ? ASPECT_PL
+                        : en
+                          ? ASPECT_EN
+                          : ASPECT_KA)[t.kind] ?? t.kind}
                     </span>
                   </p>
                   <p className="mt-1.5 text-sm font-medium text-foreground">
@@ -214,7 +259,11 @@ export function ProDailyBrief({
       {/* PRO-only ritual question */}
       <div className="mt-5 border-t border-border pt-4">
         <h3 className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
-          {en ? "PRO Reflection" : "PRO რეფლექსია"}
+          {locale === "pl"
+            ? "Refleksja PRO"
+            : en
+              ? "PRO Reflection"
+              : "PRO რეფლექსია"}
         </h3>
         <p className="mt-1.5 text-sm font-medium leading-relaxed text-foreground">
           {question}
@@ -230,15 +279,21 @@ export function ProDailyBrief({
               rows={2}
               maxLength={2000}
               placeholder={
-                en ? "A sentence is enough…" : "ერთი წინადადებაც საკმარისია…"
+                locale === "pl"
+                  ? "Wystarczy jedno zdanie…"
+                  : en
+                    ? "A sentence is enough…"
+                    : "ერთი წინადადებაც საკმარისია…"
               }
               className="w-full resize-none rounded-lg border border-border bg-background/80 px-3.5 py-2.5 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:border-primary/70 focus:outline-none"
             />
             <div className="mt-2 flex items-center justify-between gap-3">
               <span className="text-[11px] text-muted-foreground">
-                {en
-                  ? "Your answer stays in this browser."
-                  : "პასუხი მხოლოდ ამ ბრაუზერში ინახება."}
+                {locale === "pl"
+                  ? "Twoja odpowiedź pozostaje w tej przeglądarce."
+                  : en
+                    ? "Your answer stays in this browser."
+                    : "პასუხი მხოლოდ ამ ბრაუზერში ინახება."}
               </span>
               <Button
                 type="button"
@@ -250,8 +305,10 @@ export function ProDailyBrief({
                 {saved ? (
                   <>
                     <Check className="size-3.5 text-primary" />
-                    {en ? "Saved" : "შენახულია"}
+                    {locale === "pl" ? "Zapisano" : en ? "Saved" : "შენახულია"}
                   </>
+                ) : locale === "pl" ? (
+                  "Zapisz"
                 ) : en ? (
                   "Save"
                 ) : (
@@ -274,7 +331,11 @@ export function ProDailyBrief({
                 }
               >
                 <Lock className="size-4" />
-                {en ? "Unlock with PRO" : "განბლოკე PRO-ით"}
+                {locale === "pl"
+                  ? "Odblokuj z PRO"
+                  : en
+                    ? "Unlock with PRO"
+                    : "განბლოკე PRO-ით"}
               </Link>
             </Button>
           </div>

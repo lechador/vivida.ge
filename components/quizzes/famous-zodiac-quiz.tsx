@@ -13,7 +13,7 @@ import {
   FAMOUS_ZODIAC_QUESTIONS,
   FAMOUS_ZODIAC_ROUND,
   ZODIAC_SIGNS,
-  professionEn,
+  professionFor,
   signFor,
   type FamousZodiacQuestion,
 } from "@/lib/zodiac-famous-quiz";
@@ -36,6 +36,24 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 function resultCopy(score: number, total: number, locale: UserLocale) {
   const pct = total > 0 ? score / total : 0;
+  if (locale === "pl") {
+    if (score === total)
+      return [
+        "Prawdziwa zodiakalna encyklopedia!",
+        "Prawidłowo rozpoznałeś(-aś) znak zodiaku każdej gwiazdy.",
+      ];
+    if (pct >= 0.8)
+      return ["Robi wrażenie!", "Znakomicie znasz znaki zodiaku celebrytów."];
+    if (pct >= 0.5)
+      return [
+        "Solidny wynik!",
+        "Kilka znaków Ci umknęło, kolejna runda może być jeszcze lepsza.",
+      ];
+    return [
+      "Gwiazdy zachowały jeszcze kilka tajemnic.",
+      "Sprawdź poprawne odpowiedzi i spróbuj jeszcze raz.",
+    ];
+  }
   if (locale === "en") {
     if (score === total)
       return [
@@ -101,6 +119,7 @@ function FamousZodiacQuizGame({
   images: Record<string, string>;
   locale: UserLocale;
 }) {
+  const pl = locale === "pl";
   const en = locale === "en";
   const [questions, setQuestions] = useState(() =>
     shuffle(FAMOUS_ZODIAC_QUESTIONS).slice(0, FAMOUS_ZODIAC_ROUND),
@@ -155,15 +174,19 @@ function FamousZodiacQuizGame({
 
   async function share() {
     const url = `${window.location.origin}${localizedHref("/quiz/varskvlavebis-zodiaqo", locale)}`;
-    const text = en
-      ? `I scored ${score}/${total} on Vivida’s celebrity zodiac quiz ✨ How many can you guess?`
-      : `ვარსკვლავების ზოდიაქოს ქვიზში ${score}/${total} ავიღე ✨ შენ რამდენს გამოიცნობ?`;
+    const text = pl
+      ? `Zdobyłem(-am) ${score}/${total} w quizie zodiaku gwiazd Vivida ✨ Ile zdołasz odgadnąć?`
+      : en
+        ? `I scored ${score}/${total} on Vivida’s celebrity zodiac quiz ✨ How many can you guess?`
+        : `ვარსკვლავების ზოდიაქოს ქვიზში ${score}/${total} ავიღე ✨ შენ რამდენს გამოიცნობ?`;
     if (navigator.share) {
       try {
         await navigator.share({
-          title: en
-            ? "Celebrity Zodiac Quiz · Vivida"
-            : "ვარსკვლავების ზოდიაქო · Vivida",
+          title: pl
+            ? "Zodiak gwiazd · Vivida"
+            : en
+              ? "Celebrity Zodiac Quiz · Vivida"
+              : "ვარსკვლავების ზოდიაქო · Vivida",
           text,
           url,
         });
@@ -190,7 +213,7 @@ function FamousZodiacQuizGame({
             <Trophy className="size-6" />
           </div>
           <div className="mt-4 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Your result" : "შენი შედეგი"}
+            {pl ? "Twój wynik" : en ? "Your result" : "შენი შედეგი"}
           </div>
           <div className="mt-1 bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-7xl font-bold leading-none tracking-tight text-transparent">
             {score}
@@ -215,12 +238,16 @@ function FamousZodiacQuizGame({
                 <Share2 className="size-4" />
               )}
               {copied
-                ? en
-                  ? "Copied"
-                  : "დაკოპირდა"
-                : en
-                  ? "Share result"
-                  : "გააზიარე შედეგი"}
+                ? pl
+                  ? "Skopiowano"
+                  : en
+                    ? "Copied"
+                    : "დაკოპირდა"
+                : pl
+                  ? "Udostępnij wynik"
+                  : en
+                    ? "Share result"
+                    : "გააზიარე შედეგი"}
             </Button>
             <Button
               type="button"
@@ -229,11 +256,11 @@ function FamousZodiacQuizGame({
               className="gap-1.5"
             >
               <RotateCcw className="size-4" />
-              {en ? "Play again" : "თავიდან თამაში"}
+              {pl ? "Zagraj ponownie" : en ? "Play again" : "თავიდან თამაში"}
             </Button>
             <Button asChild variant="ghost">
               <Link href={localizedHref("/tests", locale)}>
-                {en ? "More tests" : "სხვა ტესტები"}
+                {pl ? "Więcej testów" : en ? "More tests" : "სხვა ტესტები"}
               </Link>
             </Button>
           </div>
@@ -241,7 +268,7 @@ function FamousZodiacQuizGame({
 
         <section className="rounded-3xl border border-border bg-card/50 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
           <h2 className="text-lg font-semibold tracking-tight">
-            {en ? "Answers" : "პასუხები"}
+            {pl ? "Odpowiedzi" : en ? "Answers" : "პასუხები"}
           </h2>
           <div className="mt-4 space-y-2.5">
             {answers.map((answer) => {
@@ -258,13 +285,28 @@ function FamousZodiacQuizGame({
                       {answer.question.name}
                     </div>
                     <div className="mt-0.5 text-xs text-muted-foreground">
-                      {en ? "Correct answer" : "სწორი პასუხი"}: {actual.glyph}{" "}
-                      {en ? actual.nameEn : actual.nameKa}
+                      {pl
+                        ? "Prawidłowa odpowiedź"
+                        : en
+                          ? "Correct answer"
+                          : "სწორი პასუხი"}
+                      : {actual.glyph}{" "}
+                      {pl ? actual.namePl : en ? actual.nameEn : actual.nameKa}
                       {!correct && (
                         <>
                           {" "}
-                          · {en ? "Your answer" : "შენი პასუხი"}: {picked.glyph}{" "}
-                          {en ? picked.nameEn : picked.nameKa}
+                          ·{" "}
+                          {pl
+                            ? "Twoja odpowiedź"
+                            : en
+                              ? "Your answer"
+                              : "შენი პასუხი"}
+                          : {picked.glyph}{" "}
+                          {pl
+                            ? picked.namePl
+                            : en
+                              ? picked.nameEn
+                              : picked.nameKa}
                         </>
                       )}
                     </div>
@@ -288,9 +330,11 @@ function FamousZodiacQuizGame({
 
         <details className="rounded-2xl border border-border bg-card/40 px-4 py-3 text-xs text-muted-foreground">
           <summary className="cursor-pointer font-medium text-foreground/80">
-            {en
-              ? "Photo sources and licenses"
-              : "ფოტოების წყაროები და ლიცენზიები"}
+            {pl
+              ? "Źródła zdjęć i licencje"
+              : en
+                ? "Photo sources and licenses"
+                : "ფოტოების წყაროები და ლიცენზიები"}
           </summary>
           <ul className="mt-3 space-y-1.5 leading-relaxed">
             {FAMOUS_ZODIAC_ASSETS.map((asset) => (
@@ -318,7 +362,8 @@ function FamousZodiacQuizGame({
       <div className="mb-6">
         <div className="mb-2 flex justify-between text-xs font-medium text-muted-foreground">
           <span>
-            {en ? "Question" : "კითხვა"} {index + 1} / {questions.length}
+            {pl ? "Pytanie" : en ? "Question" : "კითხვა"} {index + 1} /{" "}
+            {questions.length}
           </span>
           <span>{Math.round(((index + 1) / questions.length) * 100)}%</span>
         </div>
@@ -341,7 +386,13 @@ function FamousZodiacQuizGame({
           >
             <Image
               src={images[question.imageId]}
-              alt={en ? `${question.name} portrait` : question.imageAlt}
+              alt={
+                pl
+                  ? `Portret ${question.name}`
+                  : en
+                    ? `${question.name} portrait`
+                    : question.imageAlt
+              }
               width={1200}
               height={1200}
               priority
@@ -352,12 +403,14 @@ function FamousZodiacQuizGame({
       </div>
       <div className="mt-5 text-center">
         <div className="text-xs text-muted-foreground">
-          {en ? professionEn(question) : question.professionKa}
+          {professionFor(question, locale)}
         </div>
         <h2 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
-          {en
-            ? `What is ${question.name}’s zodiac sign?`
-            : `რომელი ზოდიაქოს ნიშანია ${question.name}?`}
+          {pl
+            ? `Jaki znak zodiaku ma ${question.name}?`
+            : en
+              ? `What is ${question.name}’s zodiac sign?`
+              : `რომელი ზოდიაქოს ნიშანია ${question.name}?`}
         </h2>
       </div>
       <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
@@ -378,7 +431,7 @@ function FamousZodiacQuizGame({
               className={`flex items-center gap-3 rounded-2xl border border-border bg-background/35 px-4 py-3.5 text-left text-sm font-medium transition hover:border-[var(--vivida-violet)]/60 disabled:cursor-default ${state ?? ""}`}
             >
               <span className="text-lg">{option.glyph}</span>
-              {en ? option.nameEn : option.nameKa}
+              {pl ? option.namePl : en ? option.nameEn : option.nameKa}
             </button>
           );
         })}
@@ -388,10 +441,14 @@ function FamousZodiacQuizGame({
           className={`mt-5 rounded-2xl border px-4 py-3 text-center text-sm ${correct ? "border-emerald-400/35 bg-emerald-400/10 text-emerald-300" : "border-rose-400/35 bg-rose-400/10 text-rose-300"}`}
         >
           {correct
-            ? en
-              ? "Correct!"
-              : "სწორია!"
-            : `${en ? "The correct answer is" : "სწორი პასუხია"}, ${signFor(question.sign).glyph} ${en ? signFor(question.sign).nameEn : signFor(question.sign).nameKa}`}
+            ? pl
+              ? "Prawidłowo!"
+              : en
+                ? "Correct!"
+                : "სწორია!"
+            : pl
+              ? `Prawidłowa odpowiedź: ${signFor(question.sign).glyph} ${signFor(question.sign).namePl}`
+              : `${en ? "The correct answer is" : "სწორი პასუხია"}, ${signFor(question.sign).glyph} ${en ? signFor(question.sign).nameEn : signFor(question.sign).nameKa}`}
         </div>
       )}
       <div className="mt-6 flex justify-end">
@@ -404,8 +461,10 @@ function FamousZodiacQuizGame({
           {index === questions.length - 1 ? (
             <>
               <Sparkles className="size-4" />
-              {en ? "See result" : "შედეგის ნახვა"}
+              {pl ? "Zobacz wynik" : en ? "See result" : "შედეგის ნახვა"}
             </>
+          ) : pl ? (
+            "Dalej"
           ) : en ? (
             "Next"
           ) : (

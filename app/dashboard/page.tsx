@@ -35,7 +35,9 @@ import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  return { title: locale !== "ka" ? "Today" : "დღეს" };
+  return {
+    title: locale === "pl" ? "Dzisiaj" : locale !== "ka" ? "Today" : "დღეს",
+  };
 }
 
 function pickDailyArticles(
@@ -116,7 +118,8 @@ export default async function DashboardPage() {
     noChart ? ensureMoonPhase(locale).catch(() => null) : Promise.resolve(null),
   ]);
   const firstName =
-    user.name?.split(" ")[0] ?? (en ? "stargazer" : "ვარსკვლავო");
+    user.name?.split(" ")[0] ??
+    (locale === "pl" ? "obserwatorze" : en ? "stargazer" : "ვარსკვლავო");
   const completed = new Set([
     ...(mbtiResult ? ["astro-mbti"] : []),
     ...(iqResult ? ["iq"] : []),
@@ -177,9 +180,11 @@ export default async function DashboardPage() {
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background/70 px-5 py-2.5 sm:px-6">
             <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--vivida-gold)]">
               <span className="inline-block size-1.5 rounded-full bg-[var(--vivida-gold)]" />
-              {en
-                ? "PERSONAL OBSERVATORY · EPHEMERIS WORKSPACE"
-                : "პირადი ობსერვატორია · ეფემერიდების სივრცე"}
+              {locale === "pl"
+                ? "OSOBISTE OBSERWATORIUM · PRZESTRZEŃ EFEMERYD"
+                : en
+                  ? "PERSONAL OBSERVATORY · EPHEMERIS WORKSPACE"
+                  : "პირადი ობსერვატორია · ეფემერიდების სივრცე"}
             </div>
             <div className="font-mono text-xs tabular-nums text-muted-foreground">
               {new Date().toISOString().slice(0, 10)} · UTC+4
@@ -189,13 +194,15 @@ export default async function DashboardPage() {
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-end sm:justify-between sm:p-6">
             <div>
               <h1 className="text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-                {en ? "Welcome," : "სალამი,"}{" "}
+                {locale === "pl" ? "Witaj," : en ? "Welcome," : "სალამი,"}{" "}
                 <span className="text-primary">{firstName}</span>
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                {en
-                  ? "Today's sky transits calibrated against your natal coordinates."
-                  : "დღევანდელი ცის ტრანზიტები შენი ნატალური რუკის კოორდინატებით."}
+                {locale === "pl"
+                  ? "Dzisiejsze tranzyty planetarne skalibrowane z Twoim kosmogramem urodzeniowym."
+                  : en
+                    ? "Today's sky transits calibrated against your natal coordinates."
+                    : "დღევანდელი ცის ტრანზიტები შენი ნატალური რუკის კოორდინატებით."}
               </p>
             </div>
 
@@ -204,13 +211,18 @@ export default async function DashboardPage() {
                 href="/report"
                 className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-primary/50 bg-primary/15 px-3.5 font-mono text-[11px] uppercase tracking-[0.16em] text-primary transition-colors hover:bg-primary/25"
               >
-                {en ? "Natal Chart" : "ჩემი რუკა"} →
+                {locale === "pl"
+                  ? "Kosmogram"
+                  : en
+                    ? "Natal Chart"
+                    : "ჩემი რუკა"}{" "}
+                →
               </Link>
               <Link
                 href="/synastry"
                 className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[var(--vivida-pink)]/40 bg-[var(--vivida-pink)]/10 px-3.5 font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--vivida-pink)] transition-colors hover:border-[var(--vivida-pink)]/60 hover:bg-[var(--vivida-pink)]/20"
               >
-                {en ? "Synastry" : "თავსებადობა"}
+                {locale === "pl" ? "Zgodność" : en ? "Synastry" : "თავსებადობა"}
               </Link>
               <Link
                 href="/taro"

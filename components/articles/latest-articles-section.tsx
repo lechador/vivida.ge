@@ -19,6 +19,12 @@ const COPY = {
     text: "Psychology, philosophy and self-development through a thoughtful, practical lens.",
     all: "All articles",
   },
+  pl: {
+    eyebrow: "Czytaj na Vivida",
+    title: "Myśli, przy których warto się zatrzymać",
+    text: "Psychologia, filozofia i rozwój osobisty z uważnej, praktycznej perspektywy.",
+    all: "Wszystkie artykuły",
+  },
 } as const;
 
 export async function LatestArticlesSection({

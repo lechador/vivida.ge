@@ -178,9 +178,11 @@ export async function POST(req: Request) {
     if (recentUserMessages.length >= 2) {
       const v = inferVerbosity(recentUserMessages);
       memoryBlock =
-        locale === "en"
-          ? `The person writes ${v === "short" ? "short, simple" : v === "detailed" ? "long, elaborate" : "medium-length"} messages, match that length and simplicity.`
-          : `ადამიანი წერს ${v === "short" ? "მოკლე, მარტივ" : v === "detailed" ? "გრძელ, გაშლილ" : "საშუალო სიგრძის"} შეტყობინებებს, პასუხის სიგრძე და სიმარტივე ამას შეუსაბამე.`;
+        locale === "pl"
+          ? `Użytkownik pisze wiadomości ${v === "short" ? "krótkie, proste" : v === "detailed" ? "długie, rozbudowane" : "średniej długości"}; dopasuj do tego długość i zwięzłość odpowiedzi.`
+          : locale === "en"
+            ? `The person writes ${v === "short" ? "short, simple" : v === "detailed" ? "long, elaborate" : "medium-length"} messages, match that length and simplicity.`
+            : `ადამიანი წერს ${v === "short" ? "მოკლე, მარტივ" : v === "detailed" ? "გრძელ, გაშლილ" : "საშუალო სიგრძის"} შეტყობინებებს, პასუხის სიგრძე და სიმარტივე ამას შეუსაბამე.`;
     }
   }
   // Premium flag + balance let the astrologer state cost/affordability

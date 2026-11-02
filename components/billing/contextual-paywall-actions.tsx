@@ -167,16 +167,22 @@ export function ContextualPaywallActions({
     <div className="space-y-2.5">
       <p className="text-sm text-[var(--vivida-pink)]">
         {balance > 0
-          ? en
-            ? `You already have ${balance} credit${balance === 1 ? "" : "s"} — you only need ${missing} more.`
-            : `ბალანსზე უკვე გაქვს ${balance} კრედიტი — გაკლია მხოლოდ ${missing} კრედიტი.`
-          : variant === "value_message"
-            ? en
-              ? `Unlock this result by adding ${missing} more credit${missing === 1 ? "" : "s"}.`
-              : `გახსენი ეს შედეგი კიდევ ${missing} კრედიტის დამატებით.`
+          ? locale === "pl"
+            ? `Masz już ${balance} kredytów na koncie — brakuje tylko ${missing}.`
             : en
-              ? `You need ${missing} more credit${missing === 1 ? "" : "s"}.`
-              : `გაკლია ${missing} კრედიტი.`}
+              ? `You already have ${balance} credit${balance === 1 ? "" : "s"} — you only need ${missing} more.`
+              : `ბალანსზე უკვე გაქვს ${balance} კრედიტი — გაკლია მხოლოდ ${missing} კრედიტი.`
+          : variant === "value_message"
+            ? locale === "pl"
+              ? `Odblokuj ten wynik, dodając jeszcze ${missing} kredytów.`
+              : en
+                ? `Unlock this result by adding ${missing} more credit${missing === 1 ? "" : "s"}.`
+                : `გახსენი ეს შედეგი კიდევ ${missing} კრედიტის დამატებით.`
+            : locale === "pl"
+              ? `Brakuje Ci ${missing} kredytów.`
+              : en
+                ? `You need ${missing} more credit${missing === 1 ? "" : "s"}.`
+                : `გაკლია ${missing} კრედიტი.`}
       </p>
       <div className="flex flex-wrap items-center justify-center gap-2">
         {impulse && (
@@ -213,12 +219,16 @@ export function ContextualPaywallActions({
             onClick={() => trackChoice("pro", "credits_hub")}
           >
             <Crown className="size-4" />
-            {en ? "Other packs / Unlimited PRO" : "სხვა პაკეტები / ულიმიტო PRO"}
+            {locale === "pl"
+              ? "Inne pakiety / Nielimitowane PRO"
+              : en
+                ? "Other packs / Unlimited PRO"
+                : "სხვა პაკეტები / ულიმიტო PRO"}
           </Link>
         </Button>
       </div>
       <p className="text-[11px] text-muted-foreground">
-        {`${impulse ? impulse.detail : offer.detail}${en ? " PRO is for frequent use." : " PRO ხშირი გამოყენებისთვისაა."}`}
+        {`${impulse ? impulse.detail : offer.detail}${locale === "pl" ? " PRO jest dla częstego użytku." : en ? " PRO is for frequent use." : " PRO ხშირი გამოყენებისთვისაა."}`}
       </p>
     </div>
   );

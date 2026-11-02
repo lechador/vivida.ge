@@ -94,6 +94,18 @@ const nextConfig: NextConfig = {
         has: [{ type: "host" as const, value: host }],
         headers: [{ key: "Content-Language", value: "en" }],
       })),
+      ...ENGLISH_HOSTS.flatMap((host) => [
+        {
+          source: "/pl",
+          has: [{ type: "host" as const, value: host }],
+          headers: [{ key: "Content-Language", value: "pl" }],
+        },
+        {
+          source: "/pl/:path*",
+          has: [{ type: "host" as const, value: host }],
+          headers: [{ key: "Content-Language", value: "pl" }],
+        },
+      ]),
       // Privy production surface: framing is denied outright (nothing in the
       // app expects to be framed), and the full Privy-recommended CSP ships
       // in Report-Only mode until validated, then flips to enforcing (see

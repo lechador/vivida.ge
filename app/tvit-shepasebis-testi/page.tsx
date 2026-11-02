@@ -14,6 +14,7 @@ import {
   DEFAULT_OG_IMAGE,
   ENGLISH_SITE_URL,
   GEORGIAN_SITE_URL,
+  POLISH_SITE_URL,
   localizedAlternates,
 } from "@/lib/seo/locales";
 
@@ -25,40 +26,62 @@ const TITLE_EN =
   "Rosenberg Self-Esteem Test, Free 10-Question Self-Esteem Scale";
 const DESCRIPTION_EN =
   "Take the free 10-item Rosenberg self-esteem test. Get a 0–30 score with a calm explanation and reflection themes matched to your answers.";
+const TITLE_PL = "Test samooceny, 10-punktowa skala Rosenberga | Vivida";
+const DESCRIPTION_PL =
+  "Wypełnij darmowy 10-pytaniowy test samooceny według skali Rosenberga. Uzyskaj wynik 0–30 punktów, wyważoną interpretację i tematy do refleksji.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
+  const pl = locale === "pl";
   const en = locale === "en";
-  const title = en ? TITLE_EN : TITLE_KA;
-  const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
-  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  const title = pl ? TITLE_PL : en ? TITLE_EN : TITLE_KA;
+  const description = pl
+    ? DESCRIPTION_PL
+    : en
+      ? DESCRIPTION_EN
+      : DESCRIPTION_KA;
+  const siteUrl = pl
+    ? POLISH_SITE_URL
+    : en
+      ? ENGLISH_SITE_URL
+      : GEORGIAN_SITE_URL;
+
   return {
-    title: { absolute: en ? title : title + ", Vivida" },
+    title: { absolute: pl || en ? title : title + ", Vivida" },
     description,
-    keywords: en
+    keywords: pl
       ? [
-          "rosenberg self-esteem test",
-          "self-esteem test",
-          "rosenberg scale",
-          "free self-esteem quiz",
-          "self-worth test",
+          "test samooceny",
+          "skala rosenberga",
+          "test poczucia własnej wartości",
+          "darmowy test samooceny",
+          "jak podnieść samoocenę",
+          "test psychologiczny online",
         ]
-      : [
-          "თვითშეფასების ტესტი",
-          "როზენბერგის ტესტი",
-          "Rosenberg Self-Esteem Scale ქართულად",
-          "ფსიქოლოგიური ტესტი ქართულად",
-          "დაბალი თვითშეფასება",
-        ],
+      : en
+        ? [
+            "rosenberg self-esteem test",
+            "self-esteem test",
+            "rosenberg scale",
+            "free self-esteem quiz",
+            "self-worth test",
+          ]
+        : [
+            "თვითშეფასების ტესტი",
+            "როზენბერგის ტესტი",
+            "Rosenberg Self-Esteem Scale ქართულად",
+            "ფსიქოლოგიური ტესტი ქართულად",
+            "დაბალი თვითშეფასება",
+          ],
     alternates: localizedAlternates(PATH, PATH, locale),
     openGraph: {
       images: [DEFAULT_OG_IMAGE],
       type: "website",
-      url: siteUrl + PATH,
+      url: pl ? `${POLISH_SITE_URL}${PATH}` : `${siteUrl}${PATH}`,
       title,
       description,
       siteName: "Vivida",
-      locale: en ? "en_US" : "ka_GE",
+      locale: pl ? "pl_PL" : en ? "en_US" : "ka_GE",
     },
     twitter: { card: "summary_large_image", title, description },
   };
@@ -102,37 +125,76 @@ const FAQ_EN = [
   },
 ];
 
+const FAQ_PL = [
+  {
+    q: "Co mierzy skala samooceny Rosenberga?",
+    a: "Mierzy globalną samoocenę: to, na ile wartościowy, wystarczający i godny szacunku czujesz się jako człowiek.",
+  },
+  {
+    q: "Jak obliczany jest wynik?",
+    a: "Każda z dziesięciu odpowiedzi jest punktowana od 0 do 3 punktów. Pięć twierdzeń sformułowanych negatywnie jest punktowanych odwrotnie. Wynik mieści się w przedziale 0–30, a wyższy wynik wskazuje na bardziej stabilną samoocenę.",
+  },
+  {
+    q: "Czy to jest diagnoza psychologiczna?",
+    a: "Nie. Test służy do autorefleksji i ogólnej orientacji. Nie zastępuje profesjonalnej diagnozy zdrowia psychicznego ani nie określa Twojej wartości jako człowieka.",
+  },
+  {
+    q: "Czy moje odpowiedzi są zapisywane?",
+    a: "Nie. Twoje odpowiedzi i wynik są obliczane wyłącznie w przeglądarce, nie są wysyłane na serwery Vivida i znikają po odświeżeniu strony.",
+  },
+];
+
 export default async function SelfEsteemTestPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
   const locale = await getRequestLocale();
+  const pl = locale === "pl";
   const en = locale === "en";
-  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
-  const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
-  const faq = en ? FAQ_EN : FAQ;
+  const siteUrl = pl
+    ? POLISH_SITE_URL
+    : en
+      ? ENGLISH_SITE_URL
+      : GEORGIAN_SITE_URL;
+  const description = pl
+    ? DESCRIPTION_PL
+    : en
+      ? DESCRIPTION_EN
+      : DESCRIPTION_KA;
+  const faq = pl ? FAQ_PL : en ? FAQ_EN : FAQ;
+  const testTitle = pl
+    ? "Test samooceny Rosenberga"
+    : en
+      ? "Rosenberg Self-Esteem Test"
+      : "Rosenberg-ის თვითშეფასების ტესტი ქართულად";
+
   const ld = [
     {
       "@context": "https://schema.org",
       "@type": "Quiz",
-      name: en
-        ? "Rosenberg Self-Esteem Test"
-        : "Rosenberg-ის თვითშეფასების ტესტი ქართულად",
+      name: testTitle,
       description,
-      inLanguage: en ? "en" : "ka-GE",
+      inLanguage: pl ? "pl" : en ? "en" : "ka-GE",
       url: siteUrl + PATH,
       numberOfQuestions: 10,
       about: {
         "@type": "Thing",
-        name: en ? "Self-esteem" : "თვითშეფასება",
+        name: pl ? "Samoocena" : en ? "Self-esteem" : "თვითშეფასება",
         alternateName: "Self-esteem",
       },
       author: { "@type": "Person", name: "Morris Rosenberg" },
     },
     breadcrumbLd([
-      { name: en ? "Home" : "მთავარი", url: siteUrl },
-      { name: en ? "Tests" : "ტესტები", url: siteUrl + "/tests" },
+      { name: pl ? "Strona główna" : en ? "Home" : "მთავარი", url: siteUrl },
       {
-        name: en ? "Self-Esteem Test" : "თვითშეფასების ტესტი",
+        name: pl ? "Testy" : en ? "Tests" : "ტესტები",
+        url: siteUrl + "/tests",
+      },
+      {
+        name: pl
+          ? "Test samooceny"
+          : en
+            ? "Self-Esteem Test"
+            : "თვითშეფასების ტესტი",
         url: siteUrl + PATH,
       },
     ]),
@@ -166,7 +228,14 @@ export default async function SelfEsteemTestPage() {
             Vivida · Rosenberg Self-Esteem Scale
           </div>
           <h1 className="mt-1 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-            {en ? (
+            {pl ? (
+              <>
+                Jak postrzegasz{" "}
+                <span className="bg-[linear-gradient(120deg,var(--vivida-pink),var(--vivida-violet),var(--vivida-cyan))] bg-clip-text text-transparent">
+                  samego siebie?
+                </span>
+              </>
+            ) : en ? (
               <>
                 How do you{" "}
                 <span className="bg-[linear-gradient(120deg,var(--vivida-pink),var(--vivida-violet),var(--vivida-cyan))] bg-clip-text text-transparent">
@@ -183,22 +252,32 @@ export default async function SelfEsteemTestPage() {
             )}
           </h1>
           <p className="mx-auto mt-3 max-w-lg text-pretty text-sm leading-relaxed text-foreground/75 sm:text-base">
-            {en
-              ? "Answer ten short statements and see how steady your sense of worth, capability and self-respect feels right now."
-              : "უპასუხე ათ მოკლე დებულებას და ნახე, რამდენად მყარია საკუთარი ღირებულების, შესაძლებლობებისა და თავის პატივისცემის განცდა."}
+            {pl
+              ? "Odpowiedz na dziesięć krótkich twierdzeń i przekonaj się, jak stabilne jest Twoje poczucie własnej wartości, kompetencji i szacunku do samego siebie."
+              : en
+                ? "Answer ten short statements and see how steady your sense of worth, capability and self-respect feels right now."
+                : "უპასუხე ათ მოკლე დებულებას და ნახე, რამდენად მყარია საკუთარი ღირებულების, შესაძლებლობებისა და თავის პატივისცემის განცდა."}
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1.5">
               <FileCheck2 className="size-3.5" />
-              {en ? "10 questions" : "10 კითხვა"}
+              {pl ? "10 pytań" : en ? "10 questions" : "10 კითხვა"}
             </span>
             <span className="inline-flex items-center gap-1.5">
               <Clock className="size-3.5" />
-              {en ? "About 2 minutes" : "დაახლოებით 2 წუთი"}
+              {pl
+                ? "Około 2 minut"
+                : en
+                  ? "About 2 minutes"
+                  : "დაახლოებით 2 წუთი"}
             </span>
             <span className="inline-flex items-center gap-1.5">
               <ShieldCheck className="size-3.5" />
-              {en ? "Answers are not stored" : "პასუხები არ ინახება"}
+              {pl
+                ? "Odpowiedzi nie są zapisywane"
+                : en
+                  ? "Answers are not stored"
+                  : "პასუხები არ ინახება"}
             </span>
           </div>
         </header>
@@ -209,26 +288,38 @@ export default async function SelfEsteemTestPage() {
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-24 sm:px-6">
         <div className="rounded-3xl border border-border bg-card/40 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-xl font-semibold tracking-tight">
-            {en ? "What does this test measure?" : "რას ზომავს ეს ტესტი?"}
+            {pl
+              ? "Co mierzy ten test?"
+              : en
+                ? "What does this test measure?"
+                : "რას ზომავს ეს ტესტი?"}
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            {en
-              ? "The Rosenberg scale measures global self-esteem: not one specific skill or satisfaction with appearance, but your overall attitude toward yourself. A higher score means steadier acceptance and self-respect. It does not mean narcissism or superiority over others."
-              : "Rosenberg-ის სკალა ზომავს გლობალურ თვითშეფასებას, არა ერთ კონკრეტულ უნარს ან გარეგნობით კმაყოფილებას, არამედ საკუთარ თავთან საერთო დამოკიდებულებას. მაღალი ქულა ნიშნავს უფრო მყარ მიღებასა და თვითპატივისცემას; ის არ ნიშნავს ნარცისიზმს ან სხვებზე აღმატებულობას."}
+            {pl
+              ? "Skala Rosenberga mierzy globalną samoocenę: nie jedną konkretną umiejętność czy zadowolenie z wyglądu, lecz ogólny stosunek do samego siebie. Wyższy wynik oznacza stabilniejszą akceptację i szacunek do siebie — nie oznacza narcyzmu ani wyższości nad innymi."
+              : en
+                ? "The Rosenberg scale measures global self-esteem: not one specific skill or satisfaction with appearance, but your overall attitude toward yourself. A higher score means steadier acceptance and self-respect. It does not mean narcissism or superiority over others."
+                : "Rosenberg-ის სკალა ზომავს გლობალურ თვითშეფასებას, არა ერთ კონკრეტულ უნარს ან გარეგნობით კმაყოფილებას, არამედ საკუთარ თავთან საერთო დამოკიდებულებას. მაღალი ქულა ნიშნავს უფრო მყარ მიღებასა და თვითპატივისცემას; ის არ ნიშნავს ნარცისიზმს ან სხვებზე აღმატებულობას."}
           </p>
 
           <h2 className="mt-7 text-xl font-semibold tracking-tight">
-            {en ? "How is the score calculated?" : "როგორ ითვლება ქულა?"}
+            {pl
+              ? "Jak obliczany jest wynik?"
+              : en
+                ? "How is the score calculated?"
+                : "როგორ ითვლება ქულა?"}
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            {en
-              ? "Each answer scores 0–3 points. Positively worded items 1, 3, 4, 7 and 10 count directly, while negatively worded items 2, 5, 6, 8 and 9 count in reverse. The total ranges from 0 to 30. There is deliberately no neutral answer; that is part of the original four-option format."
-              : "თითოეული პასუხი 0–3 ქულაა. დადებითად ფორმულირებული 1, 3, 4, 7 და 10 პუნქტები პირდაპირ, ხოლო უარყოფითად ფორმულირებული 2, 5, 6, 8 და 9 პუნქტები შებრუნებულად ითვლება. ჯამური ქულაა 0–30. ტესტში ნეიტრალური პასუხი განზრახ არ არის, ეს ორიგინალი ოთხპასუხიანი ფორმატის ნაწილია."}
+            {pl
+              ? "Każda odpowiedź daje 0–3 punkty. Twierdzenia pozytywne (1, 3, 4, 7 i 10) liczą się wprost, natomiast twierdzenia negatywne (2, 5, 6, 8 i 9) są odwracane. Łączny wynik mieści się w przedziale 0–30 punktów."
+              : en
+                ? "Each answer scores 0–3 points. Positively worded items 1, 3, 4, 7 and 10 count directly, while negatively worded items 2, 5, 6, 8 and 9 count in reverse. The total ranges from 0 to 30. There is deliberately no neutral answer; that is part of the original four-option format."
+                : "თითოეული პასუხი 0–3 ქულაა. დადებითად ფორმულირებული 1, 3, 4, 7 და 10 პუნქტები პირდაპირ, ხოლო უარყოფითად ფორმულირებული 2, 5, 6, 8 და 9 პუნქტები შებრუნებულად ითვლება. ჯამური ქულაა 0–30. ტესტში ნეიტრალური პასუხი განზრახ არ არის, ეს ორიგინალი ოთხპასუხიანი ფორმატის ნაწილია."}
           </p>
 
           <div className="mt-7 rounded-2xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/7 p-4 text-sm leading-relaxed text-foreground/80">
             <strong className="font-semibold text-foreground">
-              {en ? "Source:" : "წყარო:"}
+              {pl ? "Źródło:" : en ? "Source:" : "წყარო:"}
             </strong>{" "}
             Morris Rosenberg, <em>Society and the Adolescent Self-Image</em>{" "}
             (1965).{" "}
@@ -238,28 +329,38 @@ export default async function SelfEsteemTestPage() {
               rel="noreferrer"
               className="text-[var(--vivida-cyan)] underline underline-offset-2"
             >
-              {en
-                ? "According to the University of Maryland, the scale is in the public domain"
-                : "University of Maryland-ის მიხედვით, სკალა საჯარო დომენშია"}
+              {pl
+                ? "Według University of Maryland skala znajduje się w domenie publicznej"
+                : en
+                  ? "According to the University of Maryland, the scale is in the public domain"
+                  : "University of Maryland-ის მიხედვით, სკალა საჯარო დომენშია"}
             </Link>
-            {en
-              ? "; the item format and scoring are verified against "
-              : "; კითხვების ფორმატი და დათვლის წესი კი გადამოწმებულია "}
+            {pl
+              ? "; format twierdzeń i punktacja zostały zweryfikowane z "
+              : en
+                ? "; the item format and scoring are verified against "
+                : "; კითხვების ფორმატი და დათვლის წესი კი გადამოწმებულია "}
             <Link
               href="https://www.apa.org/obesity-guideline/rosenberg-self-esteem.pdf"
               target="_blank"
               rel="noreferrer"
               className="text-[var(--vivida-cyan)] underline underline-offset-2"
             >
-              {en
-                ? "the version published by the APA"
-                : "APA-ს გამოქვეყნებულ ვერსიასთან"}
+              {pl
+                ? "wersją opublikowaną przez APA"
+                : en
+                  ? "the version published by the APA"
+                  : "APA-ს გამოქვეყნებულ ვერსიასთან"}
             </Link>
             .
           </div>
 
           <h2 className="mt-8 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Frequently asked questions" : "ხშირად დასმული კითხვები"}
+            {pl
+              ? "Często zadawane pytania"
+              : en
+                ? "Frequently asked questions"
+                : "ხშირად დასმული კითხვები"}
           </h2>
           <div className="mt-4 space-y-3">
             {faq.map((item) => (
@@ -282,7 +383,7 @@ export default async function SelfEsteemTestPage() {
         </div>
       </section>
 
-      <SiteFooter />
+      <SiteFooter locale={locale} />
     </main>
   );
 }

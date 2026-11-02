@@ -43,9 +43,14 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  const en = locale !== "ka";
+  const title =
+    locale === "pl"
+      ? "Subskrypcja PRO"
+      : locale === "en"
+        ? "PRO subscription"
+        : "PRO გამოწერა";
   return {
-    title: en ? "PRO subscription" : "PRO გამოწერა",
+    title,
     robots: { index: false },
   };
 }
@@ -82,9 +87,13 @@ export default async function SubscriptionPage({
   let identity = await getBillingIdentity(user.id);
   if (!identity) throw new Error("Billing identity not found");
   if (!identity?.countryCode) {
-    const detected = countryCodeFromHeaders(await headers());
+    const detected =
+      countryCodeFromHeaders(await headers()) ||
+      (locale === "pl" ? "PL" : null);
     await setResidenceCountryIfMissing(user.id, detected);
     identity = { ...identity, countryCode: detected };
+  } else if (!identity.countryCode && locale === "pl") {
+    identity = { ...identity, countryCode: "PL" };
   }
 
   const [subscription, active] = await Promise.all([
@@ -94,8 +103,10 @@ export default async function SubscriptionPage({
   // Stripe is primary on both hosts; the English host additionally offers
   // a one-time USDC PRO pass as an alternative. KA never sees it.
   const cryptoPay = (await requestIsEnglishHost()) && isCryptoPayConfigured();
-  const plan = premiumPlanForCountry(identity?.countryCode);
-  const country = countryDisplayName(identity?.countryCode, locale);
+  const effectiveCountry =
+    identity?.countryCode || (locale === "pl" ? "PL" : undefined);
+  const plan = premiumPlanForCountry(effectiveCountry);
+  const country = countryDisplayName(effectiveCountry, locale);
 
   // Period progress for the "how much time is left" detail. Ceiled so a
   // period ending later today still reads as a day rather than zero.
@@ -149,12 +160,16 @@ export default async function SubscriptionPage({
             </div>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-5xl">
               {active
-                ? en
-                  ? "Your subscription"
-                  : "შენი გამოწერა"
-                : en
-                  ? "Unlimited Vivida"
-                  : "ულიმიტო Vivida"}
+                ? locale === "pl"
+                  ? "Twoja subskrypcja"
+                  : en
+                    ? "Your subscription"
+                    : "შენი გამოწერა"
+                : locale === "pl"
+                  ? "Nielimitowana Vivida"
+                  : en
+                    ? "Unlimited Vivida"
+                    : "ულიმიტო Vivida"}
             </h1>
           </div>
 
@@ -178,15 +193,17 @@ export default async function SubscriptionPage({
                       <span className="text-sm font-normal text-muted-foreground">
                         /
                         {subscription.source === "crypto"
-                          ? en
-                            ? "one-time pass"
-                            : "ერთჯერადი პასი"
+                          ? locale === "pl"
+                            ? "przepustka jednorazowa"
+                            : en
+                              ? "one-time pass"
+                              : "ერთჯერადი პასი"
                           : billingCadenceLabel(
                               billingPeriodMonths(
                                 subscription.currentPeriodStart,
                                 subscription.currentPeriodEnd,
                               ),
-                              en,
+                              locale,
                             )}
                       </span>
                     </div>
@@ -201,43 +218,67 @@ export default async function SubscriptionPage({
                 <dl className="mt-6 grid gap-3 sm:grid-cols-2">
                   <Detail
                     icon={History}
-                    label={en ? "Subscribed since" : "გამოწერილია"}
+                    label={
+                      locale === "pl"
+                        ? "Data subskrypcji"
+                        : en
+                          ? "Subscribed since"
+                          : "გამოწერილია"
+                    }
                     value={formatDate(subscription.createdAt, locale)}
                   />
                   <Detail
                     icon={Hourglass}
-                    label={en ? "Time remaining" : "დარჩენილი დრო"}
-                    value={remainingLabel(daysLeft, en)}
+                    label={
+                      locale === "pl"
+                        ? "Pozostały czas"
+                        : en
+                          ? "Time remaining"
+                          : "დარჩენილი დრო"
+                    }
+                    value={remainingLabel(daysLeft, locale)}
                   />
                   <Detail
                     icon={CalendarDays}
                     label={
                       subscription.cancelAtPeriodEnd ||
                       subscription.source === "crypto"
-                        ? en
-                          ? "Access ends"
-                          : "წვდომა დასრულდება"
-                        : en
-                          ? "Next renewal"
-                          : "შემდეგი განახლება"
+                        ? locale === "pl"
+                          ? "Dostęp wygasa"
+                          : en
+                            ? "Access ends"
+                            : "წვდომა დასრულდება"
+                        : locale === "pl"
+                          ? "Następne odnowienie"
+                          : en
+                            ? "Next renewal"
+                            : "შემდეგი განახლება"
                     }
                     value={formatDate(subscription.currentPeriodEnd, locale)}
                   />
                   <Detail
                     icon={CreditCard}
-                    label={en ? "Billing" : "გადახდა"}
+                    label={
+                      locale === "pl" ? "Płatność" : en ? "Billing" : "გადახდა"
+                    }
                     value={
                       subscription.source === "crypto"
-                        ? en
-                          ? "One-time card payment"
-                          : "ერთჯერადი გადახდა (ბარათით)"
-                        : subscription.cancelAtPeriodEnd
-                          ? en
-                            ? "Cancellation scheduled"
-                            : "გაუქმება დაგეგმილია"
+                        ? locale === "pl"
+                          ? "Jednorazowa płatność kartą"
                           : en
-                            ? "Renews automatically"
-                            : "ავტომატურად განახლდება"
+                            ? "One-time card payment"
+                            : "ერთჯერადი გადახდა (ბარათით)"
+                        : subscription.cancelAtPeriodEnd
+                          ? locale === "pl"
+                            ? "Zaplanowano anulowanie"
+                            : en
+                              ? "Cancellation scheduled"
+                              : "გაუქმება დაგეგმილია"
+                          : locale === "pl"
+                            ? "Odnawia się automatycznie"
+                            : en
+                              ? "Renews automatically"
+                              : "ავტომატურად განახლდება"
                     }
                   />
                 </dl>
@@ -249,7 +290,11 @@ export default async function SubscriptionPage({
                   aria-valuemin={0}
                   aria-valuemax={100}
                   aria-label={
-                    en ? "Billing period elapsed" : "საბილინგო პერიოდი"
+                    locale === "pl"
+                      ? "Upływ okresu rozliczeniowego"
+                      : en
+                        ? "Billing period elapsed"
+                        : "საბილინგო პერიოდი"
                   }
                 >
                   <div
@@ -286,7 +331,11 @@ export default async function SubscriptionPage({
                     Vivida PRO
                   </div>
                   <div className="mt-1 text-2xl font-semibold">
-                    {en ? "PRO is active" : "PRO ჩართულია"}
+                    {locale === "pl"
+                      ? "PRO jest aktywne"
+                      : en
+                        ? "PRO is active"
+                        : "PRO ჩართულია"}
                   </div>
                 </div>
                 <span className="rounded-full bg-emerald-400/12 px-3 py-1 text-xs font-semibold text-emerald-300">
@@ -297,13 +346,25 @@ export default async function SubscriptionPage({
               <dl className="mt-6 grid gap-3 sm:grid-cols-2">
                 <Detail
                   icon={CalendarDays}
-                  label={en ? "Active until" : "აქტიურია"}
+                  label={
+                    locale === "pl"
+                      ? "Aktywne do"
+                      : en
+                        ? "Active until"
+                        : "აქტიურია"
+                  }
                   value={formatDate(identity.premiumUntil, locale)}
                 />
                 <Detail
                   icon={Hourglass}
-                  label={en ? "Time remaining" : "დარჩენილი დრო"}
-                  value={remainingLabel(directDaysLeft, en)}
+                  label={
+                    locale === "pl"
+                      ? "Pozostały czas"
+                      : en
+                        ? "Time remaining"
+                        : "დარჩენილი დრო"
+                  }
+                  value={remainingLabel(directDaysLeft, locale)}
                 />
               </dl>
             </section>
@@ -326,7 +387,9 @@ export default async function SubscriptionPage({
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 function formatDate(date: Date, locale: UserLocale) {
-  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "ka-GE", {
+  const intlLocale =
+    locale === "pl" ? "pl-PL" : locale === "en" ? "en-GB" : "ka-GE";
+  return new Intl.DateTimeFormat(intlLocale, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -334,16 +397,38 @@ function formatDate(date: Date, locale: UserLocale) {
 }
 
 /** "23 days left", the remaining-time value under the subscription dates. */
-function remainingLabel(daysLeft: number, en: boolean): string {
-  if (daysLeft <= 0) return en ? "Ended" : "დასრულდა";
-  if (daysLeft === 1) return en ? "1 day left" : "დარჩა 1 დღე";
-  return en ? `${daysLeft} days left` : `დარჩა ${daysLeft} დღე`;
+function remainingLabel(daysLeft: number, locale: UserLocale): string {
+  if (daysLeft <= 0) {
+    return locale === "pl"
+      ? "Zakończona"
+      : locale === "en"
+        ? "Ended"
+        : "დასრულდა";
+  }
+  if (daysLeft === 1) {
+    return locale === "pl"
+      ? "Został 1 dzień"
+      : locale === "en"
+        ? "1 day left"
+        : "დარჩა 1 დღე";
+  }
+  return locale === "pl"
+    ? `Zostało ${daysLeft} dni`
+    : locale === "en"
+      ? `${daysLeft} days left`
+      : `დარჩა ${daysLeft} დღე`;
 }
 
 /** "month" / "3 months", the denominator under a subscription's price. */
-function billingCadenceLabel(months: number, en: boolean): string {
-  if (months === 1) return en ? "month" : "თვე";
-  return en ? `${months} months` : `${months} თვე`;
+function billingCadenceLabel(months: number, locale: UserLocale): string {
+  if (months === 1) {
+    return locale === "pl" ? "miesiąc" : locale === "en" ? "month" : "თვე";
+  }
+  return locale === "pl"
+    ? `${months} mies.`
+    : locale === "en"
+      ? `${months} months`
+      : `${months} თვე`;
 }
 
 function Detail({

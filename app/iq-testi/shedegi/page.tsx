@@ -9,12 +9,15 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  const en = locale !== "ka";
+  const pl = locale === "pl";
+  const en = locale === "en";
   return {
-    title: en ? "Your IQ Result" : "შენი IQ შედეგი",
-    description: en
-      ? "Your estimated IQ score, percentile and reasoning profile."
-      : "შენი ინტელექტის ტესტის შედეგი, IQ ქულა, პროცენტილი და აზროვნების ანალიზი.",
+    title: pl ? "Twój wynik IQ" : en ? "Your IQ Result" : "შენი IQ შედეგი",
+    description: pl
+      ? "Twój szacowany wynik IQ, percentyl i profil zdolności poznawczych."
+      : en
+        ? "Your estimated IQ score, percentile and reasoning profile."
+        : "შენი ინტელექტის ტესტის შედეგი, IQ ქულა, პროცენტილი და აზროვნების ანალიზი.",
     robots: { index: false, follow: false },
   };
 }

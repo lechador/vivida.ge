@@ -18,17 +18,21 @@ type Input = {
 
 function signName(index: number, locale: UserLocale): string {
   const sign = signByIndex(index);
+  if (locale === "pl") return sign.labelPl;
   return locale === "ka" ? sign.labelKa : sign.labelEn;
 }
 
 function bodyName(key: string, locale: UserLocale): string {
   const body = BODIES[key];
   if (!body) return key;
+  if (locale === "pl") return body.labelPl;
   return locale === "ka" ? body.labelKa : body.labelEn;
 }
 
 function baseName(name: string | null, locale: UserLocale): string {
-  return name || (locale === "ka" ? "შენი" : "Your");
+  if (name) return name;
+  if (locale === "pl") return "Twój";
+  return locale === "ka" ? "შენი" : "Your";
 }
 
 /**

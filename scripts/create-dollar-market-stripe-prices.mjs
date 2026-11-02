@@ -70,6 +70,16 @@ const PLANS = [
     productName: "Vivida PRO New Zealand",
     priceNickname: "New Zealand monthly unlimited plan",
   },
+  {
+    key: "premium_pl_monthly",
+    countryCode: "PL",
+    amountMinor: 3999,
+    currency: "pln",
+    interval: "month",
+    lookupKey: "vivida_premium_pl_monthly_3999_v1",
+    productName: "Vivida PRO Poland",
+    priceNickname: "Poland monthly unlimited plan",
+  },
 ];
 
 const PRODUCT_DESCRIPTION =

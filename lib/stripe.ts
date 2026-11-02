@@ -110,9 +110,14 @@ export async function createCreditCheckoutSession(opts: {
   // Same formatter the top-up card uses, so the price on the button and the
   // price on the Stripe page are written identically.
   const formatted = formatBillingAmount(amountMinor, currency, locale);
-  const creditWord = { ka: "კრედიტი", en: "credits" }[locale];
+  const creditWord =
+    locale === "pl" ? "kredytów" : locale === "en" ? "credits" : "კრედიტი";
   const productName =
-    locale === "en" ? `${credits} Vivida credits` : `${credits} ${creditWord}`;
+    locale === "pl"
+      ? `${credits} kredytów Vivida`
+      : locale === "en"
+        ? `${credits} Vivida credits`
+        : `${credits} ${creditWord}`;
   return stripe().checkout.sessions.create({
     mode: "payment",
     customer_email: email ?? undefined,

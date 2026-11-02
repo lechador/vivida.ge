@@ -12,6 +12,11 @@ const KIND_LABEL_EN: Record<"sun" | "moon" | "ascendant", string> = {
   moon: "Moon",
   ascendant: "Ascendant",
 };
+const KIND_LABEL_PL: Record<"sun" | "moon" | "ascendant", string> = {
+  sun: "Słońce",
+  moon: "Księżyc",
+  ascendant: "Ascendent",
+};
 
 const KIND_GLYPH: Record<"sun" | "moon" | "ascendant", string> = {
   sun: "☉",
@@ -55,7 +60,11 @@ export function BigThreeCard({
           {KIND_GLYPH[kind]}
         </span>
         <span className="font-semibold text-foreground">
-          {en ? KIND_LABEL_EN[kind] : KIND_LABEL[kind]}
+          {locale === "pl"
+            ? KIND_LABEL_PL[kind]
+            : en
+              ? KIND_LABEL_EN[kind]
+              : KIND_LABEL[kind]}
         </span>
         <span className="text-muted-foreground">·</span>
         <span className="flex min-w-0 items-center gap-1.5 text-foreground/90">
@@ -67,12 +76,14 @@ export function BigThreeCard({
             {`${sign.symbol}︎`}
           </span>
           <span className="truncate font-medium">
-            {en ? sign.labelEn : sign.labelKa}
+            {locale === "pl" ? sign.labelPl : en ? sign.labelEn : sign.labelKa}
           </span>
         </span>
         <span className="ml-auto shrink-0 whitespace-nowrap font-mono text-xs tabular-nums text-muted-foreground">
           {formatDegree(point.signDegree)}
-          {point.house ? ` · ${point.house} ${en ? "H" : "სახ."}` : ""}
+          {point.house
+            ? ` · ${point.house} ${locale === "pl" ? "dom" : en ? "H" : "სახ."}`
+            : ""}
         </span>
       </div>
       {interpretation && (

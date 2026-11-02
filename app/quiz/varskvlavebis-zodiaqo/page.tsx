@@ -23,25 +23,47 @@ const DESCRIPTION_KA =
 const TITLE_EN = "Celebrity Zodiac Quiz, Guess Their Star Signs";
 const DESCRIPTION_EN =
   "Can you guess the zodiac signs of 20 famous actors, musicians, athletes and public figures? Play free and see every correct answer.";
+const TITLE_PL =
+  "Zodiak gwiazd i celebrytów, zgadnij ich znaki zodiaku | Vivida";
+const DESCRIPTION_PL =
+  "Czy odgadniesz znaki zodiaku 20 sławnych aktorów, muzyków, sportowców i osób publicznych? Zagraj za darmo i sprawdź swoje odpowiedzi.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
+  const pl = locale === "pl";
   const en = locale === "en";
-  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
-  const title = en ? TITLE_EN : TITLE_KA;
-  const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
-  const url = `${siteUrl}/quiz/varskvlavebis-zodiaqo`;
+  const siteUrl = pl
+    ? `${ENGLISH_SITE_URL}/pl`
+    : en
+      ? ENGLISH_SITE_URL
+      : GEORGIAN_SITE_URL;
+  const title = pl ? TITLE_PL : en ? TITLE_EN : TITLE_KA;
+  const description = pl
+    ? DESCRIPTION_PL
+    : en
+      ? DESCRIPTION_EN
+      : DESCRIPTION_KA;
+  const url = pl
+    ? `${ENGLISH_SITE_URL}/pl/quiz/zodiak-gwiazd`
+    : `${siteUrl}/quiz/varskvlavebis-zodiaqo`;
   return {
     title: { absolute: title },
     description,
-    keywords: en
+    keywords: pl
       ? [
-          "celebrity zodiac quiz",
-          "guess the star sign",
-          "famous people zodiac signs",
-          "astrology quiz",
+          "zodiak gwiazd",
+          "quiz znak zodiaku",
+          "znaki zodiaku celebrytów",
+          "quiz astrologiczny online",
         ]
-      : undefined,
+      : en
+        ? [
+            "celebrity zodiac quiz",
+            "guess the star sign",
+            "famous people zodiac signs",
+            "astrology quiz",
+          ]
+        : undefined,
     alternates: localizedAlternates(
       "/quiz/varskvlavebis-zodiaqo",
       "/quiz/varskvlavebis-zodiaqo",
@@ -54,7 +76,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       siteName: "Vivida",
-      locale: en ? "en_US" : "ka_GE",
+      locale: pl ? "pl_PL" : en ? "en_US" : "ka_GE",
     },
     twitter: { card: "summary_large_image", title, description },
   };
@@ -63,10 +85,22 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function FamousZodiacQuizPage() {
   const [session, locale] = await Promise.all([auth(), getRequestLocale()]);
   const authed = !!session?.user?.id;
+  const pl = locale === "pl";
   const en = locale === "en";
-  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
-  const title = en ? TITLE_EN : TITLE_KA;
-  const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
+  const siteUrl = pl
+    ? `${ENGLISH_SITE_URL}/pl`
+    : en
+      ? ENGLISH_SITE_URL
+      : GEORGIAN_SITE_URL;
+  const pageUrl = pl
+    ? `${ENGLISH_SITE_URL}/pl/quiz/zodiak-gwiazd`
+    : `${siteUrl}/quiz/varskvlavebis-zodiaqo`;
+  const title = pl ? TITLE_PL : en ? TITLE_EN : TITLE_KA;
+  const description = pl
+    ? DESCRIPTION_PL
+    : en
+      ? DESCRIPTION_EN
+      : DESCRIPTION_KA;
 
   const r2Ready = isR2Configured();
   const imageUrls = Object.fromEntries(
@@ -86,16 +120,26 @@ export default async function FamousZodiacQuizPage() {
       "@type": "Quiz",
       name: title,
       description,
-      inLanguage: en ? "en" : "ka-GE",
-      url: `${siteUrl}/quiz/varskvlavebis-zodiaqo`,
+      inLanguage: pl ? "pl-PL" : en ? "en" : "ka-GE",
+      url: pageUrl,
       numberOfQuestions: 20,
     },
     breadcrumbLd([
-      { name: en ? "Home" : "მთავარი", url: siteUrl },
-      { name: en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
       {
-        name: en ? "Celebrity Zodiac Quiz" : "ვარსკვლავების ზოდიაქო",
-        url: `${siteUrl}/quiz/varskvlavebis-zodiaqo`,
+        name: pl ? "Strona główna" : en ? "Home" : "მთავარი",
+        url: pl ? `${ENGLISH_SITE_URL}/pl` : siteUrl,
+      },
+      {
+        name: pl ? "Testy" : en ? "Tests" : "ტესტები",
+        url: pl ? `${ENGLISH_SITE_URL}/pl/tests` : `${siteUrl}/tests`,
+      },
+      {
+        name: pl
+          ? "Zodiak gwiazd"
+          : en
+            ? "Celebrity Zodiac Quiz"
+            : "ვარსკვლავების ზოდიაქო",
+        url: pageUrl,
       },
     ]),
   ];
@@ -126,18 +170,28 @@ export default async function FamousZodiacQuizPage() {
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <header className="mb-6 text-center">
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            Vivida Quiz
+            {pl ? "Quiz Vivida" : "Vivida Quiz"}
           </div>
           <h1 className="mt-1 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-            {en ? "Can you guess the" : "რომელი ზოდიაქოს ნიშანია"}{" "}
+            {pl
+              ? "Czy potrafisz odgadnąć"
+              : en
+                ? "Can you guess the"
+                : "რომელი ზოდიაქოს ნიშანია"}{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {en ? "celebrity’s zodiac sign?" : "ვარსკვლავი?"}
+              {pl
+                ? "znaki zodiaku gwiazd?"
+                : en
+                  ? "celebrity’s zodiac sign?"
+                  : "ვარსკვლავი?"}
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm text-foreground/80 sm:text-base">
-            {en
-              ? "Guess the star signs of famous actors, musicians, athletes and public figures."
-              : "გამოიცანი ცნობილი მსახიობების, მომღერლებისა და სპორტსმენების ზოდიაქოს ნიშნები."}
+            {pl
+              ? "Zgadnij znaki zodiaku sławnych aktorów, muzyków, sportowców i osobistości ze świata mediów."
+              : en
+                ? "Guess the star signs of famous actors, musicians, athletes and public figures."
+                : "გამოიცანი ცნობილი მსახიობების, მომღერლებისა და სპორტსმენების ზოდიაქოს ნიშნები."}
           </p>
         </header>
         <FamousZodiacQuiz images={imageUrls} locale={locale} />

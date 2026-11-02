@@ -91,11 +91,40 @@ const BANDS_EN: Array<{ min: number; label: string; hint: string }> = [
   },
 ];
 
+const BANDS_PL: Array<{ min: number; label: string; hint: string }> = [
+  {
+    min: 9,
+    label: "Mocny dzień",
+    hint: "Niebo sprzyja Twoim działaniom, zrób odważny krok.",
+  },
+  {
+    min: 7,
+    label: "Dobry dzień",
+    hint: "Wspierające tło kosmiczne, wykorzystaj je na swoją korzyść.",
+  },
+  {
+    min: 5,
+    label: "Zrównoważony dzień",
+    hint: "Ani wyraźnych przeszkód, ani darów losu – to Ty nadajesz rytm.",
+  },
+  {
+    min: 3,
+    label: "Spokojny dzień",
+    hint: "Nie przeciążaj grafiku, odpocznij i obserwuj.",
+  },
+  {
+    min: 1,
+    label: "Wymagający dzień",
+    hint: "Unikaj kluczowych decyzji i bądź dla siebie wyrozumiały.",
+  },
+];
+
 export function dayScoreBand(
   score: number,
   locale: UserLocale = "ka",
 ): DayScoreBand {
-  const bands = locale === "ka" ? BANDS_KA : BANDS_EN;
+  const bands =
+    locale === "pl" ? BANDS_PL : locale === "ka" ? BANDS_KA : BANDS_EN;
   const band = bands.find((b) => score >= b.min) ?? bands[bands.length - 1];
   return { label: band.label, hint: band.hint };
 }

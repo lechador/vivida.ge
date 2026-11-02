@@ -13,6 +13,7 @@ import {
   BIG5_LIKERT,
   BIG5_QUESTIONS,
   BIG5_QUESTIONS_EN,
+  BIG5_QUESTIONS_PL,
 } from "@/lib/big-five/questions";
 
 import type { UserLocale } from "@/lib/i18n/user-locale";
@@ -24,8 +25,13 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function BigFiveTestClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
+  const pl = locale === "pl";
   const en = locale === "en";
-  const questions = en ? BIG5_QUESTIONS_EN : BIG5_QUESTIONS;
+  const questions = pl
+    ? BIG5_QUESTIONS_PL
+    : en
+      ? BIG5_QUESTIONS_EN
+      : BIG5_QUESTIONS;
   const scale = BIG5_LIKERT;
 
   async function onSubmit(
@@ -57,8 +63,16 @@ export function BigFiveTestClient({ locale = "ka" }: { locale?: UserLocale }) {
       scale={scale}
       onSubmit={onSubmit}
       locale={locale}
-      submitLabel={en ? "See my result" : "ნახე შედეგი"}
-      workingLabel={en ? "Calculating your profile…" : "ვთვლი შენს პროფილს…"}
+      submitLabel={
+        pl ? "Zobacz mój wynik" : en ? "See my result" : "ნახე შედეგი"
+      }
+      workingLabel={
+        pl
+          ? "Obliczam Twój profil…"
+          : en
+            ? "Calculating your profile…"
+            : "ვთვლი შენს პროფილს…"
+      }
     />
   );
 }

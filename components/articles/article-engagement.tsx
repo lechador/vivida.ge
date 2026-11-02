@@ -46,6 +46,21 @@ const COPY = {
     invalidComment: "Write a comment before publishing.",
     user: "Vivida member",
   },
+  pl: {
+    discussion: "Dyskusja",
+    comments: "komentarzy",
+    like: "Lubię to",
+    unlike: "Usuń polubienie",
+    placeholder: "Podziel się swoją opinią…",
+    publish: "Opublikuj",
+    empty: "Brak komentarzy, rozpocznij dyskusję.",
+    loginTitle: "Dołącz do dyskusji",
+    loginText: "Zaloguj się, aby polubić artykuł lub dodać komentarz.",
+    login: "Zaloguj się",
+    genericError: "Nie udało się wykonać akcji. Spróbuj ponownie.",
+    invalidComment: "Napisz komentarz przed publikacją.",
+    user: "Użytkownik Vivida",
+  },
 } as const;
 
 type ClientComment = Omit<ArticleComment, "createdAt"> & {

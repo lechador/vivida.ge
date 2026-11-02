@@ -32,14 +32,29 @@ export function MessageEmail({
   unsubscribeUrl: string;
   locale?: UserLocale;
 }) {
+  const pl = locale === "pl";
   const en = locale === "en";
   const greeting = recipientName
-    ? en ? `Hello, ${recipientName}!` : `სალამი, ${recipientName}!`
-    : en ? "Hello!" : "სალამი!";
+    ? pl
+      ? `Cześć, ${recipientName}!`
+      : en
+        ? `Hello, ${recipientName}!`
+        : `სალამი, ${recipientName}!`
+    : pl
+      ? "Cześć!"
+      : en
+        ? "Hello!"
+        : "სალამი!";
   const fromHandle = fromUsername ? `@${fromUsername}` : null;
   return (
     <EmailLayout
-      preview={en ? `${fromName} sent you a message` : `${fromName}-მ წერილი მოგწერა`}
+      preview={
+        pl
+          ? `${fromName} wysłał(a) Ci wiadomość`
+          : en
+            ? `${fromName} sent you a message`
+            : `${fromName}-მ წერილი მოგწერა`
+      }
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
     >
@@ -54,7 +69,7 @@ export function MessageEmail({
           margin: "0 0 16px",
         }}
       >
-        {en ? "New message" : "ახალი წერილი"}
+        {pl ? "Nowa wiadomość" : en ? "New message" : "ახალი წერილი"}
       </Heading>
 
       <Text style={paragraphStyle}>{greeting}</Text>
@@ -63,7 +78,11 @@ export function MessageEmail({
         {fromHandle ? (
           <span style={{ color: "#9b94ad" }}> ({fromHandle})</span>
         ) : null}{" "}
-        {en ? " sent you a message on Vivida:" : " წერილი მოგწერა Vivida-ზე:"}
+        {pl
+          ? " wysłał(a) Ci wiadomość na Vivida:"
+          : en
+            ? " sent you a message on Vivida:"
+            : " წერილი მოგწერა Vivida-ზე:"}
       </Text>
 
       {/* Message snippet block */}
@@ -84,11 +103,19 @@ export function MessageEmail({
       </div>
 
       <Button href={conversationUrl} style={buttonStyle}>
-        {en ? "Read and reply" : "წაიკითხე და უპასუხე"}
+        {pl
+          ? "Przeczytaj i odpowiedz"
+          : en
+            ? "Read and reply"
+            : "წაიკითხე და უპასუხე"}
       </Button>
 
       <Text style={mutedStyle}>
-        {en ? "You received this notification because you have not visited Vivida recently." : "ეს შეტყობინება მიიღე, რადგან გარკვეული ხნის წინ არ ეწვიე vivida.ge-ს."}
+        {pl
+          ? "Otrzymujesz to powiadomienie, ponieważ od pewnego czasu nie odwiedzałeś Vivida."
+          : en
+            ? "You received this notification because you have not visited Vivida recently."
+            : "ეს შეტყობინება მიიღე, რადგან გარკვეული ხნის წინ არ ეწვიე vivida.ge-ს."}
       </Text>
     </EmailLayout>
   );

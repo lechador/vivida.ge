@@ -15,10 +15,16 @@ const MESSAGES_EN = [
   "Comparing them with your natal chart…",
   "Writing your personal horoscope…",
 ];
+const MESSAGES_PL = [
+  "Odczytuję dzisiejsze niebo…",
+  "Obliczam tranzyty planetarne…",
+  "Porównuję je z Twoim kosmogramem…",
+  "Przygotowuję Twój osobisty horoskop…",
+];
 
 export function HoroscopeLoading({ locale = "ka" }: { locale?: UserLocale }) {
   const en = locale !== "ka";
-  const messages = en ? MESSAGES_EN : MESSAGES;
+  const messages = locale === "pl" ? MESSAGES_PL : en ? MESSAGES_EN : MESSAGES;
   const [progress, setProgress] = useState(8);
   const [stage, setStage] = useState(0);
 
@@ -39,9 +45,11 @@ export function HoroscopeLoading({ locale = "ka" }: { locale?: UserLocale }) {
     <article className="min-h-[220px] rounded-md border border-border bg-card p-6 sm:p-8">
       <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-primary">
         <span>
-          {en
-            ? "Calculating Ephemeris"
-            : "მიმდინარეობს ეფემერიდის გამოთვლა"}
+          {locale === "pl"
+            ? "Obliczanie efemeryd"
+            : en
+              ? "Calculating Ephemeris"
+              : "მიმდინარეობს ეფემერიდის გამოთვლა"}
         </span>
         <span className="font-mono tabular-nums text-muted-foreground">
           {Math.round(progress)}%
@@ -60,9 +68,11 @@ export function HoroscopeLoading({ locale = "ka" }: { locale?: UserLocale }) {
       </div>
 
       <p className="mt-3 text-xs text-muted-foreground">
-        {en
-          ? "Chart calculations usually take a few seconds."
-          : "ცის რუკის გაანგარიშებას ჩვეულებრივ რამდენიმე წამი სჭირდება."}
+        {locale === "pl"
+          ? "Obliczenia kosmogramu trwają zazwyczaj kilka sekund."
+          : en
+            ? "Chart calculations usually take a few seconds."
+            : "ცის რუკის გაანგარიშებას ჩვეულებრივ რამდენიმე წამი სჭირდება."}
       </p>
     </article>
   );

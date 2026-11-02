@@ -42,8 +42,15 @@ export const DOMAIN_LABELS_EN: Record<IqDomain, string> = {
   pattern: "Pattern recognition",
 };
 
+export const DOMAIN_LABELS_PL: Record<IqDomain, string> = {
+  numeric: "Rozumowanie liczbowe",
+  logic: "Myślenie logiczne",
+  spatial: "Wyobraźnia przestrzenna",
+  pattern: "Rozpoznawanie wzorców",
+};
+
 export type IqOption =
-  | { kind: "text"; text: string; textEn?: string }
+  | { kind: "text"; text: string; textEn?: string; textPl?: string }
   | { kind: "figure"; spec: FigureSpec };
 
 export type IqStem =
@@ -51,7 +58,7 @@ export type IqStem =
   | { type: "matrix"; cells: (FigureSpec | null)[] } // 9 cells, row-major, one null
   | { type: "analogy"; a: FigureSpec; b: FigureSpec; c: FigureSpec }
   | { type: "odd-one-out" } // the options themselves are the figures
-  | { type: "logic"; textKa: string; textEn: string };
+  | { type: "logic"; textKa: string; textEn: string; textPl?: string };
 
 export type IqItem = {
   id: string;
@@ -80,12 +87,22 @@ export const STEM_PROMPT_EN: Record<IqStem["type"], string> = {
   logic: "",
 };
 
+export const STEM_PROMPT_PL: Record<IqStem["type"], string> = {
+  "number-series": "Która liczba jest kolejną w sekwencji?",
+  matrix: "Która figura powinna znaleźć się w miejscu znaku zapytania?",
+  analogy:
+    "Zastosuj regułę z pierwszej pary do drugiej. Której figury brakuje?",
+  "odd-one-out": "Wybierz figurę, która nie pasuje do pozostałych.",
+  logic: "",
+};
+
 // ── figure helpers ─────────────────────────────────────────────────────────
 const fig = (spec: FigureSpec): IqOption => ({ kind: "figure", spec });
-const txt = (t: string, textEn?: string): IqOption => ({
+const txt = (t: string, textEn?: string, textPl?: string): IqOption => ({
   kind: "text",
   text: t,
   textEn,
+  textPl,
 });
 const one = (shape: ShapeKind, extra: Partial<Mark> = {}): FigureSpec => [
   { shape, size: 56, ...extra },
@@ -114,16 +131,20 @@ function logic(
   b: number,
   textKa: string,
   textEn: string,
+  textPl: string,
   options: string[],
   optionsEn: string[],
+  optionsPl: string[],
   answer: number,
 ): IqItem {
   return {
     id,
     domain: "logic",
     b,
-    stem: { type: "logic", textKa, textEn },
-    options: options.map((option, index) => txt(option, optionsEn[index])),
+    stem: { type: "logic", textKa, textEn, textPl },
+    options: options.map((option, index) =>
+      txt(option, optionsEn[index], optionsPl[index]),
+    ),
     answer,
   };
 }
@@ -216,8 +237,10 @@ const RAW_ITEMS: IqItem[] = [
     1.41,
     "თუ A > B და B > C, მაშინ რომელი მტკიცებაა ჭეშმარიტი?",
     "If A > B and B > C, which statement must be true?",
+    "Jeśli A > B oraz B > C, to które stwierdzenie jest prawdziwe?",
     ["A > C", "C > A", "A = C", "ვერ დავადგენთ"],
     ["A > C", "C > A", "A = C", "Cannot be determined"],
+    ["A > C", "C > A", "A = C", "Nie można ustalić"],
     0,
   ),
   logic(
@@ -225,8 +248,10 @@ const RAW_ITEMS: IqItem[] = [
     0.17,
     "ორშაბათი, ოთხშაბათი, პარასკევი, …, რომელი დღე მოდის შემდეგ?",
     "Monday, Wednesday, Friday, …, which day comes next?",
+    "Poniedziałek, środa, piątek, …, który dzień tygodnia jest następny?",
     ["შაბათი", "კვირა", "ორშაბათი", "ხუთშაბათი"],
     ["Saturday", "Sunday", "Monday", "Thursday"],
+    ["Sobota", "Niedziela", "Poniedziałek", "Czwartek"],
     1,
   ), // every 2 days → Sunday
   logic(
@@ -234,8 +259,10 @@ const RAW_ITEMS: IqItem[] = [
     0.86,
     "3 მუშა სამუშაოს 3 საათში ასრულებს. რამდენ ხანში დაასრულებს იმავე სამუშაოს 6 მუშა?",
     "Three workers complete a job in three hours. How long would six equally productive workers take?",
+    "Trzech pracowników wykonuje pracę w 3 godziny. W jakim czasie tę samą pracę wykona 6 równie wydajnych pracowników?",
     ["1.5 საათი", "2 საათი", "3 საათი", "6 საათი"],
     ["1.5 hours", "2 hours", "3 hours", "6 hours"],
+    ["1,5 godziny", "2 godziny", "3 godziny", "6 godzin"],
     0,
   ),
 
@@ -245,7 +272,9 @@ const RAW_ITEMS: IqItem[] = [
     0.82,
     "ა, გ, ე, ზ, …, რომელი ასო მოდის შემდეგ?",
     "A, C, E, G, …, which letter comes next?",
+    "A, C, E, G, …, która litera jest następna?",
     ["თ", "ი", "კ", "ლ"],
+    ["H", "I", "J", "K"],
     ["H", "I", "J", "K"],
     1,
   ), // every 2nd letter of the Georgian alphabet → ი
@@ -254,8 +283,10 @@ const RAW_ITEMS: IqItem[] = [
     0.12,
     "ანა უფროსია ბექოზე. გია უფროსია ანაზე. დათო უმცროსია ბექოზე. ვინ არის ყველაზე უფროსი?",
     "Anna is older than Ben. George is older than Anna. Daniel is younger than Ben. Who is the oldest?",
+    "Anna jest starsza od Bartka. Grzegorz jest starszy od Anny. Daniel jest młodszy od Bartka. Kto jest najstarszy?",
     ["ანა", "ბექო", "გია", "დათო"],
     ["Anna", "Ben", "George", "Daniel"],
+    ["Anna", "Bartek", "Grzegorz", "Daniel"],
     2,
   ), // გია > ანა > ბექო > დათო
   logic(
@@ -263,6 +294,7 @@ const RAW_ITEMS: IqItem[] = [
     4.19,
     "ყველა კატა ცხოველია. ზოგიერთი ცხოველი შავია. რომელი დასკვნაა ნამდვილად სწორი?",
     "All cats are animals. Some animals are black. Which conclusion is definitely valid?",
+    "Wszystkie koty to zwierzęta. Niektóre zwierzęta są czarne. Który wniosek jest bezwzględnie prawdziwy?",
     [
       "ყველა კატა შავია",
       "ზოგიერთი კატა შავია",
@@ -274,6 +306,12 @@ const RAW_ITEMS: IqItem[] = [
       "Some cats are black",
       "It cannot be determined whether any cats are black",
       "No cats are black",
+    ],
+    [
+      "Wszystkie koty są czarne",
+      "Niektóre koty są czarne",
+      "Nie można ustalić, czy którekolwiek koty są czarne",
+      "Żaden kot nie jest czarny",
     ],
     2,
   ), // the valid conclusion is "cannot be determined"
@@ -506,6 +544,7 @@ const RAW_ITEMS: IqItem[] = [
     2.27,
     "ზოგიერთი A არის B. ყველა B არის C. არცერთი C არ არის D. რომელი დასკვნაა აუცილებლად სწორი?",
     "Some A are B. All B are C. No C are D. Which conclusion must be true?",
+    "Niektóre A to B. Wszystkie B to C. Żadne C nie jest D. Który wniosek musi być prawdziwy?",
     [
       "ყველა A არის D",
       "ზოგიერთი A არ არის D",
@@ -513,6 +552,12 @@ const RAW_ITEMS: IqItem[] = [
       "ყველა D არის B",
     ],
     ["All A are D", "Some A are not D", "No A are C", "All D are B"],
+    [
+      "Wszystkie A to D",
+      "Niektóre A nie są D",
+      "Żadne A nie jest C",
+      "Wszystkie D to B",
+    ],
     1,
   ), // some A are B → C → not D ⇒ some A are not D
   // XOR matrix (hardest Raven rule): col2 = col0 ⊕ col1 by dot position →

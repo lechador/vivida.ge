@@ -44,42 +44,60 @@ export function LowCreditOfferEmail({
   unsubscribeUrl: string;
   locale?: UserLocale;
 }) {
-  const en = locale !== "ka";
+  const pl = locale === "pl";
+  const en = locale === "en";
   const isSingleMonth = months === 1;
   const greeting = name
-    ? en
-      ? `Hello, ${name}!`
-      : `სალამი, ${name}!`
-    : en
-      ? "Hello!"
-      : "სალამი!";
+    ? pl
+      ? `Cześć, ${name}!`
+      : en
+        ? `Hello, ${name}!`
+        : `სალამი, ${name}!`
+    : pl
+      ? "Cześć!"
+      : en
+        ? "Hello!"
+        : "სალამი!";
 
+  const spanTextPl = isSingleMonth ? "1 miesiąc" : `${months} miesiące`;
   const spanTextEn = isSingleMonth ? "1 month" : `${months} months`;
   const spanTextKa = isSingleMonth ? "1 თვე" : `${months} თვე`;
 
-  const balanceLead = en
+  const balanceLead = pl
     ? balance <= 0
-      ? "Your credits have reached 0, yet we see you still coming back to check the stars."
-      : `You only have ${balance} ${balance === 1 ? "credit" : "credits"} left, yet we see you still coming back to check the stars.`
-    : balance <= 0
-      ? "შენს ბალანსზე კრედიტები ამოიწურა, მაგრამ ვხედავთ, რომ ვარსკვლავებთან კავშირს არ წყვეტ და კვლავ გვსტუმრობ."
-      : `შენს ბალანსზე სულ ${balance} კრედიტია დარჩენილი, მაგრამ ვხედავთ, რომ ვარსკვლავებთან კავშირს არ წყვეტ და კვლავ ჩვენთან ხარ.`;
+      ? "Twoje kredyty się wyczerpały, a jednak widzimy, że wciąż wracasz, by sprawdzać układ gwiazd."
+      : `Zostało Ci tylko ${balance} ${balance === 1 ? "kredyt" : "kredyty"}, a jednak widzimy, że wciąż wracasz, by sprawdzać układ gwiazd.`
+    : en
+      ? balance <= 0
+        ? "Your credits have reached 0, yet we see you still coming back to check the stars."
+        : `You only have ${balance} ${balance === 1 ? "credit" : "credits"} left, yet we see you still coming back to check the stars.`
+      : balance <= 0
+        ? "შენს ბალანსზე კრედიტები ამოიწურა, მაგრამ ვხედავთ, რომ ვარსკვლავებთან კავშირს არ წყვეტ და კვლავ გვსტუმრობ."
+        : `შენს ბალანსზე სულ ${balance} კრედიტია დარჩენილი, მაგრამ ვხედავთ, რომ ვარსკვლავებთან კავშირს არ წყვეტ და კვლავ ჩვენთან ხარ.`;
 
-  const perks = en
+  const perks = pl
     ? [
-        "🔮  Unlimited Tarot spreads & deep follow-up questions all month long",
-        "✨  Unlimited 24/7 AI chat with your personal astrologer",
-        "🌙  Unlimited synastry & compatibility readings with anyone",
-        "📜  7-day cosmic forecasts, dream interpretations & PDF reports",
-        "👑  Full personality, IQ, EQ & Big Five results + Verified profile badge",
+        "🔮  Nielimitowane rozkłady Tarota i pogłębione pytania przez cały miesiąc",
+        "✨  Nielimitowany czat AI 24/7 z Twoim osobistym astrologiem",
+        "🌙  Nielimitowane analizy synastrii i kompatybilności z dowolną osobą",
+        "📜  7-dniowe prognozy kosmiczne, interpretacje snów i raporty PDF",
+        "👑  Pełne wyniki testów (MBTI, IQ, EQ, Big Five) i odznaka Zweryfikowanego Profilu",
       ]
-    : [
-        "🔮  ულიმიტო ტაროს გაშლები და ჩაღრმავებული კითხვები მთელი თვის განმავლობაში",
-        "✨  ულიმიტო AI ჩატი შენს პირად ასტროლოგთან — იკითხე რაც გინდა, ლიმიტის გარეშე",
-        "🌙  თავსებადობისა და სინასტრიის ანალიზი ნებისმიერ ადამიანთან, რამდენჯერაც გინდა",
-        "📜  7-დღიანი პროგნოზები, სიზმრების ახსნა და პერსონალური PDF რუკები",
-        "👑  ტესტების სრული შედეგები (MBTI, IQ, EQ, Big Five) და Verified badge პროფილზე",
-      ];
+    : en
+      ? [
+          "🔮  Unlimited Tarot spreads & deep follow-up questions all month long",
+          "✨  Unlimited 24/7 AI chat with your personal astrologer",
+          "🌙  Unlimited synastry & compatibility readings with anyone",
+          "📜  7-day cosmic forecasts, dream interpretations & PDF reports",
+          "👑  Full personality, IQ, EQ & Big Five results + Verified profile badge",
+        ]
+      : [
+          "🔮  ულიმიტო ტაროს გაშლები და ჩაღრმავებული კითხვები მთელი თვის განმავლობაში",
+          "✨  ულიმიტო AI ჩატი შენს პირად ასტროლოგთან — იკითხე რაც გინდა, ლიმიტის გარეშე",
+          "🌙  თავსებადობისა და სინასტრიის ანალიზი ნებისმიერ ადამიანთან, რამდენჯერაც გინდა",
+          "📜  7-დღიანი პროგნოზები, სიზმრების ახსნა და პერსონალური PDF რუკები",
+          "👑  ტესტების სრული შედეგები (MBTI, IQ, EQ, Big Five) და Verified badge პროფილზე",
+        ];
 
   const halloweenButtonStyle: React.CSSProperties = {
     ...buttonStyle,
@@ -94,9 +112,11 @@ export function LowCreditOfferEmail({
   return (
     <EmailLayout
       preview={
-        en
-          ? `🎃 Halloween Special: ${spanTextEn} of unlimited Vivida PRO for just ${priceLabel}`
-          : `🎃 ჰელოუინის სპეციალური შეთავაზება: ${spanTextKa} ულიმიტო Vivida PRO მხოლოდ ${priceLabel}-ად`
+        pl
+          ? `🎃 Oferta Halloweenowa: ${spanTextPl} nielimitowanego Vivida PRO za jedyne ${priceLabel}`
+          : en
+            ? `🎃 Halloween Special: ${spanTextEn} of unlimited Vivida PRO for just ${priceLabel}`
+            : `🎃 ჰელოუინის სპეციალური შეთავაზება: ${spanTextKa} ულიმიტო Vivida PRO მხოლოდ ${priceLabel}-ად`
       }
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
@@ -117,9 +137,11 @@ export function LowCreditOfferEmail({
             textTransform: "uppercase",
           }}
         >
-          {en
-            ? "🎃 Halloween Special · Personal Offer"
-            : "🎃 ჰელოუინის სპეციალური შეთავაზება"}
+          {pl
+            ? "🎃 Oferta Halloweenowa · Specjalnie dla Ciebie"
+            : en
+              ? "🎃 Halloween Special · Personal Offer"
+              : "🎃 ჰელოუინის სპეციალური შეთავაზება"}
         </span>
       </div>
 
@@ -134,9 +156,11 @@ export function LowCreditOfferEmail({
           margin: "0 0 16px",
         }}
       >
-        {en
-          ? `Unlock the veil: ${spanTextEn} of unlimited Vivida PRO for just ${priceLabel}`
-          : `როცა სამყაროებს შორის ზღვარი ქრება — ${spanTextKa} ულიმიტო Vivida PRO მხოლოდ ${priceLabel}-ად`}
+        {pl
+          ? `Uchyl zasłonę tajemnicy: ${spanTextPl} nielimitowanego Vivida PRO za jedyne ${priceLabel}`
+          : en
+            ? `Unlock the veil: ${spanTextEn} of unlimited Vivida PRO for just ${priceLabel}`
+            : `როცა სამყაროებს შორის ზღვარი ქრება — ${spanTextKa} ულიმიტო Vivida PRO მხოლოდ ${priceLabel}-ად`}
       </Heading>
 
       <Text style={{ ...paragraphStyle, color: "#f3e8ff", fontSize: "16px" }}>
@@ -145,15 +169,19 @@ export function LowCreditOfferEmail({
 
       <Text style={paragraphStyle}>
         {balanceLead}{" "}
-        {en
-          ? "Halloween is the most mystical week of the year — when intuition, Tarot cards, and astrological transits speak the loudest."
-          : "ჰელოუინი წლის ყველაზე მისტიკური პერიოდია — დრო, როცა ინტუიცია, ტაროს არკანები და ვარსკვლავების მინიშნებები ყველაზე მძაფრად იგრძნობა."}
+        {pl
+          ? "Halloween to najbardziej mistyczny okres w roku — czas, kiedy intuicja, karty Tarota i kosmiczne tranzyty przemawiają najsilniej."
+          : en
+            ? "Halloween is the most mystical week of the year — when intuition, Tarot cards, and astrological transits speak the loudest."
+            : "ჰელოუინი წლის ყველაზე მისტიკური პერიოდია — დრო, როცა ინტუიცია, ტაროს არკანები და ვარსკვლავების მინიშნებები ყველაზე მძაფრად იგრძნობა."}
       </Text>
 
       <Text style={paragraphStyle}>
-        {en
-          ? `Because you're one of our most engaged explorers, we unlocked a private Halloween offer on your account: ${spanTextEn} of unlimited Vivida PRO for just ${priceLabel} instead of ${regularPriceLabel}. No credit counting, no locked answers — everything is open.`
-          : `რადგან ჩვენი ერთ-ერთი ყველაზე აქტიური მომხმარებელი ხარ, სპეციალურად შენს ანგარიშზე გავხსენით დახურული ჰელოუინის ფასდაკლება: ${spanTextKa} ულიმიტო Vivida PRO მხოლოდ ${priceLabel}-ად (სტანდარტული ${regularPriceLabel}-ის ნაცვლად). აღარანაირი კრედიტების თვლა — ყველაფერი სრულად ღიაა.`}
+        {pl
+          ? `Ponieważ jesteś jednym z naszych najbardziej zaangażowanych odkrywców, odblokowaliśmy na Twoim koncie prywatną ofertę halloweenową: ${spanTextPl} nielimitowanego Vivida PRO za jedyne ${priceLabel} zamiast ${regularPriceLabel}. Koniec z liczeniem kredytów — wszystko stoi przed Tobą otworem.`
+          : en
+            ? `Because you're one of our most engaged explorers, we unlocked a private Halloween offer on your account: ${spanTextEn} of unlimited Vivida PRO for just ${priceLabel} instead of ${regularPriceLabel}. No credit counting, no locked answers — everything is open.`
+            : `რადგან ჩვენი ერთ-ერთი ყველაზე აქტიური მომხმარებელი ხარ, სპეციალურად შენს ანგარიშზე გავხსენით დახურული ჰელოუინის ფასდაკლება: ${spanTextKa} ულიმიტო Vivida PRO მხოლოდ ${priceLabel}-ად (სტანდარტული ${regularPriceLabel}-ის ნაცვლად). აღარანაირი კრედიტების თვლა — ყველაფერი სრულად ღიაა.`}
       </Text>
 
       {/* Halloween Offer Frame */}
@@ -177,7 +205,11 @@ export function LowCreditOfferEmail({
             textTransform: "uppercase",
           }}
         >
-          {en ? "✦ −50% Halloween Privilege" : "✦ −50% ჰელოუინის პრივილეგია"}
+          {pl
+            ? "✦ −50% Przywilej Halloweenowy"
+            : en
+              ? "✦ −50% Halloween Privilege"
+              : "✦ −50% ჰელოუინის პრივილეგია"}
         </Text>
         <Text
           style={{
@@ -208,13 +240,17 @@ export function LowCreditOfferEmail({
               marginLeft: "6px",
             }}
           >
-            {en
+            {pl
               ? isSingleMonth
-                ? "/ month"
-                : `/ ${months} months`
-              : isSingleMonth
-                ? "/ 1 თვე"
-                : `/ ${months} თვე`}
+                ? "/ miesiąc"
+                : `/ ${months} mies.`
+              : en
+                ? isSingleMonth
+                  ? "/ month"
+                  : `/ ${months} months`
+                : isSingleMonth
+                  ? "/ 1 თვე"
+                  : `/ ${months} თვე`}
           </span>
         </Text>
         <Text
@@ -225,9 +261,11 @@ export function LowCreditOfferEmail({
             margin: "6px 0 0",
           }}
         >
-          {en
-            ? `Full ${spanTextEn} of unlimited PRO access — zero credit limits`
-            : `${isSingleMonth ? "1 სრული თვის" : `${months} სრული თვის`} ულიმიტო PRO წვდომა — ნული შეზღუდვა`}
+          {pl
+            ? `Pełne ${spanTextPl} nielimitowanego dostępu PRO — zero ograniczeń`
+            : en
+              ? `Full ${spanTextEn} of unlimited PRO access — zero credit limits`
+              : `${isSingleMonth ? "1 სრული თვის" : `${months} სრული თვის`} ულიმიტო PRO წვდომა — ნული შეზღუდვა`}
         </Text>
       </div>
 
@@ -239,9 +277,11 @@ export function LowCreditOfferEmail({
           fontWeight: 600,
         }}
       >
-        {en
-          ? "Everything that opens immediately:"
-          : "რა იხსნება გააქტიურებისთანავე:"}
+        {pl
+          ? "Wszystko, co odblokowujesz natychmiast:"
+          : en
+            ? "Everything that opens immediately:"
+            : "რა იხსნება გააქტიურებისთანავე:"}
       </Text>
       {perks.map((perk) => (
         <Text
@@ -259,9 +299,11 @@ export function LowCreditOfferEmail({
 
       <div style={{ marginTop: 26, marginBottom: 8 }}>
         <Button href={creditsUrl} style={halloweenButtonStyle}>
-          {en
-            ? `🎃 Claim Unlimited Month for ${priceLabel} →`
-            : `🎃 გაააქტიურე ულიმიტო თვე ${priceLabel}-ად →`}
+          {pl
+            ? `🎃 Odbierz nielimitowany miesiąc za ${priceLabel} →`
+            : en
+              ? `🎃 Claim Unlimited Month for ${priceLabel} →`
+              : `🎃 გაააქტიურე ულიმიტო თვე ${priceLabel}-ად →`}
         </Button>
       </div>
 
@@ -273,9 +315,11 @@ export function LowCreditOfferEmail({
       />
 
       <Text style={mutedStyle}>
-        {en
-          ? `⏳ This Halloween offer is exclusively linked to your account and expires on ${deadlineLabel}. Afterwards it renews at the same ${priceLabel} every ${isSingleMonth ? "month" : `${months} months`}, and you can cancel any time with one click.`
-          : `⏳ ეს ჰელოუინის შეთავაზება მიბმულია მხოლოდ შენს ანგარიშზე და მოქმედებს ${deadlineLabel} ჩათვლით. შემდეგ ავტომატურად განახლდება იმავე ${priceLabel}-ად ${isSingleMonth ? "ყოველ თვეში" : `ყოველ ${months} თვეში`}, გაუქმება კი ნებისმიერ დროს, ერთი კლიკით შეგიძლია.`}
+        {pl
+          ? `⏳ Ta oferta halloweenowa jest przypisana wyłącznie do Twojego konta i wygasa ${deadlineLabel}. Następnie odnawia się w tej samej cenie ${priceLabel} co ${isSingleMonth ? "miesiąc" : `${months} miesiące`}, a subskrypcję możesz anulować w każdej chwili jednym kliknięciem.`
+          : en
+            ? `⏳ This Halloween offer is exclusively linked to your account and expires on ${deadlineLabel}. Afterwards it renews at the same ${priceLabel} every ${isSingleMonth ? "month" : `${months} months`}, and you can cancel any time with one click.`
+            : `⏳ ეს ჰელოუინის შეთავაზება მიბმულია მხოლოდ შენს ანგარიშზე და მოქმედებს ${deadlineLabel} ჩათვლით. შემდეგ ავტომატურად განახლდება იმავე ${priceLabel}-ად ${isSingleMonth ? "ყოველ თვეში" : `ყოველ ${months} თვეში`}, გაუქმება კი ნებისმიერ დროს, ერთი კლიკით შეგიძლია.`}
       </Text>
     </EmailLayout>
   );

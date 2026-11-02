@@ -125,9 +125,11 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
         }
       } catch {
         setError(
-          en
-            ? "Could not create the account. Please try again."
-            : "ანგარიშის შექმნა ვერ მოხერხდა. სცადე ხელახლა.",
+          locale === "pl"
+            ? "Nie udało się utworzyć konta. Spróbuj ponownie."
+            : en
+              ? "Could not create the account. Please try again."
+              : "ანგარიშის შექმნა ვერ მოხერხდა. სცადე ხელახლა.",
         );
       } finally {
         // Turnstile proof is single-use, including failed server attempts.
@@ -149,27 +151,39 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
       <div className="space-y-4 text-center">
         <CheckCircle2 className="mx-auto size-9 text-[var(--vivida-cyan)]" />
         <h3 className="text-lg font-semibold">
-          {en ? "Email verified" : "ელფოსტა დადასტურდა"}
+          {locale === "pl"
+            ? "E-mail zweryfikowany"
+            : en
+              ? "Email verified"
+              : "ელფოსტა დადასტურდა"}
         </h3>
         <p className="text-sm text-muted-foreground">
-          {en
-            ? "Your phone verification expired or could not be linked. Add the number again in Account to use phone sign-in and choose promotional SMS."
-            : "ნომრის დადასტურებას ვადა გაუვიდა ან მიბმა ვერ მოხერხდა. ტელეფონით შესასვლელად და მარკეტინგული SMS-ის ასარჩევად ნომერი ანგარიშიდან ხელახლა დაამატე."}
+          {locale === "pl"
+            ? "Weryfikacja telefonu wygasła lub nie mogła zostać połączona. Dodaj numer ponownie w Koncie, aby logować się telefonem i wybrać SMS-y promocyjne."
+            : en
+              ? "Your phone verification expired or could not be linked. Add the number again in Account to use phone sign-in and choose promotional SMS."
+              : "ნომრის დადასტურებას ვადა გაუვიდა ან მიბმა ვერ მოხერხდა. ტელეფონით შესასვლელად და მარკეტინგული SMS-ის ასარჩევად ნომერი ანგარიშიდან ხელახლა დაამატე."}
         </p>
         <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
           <Button asChild variant="mystic">
             <Link href={verifiedSignedIn ? "/account" : "/login?verified=1"}>
               {verifiedSignedIn
-                ? en
-                  ? "Add number in Account"
-                  : "ნომრის დამატება ანგარიშში"
-                : en
-                  ? "Sign in"
-                  : "შესვლა"}
+                ? locale === "pl"
+                  ? "Dodaj numer w Koncie"
+                  : en
+                    ? "Add number in Account"
+                    : "ნომრის დამატება ანგარიშში"
+                : locale === "pl"
+                  ? "Zaloguj się"
+                  : en
+                    ? "Sign in"
+                    : "შესვლა"}
             </Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href={continueHref}>{en ? "Continue" : "გაგრძელება"}</Link>
+            <Link href={continueHref}>
+              {locale === "pl" ? "Kontynuuj" : en ? "Continue" : "გაგრძელება"}
+            </Link>
           </Button>
         </div>
       </div>
@@ -184,27 +198,41 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
         </div>
         <div>
           <h3 className="text-lg font-semibold tracking-tight">
-            {en ? "Check your inbox" : "შემოწმე საფოსტო ყუთი"}
+            {locale === "pl"
+              ? "Sprawdź swoją skrzynkę"
+              : en
+                ? "Check your inbox"
+                : "შემოწმე საფოსტო ყუთი"}
           </h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            {en ? "We sent an email to " : "გამოგიგზავნეთ წერილი "}
+            {locale === "pl"
+              ? "Wysłaliśmy e-mail na adres "
+              : en
+                ? "We sent an email to "
+                : "გამოგიგზავნეთ წერილი "}
             <span className="text-foreground">{email}</span>
-            {en
-              ? ". Enter the 6-digit email code below, or open the link and choose your password there."
-              : "-ზე. ქვემოთ შეიყვანე ელფოსტის 6-ნიშნა კოდი, ან გახსენი ლინკი და იქ დააყენე პაროლი."}
+            {locale === "pl"
+              ? ". Wpisz poniżej 6-cyfrowy kod z wiadomości lub otwórz link i ustaw tam swoje hasło."
+              : en
+                ? ". Enter the 6-digit email code below, or open the link and choose your password there."
+                : "-ზე. ქვემოთ შეიყვანე ელფოსტის 6-ნიშნა კოდი, ან გახსენი ლინკი და იქ დააყენე პაროლი."}
           </p>
           {phoneClaim && (
             <p className="mt-2 text-xs text-muted-foreground">
-              {en
-                ? "Use the email code below to link the number you just verified. If you use the email link, add the number later in Account."
-                : "ახლახან დადასტურებული ნომრის მისაბმელად ქვემოთ ელფოსტის კოდი გამოიყენე. თუ ელფოსტის ლინკს გახსნი, ნომერს მოგვიანებით ანგარიშიდან დაამატებ."}
+              {locale === "pl"
+                ? "Użyj poniższego kodu z e-maila, aby połączyć zweryfikowany numer. Jeśli użyjesz linku z e-maila, dodaj numer później w Koncie."
+                : en
+                  ? "Use the email code below to link the number you just verified. If you use the email link, add the number later in Account."
+                  : "ახლახან დადასტურებული ნომრის მისაბმელად ქვემოთ ელფოსტის კოდი გამოიყენე. თუ ელფოსტის ლინკს გახსნი, ნომერს მოგვიანებით ანგარიშიდან დაამატებ."}
             </p>
           )}
           {hasUnverifiedPhone && (
             <p className="mt-2 text-xs text-muted-foreground">
-              {en
-                ? "The unverified number was not added. You can add it later in Account."
-                : "დაუდასტურებელი ნომერი არ დამატებულა. მისი დამატება მოგვიანებით ანგარიშიდან შეგიძლია."}
+              {locale === "pl"
+                ? "Niezweryfikowany numer nie został dodany. Możesz go dodać później w Koncie."
+                : en
+                  ? "The unverified number was not added. You can add it later in Account."
+                  : "დაუდასტურებელი ნომერი არ დამატებულა. მისი დამატება მოგვიანებით ანგარიშიდან შეგიძლია."}
             </p>
           )}
         </div>
@@ -213,7 +241,11 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
         <form onSubmit={verifyCode} className="space-y-3 text-left">
           <div className="space-y-1.5">
             <Label htmlFor="code">
-              {en ? "Verification code" : "დადასტურების კოდი"}
+              {locale === "pl"
+                ? "Kod weryfikacyjny"
+                : en
+                  ? "Verification code"
+                  : "დადასტურების კოდი"}
             </Label>
             <Input
               id="code"
@@ -245,27 +277,37 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
           >
             {verifying && <Loader2 className="size-4 animate-spin" />}
             {verifying
-              ? en
-                ? "Verifying…"
-                : "მოწმდება…"
-              : en
-                ? "Verify"
-                : "დადასტურება"}
+              ? locale === "pl"
+                ? "Weryfikacja…"
+                : en
+                  ? "Verifying…"
+                  : "მოწმდება…"
+              : locale === "pl"
+                ? "Weryfikuj"
+                : en
+                  ? "Verify"
+                  : "დადასტურება"}
           </Button>
         </form>
 
         <div className="flex items-start gap-2 rounded-lg border border-border/60 bg-card/40 px-3 py-2 text-left text-xs text-muted-foreground">
           <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-muted-foreground/70" />
-          {en
-            ? "Can't find the email? Check spam or request it again from the "
-            : "ვერ ნახავ წერილს? ნახე spam-ში ან "}
+          {locale === "pl"
+            ? "Nie możesz znaleźć wiadomości? Sprawdź folder spam lub poproś o nią ponownie na "
+            : en
+              ? "Can't find the email? Check spam or request it again from the "
+              : "ვერ ნახავ წერილს? ნახე spam-ში ან "}
           <Link
             href="/login"
             className="underline underline-offset-2 hover:underline"
           >
-            {en ? "sign-in page" : "შესვლის გვერდიდან"}
+            {locale === "pl"
+              ? "stronie logowania"
+              : en
+                ? "sign-in page"
+                : "შესვლის გვერდიდან"}
           </Link>{" "}
-          {en ? "." : " მოითხოვე ხელახლა."}
+          {locale === "pl" ? "." : en ? "." : " მოითხოვე ხელახლა."}
         </div>
       </div>
     );
@@ -274,7 +316,9 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
   return (
     <form onSubmit={submit} className="space-y-4">
       <div className="space-y-1.5">
-        <Label htmlFor="name">{en ? "Name" : "სახელი"}</Label>
+        <Label htmlFor="name">
+          {locale === "pl" ? "Imię" : en ? "Name" : "სახელი"}
+        </Label>
         <Input
           id="name"
           name="name"
@@ -284,11 +328,15 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           disabled={isPending}
-          placeholder={en ? "e.g. Alex" : "მაგ. გიორგი"}
+          placeholder={
+            locale === "pl" ? "np. Anna" : en ? "e.g. Alex" : "მაგ. გიორგი"
+          }
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="email">{en ? "Email" : "ელფოსტა"}</Label>
+        <Label htmlFor="email">
+          {locale === "pl" ? "E-mail" : en ? "Email" : "ელფოსტა"}
+        </Label>
         <Input
           id="email"
           name="email"
@@ -301,7 +349,9 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="password">{en ? "Password" : "პაროლი"}</Label>
+        <Label htmlFor="password">
+          {locale === "pl" ? "Hasło" : en ? "Password" : "პაროლი"}
+        </Label>
         <Input
           id="password"
           name="password"
@@ -314,7 +364,11 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
           disabled={isPending}
         />
         <p className="text-xs text-muted-foreground">
-          {en ? "At least 8 characters." : "მინიმუმ 8 სიმბოლო."}
+          {locale === "pl"
+            ? "Co najmniej 8 znaków."
+            : en
+              ? "At least 8 characters."
+              : "მინიმუმ 8 სიმბოლო."}
         </p>
       </div>
 
@@ -391,24 +445,34 @@ export function SignupForm({ locale = "ka" }: { locale?: UserLocale }) {
       >
         {isPending && <Loader2 className="size-4 animate-spin" />}
         {isPending
-          ? en
-            ? "Creating account…"
-            : "ანგარიშის შექმნა…"
-          : en
-            ? "Create account"
-            : "ანგარიშის შექმნა"}
+          ? locale === "pl"
+            ? "Tworzenie konta…"
+            : en
+              ? "Creating account…"
+              : "ანგარიშის შექმნა…"
+          : locale === "pl"
+            ? "Utwórz konto"
+            : en
+              ? "Create account"
+              : "ანგარიშის შექმნა"}
       </Button>
 
       <p className="text-center text-xs text-muted-foreground">
-        {en
-          ? "By creating an account, you agree to the "
-          : "რეგისტრაციით ეთანხმები "}
+        {locale === "pl"
+          ? "Rejestrując się, akceptujesz "
+          : en
+            ? "By creating an account, you agree to the "
+            : "რეგისტრაციით ეთანხმები "}
         <Link href="/terms" className="underline-offset-2 hover:underline">
-          {en ? "Terms" : "წესებსა და პირობებს"}
+          {locale === "pl" ? "Regulamin" : en ? "Terms" : "წესებსა და პირობებს"}
         </Link>{" "}
-        {en ? " and " : " და "}
+        {locale === "pl" ? "oraz " : en ? " and " : " და "}
         <Link href="/privacy" className="underline-offset-2 hover:underline">
-          {en ? "Privacy Policy" : "კონფიდენციალურობის პოლიტიკას"}
+          {locale === "pl"
+            ? "Politykę prywatności"
+            : en
+              ? "Privacy Policy"
+              : "კონფიდენციალურობის პოლიტიკას"}
         </Link>
         .
       </p>

@@ -3,6 +3,7 @@ import { bodyMeta, formatDegree, signByIndex } from "@/lib/zodiac";
 import { houseDef, HOUSE_NUMBERS } from "@/lib/houses";
 import { aspectKey } from "@/lib/aspects";
 import type { ChartSalience } from "@/lib/report-salience";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 import {
   getLibraryEntries,
   libraryKey,
@@ -90,6 +91,16 @@ const SYSTEM = `შენ ხარ გამოცდილი, თბილი
 - არ გაიმეორო ერთი და იგივე აზრი.
 - დააბრუნე მხოლოდ ვალიდური JSON ზუსტად მოთხოვნილი ფორმით.`;
 
+const SYSTEM_PL = `Jesteś doświadczonym, empatycznym i obdarzonym głęboką wiedzą astrologiem, który pisze płatny raport urodzeniowy premium w języku polskim.
+To nie jest krótki, darmowy opis ze strony internetowej, lecz wyczerpujący produkt wysokiej jakości, w który użytkownik zainwestował.
+Styl: bogaty literacko, psychologicznie wnikliwy, ale zarazem konkretny i osobisty. Każdą planetę, dom i aspekt omów wnikliwie: psychologia, przejawianie się w życiu codziennym, mocne strony oraz obszary rozwoju i cienia.
+Zasady:
+- Pisz wyłącznie po polsku, poprawną i bogatą polszczyzną.
+- Zwracaj się bezpośrednio do czytelnika na «Ty».
+- Odnoś się ściśle do tego konkretnego kosmogramu, unikaj ogólnikowych banałów horoskopowych.
+- Nie powtarzaj tych samych myśli.
+- Zwróć wyłącznie poprawny format JSON w ściśle wymaganym schemacie.`;
+
 // ─── Types ────────────────────────────────────────────────────────────────
 
 export type NatalNarrative = {
@@ -129,7 +140,25 @@ const PLANET_KEYS = [
   "pluto",
 ] as const;
 
-function planetFacts(chart: NatalChartJson): string {
+function planetFacts(chart: NatalChartJson, locale: UserLocale = "ka"): string {
+  if (locale === "pl") {
+    const lines: string[] = [];
+    const asc = signByIndex(chart.ascendant.signIndex);
+    lines.push(
+      `Ascendent: ${asc.labelPl}, ${formatDegree(chart.ascendant.signDegree)}`,
+    );
+    for (const key of PLANET_KEYS) {
+      const p = chart.bodies[key];
+      if (!p) continue;
+      const sign = signByIndex(p.signIndex);
+      const retro = p.retrograde ? ", retrogradacja" : "";
+      const house = p.house ? `, dom ${p.house}` : "";
+      lines.push(
+        `${bodyMeta(key)?.labelPl ?? key}: ${sign.labelPl}, ${formatDegree(p.signDegree)}${house}${retro}`,
+      );
+    }
+    return lines.join("\n");
+  }
   const lines: string[] = [];
   const asc = signByIndex(chart.ascendant.signIndex);
   lines.push(
@@ -146,19 +175,31 @@ function planetFacts(chart: NatalChartJson): string {
   return lines.join("\n");
 }
 
-function houseFacts(chart: NatalChartJson): string {
+function houseFacts(chart: NatalChartJson, locale: UserLocale = "ka"): string {
+  const pl = locale === "pl";
   const occupants: Record<number, string[]> = {};
   for (const [key, p] of Object.entries(chart.bodies)) {
     if (p.house)
-      (occupants[p.house] ??= []).push(bodyMeta(key)?.labelKa ?? key);
+      (occupants[p.house] ??= []).push(
+        pl ? (bodyMeta(key)?.labelPl ?? key) : (bodyMeta(key)?.labelKa ?? key),
+      );
   }
   return HOUSE_NUMBERS.map((n) => {
     const cusp = chart.houses.find((h) => h.number === n);
-    const sign = cusp ? signByIndex(cusp.signIndex).labelKa : "—";
+    const sign = cusp
+      ? pl
+        ? signByIndex(cusp.signIndex).labelPl
+        : signByIndex(cusp.signIndex).labelKa
+      : "—";
     const occ = occupants[n]?.length
-      ? `, შიგნით: ${occupants[n].join(", ")}`
+      ? pl
+        ? `, planety wewnątrz: ${occupants[n].join(", ")}`
+        : `, შიგნით: ${occupants[n].join(", ")}`
       : "";
-    return `მე-${n} სახლი (${houseDef(n).themeKa}): ${sign}${occ}`;
+    const theme = pl ? houseDef(n).themeEn : houseDef(n).themeKa;
+    return pl
+      ? `Dom ${n} (${theme}): ${sign}${occ}`
+      : `მე-${n} სახლი (${theme}): ${sign}${occ}`;
   }).join("\n");
 }
 
@@ -168,38 +209,100 @@ async function generateNarrative(input: {
   firstName: string | null;
   chart: NatalChartJson;
   salience: ChartSalience;
+  locale?: UserLocale;
 }): Promise<NatalNarrative | null> {
+  const loc = input.locale ?? "ka";
+  const pl = loc === "pl";
   const s = input.salience;
   const pct = (n: number) => `${Math.round(n)}%`;
   const elLines = s.elements.ranked
-    .map((el) => `  ${el}: ${pct(s.elements.percentages[el])}`)
+    .map((el) => {
+      const label = pl
+        ? el === "ცეცხლი"
+          ? "Ogień"
+          : el === "მიწა"
+            ? "Ziemia"
+            : el === "ჰაერი"
+              ? "Powietrze"
+              : "Woda"
+        : el;
+      return `  ${label}: ${pct(s.elements.percentages[el])}`;
+    })
     .join("\n");
   const modLines = (["კარდინალური", "ფიქსირებული", "მუტაბელური"] as const)
-    .map((m) => `  ${m}: ${pct(s.modality.percentages[m])}`)
+    .map((m) => {
+      const label = pl
+        ? m === "კარდინალური"
+          ? "Kardynalna"
+          : m === "ფიქსირებული"
+            ? "Stała"
+            : "Zmienna"
+        : m;
+      return `  ${label}: ${pct(s.modality.percentages[m])}`;
+    })
     .join("\n");
   const aspectLines = s.tightestAspects
-    .map(
-      (a) =>
-        `  ${a.aLabel}–${a.bLabel} (${a.kind}, ${a.family}, ორბი ${a.orb.toFixed(1)}°)`,
-    )
+    .map((a) => {
+      if (pl) {
+        return `  ${a.aLabel}–${a.bLabel} (${a.kind}, orba ${a.orb.toFixed(1)}°)`;
+      }
+      return `  ${a.aLabel}–${a.bLabel} (${a.kind}, ${a.family}, ორბი ${a.orb.toFixed(1)}°)`;
+    })
     .join("\n");
   const angular = s.angularPlanets.length
     ? s.angularPlanets
         .map((p) => `  ${p.label} ≈ ${p.angle} (${p.orb.toFixed(1)}°)`)
         .join("\n")
-    : "  (არცერთი)";
+    : pl
+      ? "  (brak)"
+      : "  (არცერთი)";
   const stelliums = s.stelliums.length
     ? s.stelliums
         .map((st) => `  ${st.label}: ${st.planets.join(", ")}`)
         .join("\n")
-    : "  (არცერთი)";
+    : pl
+      ? "  (brak)"
+      : "  (არცერთი)";
   const retro = s.retrogrades.length
     ? s.retrogrades.map((r) => r.label).join(", ")
-    : "(არცერთი)";
+    : pl
+      ? "(brak)"
+      : "(არცერთი)";
 
-  const user = `გამოთვლილი მონაცემები${input.firstName ? ` (${input.firstName})` : ""}:
+  const user = pl
+    ? `Obliczone dane kosmogramu${input.firstName ? ` (${input.firstName})` : ""}:
 
-${planetFacts(input.chart)}
+${planetFacts(input.chart, "pl")}
+
+Balans żywiołów:
+${elLines}
+
+Balans jakości (modalności):
+${modLines}
+
+Najściślejsze aspekty:
+${aspectLines}
+
+Przy osiach horoskopu:
+${angular}
+
+Stellika (nagromadzenia planet):
+${stelliums}
+
+Planety w retrogradacji: ${retro}
+
+Zwróć poprawny JSON:
+{
+  "standout": [ { "title": "...", "body": "3-5 zdań" } ],   // 4-6 elementów, od najbardziej uderzających, na podstawie obliczonych danych
+  "signature": "5-7 zdań: rdzenny archetyp tego horoskopu, synteza",
+  "balance": "4-6 zdań o żywiołach i jakościach, w tym o elemencie słabszym",
+  "strengths": "5-7 zdań o konkretnych mocnych stronach i talentach",
+  "growth": "5-7 zdań o obszarach rozwoju i pracy z cieniem",
+  "closing": "4-5 zdań ciepłego podsumowania"
+}`
+    : `გამოთვლილი მონაცემები${input.firstName ? ` (${input.firstName})` : ""}:
+
+${planetFacts(input.chart, "ka")}
 
 ელემენტების ბალანსი (დომინანტი: ${s.elements.dominant}, სუსტი: ${s.elements.weakest}):
 ${elLines}
@@ -227,55 +330,80 @@ ${stelliums}
   "growth": "5-7 წინადადება ზრდის ზონები და ჩრდილი, როგორ იმუშაოს მათზე",
   "closing": "4-5 წინადადებიანი თბილი დასკვნა"
 }`;
-  return chatJson<NatalNarrative>(SYSTEM, user, 12000);
+  return chatJson<NatalNarrative>(pl ? SYSTEM_PL : SYSTEM, user, 12000);
 }
 
 async function generatePlanets(
   chart: NatalChartJson,
+  locale: UserLocale = "ka",
 ): Promise<Record<string, string> | null> {
-  const user = `რუკის პლანეტარული განლაგება:
-${planetFacts(chart)}
+  const pl = locale === "pl";
+  const user = pl
+    ? `Położenie planet w kosmogramie:
+${planetFacts(chart, "pl")}
+
+Zwróć JSON, gdzie każda planeta (sun, moon, ascendant, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto) jest dogłębnie zinterpretowana (po 6-9 zdań): funkcja planety w psychice, wpływ znaku zodiaku, znaczenie domu astrologicznego, ewentualna retrogradacja, konkretna mocna strona oraz strefa rozwoju.
+Format: { "sun": "...", "moon": "...", "ascendant": "...", "mercury": "...", ... }`
+    : `რუკის პლანეტარული განლაგება:
+${planetFacts(chart, "ka")}
 
 დააბრუნე JSON, სადაც თითო პლანეტა (sun, moon, ascendant, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto) ღრმად არის ინტერპრეტირებული, თითო 6-9 წინადადება, რომელიც მოიცავს: პლანეტის ფუნქციას ფსიქიკაში, ნიშნის გავლენას, სახლის (ცხოვრების სფერო) მნიშვნელობას, რეტროგრადულობას თუ აქვს, კონკრეტულ ძლიერ მხარესა და ზრდის ზონას.
 ფორმატი: { "sun": "...", "moon": "...", "ascendant": "...", "mercury": "...", ... }`;
-  return chatJson<Record<string, string>>(SYSTEM, user, 24000);
+  return chatJson<Record<string, string>>(pl ? SYSTEM_PL : SYSTEM, user, 24000);
 }
 
 async function generateHouses(
   chart: NatalChartJson,
+  locale: UserLocale = "ka",
 ): Promise<Record<string, string> | null> {
-  const user = `რუკის 12 სახლი:
-${houseFacts(chart)}
+  const pl = locale === "pl";
+  const user = pl
+    ? `12 domów kosmogramu:
+${houseFacts(chart, "pl")}
+
+Zwróć JSON, gdzie każdy dom ("1".."12") jest dogłębnie zinterpretowany (po 5-7 zdań): sfera życia, wpływ znaku na wierzchołku i planet wewnątrz, co warto w tym obszarze rozwijać.
+Format: { "1": "...", "2": "...", ..., "12": "..." }`
+    : `რუკის 12 სახლი:
+${houseFacts(chart, "ka")}
 
 დააბრუნე JSON, სადაც თითო სახლი ("1".."12") ღრმად არის ინტერპრეტირებული, თითო 5-7 წინადადება: ცხოვრების სფერო, კუსპის ნიშნისა და შიგა პლანეტების გავლენა, რა უნდა განავითაროს ამ სფეროში.
 ფორმატი: { "1": "...", "2": "...", ..., "12": "..." }`;
-  return chatJson<Record<string, string>>(SYSTEM, user, 24000);
+  return chatJson<Record<string, string>>(pl ? SYSTEM_PL : SYSTEM, user, 24000);
 }
 
 async function generateAspects(
   chart: NatalChartJson,
   salience: ChartSalience,
+  locale: UserLocale = "ka",
 ): Promise<Record<string, string> | null> {
+  const pl = locale === "pl";
   const list = salience.tightestAspects
     .map(
       (a, i) =>
-        `${i + 1}. ${a.aLabel}–${a.bLabel} | kind=${a.kind} | family=${a.family} | ორბი ${a.orb.toFixed(1)}° | key=${aspectKey(a.a, a.b, a.kind as Parameters<typeof aspectKey>[2])}`,
+        `${i + 1}. ${a.aLabel}–${a.bLabel} | kind=${a.kind} | family=${a.family} | orb=${a.orb.toFixed(1)}° | key=${aspectKey(a.a, a.b, a.kind as Parameters<typeof aspectKey>[2])}`,
     )
     .join("\n");
-  const user = `ამ რუკის ყველაზე ძლიერი ასპექტები (ზუსტი = ძლიერი):
+  const user = pl
+    ? `Najsilniejsze aspekty tego horoskopu (ścisłe = silne):
+${list}
+
+Zwróć JSON, gdzie kluczem jest "key" każdego aspektu, a wartością dogłębna interpretacja (5-7 zdań): dynamika między planetami, charakter harmonijny lub napięciowy, przejawianie się w życiu i jak konstruktywnie z tym aspektem pracować.
+Format: { "<key>": "...", ... }`
+    : `ამ რუკის ყველაზე ძლიერი ასპექტები (ზუსტი = ძლიერი):
 ${list}
 
 დააბრუნე JSON, სადაც გასაღები არის თითო ასპექტის "key" და მნიშვნელობა, ღრმა ინტერპრეტაცია (5-7 წინადადება): ორ პლანეტას შორის დინამიკა, ჰარმონიული/დაძაბული ბუნება, როგორ ვლინდება ცხოვრებაში, როგორ იმუშაოს მასთან.
 ფორმატი: { "<key>": "...", ... }`;
-  return chatJson<Record<string, string>>(SYSTEM, user, 16000);
+  return chatJson<Record<string, string>>(pl ? SYSTEM_PL : SYSTEM, user, 16000);
 }
 
 export async function generateNatalReport(input: {
   firstName: string | null;
   chart: NatalChartJson;
   salience: ChartSalience;
+  locale?: UserLocale;
 }): Promise<NatalReportContent> {
-  const { chart } = input;
+  const { chart, locale = "ka" } = input;
 
   // The per-placement (Big Three + planet) section reuses the shared
   // interpretation library, the same text the website report shows, so the
@@ -361,19 +489,19 @@ export async function generateNatalReport(input: {
     }),
     planetsComplete
       ? Promise.resolve(libPlanets)
-      : generatePlanets(chart).catch((e) => {
+      : generatePlanets(chart, locale).catch((e) => {
           console.warn("[report] planets failed:", (e as Error).message);
           return Object.keys(libPlanets).length ? libPlanets : null;
         }),
     housesComplete
       ? Promise.resolve(libHouses)
-      : generateHouses(chart).catch((e) => {
+      : generateHouses(chart, locale).catch((e) => {
           console.warn("[report] houses failed:", (e as Error).message);
           return Object.keys(libHouses).length ? libHouses : null;
         }),
     aspectsComplete
       ? Promise.resolve(libAspects)
-      : generateAspects(chart, input.salience).catch((e) => {
+      : generateAspects(chart, input.salience, locale).catch((e) => {
           console.warn("[report] aspects failed:", (e as Error).message);
           return Object.keys(libAspects).length ? libAspects : null;
         }),

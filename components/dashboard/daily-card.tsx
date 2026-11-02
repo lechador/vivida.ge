@@ -35,6 +35,13 @@ const ASPECT_EN: Record<string, string> = {
   trine: "trine",
   opposition: "opposition",
 };
+const ASPECT_PL: Record<string, string> = {
+  conjunction: "koniunkcja",
+  sextile: "sekstyl",
+  square: "kwadratura",
+  trine: "trygon",
+  opposition: "opozycja",
+};
 
 /**
  * Editorial Celestial Daily Transit Briefing Card.
@@ -98,21 +105,33 @@ export function DailyCard({
     return () => observer.disconnect();
   }, [horoscope.date, onRead, transits.length]);
 
-  const date = en
-    ? new Intl.DateTimeFormat("en", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-        timeZone: "UTC",
-      }).format(new Date(`${horoscope.date}T00:00:00Z`))
-    : kaLongDate(horoscope.date);
+  const date =
+    locale === "pl"
+      ? new Intl.DateTimeFormat("pl", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+          timeZone: "UTC",
+        }).format(new Date(`${horoscope.date}T00:00:00Z`))
+      : en
+        ? new Intl.DateTimeFormat("en", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            timeZone: "UTC",
+          }).format(new Date(`${horoscope.date}T00:00:00Z`))
+        : kaLongDate(horoscope.date);
 
   return (
     <article className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8">
       <header className="border-b border-border pb-5">
         <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
           <span className="font-medium uppercase tracking-[0.2em] text-[var(--vivida-gold)]">
-            {en ? "Daily Transit Briefing" : "დღევანდელი პროგნოზი"}
+            {locale === "pl"
+              ? "Codzienny przegląd tranzytów"
+              : en
+                ? "Daily Transit Briefing"
+                : "დღევანდელი პროგნოზი"}
           </span>
           <span className="font-mono tabular-nums">{date}</span>
         </div>
@@ -157,7 +176,11 @@ export function DailyCard({
         <details className="group mt-6 border-t border-border pt-4">
           <summary className="flex cursor-pointer list-none items-center justify-between text-xs font-medium uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden">
             <span>
-              {en ? "Details and transits" : "დეტალები და ტრანზიტები"}
+              {locale === "pl"
+                ? "Szczegóły i tranzyty"
+                : en
+                  ? "Details and transits"
+                  : "დეტალები და ტრანზიტები"}
             </span>
             <span
               aria-hidden
@@ -175,7 +198,11 @@ export function DailyCard({
             {transits.length > 0 && (
               <section className="border-t border-border pt-4">
                 <h3 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-[var(--vivida-cyan)]">
-                  {en ? "Today's Transits" : "დღის ტრანზიტები"}
+                  {locale === "pl"
+                    ? "Dzisiejsze tranzyty"
+                    : en
+                      ? "Today's Transits"
+                      : "დღის ტრანზიტები"}
                 </h3>
                 <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-background/70">
                   {transits.map((t, i) => {
@@ -186,18 +213,27 @@ export function DailyCard({
                         <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                           <span className="font-mono font-medium text-[var(--vivida-cyan)]">
                             {transitBody?.symbol}{" "}
-                            {(en
-                              ? transitBody?.labelEn
-                              : transitBody?.labelKa) ?? t.transit}{" "}
+                            {(locale === "pl"
+                              ? transitBody?.labelPl
+                              : en
+                                ? transitBody?.labelEn
+                                : transitBody?.labelKa) ?? t.transit}{" "}
                             <span aria-hidden className="text-muted-foreground">
                               {ASPECT_GLYPH[t.kind] ?? "·"}
                             </span>{" "}
                             {natalBody?.symbol}{" "}
-                            {(en ? natalBody?.labelEn : natalBody?.labelKa) ??
-                              t.natal}
+                            {(locale === "pl"
+                              ? natalBody?.labelPl
+                              : en
+                                ? natalBody?.labelEn
+                                : natalBody?.labelKa) ?? t.natal}
                           </span>
                           <span className="font-mono uppercase tracking-wider text-muted-foreground">
-                            {(en ? ASPECT_EN : ASPECT_KA)[t.kind] ?? t.kind}
+                            {(locale === "pl"
+                              ? ASPECT_PL
+                              : en
+                                ? ASPECT_EN
+                                : ASPECT_KA)[t.kind] ?? t.kind}
                           </span>
                         </div>
                         <p className="mt-1.5 text-sm font-semibold text-foreground">
@@ -217,9 +253,11 @@ export function DailyCard({
       )}
 
       <p className="mt-6 border-t border-border pt-4 text-xs text-muted-foreground">
-        {en
-          ? "A new reading will be waiting tomorrow."
-          : "ხვალ ახალი წინასწარმეტყველება გელოდება."}
+        {locale === "pl"
+          ? "Nowa interpretacja będzie czekać jutro."
+          : en
+            ? "A new reading will be waiting tomorrow."
+            : "ხვალ ახალი წინასწარმეტყველება გელოდება."}
       </p>
     </article>
   );

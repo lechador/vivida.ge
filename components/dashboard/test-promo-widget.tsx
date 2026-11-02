@@ -11,7 +11,12 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import type { TestCatalogEntry } from "@/lib/tests-catalog";
+import {
+  type TestCatalogEntry,
+  getTestTitle,
+  getTestTagline,
+  getTestMeta,
+} from "@/lib/tests-catalog";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
 
@@ -72,28 +77,32 @@ export function DashboardTestPromo({
         <span className="min-w-0 flex-1">
           <span className="block text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
             {allCompleted
-              ? en
-                ? "A quick quiz for you"
-                : "სწრაფი ქვიზი შენთვის"
-              : en
-                ? "Complete your profile"
-                : "შეავსე შენი პროფილი"}
+              ? locale === "pl"
+                ? "Szybki test dla Ciebie"
+                : en
+                  ? "A quick quiz for you"
+                  : "სწრაფი ქვიზი შენთვის"
+              : locale === "pl"
+                ? "Uzupełnij swój profil"
+                : en
+                  ? "Complete your profile"
+                  : "შეავსე შენი პროფილი"}
           </span>
           <span className="mt-0.5 block font-semibold tracking-tight">
-            {en ? test.titleEn : test.titleKa}
+            {getTestTitle(test, locale)}
           </span>
           <span className="mt-1 block line-clamp-1 text-xs text-muted-foreground sm:text-sm">
-            {en ? test.taglineEn : test.taglineKa}
+            {getTestTagline(test, locale)}
           </span>
           <span className="mt-2 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-            <Clock3 className="size-3" /> {en ? test.metaEn : test.metaKa}
+            <Clock3 className="size-3" /> {getTestMeta(test, locale)}
           </span>
         </span>
         <span
           className="hidden shrink-0 items-center gap-1 text-sm font-medium sm:flex"
           style={{ color: accent }}
         >
-          {en ? "Start" : "დაწყება"}{" "}
+          {locale === "pl" ? "Rozpocznij" : en ? "Start" : "დაწყება"}{" "}
           <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
         </span>
         <ArrowRight className="size-4 shrink-0 text-muted-foreground sm:hidden" />

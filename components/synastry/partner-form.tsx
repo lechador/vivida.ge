@@ -53,7 +53,11 @@ export function PartnerForm({ locale }: { locale: UserLocale }) {
     const dateStr = validateDate(date);
     if (!name.trim() || !dateStr || !timeRes.ok || !place) {
       setError(
-        en ? "Please complete every field." : "გთხოვ, ყველა ველი შეავსო.",
+        locale === "pl"
+          ? "Wypełnij wszystkie pola."
+          : en
+            ? "Please complete every field."
+            : "გთხოვ, ყველა ველი შეავსო.",
       );
       return;
     }
@@ -78,11 +82,21 @@ export function PartnerForm({ locale }: { locale: UserLocale }) {
   return (
     <div className="space-y-6">
       {/* Name */}
-      <Section label={en ? "Partner's name" : "პარტნიორის სახელი"}>
+      <Section
+        label={
+          locale === "pl"
+            ? "Imię partnera"
+            : en
+              ? "Partner's name"
+              : "პარტნიორის სახელი"
+        }
+      >
         <Input
           value={name}
           onChange={(e) => setName(e.target.value.slice(0, 60))}
-          placeholder={en ? "e.g. Alex" : "მაგ. ნინო"}
+          placeholder={
+            locale === "pl" ? "np. Anna" : en ? "e.g. Alex" : "მაგ. ნინო"
+          }
           maxLength={60}
           autoFocus
         />
@@ -90,11 +104,19 @@ export function PartnerForm({ locale }: { locale: UserLocale }) {
 
       {/* Date */}
       <Section
-        label={en ? "Birth date" : "დაბადების თარიღი"}
+        label={
+          locale === "pl"
+            ? "Data urodzenia"
+            : en
+              ? "Birth date"
+              : "დაბადების თარიღი"
+        }
         hint={
-          en
-            ? "Your Sun, Moon, and core chart patterns begin here."
-            : "მზე, მთვარე და ძირითადი არქეტიპები, აქედან იწყება."
+          locale === "pl"
+            ? "Słońce, Księżyc i główne archetypy kosmogramu biorą tu swój początek."
+            : en
+              ? "Your Sun, Moon, and core chart patterns begin here."
+              : "მზე, მთვარე და ძირითადი არქეტიპები, აქედან იწყება."
         }
       >
         <div className="grid grid-cols-[1fr_1fr_1.4fr] gap-3">
@@ -140,11 +162,19 @@ export function PartnerForm({ locale }: { locale: UserLocale }) {
 
       {/* Time */}
       <Section
-        label={en ? "Birth time" : "დაბადების დრო"}
+        label={
+          locale === "pl"
+            ? "Godzina urodzenia"
+            : en
+              ? "Birth time"
+              : "დაბადების დრო"
+        }
         hint={
-          en
-            ? "Birth time determines the rising sign and houses. If you don't know it, we'll use noon."
-            : "ამომავალი ნიშანი და სახლების განლაგება დროითაა განსაზღვრული. თუ არ ვიცი, გამოვიყენებთ შუადღეს."
+          locale === "pl"
+            ? "Godzina urodzenia określa Ascendent i domy. Jeśli jej nie znasz, użyjemy południa."
+            : en
+              ? "Birth time determines the rising sign and houses. If you don't know it, we'll use noon."
+              : "ამომავალი ნიშანი და სახლების განლაგება დროითაა განსაზღვრული. თუ არ ვიცი, გამოვიყენებთ შუადღეს."
         }
       >
         <div className="grid grid-cols-[1fr_1fr] gap-3">
@@ -199,17 +229,29 @@ export function PartnerForm({ locale }: { locale: UserLocale }) {
                 : "border-muted-foreground",
             )}
           />
-          {en ? "I don't know the exact time" : "ზუსტი დრო არ ვიცი"}
+          {locale === "pl"
+            ? "Nie znam dokładnej godziny"
+            : en
+              ? "I don't know the exact time"
+              : "ზუსტი დრო არ ვიცი"}
         </button>
       </Section>
 
       {/* Place */}
       <Section
-        label={en ? "Birthplace" : "დაბადების ადგილი"}
+        label={
+          locale === "pl"
+            ? "Miejsce urodzenia"
+            : en
+              ? "Birthplace"
+              : "დაბადების ადგილი"
+        }
         hint={
-          en
-            ? "Search in any language."
-            : "ქართულად ან ლათინურად, ყველანაირი ვარიანტი მუშაობს."
+          locale === "pl"
+            ? "Wyszukaj w dowolnym języku."
+            : en
+              ? "Search in any language."
+              : "ქართულად ან ლათინურად, ყველანაირი ვარიანტი მუშაობს."
         }
       >
         <PlaceField value={place} onChange={setPlace} locale={locale} />
@@ -227,12 +269,16 @@ export function PartnerForm({ locale }: { locale: UserLocale }) {
       >
         <Sparkles />
         {isPending
-          ? en
-            ? "Calculating..."
-            : "ვითვლით..."
-          : en
-            ? "Calculate compatibility"
-            : "გამოთვალე თავსებადობა"}
+          ? locale === "pl"
+            ? "Obliczanie..."
+            : en
+              ? "Calculating..."
+              : "ვითვლით..."
+          : locale === "pl"
+            ? "Oblicz zgodność"
+            : en
+              ? "Calculate compatibility"
+              : "გამოთვალე თავსებადობა"}
       </Button>
     </div>
   );
@@ -328,7 +374,11 @@ function PlaceField({
             if (value) onChange(null);
           }}
           placeholder={
-            en ? "London, Paris, New York..." : "თბილისი, Tbilisi, ნიუ-იორკი..."
+            locale === "pl"
+              ? "Warszawa, Kraków, Londyn..."
+              : en
+                ? "London, Paris, New York..."
+                : "თბილისი, Tbilisi, ნიუ-იორკი..."
           }
           className="pl-9 pr-9"
         />
@@ -342,7 +392,9 @@ function PlaceField({
               onChange(null);
             }}
             className="absolute right-2 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
-            aria-label={en ? "Clear" : "გასუფთავება"}
+            aria-label={
+              locale === "pl" ? "Wyczyść" : en ? "Clear" : "გასუფთავება"
+            }
           >
             <X className="size-3.5" />
           </button>

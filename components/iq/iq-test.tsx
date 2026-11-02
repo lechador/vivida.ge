@@ -14,6 +14,7 @@ import {
   IQ_TIME_LIMIT_SEC,
   STEM_PROMPT_EN,
   STEM_PROMPT_KA,
+  STEM_PROMPT_PL,
   type IqItem,
 } from "@/lib/iq/items";
 import {
@@ -40,8 +41,9 @@ const randomAttemptSeed = () => Math.floor(Math.random() * 2 ** 31);
  */
 export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
+  const pl = locale === "pl";
   const en = locale === "en";
-  const prompt = en ? STEM_PROMPT_EN : STEM_PROMPT_KA;
+  const prompt = pl ? STEM_PROMPT_PL : en ? STEM_PROMPT_EN : STEM_PROMPT_KA;
 
   const [administered, setAdministered] = useState<IqItem[]>(() => [
     firstAdaptiveItem(),
@@ -164,7 +166,11 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
           <Sparkles className="size-7 animate-pulse text-[var(--vivida-violet)]" />
         </div>
         <h2 className="mt-5 text-xl font-semibold tracking-tight">
-          {en ? "Calculating your result…" : "ვთვლი შენს შედეგს…"}
+          {pl
+            ? "Obliczanie Twojego wyniku…"
+            : en
+              ? "Calculating your result…"
+              : "ვთვლი შენს შედეგს…"}
         </h2>
         <Loader2 className="mx-auto mt-6 size-5 animate-spin text-muted-foreground" />
       </div>
@@ -177,13 +183,21 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
       <div className="mb-6">
         <div className="mb-2 flex items-center justify-between text-xs font-medium text-muted-foreground">
           <span>
-            {en ? "Task" : "დავალება"} {step} / {IQ_ADAPTIVE_LENGTH}
+            {pl ? "Zadanie" : en ? "Task" : "დავალება"} {step} /{" "}
+            {IQ_ADAPTIVE_LENGTH}
           </span>
           <span
             className={cn(
               "inline-flex items-center gap-1.5 tabular-nums",
               lowTime && "text-[var(--vivida-pink)]",
             )}
+            aria-label={
+              pl
+                ? `Pozostały czas: ${mm}:${ss}`
+                : en
+                  ? `Time remaining: ${mm}:${ss}`
+                  : `დარჩენილი დრო: ${mm}:${ss}`
+            }
           >
             <Clock className="size-3.5" />
             {mm}:{ss}
@@ -223,7 +237,7 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
         {isLast ? (
           <Button type="button" variant="mystic" size="lg" onClick={advance}>
             <Sparkles className="size-4" />
-            {en ? "Finish" : "დასრულება"}
+            {pl ? "Zakończ" : en ? "Finish" : "დასრულება"}
           </Button>
         ) : (
           <Button
@@ -231,7 +245,17 @@ export function IqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
             variant={answered ? "mystic" : "outline"}
             onClick={advance}
           >
-            {answered ? (en ? "Next" : "შემდეგი") : en ? "Skip" : "გამოტოვება"}
+            {answered
+              ? pl
+                ? "Dalej"
+                : en
+                  ? "Next"
+                  : "შემდეგი"
+              : pl
+                ? "Pomiń"
+                : en
+                  ? "Skip"
+                  : "გამოტოვება"}
           </Button>
         )}
       </div>
@@ -267,7 +291,11 @@ function IqStem({ item, locale }: { item: IqItem; locale: UserLocale }) {
   if (s.type === "logic") {
     return (
       <p className="min-h-[3.5rem] text-balance text-center text-lg font-medium leading-snug sm:text-xl">
-        {locale === "en" ? s.textEn : s.textKa}
+        {locale === "pl"
+          ? (s.textPl ?? s.textEn ?? s.textKa)
+          : locale === "en"
+            ? s.textEn
+            : s.textKa}
       </p>
     );
   }
@@ -370,9 +398,11 @@ function IqOptions({
             // letter is the same identity the text options show in their badge.
             aria-label={
               opt.kind === "figure"
-                ? locale === "en"
-                  ? `Option ${String.fromCharCode(65 + displayIdx)}`
-                  : `ვარიანტი ${String.fromCharCode(65 + displayIdx)}`
+                ? locale === "pl"
+                  ? `Opcja ${String.fromCharCode(65 + displayIdx)}`
+                  : locale === "en"
+                    ? `Option ${String.fromCharCode(65 + displayIdx)}`
+                    : `ვარიანტი ${String.fromCharCode(65 + displayIdx)}`
                 : undefined
             }
             className={cn(
@@ -399,7 +429,11 @@ function IqOptions({
                 >
                   {String.fromCharCode(65 + displayIdx)}
                 </span>
-                {locale === "en" ? (opt.textEn ?? opt.text) : opt.text}
+                {locale === "pl"
+                  ? (opt.textPl ?? opt.textEn ?? opt.text)
+                  : locale === "en"
+                    ? (opt.textEn ?? opt.text)
+                    : opt.text}
               </span>
             )}
           </button>

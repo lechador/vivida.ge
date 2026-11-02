@@ -39,21 +39,31 @@ export function SendReportEmailButton({
 
   function errorFor(code: string | undefined): string {
     if (code === "rate_limited") {
-      return en
-        ? "Too many emails for now. Please try again in an hour."
-        : "ძალიან ბევრი წერილი გაიგზავნა. სცადე ერთ საათში.";
+      return locale === "pl"
+        ? "Zbyt wiele wiadomości. Spróbuj ponownie za godzinę."
+        : en
+          ? "Too many emails for now. Please try again in an hour."
+          : "ძალიან ბევრი წერილი გაიგზავნა. სცადე ერთ საათში.";
     }
     if (code === "no_email") {
-      return en
-        ? "There's no email address on your account."
-        : "შენს ანგარიშზე ელფოსტა მითითებული არ არის.";
+      return locale === "pl"
+        ? "Brak adresu e-mail powiązanego z Twoim kontem."
+        : en
+          ? "There's no email address on your account."
+          : "შენს ანგარიშზე ელფოსტა მითითებული არ არის.";
     }
     if (code === "not_ready") {
-      return en ? "The report isn't ready yet." : "ანგარიში ჯერ არ არის მზად.";
+      return locale === "pl"
+        ? "Raport nie jest jeszcze gotowy."
+        : en
+          ? "The report isn't ready yet."
+          : "ანგარიში ჯერ არ არის მზად.";
     }
-    return en
-      ? "We couldn't send it. Please try again."
-      : "გაგზავნა ვერ მოხერხდა. სცადე ხელახლა.";
+    return locale === "pl"
+      ? "Nie udało się wysłać. Spróbuj ponownie."
+      : en
+        ? "We couldn't send it. Please try again."
+        : "გაგზავნა ვერ მოხერხდა. სცადე ხელახლა.";
   }
 
   async function send() {
@@ -73,9 +83,11 @@ export function SendReportEmailButton({
       setState("sent");
     } catch {
       setError(
-        en
-          ? "Network error. Please try again."
-          : "ქსელის შეცდომა. სცადე ხელახლა.",
+        locale === "pl"
+          ? "Błąd sieci. Spróbuj ponownie."
+          : en
+            ? "Network error. Please try again."
+            : "ქსელის შეცდომა. სცადე ხელახლა.",
       );
       setState("error");
     }
@@ -83,12 +95,16 @@ export function SendReportEmailButton({
 
   const label =
     state === "sent"
-      ? en
-        ? "Sent"
-        : "გაიგზავნა"
-      : en
-        ? "Email me the PDF"
-        : "გამომიგზავნე PDF ელფოსტაზე";
+      ? locale === "pl"
+        ? "Wysłano"
+        : en
+          ? "Sent"
+          : "გაიგზავნა"
+      : locale === "pl"
+        ? "Wyślij PDF na e-mail"
+        : en
+          ? "Email me the PDF"
+          : "გამომიგზავნე PDF ელფოსტაზე";
 
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
@@ -111,12 +127,16 @@ export function SendReportEmailButton({
       {state === "sent" && (
         <p className="text-xs text-foreground/70">
           {sentTo
-            ? en
-              ? `Sent to ${sentTo}, check your inbox.`
-              : `გაიგზავნა ${sentTo}-ზე, შეამოწმე ფოსტა.`
-            : en
-              ? "Check your inbox."
-              : "შეამოწმე ფოსტა."}
+            ? locale === "pl"
+              ? `Wysłano na adres ${sentTo}, sprawdź skrzynkę.`
+              : en
+                ? `Sent to ${sentTo}, check your inbox.`
+                : `გაიგზავნა ${sentTo}-ზე, შეამოწმე ფოსტა.`
+            : locale === "pl"
+              ? "Sprawdź skrzynkę odbiorczą."
+              : en
+                ? "Check your inbox."
+                : "შეამოწმე ფოსტა."}
         </p>
       )}
       {state === "error" && error && (

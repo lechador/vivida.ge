@@ -29,8 +29,11 @@ import { ELEMENT_COLOR } from "@/lib/pdf/theme";
 import { cn } from "@/lib/utils";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { ZodiacSignPageEn } from "@/components/seo/zodiac-sign-page-en";
+import { ZodiacSignPagePl } from "@/components/seo/zodiac-sign-page-pl";
 
 import { ZODIAC_SIGN_EN } from "@/lib/zodiac-sign-en";
+import { ZODIAC_SIGN_PL } from "@/lib/seo/zodiac-sign-pl";
+import { signLabel } from "@/lib/zodiac";
 
 import { ENGLISH_SITE_URL, localizedAlternates } from "@/lib/seo/locales";
 
@@ -57,6 +60,35 @@ export async function generateMetadata({
   const meta = signMetaBySlug(sign);
   const locale = await getRequestLocale();
   const accent = (meta && ELEMENT_COLOR[meta.element]) || "#b884f2";
+
+  if (locale === "pl" && meta) {
+    const name = signLabel(meta, "pl");
+    const content = ZODIAC_SIGN_PL[sign];
+    const title = `${name} (Znak Zodiaku) – Daty, Cechy, Miłość i Kariera | Vivida`;
+    const description = `${name} – przewodnik po znaku zodiaku: ${content?.tagline ?? ""} Poznaj daty, cechy osobowości, miłość i predyspozycje zawodowe.`;
+    const path = `/zodiac/${sign}`;
+    const ogPl = `https://www.vividaastro.com/api/og/page?t=${encodeURIComponent(name)}&k=${encodeURIComponent("Znak zodiaku")}&a=${encodeURIComponent(accent)}`;
+    return {
+      title: { absolute: title },
+      description,
+      alternates: localizedAlternates(path, path, "pl"),
+      openGraph: {
+        type: "article",
+        url: `https://www.vividaastro.com/pl/znaki-zodiaku/${sign}`,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "pl_PL",
+        images: [{ url: ogPl, width: 1200, height: 630 }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: [ogPl],
+      },
+    };
+  }
 
   if (locale === "en" && meta) {
     const name = meta.labelEn;
@@ -125,6 +157,7 @@ export default async function ZodiacSignPage({
   const { sign } = await params;
   if (!isSlug(sign)) notFound();
   const locale = await getRequestLocale();
+  if (locale === "pl") return <ZodiacSignPagePl sign={sign} />;
   if (locale === "en") return <ZodiacSignPageEn sign={sign} />;
   const c = SIGNS_CONTENT[sign];
   const meta = signMetaBySlug(sign);
@@ -534,7 +567,6 @@ export default async function ZodiacSignPage({
             <Link href="/nataluri-ruka">ჩემი სრული რუკა</Link>
           </Button>
         </div>
-
       </section>
 
       <SiteFooter />

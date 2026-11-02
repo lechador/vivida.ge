@@ -22,6 +22,7 @@ import { signColor } from "@/lib/zodiac";
 import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { HoroscopeHubEn } from "@/components/seo/horoscope-hub-en";
+import { HoroscopeHubPl } from "@/components/seo/horoscope-hub-pl";
 
 import { internationalPublicPath } from "@/lib/seo/public-paths";
 
@@ -35,7 +36,43 @@ const DESCRIPTION =
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
+  const isPl = locale === "pl";
   const en = locale === "en";
+
+  if (isPl) {
+    const title = "Horoskop Dzienny na Dziś – Wszystkie Znaki Zodiaku | Vivida";
+    const description =
+      "Przeczytaj aktualny horoskop dzienny dla każdego znaku zodiaku na podstawie rzeczywistych tranzytów planet. Sprawdź horoskop na dziś, jutro, tydzień i miesiąc.";
+    return {
+      title: { absolute: title },
+      description,
+      keywords: [
+        "horoskop dzienny",
+        "horoskop na dzis",
+        "horoskop",
+        "znaki zodiaku",
+        "horoskop zodiakalny",
+        "horoskop tygodniowy",
+        "horoskop miesieczny",
+      ],
+      alternates: localizedAlternates(
+        "/pl/horoskop-dzienny",
+        "/horoskopi",
+        "pl",
+      ),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: "https://www.vividaastro.com/pl/horoskop-dzienny",
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "pl_PL",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
+
   const title = en ? "Daily Horoscope Today, All Zodiac Signs" : TITLE;
   const description = en
     ? "Read today's horoscope for every zodiac sign, with practical guidance based on the current sky. Explore daily, weekly, and monthly astrology forecasts."
@@ -115,6 +152,7 @@ const FAQ = [
 
 export default async function HoroskopiHubPage() {
   const locale = await getRequestLocale();
+  if (locale === "pl") return <HoroscopeHubPl />;
   if (locale === "en") return <HoroscopeHubEn />;
   const now = new Date();
   const todayLabel = signHoroscopePeriodLabel(now, "day");

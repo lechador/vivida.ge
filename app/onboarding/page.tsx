@@ -22,7 +22,14 @@ import { normalizeReturnPath } from "@/lib/safe-return-path";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  return { title: locale !== "ka" ? "Set up your chart" : "გაცნობა" };
+  return {
+    title:
+      locale === "pl"
+        ? "Skonfiguruj swój kosmogram"
+        : locale !== "ka"
+          ? "Set up your chart"
+          : "გაცნობა",
+  };
 }
 
 export default async function OnboardingPage({
@@ -71,9 +78,15 @@ export default async function OnboardingPage({
             </span>
           </Link>
           <div className="font-mono text-xs text-muted-foreground">
-            {en ? "Observatory Setup" : "პირადი რუკის შექმნა"} ·{" "}
+            {locale === "pl"
+              ? "Tworzenie kosmogramu"
+              : en
+                ? "Observatory Setup"
+                : "პირადი რუკის შექმნა"}{" "}
+            ·{" "}
             <span className="text-foreground">
-              {user.name?.split(" ")[0] ?? (en ? "Stargazer" : "სტუმარი")}
+              {user.name?.split(" ")[0] ??
+                (locale === "pl" ? "Odkrywca" : en ? "Stargazer" : "სტუმარი")}
             </span>
           </div>
         </div>

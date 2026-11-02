@@ -18,18 +18,29 @@ export function PasswordResetEmail({
   resetUrl: string;
   locale?: UserLocale;
 }) {
+  const pl = locale === "pl";
   const en = locale === "en";
   const greeting = name
-    ? en
-      ? `Hi, ${name}!`
-      : `სალამი, ${name}!`
-    : en
-      ? "Hi!"
-      : "სალამი!";
+    ? pl
+      ? `Cześć, ${name}!`
+      : en
+        ? `Hi, ${name}!`
+        : `სალამი, ${name}!`
+    : pl
+      ? "Cześć!"
+      : en
+        ? "Hi!"
+        : "სალამი!";
   return (
     <EmailLayout
       locale={locale}
-      preview={en ? "Reset your Vivida password" : "აღადგინე შენი პაროლი Vivida-ზე"}
+      preview={
+        pl
+          ? "Zresetuj swoje hasło w Vivida"
+          : en
+            ? "Reset your Vivida password"
+            : "აღადგინე შენი პაროლი Vivida-ზე"
+      }
     >
       <Heading
         as="h1"
@@ -42,31 +53,48 @@ export function PasswordResetEmail({
           margin: "0 0 16px",
         }}
       >
-        {en ? "Reset your password" : "აღადგინე შენი პაროლი"}
+        {pl
+          ? "Zresetuj swoje hasło"
+          : en
+            ? "Reset your password"
+            : "აღადგინე შენი პაროლი"}
       </Heading>
 
       <Text style={paragraphStyle}>{greeting}</Text>
       <Text style={paragraphStyle}>
-        {en
-          ? "We received a request to reset your password. Use the button below to choose a new one."
-          : "მივიღეთ მოთხოვნა შენი პაროლის აღდგენაზე. დააჭირე ღილაკს და დააყენე ახალი პაროლი."}
+        {pl
+          ? "Otrzymaliśmy prośbę o zresetowanie Twojego hasła. Użyj poniższego przycisku, aby ustawić nowe hasło."
+          : en
+            ? "We received a request to reset your password. Use the button below to choose a new one."
+            : "მივიღეთ მოთხოვნა შენი პაროლის აღდგენაზე. დააჭირე ღილაკს და დააყენე ახალი პაროლი."}
       </Text>
 
       <Button href={resetUrl} style={buttonStyle}>
-        {en ? "Set a new password" : "ახალი პაროლის დაყენება"}
+        {pl
+          ? "Ustaw nowe hasło"
+          : en
+            ? "Set a new password"
+            : "ახალი პაროლის დაყენება"}
       </Button>
 
       <Text style={mutedStyle}>
-        {en ? "Or paste this into your browser:" : "ან ჩასვი ბრაუზერში:"} <br />
+        {pl
+          ? "Albo wklej ten link do przeglądarki:"
+          : en
+            ? "Or paste this into your browser:"
+            : "ან ჩასვი ბრაუზერში:"}{" "}
+        <br />
         <span style={{ color: "#c4b5fd", wordBreak: "break-all" }}>
           {resetUrl}
         </span>
       </Text>
 
       <Text style={mutedStyle}>
-        {en
-          ? "This link is valid for one hour. If you did not request a reset, ignore this email, your password has not changed."
-          : "ლინკი მოქმედია 1 საათი. თუ შენ არ გითხოვია აღდგენა, უგულებელყავი ეს წერილი, შენი პაროლი იგივე დარჩა."}
+        {pl
+          ? "Ten link jest ważny przez 1 godzinę. Jeśli to nie Ty prosiłeś o reset, zignoruj tę wiadomość — Twoje hasło pozostanie bez zmian."
+          : en
+            ? "This link is valid for one hour. If you did not request a reset, ignore this email, your password has not changed."
+            : "ლინკი მოქმედია 1 საათი. თუ შენ არ გითხოვია აღდგენა, უგულებელყავი ეს წერილი, შენი პაროლი იგივე დარჩა."}
       </Text>
     </EmailLayout>
   );

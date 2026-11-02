@@ -16,22 +16,29 @@ export function StepVisibility({
   locale?: UserLocale;
 }) {
   const en = locale !== "ka";
+  const pl = locale === "pl";
   return (
     <div className="space-y-6">
       <header className="space-y-2 text-center">
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          {en ? "Choose a username" : "აირჩიე სახელი"}
+          {pl
+            ? "Wybierz nazwę użytkownika"
+            : en
+              ? "Choose a username"
+              : "აირჩიე სახელი"}
         </h2>
         <p className="mx-auto max-w-md text-muted-foreground">
-          {en
-            ? `This becomes your profile link, vividaastro.com/u/${value.username || "you"}. It helps other people find you.`
-            : `ეს სახელი იქნება შენი პროფილის ბმული, vivida.ge/u/${value.username || "you"}. მის გარეშე სხვები ვერ აღმოგაჩენენ.`}
+          {pl
+            ? `To będzie Twój link do profilu: vividaastro.com/u/${value.username || "ty"}. Pomoże innym Cię odnaleźć.`
+            : en
+              ? `This becomes your profile link, vividaastro.com/u/${value.username || "you"}. It helps other people find you.`
+              : `ეს სახელი იქნება შენი პროფილის ბმული, vivida.ge/u/${value.username || "you"}. მის გარეშე სხვები ვერ აღმოგაჩენენ.`}
         </p>
       </header>
 
       <div className="mx-auto max-w-md space-y-2">
         <Label htmlFor="onb-username">
-          {en ? "Username" : "მომხმარებლის სახელი"}
+          {pl ? "Nazwa użytkownika" : en ? "Username" : "მომხმარებლის სახელი"}
         </Label>
         <div className="flex items-stretch overflow-hidden rounded-lg border border-border bg-input/40 transition-colors focus-within:border-transparent focus-within:ring-2 focus-within:ring-ring">
           <span className="flex select-none items-center bg-card/60 px-3 text-sm text-muted-foreground">
@@ -52,9 +59,11 @@ export function StepVisibility({
           />
         </div>
         <p className="text-xs text-muted-foreground">
-          {en
-            ? "3–24 characters, only a–z, 0–9 and _"
-            : "3-24 სიმბოლო, მხოლოდ a-z, 0-9 და _"}
+          {pl
+            ? "3–24 znaki, tylko a–z, 0–9 oraz _"
+            : en
+              ? "3–24 characters, only a–z, 0–9 and _"
+              : "3-24 სიმბოლო, მხოლოდ a-z, 0-9 და _"}
         </p>
       </div>
 
@@ -87,14 +96,18 @@ export function StepVisibility({
           </span>
           <span>
             <span className="block text-sm font-medium text-foreground">
-              {en
-                ? "Let new people discover me"
-                : "ახალმა ადამიანებმა აღმომაჩინონ"}
+              {pl
+                ? "Pozwól innym mnie odkryć"
+                : en
+                  ? "Let new people discover me"
+                  : "ახალმა ადამიანებმა აღმომაჩინონ"}
             </span>
             <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
-              {en
-                ? "Off: only people with your link can open your profile. On: you can also appear in People, search and suggestions."
-                : "გამორთული: პროფილს მხოლოდ ბმულის მქონე ნახავს. ჩართული: ასევე გამოჩნდები People-ში, ძიებასა და რეკომენდაციებში."}
+              {pl
+                ? "Wyłączone: profil otworzą tylko osoby posiadające Twój link. Włączone: możesz pojawić się w sekcji Osoby, wyszukiwarce i rekomendacjach."
+                : en
+                  ? "Off: only people with your link can open your profile. On: you can also appear in People, search and suggestions."
+                  : "გამორთული: პროფილს მხოლოდ ბმულის მქონე ნახავს. ჩართული: ასევე გამოჩნდები People-ში, ძიებასა და რეკომენდაციებში."}
             </span>
           </span>
         </button>

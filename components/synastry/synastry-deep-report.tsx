@@ -20,6 +20,12 @@ const ERRORS_EN: Record<string, string> = {
   generation_failed: "We couldn't create the report. Please try again.",
 };
 
+const ERRORS_PL: Record<string, string> = {
+  rate_limited: "Osiągnięto dzisiejszy limit. Spróbuj ponownie jutro.",
+  unavailable: "Usługa jest chwilowo niedostępna.",
+  generation_failed: "Nie udało się wygenerować raportu. Spróbuj ponownie.",
+};
+
 const GEN_MESSAGES = [
   "ვაანალიზებთ ორ რუკას…",
   "ვადარებთ პლანეტებსა და სახლებს…",
@@ -32,13 +38,23 @@ const GEN_MESSAGES_EN = [
   "Writing your in-depth report…",
 ];
 
+const GEN_MESSAGES_PL = [
+  "Analizujemy oba kosmogramy…",
+  "Porównujemy planety i domy…",
+  "Piszemy szczegółowy raport…",
+];
+
 const SECTIONS: {
   key: keyof SynastryDeepReportJson;
   code: string;
   title: string;
 }[] = [
   { key: "love", code: "01", title: "სიყვარული და რომანტიკა" },
-  { key: "communication", code: "02", title: "კომუნიკაცია და გონებრივი კავშირი" },
+  {
+    key: "communication",
+    code: "02",
+    title: "კომუნიკაცია და გონებრივი კავშირი",
+  },
   { key: "trust", code: "03", title: "ნდობა და ემოციური უსაფრთხოება" },
   { key: "friction", code: "04", title: "ხახუნი და ზრდა" },
   { key: "longTerm", code: "05", title: "გრძელვადიანი პოტენციალი" },
@@ -46,10 +62,26 @@ const SECTIONS: {
 
 const SECTIONS_EN: typeof SECTIONS = [
   { key: "love", code: "01", title: "Love and romance" },
-  { key: "communication", code: "02", title: "Communication and mental connection" },
+  {
+    key: "communication",
+    code: "02",
+    title: "Communication and mental connection",
+  },
   { key: "trust", code: "03", title: "Trust and emotional safety" },
   { key: "friction", code: "04", title: "Friction and growth" },
   { key: "longTerm", code: "05", title: "Long-term potential" },
+];
+
+const SECTIONS_PL: typeof SECTIONS = [
+  { key: "love", code: "01", title: "Miłość i romantyzm" },
+  {
+    key: "communication",
+    code: "02",
+    title: "Komunikacja i połączenie intelektualne",
+  },
+  { key: "trust", code: "03", title: "Zaufanie i poczucie bezpieczeństwa" },
+  { key: "friction", code: "04", title: "Napięcia i obszary rozwoju" },
+  { key: "longTerm", code: "05", title: "Potencjał długoterminowy" },
 ];
 
 function paras(s: string): string[] {
@@ -71,8 +103,10 @@ export function SynastryDeepReport({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
-  const messages = en ? GEN_MESSAGES_EN : GEN_MESSAGES;
-  const sections = en ? SECTIONS_EN : SECTIONS;
+  const isPl = locale === "pl";
+  const messages = isPl ? GEN_MESSAGES_PL : en ? GEN_MESSAGES_EN : GEN_MESSAGES;
+  const sections = isPl ? SECTIONS_PL : en ? SECTIONS_EN : SECTIONS;
+  const errorMap = isPl ? ERRORS_PL : en ? ERRORS_EN : ERRORS;
   const [report, setReport] = useState<SynastryDeepReportJson | null>(initial);
   const [status, setStatus] = useState<"idle" | "generating" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -106,10 +140,12 @@ export function SynastryDeepReport({
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.report) {
         setError(
-          (en ? ERRORS_EN : ERRORS)[data.error] ??
-            (en
-              ? "Something went wrong. Please try again."
-              : "რაღაც ვერ მოხერხდა. სცადე ხელახლა."),
+          errorMap[data.error] ??
+            (isPl
+              ? "Coś poszło nie tak. Spróbuj ponownie."
+              : en
+                ? "Something went wrong. Please try again."
+                : "რაღაც ვერ მოხერხდა. სცადე ხელახლა."),
         );
         setStatus("error");
         return;
@@ -118,9 +154,11 @@ export function SynastryDeepReport({
       setStatus("idle");
     } catch {
       setError(
-        en
-          ? "Network error. Please try again."
-          : "ქსელის შეცდომა. სცადე ხელახლა.",
+        isPl
+          ? "Błąd sieci. Spróbuj ponownie."
+          : en
+            ? "Network error. Please try again."
+            : "ქსელის შეცდომა. სცადე ხელახლა.",
       );
       setStatus("error");
     }
@@ -137,7 +175,11 @@ export function SynastryDeepReport({
         <div className="border-b border-border bg-background/50 px-5 py-3.5 sm:px-8">
           <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
             <Sparkles className="size-3.5" />
-            {en ? "MONOGRAPH · IN-DEPTH SYNASTRY REPORT" : "მონოგრაფია · ღრმა ანგარიში"}
+            {isPl
+              ? "MONOGRAFIA · GŁĘBOKI RAPORT SYNASTRII"
+              : en
+                ? "MONOGRAPH · IN-DEPTH SYNASTRY REPORT"
+                : "მონოგრაფია · ღრმა ანგარიში"}
           </div>
         </div>
 
@@ -155,7 +197,7 @@ export function SynastryDeepReport({
               return (
                 <section key={s.key} className="py-6">
                   <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
-                    CHAPTER {s.code}
+                    {isPl ? `ROZDZIAŁ ${s.code}` : `CHAPTER ${s.code}`}
                   </div>
                   <h3 className="mb-3 text-lg font-semibold tracking-tight text-foreground">
                     {s.title}
@@ -173,7 +215,11 @@ export function SynastryDeepReport({
           {report.advice.length > 0 && (
             <section className="mt-6 rounded-sm border border-primary/30 bg-primary/5 p-5">
               <h3 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-                {en ? "PRACTICAL PROTOCOL · ADVICE" : "პრაქტიკული რეკომენდაციები"}
+                {isPl
+                  ? "PROTOKÓŁ PRAKTYCZNY · WSKAZÓWKI"
+                  : en
+                    ? "PRACTICAL PROTOCOL · ADVICE"
+                    : "პრაქტიკული რეკომენდაციები"}
               </h3>
               <ul className="space-y-2 text-sm leading-relaxed text-foreground/90">
                 {report.advice.map((a, i) => (
@@ -205,7 +251,11 @@ export function SynastryDeepReport({
           />
         </div>
         <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-          {en ? "COMPUTING EPHEMERIS SYNTHESIS…" : "მიმდინარეობს ანგარიშის შედგენა…"}
+          {isPl
+            ? "OBLICZANIE SYNTEZY EFEMERYD…"
+            : en
+              ? "COMPUTING EPHEMERIS SYNTHESIS…"
+              : "მიმდინარეობს ანგარიშის შედგენა…"}
         </p>
       </div>
     );
@@ -222,16 +272,26 @@ export function SynastryDeepReport({
         <Lock className="size-4.5" />
       </div>
       <h3 className="text-balance text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
-        {en ? "In-depth compatibility monograph" : "ღრმა თავსებადობის ანგარიში"}
+        {isPl
+          ? "Monografia głębokiej zgodności"
+          : en
+            ? "In-depth compatibility monograph"
+            : "ღრმა თავსებადობის ანგარიში"}
       </h3>
       <p className="mx-auto mt-2 max-w-md text-pretty text-sm text-muted-foreground">
-        {en
-          ? `A complete reading of your connection with ${partnerName}: love, communication, trust, friction, long-term potential, and practical advice.`
-          : `${partnerName}-თან თქვენი კავშირის სრული წაკითხვა: სიყვარული, კომუნიკაცია, ნდობა, ხახუნი, გრძელვადიანი პოტენციალი და პრაქტიკული რჩევები.`}
+        {isPl
+          ? `Kompleksowa analiza Twojej relacji z ${partnerName}: miłość, komunikacja, zaufanie, tarcia, potencjał długoterminowy i praktyczne wskazówki.`
+          : en
+            ? `A complete reading of your connection with ${partnerName}: love, communication, trust, friction, long-term potential, and practical advice.`
+            : `${partnerName}-თან თქვენი კავშირის სრული წაკითხვა: სიყვარული, კომუნიკაცია, ნდობა, ხახუნი, გრძელვადიანი პოტენციალი და პრაქტიკული რჩევები.`}
       </p>
       <Button size="lg" className="mt-5" onClick={generate}>
         <Sparkles className="size-4" />
-        {en ? "Create in-depth report" : "შექმენი ღრმა ანგარიში"}
+        {isPl
+          ? "Utwórz szczegółowy raport"
+          : en
+            ? "Create in-depth report"
+            : "შექმენი ღრმა ანგარიში"}
       </Button>
       {status === "error" && error && (
         <p className="mt-3 text-sm text-destructive">{error}</p>

@@ -8,6 +8,7 @@ import { Check, Lock, RotateCcw, Share2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EQ_ANSWERS_STORAGE_KEY } from "@/lib/eq/questions";
 import { calculateEq, EQ_BAND_META, type EqResult } from "@/lib/eq/scoring";
+import { localizedHref } from "@/lib/seo/public-paths";
 import { EqProfile } from "@/components/eq/eq-profile";
 import { ProfileVisibilityToggle } from "@/components/tests/profile-visibility-toggle";
 import { NextTestWidget } from "@/components/tests/next-test-widget";
@@ -26,7 +27,8 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
-  const en = locale !== "ka";
+  const pl = locale === "pl";
+  const en = locale === "en";
   const [stored, setStored] = useState<Stored | null | "missing">(null);
   const [authed, setAuthed] = useState<boolean | null>(null);
 
@@ -88,13 +90,15 @@ export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
     return (
       <div className="rounded-3xl border border-border bg-card/55 p-8 text-center ring-1 ring-foreground/5 backdrop-blur-xl">
         <p className="text-foreground/85">
-          {en
-            ? "Take the test first to see your result."
-            : "ჯერ ტესტი უნდა გაიარო."}
+          {pl
+            ? "Najpierw wypełnij test, aby zobaczyć swój wynik."
+            : en
+              ? "Take the test first to see your result."
+              : "ჯერ ტესტი უნდა გაიარო."}
         </p>
         <Button asChild variant="mystic" className="mt-5">
-          <Link href="/eq-testi">
-            {en ? "Start the test" : "ტესტის დაწყება"}
+          <Link href={localizedHref("/eq-testi", locale)}>
+            {pl ? "Rozpocznij test" : en ? "Start the test" : "ტესტის დაწყება"}
           </Link>
         </Button>
       </div>
@@ -115,7 +119,7 @@ export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
     } catch {
       /* ignore */
     }
-    router.push("/eq-testi");
+    router.push(localizedHref("/eq-testi", locale));
   }
 
   const bandMeta = EQ_BAND_META[result.band];
@@ -125,7 +129,7 @@ export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
       {/* Score card (free) */}
       <div className="rounded-3xl border border-border bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
         <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          {en ? "Your EQ score" : "შენი EQ ქულა"}
+          {pl ? "Twój wynik EQ" : en ? "Your EQ score" : "შენი EQ ქულა"}
         </div>
         <div className="mt-2 bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-7xl font-bold leading-none tracking-tight text-transparent sm:text-8xl">
           {result.overall}
@@ -139,10 +143,18 @@ export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
           }}
         >
           <Sparkles className="size-3.5" />
-          {en ? bandMeta.labelEn : bandMeta.labelKa}
+          {pl
+            ? (bandMeta.labelPl ?? bandMeta.labelEn)
+            : en
+              ? bandMeta.labelEn
+              : bandMeta.labelKa}
         </div>
         <p className="mx-auto mt-4 max-w-md text-pretty text-sm text-foreground/80">
-          {en ? bandMeta.summaryEn : bandMeta.summaryKa}
+          {pl
+            ? (bandMeta.summaryPl ?? bandMeta.summaryEn)
+            : en
+              ? bandMeta.summaryEn
+              : bandMeta.summaryKa}
         </p>
       </div>
 
@@ -163,13 +175,19 @@ export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
                 <Lock className="size-5 text-[var(--vivida-violet)]" />
               </div>
               <p className="mx-auto mt-3 max-w-xs text-pretty text-sm text-foreground/85">
-                {en
-                  ? "Create a free account to save your result and explore all five areas of your emotional profile."
-                  : "დარეგისტრირდი უფასოდ და ნახე შენი ემოციური რუკა ხუთივე სფეროში, და შეინახე შედეგი."}
+                {pl
+                  ? "Załóż bezpłatne konto, aby zapisać wynik i poznać swój profil emocjonalny w 5 obszarach."
+                  : en
+                    ? "Create a free account to save your result and explore all five areas of your emotional profile."
+                    : "დარეგისტრირდი უფასოდ და ნახე შენი ემოციური რუკა ხუთივე სფეროში, და შეინახე შედეგი."}
               </p>
               <Button asChild variant="mystic" className="mt-4">
                 <Link href="/signup?from=eq">
-                  {en ? "Create free account" : "უფასო რეგისტრაცია"}
+                  {pl
+                    ? "Załóż bezpłatne konto"
+                    : en
+                      ? "Create free account"
+                      : "უფასო რეგისტრაცია"}
                 </Link>
               </Button>
             </div>
@@ -177,7 +195,7 @@ export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
         )}
       </div>
 
-      {!en && <EqArticleRecommendations result={result} />}
+      {!en && !pl && <EqArticleRecommendations result={result} />}
 
       <ProfileVisibilityToggle kind="eq" locale={locale} />
 
@@ -190,19 +208,23 @@ export function EqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
           className="gap-1.5"
         >
           <RotateCcw className="size-4" />
-          {en ? "Retake" : "თავიდან გავლა"}
+          {pl ? "Powtórz" : en ? "Retake" : "თავიდან გავლა"}
         </Button>
         <Button asChild variant="ghost">
-          <Link href="/tests">{en ? "Other tests" : "სხვა ტესტები"}</Link>
+          <Link href={localizedHref("/tests", locale)}>
+            {pl ? "Inne testy" : en ? "Other tests" : "სხვა ტესტები"}
+          </Link>
         </Button>
       </div>
 
       <NextTestWidget completed="eq" locale={locale} />
 
       <p className="mx-auto max-w-lg text-center text-xs leading-relaxed text-muted-foreground">
-        {en
-          ? "This is a self-report assessment and reflects how you perceive your own emotional skills. It is not a clinical diagnosis."
-          : "ეს არის თვითშეფასების ტესტი, ის ასახავს იმას, როგორ აღიქვამ საკუთარ ემოციურ უნარებს. ეს არ არის კლინიკური დიაგნოზი."}
+        {pl
+          ? "To badanie oparte na samoocenie odzwierciedla to, jak postrzegasz swoje umiejętności emocjonalne. Nie stanowi diagnozy klinicznej."
+          : en
+            ? "This is a self-report assessment and reflects how you perceive your own emotional skills. It is not a clinical diagnosis."
+            : "ეს არის თვითშეფასების ტესტი, ის ასახავს იმას, როგორ აღიქვამ საკუთარ ემოციურ უნარებს. ეს არ არის კლინიკური დიაგნოზი."}
       </p>
     </div>
   );
@@ -215,19 +237,28 @@ function ShareButton({
   overall: number;
   locale: UserLocale;
 }) {
-  const en = locale !== "ka";
+  const pl = locale === "pl";
+  const en = locale === "en";
   const [copied, setCopied] = useState(false);
   async function share() {
-    const url = en
-      ? "https://www.vividaastro.com/eq-test"
-      : "https://www.vivida.ge/eq-testi";
-    const text = en
-      ? `My emotional intelligence score on Vivida: ${overall} 💗 What will you get?`
-      : `ჩემი ემოციური ინტელექტი (EQ) Vivida-ზე: ${overall} 💗 შენ რას მიიღებ?`;
+    const url = pl
+      ? "https://www.vividaastro.com/pl/test-eq"
+      : en
+        ? "https://www.vividaastro.com/eq-test"
+        : "https://www.vivida.ge/eq-testi";
+    const text = pl
+      ? `Mój wynik inteligencji emocjonalnej (EQ) na Vivida: ${overall} 💗 Jaki będzie Twój?`
+      : en
+        ? `My emotional intelligence score on Vivida: ${overall} 💗 What will you get?`
+        : `ჩემი ემოციური ინტელექტი (EQ) Vivida-ზე: ${overall} 💗 შენ რას მიიღებ?`;
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: en ? "Vivida EQ Test" : "Vivida EQ ტესტი",
+          title: pl
+            ? "Test EQ Vivida"
+            : en
+              ? "Vivida EQ Test"
+              : "Vivida EQ ტესტი",
           text,
           url,
         });
@@ -247,7 +278,17 @@ function ShareButton({
   return (
     <Button type="button" variant="mystic" onClick={share} className="gap-1.5">
       {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
-      {copied ? (en ? "Copied" : "დაკოპირდა") : en ? "Share" : "გააზიარე"}
+      {copied
+        ? pl
+          ? "Skopiowano"
+          : en
+            ? "Copied"
+            : "დაკოპირდა"
+        : pl
+          ? "Udostępnij"
+          : en
+            ? "Share"
+            : "გააზიარე"}
     </Button>
   );
 }

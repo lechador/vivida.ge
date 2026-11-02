@@ -22,32 +22,49 @@ const DESCRIPTION_KA =
 const TITLE_EN = "Free Emotional Intelligence Test, EQ Assessment";
 const DESCRIPTION_EN =
   "Take a free 40-question emotional intelligence self-assessment across self-awareness, self-regulation, motivation, empathy and social skills.";
+const TITLE_PL = "Darmowy Test EQ (Inteligencji Emocjonalnej) Online | Vivida";
+const DESCRIPTION_PL =
+  "Wypełnij darmowy test EQ online: samoocena inteligencji emocjonalnej w 5 obszarach (samoświadomość, samoregulacja, motywacja, empatia i relacje). 40 pytań, ok. 7 minut. Bez rejestracji.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
+  const pl = locale === "pl";
   const en = locale === "en";
-  const title = en ? TITLE_EN : TITLE_KA;
-  const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
-  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  const title = pl ? TITLE_PL : en ? TITLE_EN : TITLE_KA;
+  const description = pl
+    ? DESCRIPTION_PL
+    : en
+      ? DESCRIPTION_EN
+      : DESCRIPTION_KA;
+  const siteUrl = pl || en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
   return {
     title: { absolute: title },
     description,
-    keywords: en
+    keywords: pl
       ? [
-          "free EQ test",
-          "emotional intelligence test",
-          "empathy test",
-          "self awareness test",
-          "emotional intelligence assessment",
+          "test eq",
+          "test inteligencji emocjonalnej",
+          "inteligencja emocjonalna test",
+          "darmowy test eq",
+          "test empatii",
+          "samoświadomość",
         ]
-      : [
-          "eq ტესტი",
-          "ემოციური ინტელექტი",
-          "ემოციური ინტელექტის ტესტი",
-          "უფასო eq ტესტი",
-          "ემპათიის ტესტი",
-        ],
-    alternates: localizedAlternates("/eq-testi", "/eq-testi", en ? "en" : "ka"),
+      : en
+        ? [
+            "free EQ test",
+            "emotional intelligence test",
+            "empathy test",
+            "self awareness test",
+            "emotional intelligence assessment",
+          ]
+        : [
+            "eq ტესტი",
+            "ემოციური ინტელექტი",
+            "ემოციური ინტელექტის ტესტი",
+            "უფასო eq ტესტი",
+            "ემპათიის ტესტი",
+          ],
+    alternates: localizedAlternates("/eq-testi", "/eq-testi", locale),
     openGraph: {
       images: [DEFAULT_OG_IMAGE],
       type: "website",
@@ -55,7 +72,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       siteName: "Vivida",
-      locale: en ? "en_US" : "ka_GE",
+      locale: pl ? "pl_PL" : en ? "en_US" : "ka_GE",
     },
     twitter: { card: "summary_large_image", title, description },
   };
@@ -99,6 +116,25 @@ const EQ_FAQ_EN = [
   },
 ];
 
+const EQ_FAQ_PL = [
+  {
+    q: "Czym jest inteligencja emocjonalna (EQ)?",
+    a: "Inteligencja emocjonalna opisuje zdolność rozpoznawania, rozumienia i kierowania emocjami własnymi oraz innych ludzi. Test opiera się na 5 filarach modelu Daniela Golemana: samoświadomości, samoregulacji, motywacji, empatii i relacjach społecznych.",
+  },
+  {
+    q: "Jak obliczany jest wynik EQ?",
+    a: "Odpowiadasz na pytania na 5-stopniowej skali. Pozycje odwrócone zapobiegają tendencyjnym odpowiedziom. Każdy z pięciu obszarów jest skalowany od 0 do 100 punktów, a całkowity wynik EQ stanowi ich średnią arytmetyczną.",
+  },
+  {
+    q: "Czy test jest darmowy i czy wymaga rejestracji?",
+    a: "Test i ogólny wynik EQ są w pełni darmowe i dostępne od razu po rozwiązaniu. Zapisanie wyniku i dostęp do szczegółowej mapy 5 obszarów wymaga darmowej rejestracji konta.",
+  },
+  {
+    q: "Co jest ważniejsze: EQ czy IQ?",
+    a: "Oba parametry opisują zupełnie inne zdolności. IQ bada myślenie abstrakcyjne i logiczne, natomiast EQ odpowiada za relacje międzyludzkie, radzenie sobie ze stresem i empatię. W życiu i pracy zawodowej wysokie EQ często ma decydujące znaczenie.",
+  },
+];
+
 /**
  * Free EQ (emotional intelligence) self-report test. Anyone can take it; the
  * score is computed client-side (see /eq-testi/shedegi), the deep 5-domain
@@ -108,32 +144,47 @@ export default async function EqTestPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
   const locale = await getRequestLocale();
+  const pl = locale === "pl";
   const en = locale === "en";
-  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
-  const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
-  const faq = en ? EQ_FAQ_EN : EQ_FAQ;
+  const siteUrl = pl || en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
+  const description = pl
+    ? DESCRIPTION_PL
+    : en
+      ? DESCRIPTION_EN
+      : DESCRIPTION_KA;
+  const faq = pl ? EQ_FAQ_PL : en ? EQ_FAQ_EN : EQ_FAQ;
 
   const ld = [
     {
       "@context": "https://schema.org",
       "@type": "Quiz",
-      name: en ? "Vivida EQ Test" : "Vivida EQ ტესტი",
+      name: pl ? "Test EQ Vivida" : en ? "Vivida EQ Test" : "Vivida EQ ტესტი",
       description,
-      inLanguage: en ? "en" : "ka-GE",
+      inLanguage: pl ? "pl-PL" : en ? "en" : "ka-GE",
       url: `${siteUrl}/eq-testi`,
       educationalLevel: "beginner",
       numberOfQuestions: EQ_QUESTION_COUNT,
       about: {
         "@type": "Thing",
-        name: en ? "Emotional intelligence (EQ)" : "ემოციური ინტელექტი (EQ)",
+        name: pl
+          ? "Inteligencja emocjonalna (EQ)"
+          : en
+            ? "Emotional intelligence (EQ)"
+            : "ემოციური ინტელექტი (EQ)",
         alternateName: "EQ",
       },
     },
     faqLd(faq),
     breadcrumbLd([
-      { name: en ? "Home" : "მთავარი", url: siteUrl },
-      { name: en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
-      { name: en ? "EQ Test" : "EQ ტესტი", url: `${siteUrl}/eq-testi` },
+      { name: pl ? "Strona główna" : en ? "Home" : "მთავარი", url: siteUrl },
+      {
+        name: pl ? "Testy" : en ? "Tests" : "ტესტები",
+        url: `${siteUrl}/tests`,
+      },
+      {
+        name: pl ? "Test EQ" : en ? "EQ Test" : "EQ ტესტი",
+        url: `${siteUrl}/eq-testi`,
+      },
     ]),
   ];
 
@@ -164,15 +215,21 @@ export default async function EqTestPage() {
             Vivida EQ
           </div>
           <h1 className="mt-1 text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
-            {en ? "Your " : "შენი"}{" "}
+            {pl ? "Twój " : en ? "Your " : "შენი"}{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {en ? "emotional intelligence test" : "ემოციური ინტელექტის ტესტი"}
+              {pl
+                ? "test inteligencji emocjonalnej"
+                : en
+                  ? "emotional intelligence test"
+                  : "ემოციური ინტელექტის ტესტი"}
             </span>
           </h1>
           <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
-            {en
-              ? `${EQ_QUESTION_COUNT} questions · about 7 minutes · free`
-              : `${EQ_QUESTION_COUNT} კითხვა · ~7 წუთი · უფასო`}
+            {pl
+              ? `${EQ_QUESTION_COUNT} pytań · ok. 7 minut · bezpłatnie`
+              : en
+                ? `${EQ_QUESTION_COUNT} questions · about 7 minutes · free`
+                : `${EQ_QUESTION_COUNT} კითხვა · ~7 წუთი · უფასო`}
           </p>
         </header>
 
@@ -183,20 +240,26 @@ export default async function EqTestPage() {
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-24 sm:px-6">
         <div className="rounded-3xl border border-border bg-card/40 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-xl font-semibold tracking-tight">
-            {en
-              ? "What is emotional intelligence?"
-              : "რა არის ემოციური ინტელექტი?"}
+            {pl
+              ? "Czym jest inteligencja emocjonalna?"
+              : en
+                ? "What is emotional intelligence?"
+                : "რა არის ემოციური ინტელექტი?"}
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            {en
-              ? "Emotional intelligence describes the skills involved in recognizing, understanding and managing emotion, both your own and other people's. These habits affect communication, conflict, resilience and relationships, and they can develop through practice."
-              : "ემოციური ინტელექტი (EQ) არის უნარი ამოიცნო, გაიგო და მართო ემოციები, როგორც საკუთარი, ისე სხვისი. IQ-სგან განსხვავებით, EQ განისაზღვრავს იმას, თუ როგორ ვამყარებთ კავშირებს, ვაგვარებთ კონფლიქტს და ვმართავთ სტრესს. კარგი ამბავი: EQ, IQ-სგან განსხვავებით, მთელი ცხოვრება ვითარდება."}
+            {pl
+              ? "Inteligencja emocjonalna (EQ) to zbiór umiejętności związanych z rozpoznawaniem, rozumieniem i kierowaniem emocjami – zarówno własnymi, jak i innych osób. Wpływa na sposób budowania relacji, radzenie sobie ze stresem, odporność psychiczną i komunikację. W przeciwieństwie do IQ, kompetencje emocjonalne można stale rozwijać i doskonalić w każdym wieku."
+              : en
+                ? "Emotional intelligence describes the skills involved in recognizing, understanding and managing emotion, both your own and other people's. These habits affect communication, conflict, resilience and relationships, and they can develop through practice."
+                : "ემოციური ინტელექტი (EQ) არის უნარი ამოიცნო, გაიგო და მართო ემოციები, როგორც საკუთარი, ისე სხვისი. IQ-სგან განსხვავებით, EQ განისაზღვრავს იმას, თუ როგორ ვამყარებთ კავშირებს, ვაგვარებთ კონფლიქტს და ვმართავთ სტრესს. კარგი ამბავი: EQ, IQ-სგან განსხვავებით, მთელი ცხოვრება ვითარდება."}
           </p>
 
           <h2 className="mt-8 text-xl font-semibold tracking-tight">
-            {en
-              ? "The five areas in this assessment"
-              : "ხუთი სფერო, რომელსაც ტესტი ზომავს"}
+            {pl
+              ? "Pięć obszarów mierzonych w teście"
+              : en
+                ? "The five areas in this assessment"
+                : "ხუთი სფერო, რომელსაც ტესტი ზომავს"}
           </h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {EQ_DOMAINS.map((d) => (
@@ -206,17 +269,25 @@ export default async function EqTestPage() {
               >
                 <div className="flex items-center gap-2 text-sm font-semibold">
                   <span>{d.glyph}</span>
-                  {en ? d.nameEn : d.nameKa}
+                  {pl ? (d.namePl ?? d.nameEn) : en ? d.nameEn : d.nameKa}
                 </div>
                 <div className="mt-0.5 text-xs text-muted-foreground">
-                  {en ? d.taglineEn : d.taglineKa}
+                  {pl
+                    ? (d.taglinePl ?? d.taglineEn)
+                    : en
+                      ? d.taglineEn
+                      : d.taglineKa}
                 </div>
               </div>
             ))}
           </div>
 
           <h2 className="mt-8 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Frequently asked questions" : "ხშირად დასმული კითხვები"}
+            {pl
+              ? "Najczęściej zadawane pytania"
+              : en
+                ? "Frequently asked questions"
+                : "ხშირად დასმული კითხვები"}
           </h2>
           <div className="mt-4 space-y-3">
             {faq.map((item) => (
@@ -236,7 +307,6 @@ export default async function EqTestPage() {
               </details>
             ))}
           </div>
-
         </div>
       </section>
     </main>

@@ -282,16 +282,28 @@ function evaluate(candidate: Candidate, live: LiveUser | null): Assignment {
 }
 
 const FEATURE: Record<string, Record<UserLocale, string>> = {
-  ტარო: { ka: "ტარო", en: "tarot" },
-  "PDF რუკა": { ka: "PDF რუკა", en: "PDF reports" },
-  "7-დღიანი პროგნოზი": { ka: "7-დღიანი პროგნოზი", en: "7-day forecasts" },
-  თავსებადობა: { ka: "თავსებადობა", en: "compatibility readings" },
-  "AI ჩატი": { ka: "AI ჩატი", en: "AI chat" },
-  MBTI: { ka: "MBTI", en: "MBTI" },
-  "Big Five": { ka: "Big Five", en: "Big Five" },
-  "აუდიო ჰოროსკოპი": { ka: "აუდიო ჰოროსკოპი", en: "audio horoscope" },
-  "IQ ტესტი": { ka: "IQ ტესტი", en: "IQ test" },
-  "EQ ტესტი": { ka: "EQ ტესტი", en: "EQ test" },
+  ტარო: { ka: "ტარო", en: "tarot", pl: "tarot" },
+  "PDF რუკა": { ka: "PDF რუკა", en: "PDF reports", pl: "raporty PDF" },
+  "7-დღიანი პროგნოზი": {
+    ka: "7-დღიანი პროგნოზი",
+    en: "7-day forecasts",
+    pl: "prognozy 7-dniowe",
+  },
+  თავსებადობა: {
+    ka: "თავსებადობა",
+    en: "compatibility readings",
+    pl: "analizy dopasowania",
+  },
+  "AI ჩატი": { ka: "AI ჩატი", en: "AI chat", pl: "czat AI" },
+  MBTI: { ka: "MBTI", en: "MBTI", pl: "MBTI" },
+  "Big Five": { ka: "Big Five", en: "Big Five", pl: "Wielka Piątka" },
+  "აუდიო ჰოროსკოპი": {
+    ka: "აუდიო ჰოროსკოპი",
+    en: "audio horoscope",
+    pl: "horoskop audio",
+  },
+  "IQ ტესტი": { ka: "IQ ტესტი", en: "IQ test", pl: "test IQ" },
+  "EQ ტესტი": { ka: "EQ ტესტი", en: "EQ test", pl: "test EQ" },
 };
 
 function featureLabel(candidate: Candidate, locale: UserLocale): string {

@@ -7,7 +7,7 @@
 
 import type { NatalChartJson, ChartInterpretationJson } from "@/db/schema";
 import type { UserLocale } from "./i18n/user-locale";
-import { signByIndex } from "./zodiac";
+import { signByIndex, ASPECT_LABELS_PL } from "./zodiac";
 import { aspectKey } from "./aspects";
 import type { CrossAspect } from "./transits";
 
@@ -25,6 +25,7 @@ type GenerateInput = {
   firstName?: string | null;
   chart: NatalChartJson;
   staticBigThree: { sun?: string; moon?: string; ascendant?: string };
+  locale?: UserLocale;
 };
 
 /**
@@ -109,6 +110,35 @@ const SYSTEM_PROMPT = `შენ ხარ თბილი, ცოცხალ�
 - აცილე ტექნიკური ჟარგონი; ისე დაწერე, თითქოს მეგობარი გელაპარაკება.
 - პასუხი მხოლოდ JSON; პროზა JSON-ის გარეთ აკრძალულია.`;
 
+const SYSTEM_PROMPT_PL = `Jesteś ciepłym, wnikliwym i nowoczesnym astrologiem. Piszesz po polsku dla młodego, świadomego odbiorcy. \
+Twój język jest współczesny, poetycki, ale klarowny i konkretny; unikaj ezoterycznego żargonu, a wszelkie pojęcia astrologiczne tłumacz naturalnie w kontekście życia.
+
+Zasady:
+- Odpowiedź WYŁĄCZNIE po polsku jako obiekt JSON o dokładnie tej strukturze:
+  {
+    "summary": string,
+    "bigThree": { "sun": string, "moon": string, "ascendant": string },
+    "highlights": Array<{ "title": string, "body": string }>,
+    "planets": { "mercury": string, "venus": string, "mars": string, "jupiter": string, "saturn": string, "uranus": string, "neptune": string, "pluto": string },
+    "houses": { "1": string, "2": string, ..., "12": string },
+    "aspects": Object<string, string>  // klucz = "<a>-<b>-<kind>" dokładnie tak, jak podano na wejściu
+  }
+- "summary": 2 zdania syntetyzujące emocjonalny, głęboki obraz całego kosmogramu w formie "Ty".
+- "bigThree.sun" / "moon" / "ascendant": po 2-3 zdania każde, w bezpośredniej formie "Ty".
+- "highlights": 2 lub 3 krótkie, wyraziste punkty (znacząca planeta, kluczowa konfiguracja lub znak + żywe wyjaśnienie).
+- "planets" (mercury..pluto): po 2-3 zdania na planetę. Uwzględnij znak i dom. Słońce i Księżyc znajdują się w bigThree, nie powtarzaj ich tutaj.
+- "houses" (1..12): po 2-3 zdania na dom. Uwzględnij znak na wierzchołku oraz planety przebywające w danym domu.
+- "aspects": zinterpretuj WYŁĄCZNIE te aspekty, które przekazano w danych wejściowych. Pozostaw klucze dokładnie w tej samej postaci. Po 2-3 zdania w formie "Ty", wyjaśniając:
+    * co oznacza połączenie tych dwóch energii (np. Słońce + Mars = tożsamość i działanie)
+    * jak przejawia się to w codziennym życiu (konkretnie, bez mglistych abstrakcji)
+    * w aspektach harmonijnych (sekstyl, trygon) podkreśl naturalny talent i łatwość przepływu
+    * w aspektach napięciowych (kwadratura, opozycja) wskaż źródło tarcia oraz potencjał rozwojowy
+    * w koniunkcji podkreśl fuzję i wzajemne wzmocnienie obu energii
+- Zawsze zwracaj się bezpośrednio w drugiej osobie ("Ty").
+- Unikaj banałów i klisz ("wszechświat chce...", "zapisane w gwiazdach"). Bądź konkretny.
+- Unikaj hermetycznego żargonu; pisz tak, jakby rozmawiał zaufany, mądry przyjaciel.
+- Odpowiedź to wyłącznie poprawny obiekt JSON, bez tekstu poza klamrami i bez znaczników markdown.`;
+
 /** Pick the most personally-relevant aspects for AI interpretation. */
 function selectAspectsToInterpret(
   chart: NatalChartJson,
@@ -159,18 +189,27 @@ function selectAspectsToInterpret(
 }
 
 function buildUserPrompt(input: GenerateInput): string {
+  const isPl = input.locale === "pl";
   const name = input.firstName?.trim() || null;
   const aspects = selectAspectsToInterpret(input.chart);
 
   const parts: (string | null)[] = [
-    name ? `მომხმარებლის სახელი: ${name}` : null,
-    `ნატალური რუკის შეჯამება (ინგლისურად, ტექნიკური):`,
+    name
+      ? isPl
+        ? `Imię użytkownika: ${name}`
+        : `მომხმარებლის სახელი: ${name}`
+      : null,
+    isPl
+      ? "Podsumowanie kosmogramu urodzeniowego (techniczne, po angielsku):"
+      : "ნატალური რუკის შეჯამება (ინგლისურად, ტექნიკური):",
     summarizeChart(input.chart),
     "",
-    "ჩვენი არსებული სტატიკური ტექსტი (გამოიყენე როგორც ბაზა, მაგრამ პერსონალურად გადააფორმე):",
-    `- მზე: ${input.staticBigThree.sun ?? "(არ არის)"}`,
-    `- მთვარე: ${input.staticBigThree.moon ?? "(არ არის)"}`,
-    `- ამომავალი: ${input.staticBigThree.ascendant ?? "(არ არის)"}`,
+    isPl
+      ? "Nasz dotychczasowy tekst statyczny (użyj jako punktu wyjścia, ale spersonalizuj i rozwiń):"
+      : "ჩვენი არსებული სტატიკური ტექსტი (გამოიყენე როგორც ბაზა, მაგრამ პერსონალურად გადააფორმე):",
+    `- ${isPl ? "Słońce" : "მზე"}: ${input.staticBigThree.sun ?? (isPl ? "(brak)" : "(არ არის)")}`,
+    `- ${isPl ? "Księżyc" : "მთვარე"}: ${input.staticBigThree.moon ?? (isPl ? "(brak)" : "(არ არის)")}`,
+    `- ${isPl ? "Ascendent" : "ამომავალი"}: ${input.staticBigThree.ascendant ?? (isPl ? "(brak)" : "(არ არის)")}`,
   ];
 
   if (aspects.length > 0) {
@@ -185,7 +224,10 @@ function buildUserPrompt(input: GenerateInput): string {
     }
   }
 
-  parts.push("", "გამოგვაგზავნე ვალიდური JSON.");
+  parts.push(
+    "",
+    isPl ? "Zwróć poprawny JSON." : "გამოგვაგზავნე ვალიდური JSON.",
+  );
   return parts.filter(Boolean).join("\n");
 }
 
@@ -212,7 +254,10 @@ export async function generateInterpretation(
       model: DEFAULT_MODEL,
       reasoning: { effort: "low" },
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        {
+          role: "system",
+          content: input.locale === "pl" ? SYSTEM_PROMPT_PL : SYSTEM_PROMPT,
+        },
         { role: "user", content: buildUserPrompt(input) },
       ],
       response_format: { type: "json_object" },
@@ -279,6 +324,19 @@ const SUMMARY_SYSTEM_PROMPT = `შენ ხარ თბილი, ცოცხ
 - კონკრეტული რუკის მიხედვით (ნიშნები, სახლები, ასპექტები), არა ზოგადი მისტიკა
 - მხოლოდ JSON, code fence-ის გარეშე`;
 
+const SUMMARY_SYSTEM_PROMPT_PL = `Jesteś ciepłym, nowoczesnym astrologiem piszącym po polsku dla młodego, świadomego odbiorcy. Styl nowoczesny, wnikliwy, konkretny, bez ezoterycznych banałów i kosmicznych klisz. Zwracaj się bezpośrednio w drugiej osobie ("Ty").
+
+Zwróć wyłącznie poprawny obiekt JSON o tej strukturze:
+{
+  "summary": string,                              // 2 zdania: emocjonalny, syntetyczny portret całego kosmogramu w formie "Ty"
+  "highlights": Array<{ "title": string, "body": string }>  // 2 lub 3 zwięzłe punkty: najważniejsza dominująca planeta / konfiguracja + żywe wyjaśnienie
+}
+
+Zasady:
+- Forma bezpośrednia ("Ty"), ton empatyczny, partnerski i wnikliwy
+- Oprzyj się na konkretnych elementach kosmogramu (znaki, domy, aspekty), bez pustego mistycyzmu
+- Tylko czysty JSON, bez bloków markdown (code fences)`;
+
 /**
  * Generate just the personalized summary + highlights for a chart. Returns
  * null when OpenRouter isn't configured.
@@ -286,17 +344,27 @@ const SUMMARY_SYSTEM_PROMPT = `შენ ხარ თბილი, ცოცხ
 export async function generateChartSummary(input: {
   firstName?: string | null;
   chart: NatalChartJson;
+  locale?: UserLocale;
 }): Promise<ChartSummaryResult | null> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null;
 
+  const isPl = input.locale === "pl";
   const name = input.firstName?.trim() || null;
   const userMessage = [
-    name ? `მომხმარებლის სახელი: ${name}` : null,
-    "ნატალური რუკის შეჯამება (ინგლისურად, ტექნიკური):",
+    name
+      ? isPl
+        ? `Imię użytkownika: ${name}`
+        : `მომხმარებლის სახელი: ${name}`
+      : null,
+    isPl
+      ? "Podsumowanie kosmogramu urodzeniowego (techniczne, po angielsku):"
+      : "ნატალური რუკის შეჯამება (ინგლისურად, ტექნიკური):",
     summarizeChart(input.chart),
     "",
-    "დააწერე summary + highlights. JSON-ად დააბრუნე.",
+    isPl
+      ? "Napisz summary + highlights. Zwróć jako poprawny JSON."
+      : "დააწერე summary + highlights. JSON-ად დააბრუნე.",
   ]
     .filter(Boolean)
     .join("\n");
@@ -313,7 +381,10 @@ export async function generateChartSummary(input: {
       model: DEFAULT_MODEL,
       reasoning: { effort: "low" },
       messages: [
-        { role: "system", content: SUMMARY_SYSTEM_PROMPT },
+        {
+          role: "system",
+          content: isPl ? SUMMARY_SYSTEM_PROMPT_PL : SUMMARY_SYSTEM_PROMPT,
+        },
         { role: "user", content: userMessage },
       ],
       response_format: { type: "json_object" },
@@ -395,6 +466,23 @@ const MOON_PHASE_SYSTEM_PROMPT = `შენ ხარ თბილი, თან
 - ფაზის+ნიშნის სპეციფიკური ენერგიის ხაზგასმა, არა უნივერსალური "მთვარე გრძნობებზეა"
 - მხოლოდ JSON, ფენსების გარეშე`;
 
+const MOON_PHASE_SYSTEM_PROMPT_PL = `Jesteś ciepłym, nowoczesnym astrologiem i redaktorem piszącym po polsku. Posługujesz się żywym, precyzyjnym językiem bez mglistego mistycyzmu. Piszesz o kolektywnej energii Księżyca — co dana faza i znak oznaczają dla wszystkich tu i teraz, bez odniesienia do indywidualnego kosmogramu.
+
+Zwróć wyłącznie poprawny obiekt JSON o tej strukturze:
+{
+  "headline": string,           // 40-60 znaków: żywy, konkretny nagłówek łączący fazę i znak
+  "summary": string,            // 1-2 zdania: esencja energii na niebie w tej chwili
+  "body": string,               // 110-150 słów, 2 akapity (rozdzielone \\n\\n): co przynosi ta faza w danym znaku oraz jaki rytuał lub podejście najlepiej sprawdza się w tych dniach
+  "themes": [string, string, string]  // 3 jedno- lub dwuwyrazowe motywy (np. "autorefleksja", "nowy początek", "stawianie granic")
+}
+
+Zasady:
+- Zwracaj się bezpośrednio ("Ty"), ton zrównoważony (ani melodramatyczny, ani chłodny)
+- Konkretne, namacalne przykłady i wskazówki zamiast ogólników
+- Unikaj banałów ("otwórz serce", "wszechświat na Ciebie czeka" itp.)
+- Podkreśl specyfikę kombinacji fazy i znaku (a nie ogólne "Księżyc wpływa na emocje")
+- Tylko poprawny JSON, bez bloków kodu`;
+
 export async function generateMoonPhaseReading(input: {
   phaseLabelKa: string;
   phaseKey: string;
@@ -403,19 +491,33 @@ export async function generateMoonPhaseReading(input: {
   illumination: number;
   ageDays: number;
   phaseAngle: number;
+  locale?: UserLocale;
+  phaseLabelPl?: string;
+  signPl?: string;
 }): Promise<MoonPhaseReadingResult | null> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null;
 
-  const userMessage = [
-    `მთვარის ფაზა: ${input.phaseLabelKa} (${input.phaseKey})`,
-    `მთვარის ნიშანი: ${input.signKa} (${input.signEn})`,
-    `განათება: ${(input.illumination * 100).toFixed(1)}%`,
-    `ციკლის ასაკი: ${input.ageDays.toFixed(1)} დღე (29.53 დღიანი ციკლიდან)`,
-    `მზე-მთვარის კუთხე: ${input.phaseAngle.toFixed(1)}°`,
-    "",
-    "დააწერე ამ ფაზის+ნიშნის კოლექტიური ინტერპრეტაცია. JSON-ად დააბრუნე.",
-  ].join("\n");
+  const isPl = input.locale === "pl";
+  const userMessage = isPl
+    ? [
+        `Faza Księżyca: ${input.phaseLabelPl ?? input.phaseKey} (${input.phaseKey})`,
+        `Znak Księżyca: ${input.signPl ?? input.signEn} (${input.signEn})`,
+        `Oświetlenie tarczy: ${(input.illumination * 100).toFixed(1)}%`,
+        `Wiek cyklu: ${input.ageDays.toFixed(1)} dni (z 29.53-dniowego cyklu)`,
+        `Kąt Słońce-Księżyc: ${input.phaseAngle.toFixed(1)}°`,
+        "",
+        "Napisz kolektywną interpretację tej fazy i znaku. Zwróć jako poprawny JSON.",
+      ].join("\n")
+    : [
+        `მთვარის ფაზა: ${input.phaseLabelKa} (${input.phaseKey})`,
+        `მთვარის ნიშანი: ${input.signKa} (${input.signEn})`,
+        `განათება: ${(input.illumination * 100).toFixed(1)}%`,
+        `ციკლის ასაკი: ${input.ageDays.toFixed(1)} დღე (29.53 დღიანი ციკლიდან)`,
+        `მზე-მთვარის კუთხე: ${input.phaseAngle.toFixed(1)}°`,
+        "",
+        "დააწერე ამ ფაზის+ნიშნის კოლექტიური ინტერპრეტაცია. JSON-ად დააბრუნე.",
+      ].join("\n");
 
   const res = await fetch(OPENROUTER_URL, {
     method: "POST",
@@ -429,7 +531,12 @@ export async function generateMoonPhaseReading(input: {
       model: DEFAULT_MODEL,
       reasoning: { effort: "low" },
       messages: [
-        { role: "system", content: MOON_PHASE_SYSTEM_PROMPT },
+        {
+          role: "system",
+          content: isPl
+            ? MOON_PHASE_SYSTEM_PROMPT_PL
+            : MOON_PHASE_SYSTEM_PROMPT,
+        },
         { role: "user", content: userMessage },
       ],
       response_format: { type: "json_object" },
@@ -524,6 +631,66 @@ headline-ის სარედაქციო წესები:
 
 დააბრუნე მხოლოდ ვალიდური JSON. სხვა ტექსტი არ დაგვცე.`;
 
+const DAILY_SYSTEM_PROMPT_PL = `Jesteś nowoczesnym astrologiem piszącym po polsku, który buduje codzienne horoskopy na fundamencie prawdziwej astrologii tranzytowej, a nie ogólnego mistycyzmu.
+
+Najważniejsza zasada: przewodnikiem dnia jest Księżyc.
+- Księżyc zmienia znak co 2-3 dni — to on nadaje ton i rytm codziennemu horoskopowi.
+- Dzisiejszy znak Księżyca → emocjonalne tło i klimat dnia.
+- Tranzytujący dom Księżyca (w kosmogramie urodzeniowym użytkownika) → która sfera życia staje się dziś aktywna.
+- Aspekty Księżyca do planet urodzeniowych → konkretne impulsy i wydarzenia dnia.
+
+Wszystkie inne tranzyty według horyzontu czasowego:
+- Merkury / Wenus / Mars → motywy bieżącego tygodnia (aktywne 3-7 dni).
+- Jowisz / Saturn → tło sezonu (wielotygodniowe).
+- Uran / Neptun / Pluton → tło wielomiesięczne/roczne; NIGDY nie powinny być głównym tematem nagłówka codziennego horoskopu.
+
+Struktura odpowiedzi (JSON):
+{
+  "headline": string,   // 4-8 słów: konkretny, powiązany z dzisiejszym wyborem lub sferą życia
+  "summary": string,    // 1 zdanie: esencja nastroju dnia (styl TL;DR). NIE wymieniaj wprost znaku ani domu Księżyca — to pojawi się w body.
+  "body": string,       // 3 akapity (~150-200 słów) rozdzielone \\n\\n, zobacz szczegóły poniżej
+  "themes": string[]    // 1-3 zwięzłe motywy, np. ["relacje", "kariera", "regeneracja"]
+}
+
+Bardzo ważne: summary i body nie mogą powtarzać dokładnie tej samej treści.
+- summary = klimat, nastrój i ogólny impuls dnia w jednym żywym zdaniu (np.: "Dzień zachęca do dokończenia jednej małej sprawy i odpuszczenia pośpiechu.")
+- body = astrologiczne detale i głębsze wyjaśnienie przyczyny tego klimatu.
+
+Struktura body (3 akapity rozdzielone pustą linią):
+1. Dzisiejszy Księżyc: znak + dom tranzytowy + na co rzuca światło.
+2. Jeden konkretny tranzyt lub aspekt aktywny dzisiaj → praktyczna wskazówka działania.
+3. Krótka myśl podsumowująca lub przypomnienie dłuższego tła planetarnego.
+
+Konkret > abstrakcja:
+✅ "Twoja uwaga kieruje się na dom i bliskich, gdy Księżyc przemierza Twój 4. dom"
+❌ "Wszechświat zaprasza Cię do rodzinnego ciepła"
+✅ "Spróbuj dziś spokojnie dokończyć jedną trudną rozmowę"
+❌ "Zaufaj swojej ścieżce"
+
+Zasady dla nagłówka (headline):
+- Nazwij namacalny temat lub wybór: rozmowa, relacja, praca, finanse, odpoczynek, decyzja.
+- Unikaj powtarzania wyświechtanych słów: "dusza", "serce", "harmonia", "wewnętrzny".
+- Przykłady dobrych nagłówków: "Jedna rozmowa wyjaśni dziś bardzo wiele", "Nie spiesz się z ostateczną odpowiedzią", "Sprawy zawodowe wymagają dziś pełnej uwagi".
+- Unikaj banałów: "wszechświat jest po Twojej stronie", "gwiazdy do Ciebie mówią".
+
+Język: polski. Forma bezpośrednia ("Ty"). Marka "Vivida" w alfabecie łacińskim.
+Zwróć wyłącznie poprawny obiekt JSON.`;
+
+export const PLANET_LABELS_PL: Record<string, string> = {
+  sun: "Słońce",
+  moon: "Księżyc",
+  mercury: "Merkury",
+  venus: "Wenus",
+  mars: "Mars",
+  jupiter: "Jowisz",
+  saturn: "Saturn",
+  uranus: "Uran",
+  neptune: "Neptun",
+  pluto: "Pluton",
+  ascendant: "Ascendent",
+  midheaven: "Medium Coeli",
+};
+
 // ────────────────────────────────────────────────────────────────────────
 //  Synastry, AI narrative on top of the deterministic scoring
 // ────────────────────────────────────────────────────────────────────────
@@ -579,6 +746,31 @@ Rules:
 - Avoid cosmic clichés and deterministic claims. Use Vivida in Latin characters.
 - English only. Return JSON without code fences.`;
 
+const SYNASTRY_SYSTEM_PROMPT_PL = `Jesteś ciepłym, nowoczesnym astrologiem piszącym po polsku. Tworzysz zwięzłą narrację synastrii (zgodności partnerskiej dwóch kosmogramów) na bazie wyliczonych punktów i najważniejszych aspektów międzyplanetarnych. Unikaj powierzchownego mistycyzmu i banałów.
+
+Otrzymujesz:
+- Kosmogram użytkownika (osoby czytającej)
+- Kosmogram partnera + imię
+- Obliczone punkty (love, friendship, chemistry, communication, growth, business, 0..100; overall, 0..100)
+- Najważniejsze aspekty wzajemne (cross-aspects)
+
+Zwróć poprawny JSON o dokładnie tej strukturze:
+{
+  "summary": string,         // 2-3 zdania: syntetyczny portret relacji i dynamiki między wami
+  "strengths": [string, ...], // 1-3 zwięzłe punkty: gdzie płynie naturalna harmonia i porozumienie
+  "growth": [string, ...]     // 1-3 zwięzłe punkty: gdzie pojawiają się tarcia i szansa na wspólny rozwój
+}
+
+Zasady:
+- Zwracaj się bezpośrednio do użytkownika ("Ty"), partnera wymieniaj z imienia.
+- Wskazuj konkretne kontakty w kosmogramie ("Twój Księżyc tworzy trygon z jej/jego Wenus" itp.).
+- Język otwarty i inkluzywny, nie zakładaj z góry płci ani sztywnego modelu relacji.
+- Przy wysokim wyniku (overall > 70) podkreśl naturalny przepływ; przy niższym (< 40) uczciwie nazwij napięcia, wskazując jednocześnie konstruktywną ścieżkę.
+- Każdy punkt listy to 1 żywe zdanie.
+- Marka Vivida (alfabet łaciński), nazwy planet i znaków po polsku.
+- Unikaj banałów ("gwiazdy wam sprzyjają", "przeznaczenie").
+- Tylko poprawny JSON, bez bloków markdown (code fences).`;
+
 export async function generateSynastryInterpretation(input: {
   partnerName: string;
   viewerFirstName: string | null;
@@ -597,34 +789,51 @@ export async function generateSynastryInterpretation(input: {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null;
 
-  // English prompt for English readers, Georgian otherwise.
+  // English prompt for English readers, Polish for Polish readers, Georgian otherwise.
   const loc = input.locale ?? "ka";
   const en = loc === "en";
+  const pl = loc === "pl";
   const sections: string[] = [];
   if (input.viewerFirstName)
     sections.push(
-      en
-        ? `Viewer's name: ${input.viewerFirstName}`
-        : `მომხმარებლის სახელი: ${input.viewerFirstName}`,
+      pl
+        ? `Imię użytkownika: ${input.viewerFirstName}`
+        : en
+          ? `Viewer's name: ${input.viewerFirstName}`
+          : `მომხმარებლის სახელი: ${input.viewerFirstName}`,
     );
   sections.push(
-    en
-      ? `Partner's name: ${input.partnerName}`
-      : `პარტნიორის სახელი: ${input.partnerName}`,
+    pl
+      ? `Imię partnera: ${input.partnerName}`
+      : en
+        ? `Partner's name: ${input.partnerName}`
+        : `პარტნიორის სახელი: ${input.partnerName}`,
   );
 
   sections.push(
-    en ? "\n--- Viewer's natal chart ---" : "\n--- მომხმარებლის რუკა ---",
+    pl
+      ? "\n--- Kosmogram urodzeniowy użytkownika ---"
+      : en
+        ? "\n--- Viewer's natal chart ---"
+        : "\n--- მომხმარებლის რუკა ---",
   );
   sections.push(summarizeNatalCompact(input.viewerChart));
 
   sections.push(
-    en ? "\n--- Partner's natal chart ---" : "\n--- პარტნიორის რუკა ---",
+    pl
+      ? "\n--- Kosmogram urodzeniowy partnera ---"
+      : en
+        ? "\n--- Partner's natal chart ---"
+        : "\n--- პარტნიორის რუკა ---",
   );
   sections.push(summarizeNatalCompact(input.partnerChart));
 
   sections.push(
-    en ? "\n--- Calculated scores ---" : "\n--- გათვლილი ქულები ---",
+    pl
+      ? "\n--- Obliczone punkty zgodności ---"
+      : en
+        ? "\n--- Calculated scores ---"
+        : "\n--- გათვლილი ქულები ---",
   );
   sections.push(`overall: ${input.overall}`);
   for (const [cat, val] of Object.entries(input.scores)) {
@@ -633,25 +842,40 @@ export async function generateSynastryInterpretation(input: {
 
   if (input.topAspects.length > 0) {
     sections.push(
-      en
-        ? "\n--- Strongest cross-chart aspects ---"
-        : "\n--- ყველაზე ძლიერი ცროს-ასპექტები ---",
+      pl
+        ? "\n--- Najsilniejsze aspekty wzajemne ---"
+        : en
+          ? "\n--- Strongest cross-chart aspects ---"
+          : "\n--- ყველაზე ძლიერი ცროს-ასპექტები ---",
     );
     for (const a of input.topAspects.slice(0, 8)) {
-      const left = en ? a.a : (PLANET_LABELS_KA[a.a] ?? a.a);
-      const right = en ? a.b : (PLANET_LABELS_KA[a.b] ?? a.b);
+      const left = pl
+        ? (PLANET_LABELS_PL[a.a] ?? a.a)
+        : en
+          ? a.a
+          : (PLANET_LABELS_KA[a.a] ?? a.a);
+      const right = pl
+        ? (PLANET_LABELS_PL[a.b] ?? a.b)
+        : en
+          ? a.b
+          : (PLANET_LABELS_KA[a.b] ?? a.b);
+      const kind = pl ? (ASPECT_LABELS_PL[a.kind] ?? a.kind) : a.kind;
       sections.push(
-        en
-          ? `  Your ${left} ${a.kind} ${input.partnerName}'s ${right}, orb ${a.orb.toFixed(1)}°`
-          : `  ${left} (შენი) ${a.kind} ${right} (${input.partnerName}-ის), ორბი ${a.orb.toFixed(1)}°`,
+        pl
+          ? `  Twój ${left} tworzy ${kind} z planetą ${right} partnera (${input.partnerName}), orba ${a.orb.toFixed(1)}°`
+          : en
+            ? `  Your ${left} ${a.kind} ${input.partnerName}'s ${right}, orb ${a.orb.toFixed(1)}°`
+            : `  ${left} (შენი) ${a.kind} ${right} (${input.partnerName}-ის), ორბი ${a.orb.toFixed(1)}°`,
       );
     }
   }
 
   sections.push(
-    en
-      ? "\nWrite the narrative and return JSON."
-      : "\nდააწერე ნარატივი. JSON-ად დააბრუნე.",
+    pl
+      ? "\nNapisz narrację i zwróć poprawny JSON."
+      : en
+        ? "\nWrite the narrative and return JSON."
+        : "\nდააწერე ნარატივი. JSON-ად დააბრუნე.",
   );
 
   const userMessage = sections.join("\n");
@@ -670,7 +894,11 @@ export async function generateSynastryInterpretation(input: {
       messages: [
         {
           role: "system",
-          content: en ? SYNASTRY_SYSTEM_PROMPT_EN : SYNASTRY_SYSTEM_PROMPT,
+          content: pl
+            ? SYNASTRY_SYSTEM_PROMPT_PL
+            : en
+              ? SYNASTRY_SYSTEM_PROMPT_EN
+              : SYNASTRY_SYSTEM_PROMPT,
         },
         { role: "user", content: userMessage },
       ],
@@ -757,6 +985,30 @@ Return valid JSON in exactly this shape:
 
 Write 2–3 paragraphs for intro and love, around 2 paragraphs for every other prose section, and 3–5 practical pieces of advice. Address the viewer as "you", name the partner, cite concrete chart contacts, and remain candid without being fatalistic. Do not assume gender or relationship structure. Avoid cosmic clichés. English only. Return JSON without code fences.`;
 
+const SYNASTRY_DEEP_SYSTEM_PROMPT_PL = `Jesteś ciepłym, wnikliwym, nowoczesnym astrologiem piszącym po polsku. Tworzysz obszerny, pogłębiony raport synastrii (dopasowania partnerskiego) najwyższej jakości na podstawie dwóch kosmogramów urodzeniowych, punktacji zgodności i wzajemnych aspektów planetarnych.
+
+Otrzymujesz oba kosmogramy, wyliczone punkty oraz najsilniejsze aspekty międzyplanetarne.
+
+Zwróć poprawny JSON o dokładnie tej strukturze:
+{
+  "intro": string,          // 2-3 akapity (\\n\\n): całościowy portret relacji, wspólna energia, co tworzycie razem
+  "love": string,           // 2-3 akapity: miłość, przyciąganie, chemia i romans (Wenus, Mars, domy 5/7/8)
+  "communication": string,  // 2 akapity: porozumienie umysłowe, komunikacja, styl rozmowy (Merkury, żywioł Powietrza)
+  "trust": string,          // 2 akapity: przyjaźń, zaufanie, poczucie bezpieczeństwa emocjonalnego (Księżyc, Saturn)
+  "friction": string,       // 2 akapity: gdzie leżą punkty tarcia i czego uczy was to napięcie (aspekty trudne, domy 6/8/12)
+  "longTerm": string,       // 2 akapity: potencjał długoterminowy i trwałość więzi
+  "advice": [string, ...]   // 3-5 konkretnych, praktycznych wskazówek dla pary
+}
+
+Zasady:
+- Zwracaj się bezpośrednio do użytkownika ("Ty"), partnera wymieniaj z imienia.
+- Wskazuj konkretne fakty astrologiczne ("Twój Księżyc w trygonie do jej/jego Wenus" itp.), bez pustego mistycyzmu.
+- Zachowaj szczerość i równowagę: przy wysokich punktach wskaż naturalny flow, przy trudnych uszanuj tarcia, ale pokaż konstruktywne wyjście.
+- Żywy, autentyczny język polski; unikaj kosmicznych banałów ("przeznaczenie zapisało w gwiazdach").
+- Nie narzucaj założeń co do płci partnera ani modelu relacji.
+- Nazwy planet po polsku, marka Vivida w alfabecie łacińskim.
+- Tylko czysty JSON, bez bloków kodu (code fences).`;
+
 export async function generateSynastryDeepReport(input: {
   partnerName: string;
   viewerFirstName: string | null;
@@ -772,28 +1024,45 @@ export async function generateSynastryDeepReport(input: {
 
   const loc = input.locale ?? "ka";
   const en = loc === "en";
+  const pl = loc === "pl";
   const sections: string[] = [];
   if (input.viewerFirstName)
     sections.push(
-      en
-        ? `Viewer's name: ${input.viewerFirstName}`
-        : `მომხმარებლის სახელი: ${input.viewerFirstName}`,
+      pl
+        ? `Imię użytkownika: ${input.viewerFirstName}`
+        : en
+          ? `Viewer's name: ${input.viewerFirstName}`
+          : `მომხმარებლის სახელი: ${input.viewerFirstName}`,
     );
   sections.push(
-    en
-      ? `Partner's name: ${input.partnerName}`
-      : `პარტნიორის სახელი: ${input.partnerName}`,
+    pl
+      ? `Imię partnera: ${input.partnerName}`
+      : en
+        ? `Partner's name: ${input.partnerName}`
+        : `პარტნიორის სახელი: ${input.partnerName}`,
   );
   sections.push(
-    en ? "\n--- Viewer's natal chart ---" : "\n--- მომხმარებლის რუკა ---",
+    pl
+      ? "\n--- Kosmogram urodzeniowy użytkownika ---"
+      : en
+        ? "\n--- Viewer's natal chart ---"
+        : "\n--- მომხმარებლის რუკა ---",
   );
   sections.push(summarizeNatalCompact(input.viewerChart));
   sections.push(
-    en ? "\n--- Partner's natal chart ---" : "\n--- პარტნიორის რუკა ---",
+    pl
+      ? "\n--- Kosmogram urodzeniowy partnera ---"
+      : en
+        ? "\n--- Partner's natal chart ---"
+        : "\n--- პარტნიორის რუკა ---",
   );
   sections.push(summarizeNatalCompact(input.partnerChart));
   sections.push(
-    en ? "\n--- Calculated scores ---" : "\n--- გათვლილი ქულები ---",
+    pl
+      ? "\n--- Obliczone punkty zgodności ---"
+      : en
+        ? "\n--- Calculated scores ---"
+        : "\n--- გათვლილი ქულები ---",
   );
   sections.push(`overall: ${input.overall}`);
   for (const [cat, val] of Object.entries(input.scores)) {
@@ -801,24 +1070,39 @@ export async function generateSynastryDeepReport(input: {
   }
   if (input.topAspects.length > 0) {
     sections.push(
-      en
-        ? "\n--- Strongest cross-chart aspects ---"
-        : "\n--- ყველაზე ძლიერი ცროს-ასპექტები ---",
+      pl
+        ? "\n--- Najsilniejsze aspekty wzajemne ---"
+        : en
+          ? "\n--- Strongest cross-chart aspects ---"
+          : "\n--- ყველაზე ძლიერი ცროს-ასპექტები ---",
     );
     for (const a of input.topAspects.slice(0, 10)) {
-      const left = en ? a.a : (PLANET_LABELS_KA[a.a] ?? a.a);
-      const right = en ? a.b : (PLANET_LABELS_KA[a.b] ?? a.b);
+      const left = pl
+        ? (PLANET_LABELS_PL[a.a] ?? a.a)
+        : en
+          ? a.a
+          : (PLANET_LABELS_KA[a.a] ?? a.a);
+      const right = pl
+        ? (PLANET_LABELS_PL[a.b] ?? a.b)
+        : en
+          ? a.b
+          : (PLANET_LABELS_KA[a.b] ?? a.b);
+      const kind = pl ? (ASPECT_LABELS_PL[a.kind] ?? a.kind) : a.kind;
       sections.push(
-        en
-          ? `  Your ${left} ${a.kind} ${input.partnerName}'s ${right}, orb ${a.orb.toFixed(1)}°`
-          : `  ${left} (შენი) ${a.kind} ${right} (${input.partnerName}-ის), ორბი ${a.orb.toFixed(1)}°`,
+        pl
+          ? `  Twój ${left} tworzy ${kind} z planetą ${right} partnera (${input.partnerName}), orba ${a.orb.toFixed(1)}°`
+          : en
+            ? `  Your ${left} ${a.kind} ${input.partnerName}'s ${right}, orb ${a.orb.toFixed(1)}°`
+            : `  ${left} (შენი) ${a.kind} ${right} (${input.partnerName}-ის), ორბი ${a.orb.toFixed(1)}°`,
       );
     }
   }
   sections.push(
-    en
-      ? "\nWrite the complete in-depth report and return JSON."
-      : "\nდაწერე სრული, ღრმა ანგარიში. JSON-ად დააბრუნე.",
+    pl
+      ? "\nNapisz pełny, pogłębiony raport i zwróć poprawny JSON."
+      : en
+        ? "\nWrite the complete in-depth report and return JSON."
+        : "\nდაწერე სრული, ღრმა ანგარიში. JSON-ად დააბრუნე.",
   );
 
   const res = await fetch(OPENROUTER_URL, {
@@ -835,9 +1119,11 @@ export async function generateSynastryDeepReport(input: {
       messages: [
         {
           role: "system",
-          content: en
-            ? SYNASTRY_DEEP_SYSTEM_PROMPT_EN
-            : SYNASTRY_DEEP_SYSTEM_PROMPT,
+          content: pl
+            ? SYNASTRY_DEEP_SYSTEM_PROMPT_PL
+            : en
+              ? SYNASTRY_DEEP_SYSTEM_PROMPT_EN
+              : SYNASTRY_DEEP_SYSTEM_PROMPT,
         },
         { role: "user", content: sections.join("\n") },
       ],
@@ -930,6 +1216,36 @@ const WEEKLY_FORECAST_SYSTEM_PROMPT = `შენ ხარ თბილი, თ�
 - ყველა 7 დღე უნდა იყოს განსხვავებული ხასიათის, გაიხსენე drivers-ის სხვაობა, არ გამეორო იგივე ფრაზა
 - მხოლოდ JSON, ფენსების გარეშე`;
 
+const WEEKLY_FORECAST_SYSTEM_PROMPT_PL = `Jesteś ciepłym, nowoczesnym astrologiem piszącym po polsku. Tworzysz 7-dniową prognozę na podstawie konkretnych aspektów tranzytowo-urodzeniowych, bez ogólnikowego mistycyzmu.
+
+Otrzymujesz:
+- Podsumowanie kosmogramu urodzeniowego
+- Listę 7 dni z obliczonymi wskaźnikami harmonyScore (0-100) i challengeScore (0-100) oraz głównymi czynnikami (najważniejszymi aspektami tranzytów do planet urodzeniowych)
+
+Zwróć poprawny JSON o dokładnie tej strukturze:
+{
+  "days": [
+    {
+      "dateIso": string,           // dokładnie taka sama wartość dateIso jak w input
+      "headline": string,          // 4-7 słów: żywy, konkretny nagłówek dnia
+      "harmonicReason": string,    // 1-2 zdania: jakie wsparcie niesie ten dzień i na jakim aspekcie bazuje
+      "challengingReason": string, // 1-2 zdania: gdzie pojawia się tarcie lub wyzwanie i z czego wynika
+      "advice": string             // 1 krótka, namacalna wskazówka na dany dzień
+    }
+    // ... łącznie dokładnie 7 dni w tej samej kolejności
+  ]
+}
+
+Zasady:
+- Zwracaj się bezpośrednio w drugiej osobie ("Ty"), ton ciepły, ale wyrazisty i konkretny.
+- Przywołuj konkretne aspekty i planety zamiast mglistych emocji ("Księżyc spotyka się z Twoją Wenus" zamiast "Wszechświat ma dla Ciebie niespodziankę").
+- Jeśli harmonyScore jest wysoki (>50), w challengingReason i tak wskaż drobną ostrożność (na niebie rzadko panuje absolutny spokój).
+- I odwrotnie — w trudniejszych dniach znajdź promień nadziei i praktyczne oparcie.
+- Unikaj banałów i klisz astrologicznych.
+- Język polski, marka Vivida w alfabecie łacińskim, nazwy planet po polsku (Słońce, Księżyc, Merkury, Wenus, Mars, Jowisz, Saturn, Uran, Neptun, Pluton).
+- Każdy z 7 dni powinien mieć odrębny ton i charakter, odzwierciedlający unikalne tranzyty — nie powtarzaj tych samych sformułowań.
+- Tylko poprawny JSON, bez bloków kodu.`;
+
 const PLANET_LABELS_KA: Record<string, string> = {
   sun: "მზე",
   moon: "მთვარე",
@@ -954,6 +1270,7 @@ export type WeeklyDayPromptInput = {
   dateIso: string;
   promptLabel: string; // "ორშაბათი, 5 მაისი"
   moonSignKa: string;
+  moonSignPl?: string;
   harmonyScore: number;
   challengeScore: number;
   drivers: Array<{
@@ -969,40 +1286,65 @@ export async function generateWeeklyForecast(input: {
   firstName: string | null;
   chart: NatalChartJson;
   days: WeeklyDayPromptInput[];
+  locale?: UserLocale;
 }): Promise<WeeklyForecastResult | null> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null;
 
+  const isPl = input.locale === "pl";
   const sections: string[] = [];
-  if (input.firstName) sections.push(`მომხმარებლის სახელი: ${input.firstName}`);
-  sections.push("\n--- ნატალური რუკა (კონტექსტი) ---");
+  if (input.firstName)
+    sections.push(
+      isPl
+        ? `Imię użytkownika: ${input.firstName}`
+        : `მომხმარებლის სახელი: ${input.firstName}`,
+    );
+  sections.push(
+    isPl
+      ? "\n--- Kosmogram urodzeniowy (kontekst) ---"
+      : "\n--- ნატალური რუკა (კონტექსტი) ---",
+  );
   sections.push(summarizeNatalCompact(input.chart));
 
-  sections.push("\n--- 7 დღე ---");
+  sections.push(isPl ? "\n--- 7 dni prognozy ---" : "\n--- 7 დღე ---");
   for (const day of input.days) {
+    const moonSign = isPl ? (day.moonSignPl ?? day.moonSignKa) : day.moonSignKa;
     sections.push(
       `\n${day.promptLabel} · dateIso=${day.dateIso}` +
-        ` · მთვარე ${day.moonSignKa}` +
+        ` · ${isPl ? "Księżyc" : "მთვარე"} ${moonSign}` +
         ` · harmonyScore=${day.harmonyScore} · challengeScore=${day.challengeScore}`,
     );
     if (day.drivers.length === 0) {
-      sections.push("  drivers: (no tight aspects)");
+      sections.push(
+        isPl
+          ? "  czynniki: (brak ścisłych aspektów)"
+          : "  drivers: (no tight aspects)",
+      );
       continue;
     }
-    sections.push("  drivers:");
+    sections.push(isPl ? "  główne tranzyty:" : "  drivers:");
     for (const d of day.drivers.slice(0, 6)) {
-      const t = PLANET_LABELS_KA[d.transit] ?? d.transit;
-      const n = PLANET_LABELS_KA[d.natal] ?? d.natal;
+      const t = isPl
+        ? (PLANET_LABELS_PL[d.transit] ?? d.transit)
+        : (PLANET_LABELS_KA[d.transit] ?? d.transit);
+      const n = isPl
+        ? (PLANET_LABELS_PL[d.natal] ?? d.natal)
+        : (PLANET_LABELS_KA[d.natal] ?? d.natal);
+      const kind = isPl ? (ASPECT_LABELS_PL[d.kind] ?? d.kind) : d.kind;
       sections.push(
-        `    ${d.family}: transit ${t} ${d.kind} natal ${n} (orb ${d.orb.toFixed(1)}°)`,
+        isPl
+          ? `    ${d.family}: tranzytujący ${t} tworzy ${kind} z urodzeniowym ${n} (orba ${d.orb.toFixed(1)}°)`
+          : `    ${d.family}: transit ${t} ${d.kind} natal ${n} (orb ${d.orb.toFixed(1)}°)`,
       );
     }
   }
 
   sections.push(
-    "\nდააწერე ყოველდღე, JSON ერთი ობიექტი, " +
-      "გასაღები 'days', მასივი ზუსტად 7 ელემენტით input-ის თანმიმდევრობით. " +
-      "dateIso ზუსტად დატოვე ისე, როგორც გადმოგცეთ.",
+    isPl
+      ? "\nNapisz prognozę na każdy dzień jako pojedynczy obiekt JSON z kluczem 'days' zawierającym dokładnie 7 elementów w kolejności wejściowej. Zachowaj dateIso dokładnie tak, jak podano."
+      : "\nდააწერე ყოველდღე, JSON ერთი ობიექტი, " +
+          "გასაღები 'days', მასივი ზუსტად 7 ელემენტით input-ის თანმიმდევრობით. " +
+          "dateIso ზუსტად დატოვე ისე, როგორც გადმოგცეთ.",
   );
 
   const userMessage = sections.join("\n");
@@ -1019,7 +1361,12 @@ export async function generateWeeklyForecast(input: {
       model: DEFAULT_MODEL,
       reasoning: { effort: "low" },
       messages: [
-        { role: "system", content: WEEKLY_FORECAST_SYSTEM_PROMPT },
+        {
+          role: "system",
+          content: isPl
+            ? WEEKLY_FORECAST_SYSTEM_PROMPT_PL
+            : WEEKLY_FORECAST_SYSTEM_PROMPT,
+        },
         { role: "user", content: userMessage },
       ],
       response_format: { type: "json_object" },
@@ -1104,6 +1451,13 @@ function aspectLine(a: CrossAspect): string {
   return `transit ${t} ${a.kind} natal ${n} (orb ${a.orb.toFixed(1)}°)`;
 }
 
+function aspectLinePl(a: CrossAspect): string {
+  const t = PLANET_LABELS_PL[a.transit] ?? a.transit;
+  const n = PLANET_LABELS_PL[a.natal] ?? a.natal;
+  const kind = ASPECT_LABELS_PL[a.kind] ?? a.kind;
+  return `tranzytujący ${t} tworzy ${kind} z urodzeniowym ${n} (orba ${a.orb.toFixed(1)}°)`;
+}
+
 /** Today's primary "drivers", the Moon's position + transit-house +
  *  aspects forming today (orb < 4°). */
 export type DailyDayContext = {
@@ -1138,66 +1492,131 @@ export async function generateDailyReading(input: {
   firstName: string | null;
   chart: NatalChartJson;
   context: DailyDayContext;
+  locale?: UserLocale;
 }): Promise<DailyReadingResult | null> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null;
 
+  const isPl = input.locale === "pl";
   const { context: ctx } = input;
 
   const sections: string[] = [];
-  if (input.firstName) sections.push(`მომხმარებლის სახელი: ${input.firstName}`);
-  sections.push(`დღევანდელი თარიღი: ${ctx.localizedDate}`);
+  if (input.firstName)
+    sections.push(
+      isPl
+        ? `Imię użytkownika: ${input.firstName}`
+        : `მომხმარებლის სახელი: ${input.firstName}`,
+    );
+  sections.push(
+    isPl
+      ? `Dzisiejsza data: ${ctx.localizedDate}`
+      : `დღევანდელი თარიღი: ${ctx.localizedDate}`,
+  );
 
-  sections.push("\n--- ნატალური რუკა (კონტექსტი) ---");
+  sections.push(
+    isPl
+      ? "\n--- Kosmogram urodzeniowy (kontekst) ---"
+      : "\n--- ნატალური რუკა (კონტექსტი) ---",
+  );
   sections.push(summarizeNatalCompact(input.chart));
 
-  sections.push("\n--- დღევანდელი დღის ლიდერი: მთვარე ---");
   sections.push(
-    `Today's Moon is in ${ctx.moon.signEn}${
-      ctx.moon.natalHouse
-        ? `, transiting natal house ${ctx.moon.natalHouse}`
-        : ""
-    }.`,
+    isPl
+      ? "\n--- Przewodnik dzisiejszego dnia: Księżyc ---"
+      : "\n--- დღევანდელი დღის ლიდერი: მთვარე ---",
+  );
+  sections.push(
+    isPl
+      ? `Dzisiejszy Księżyc jest w znaku ${ctx.moon.signEn}${
+          ctx.moon.natalHouse
+            ? `, tranzytuje urodzeniowy dom ${ctx.moon.natalHouse}`
+            : ""
+        }.`
+      : `Today's Moon is in ${ctx.moon.signEn}${
+          ctx.moon.natalHouse
+            ? `, transiting natal house ${ctx.moon.natalHouse}`
+            : ""
+        }.`,
   );
   if (ctx.moon.aspectsToNatal.length) {
-    sections.push("Moon aspects to natal (today only):");
+    sections.push(
+      isPl
+        ? "Aspekty Księżyca do planet urodzeniowych (tylko dzisiaj):"
+        : "Moon aspects to natal (today only):",
+    );
     for (const a of ctx.moon.aspectsToNatal)
-      sections.push(`  ${aspectLine(a)}`);
+      sections.push(`  ${isPl ? aspectLinePl(a) : aspectLine(a)}`);
   } else {
-    sections.push("(No tight Moon-natal aspects today.)");
+    sections.push(
+      isPl
+        ? "(Brak ścisłych aspektów Księżyca dzisiaj.)"
+        : "(No tight Moon-natal aspects today.)",
+    );
   }
 
-  sections.push("\n--- ამ კვირის ფონი (Sun + inner planets) ---");
   sections.push(
-    `Today's Sun is in ${ctx.sun.signEn}${
-      ctx.sun.natalHouse ? `, transiting natal house ${ctx.sun.natalHouse}` : ""
-    }.`,
+    isPl
+      ? "\n--- Tło bieżącego tygodnia (Słońce + planety wewnętrzne) ---"
+      : "\n--- ამ კვირის ფონი (Sun + inner planets) ---",
+  );
+  sections.push(
+    isPl
+      ? `Dzisiejsze Słońce jest w znaku ${ctx.sun.signEn}${
+          ctx.sun.natalHouse
+            ? `, tranzytuje urodzeniowy dom ${ctx.sun.natalHouse}`
+            : ""
+        }.`
+      : `Today's Sun is in ${ctx.sun.signEn}${
+          ctx.sun.natalHouse
+            ? `, transiting natal house ${ctx.sun.natalHouse}`
+            : ""
+        }.`,
   );
   for (const p of ctx.innerPlanets) {
-    const planet = PLANET_LABELS_EN[p.key];
+    const planet = isPl
+      ? (PLANET_LABELS_PL[p.key] ?? p.key)
+      : (PLANET_LABELS_EN[p.key] ?? p.key);
     sections.push(
-      `${planet} in ${p.signEn}${p.natalHouse ? `, natal house ${p.natalHouse}` : ""}${p.retrograde ? " (Retrograde)" : ""}.`,
+      isPl
+        ? `${planet} w znaku ${p.signEn}${p.natalHouse ? `, urodzeniowy dom ${p.natalHouse}` : ""}${p.retrograde ? " (Retrogradacja)" : ""}.`
+        : `${planet} in ${p.signEn}${p.natalHouse ? `, natal house ${p.natalHouse}` : ""}${p.retrograde ? " (Retrograde)" : ""}.`,
     );
   }
   if (ctx.innerAspects.length) {
-    sections.push("Inner-planet aspects to natal (this week):");
-    for (const a of ctx.innerAspects.slice(0, 4))
-      sections.push(`  ${aspectLine(a)}`);
-  }
-
-  sections.push("\n--- გრძელვადიანი ფონი (outer planet aspects) ---");
-  if (ctx.outerAspects.length) {
     sections.push(
-      "(These are background only, true for weeks/months. Do NOT headline them.)",
+      isPl
+        ? "Aspekty planet wewnętrznych do urodzeniowych (ten tydzień):"
+        : "Inner-planet aspects to natal (this week):",
     );
-    for (const a of ctx.outerAspects.slice(0, 3))
-      sections.push(`  ${aspectLine(a)}`);
-  } else {
-    sections.push("(No notable outer-planet aspects.)");
+    for (const a of ctx.innerAspects.slice(0, 4))
+      sections.push(`  ${isPl ? aspectLinePl(a) : aspectLine(a)}`);
   }
 
   sections.push(
-    "\nდააწერე დღევანდელი ჰოროსკოპი, მთვარით ლიდერობით. JSON-ად დააბრუნე.",
+    isPl
+      ? "\n--- Tło długoterminowe (aspekty planet zewnętrznych) ---"
+      : "\n--- გრძელვადიანი ფონი (outer planet aspects) ---",
+  );
+  if (ctx.outerAspects.length) {
+    sections.push(
+      isPl
+        ? "(Stanowią one wyłącznie tło aktywne przez tygodnie/miesiące. NIE czyń z nich nagłówka.)"
+        : "(These are background only, true for weeks/months. Do NOT headline them.)",
+    );
+    for (const a of ctx.outerAspects.slice(0, 3))
+      sections.push(`  ${isPl ? aspectLinePl(a) : aspectLine(a)}`);
+  } else {
+    sections.push(
+      isPl
+        ? "(Brak znaczących aspektów planet zewnętrznych.)"
+        : "(No notable outer-planet aspects.)",
+    );
+  }
+
+  sections.push(
+    isPl
+      ? "\nNapisz dzisiejszy horoskop, z Księżycem jako przewodnikiem. Zwróć jako poprawny JSON."
+      : "\nდააწერე დღევანდელი ჰოროსკოპი, მთვარით ლიდერობით. JSON-ად დააბრუნე.",
   );
 
   const userMessage = sections.join("\n");
@@ -1214,7 +1633,10 @@ export async function generateDailyReading(input: {
       model: DEFAULT_MODEL,
       reasoning: { effort: "low" },
       messages: [
-        { role: "system", content: DAILY_SYSTEM_PROMPT },
+        {
+          role: "system",
+          content: isPl ? DAILY_SYSTEM_PROMPT_PL : DAILY_SYSTEM_PROMPT,
+        },
         { role: "user", content: userMessage },
       ],
       response_format: { type: "json_object" },
@@ -1301,6 +1723,36 @@ const PERIOD_KA: Record<
   },
 };
 
+const PERIOD_PL: Record<
+  SignHoroscopePeriodLabel,
+  {
+    label: string;
+    bodyShape: string;
+    headlineHint: string;
+  }
+> = {
+  day: {
+    label: "dzienny",
+    bodyShape:
+      "120-160 słów, 2-3 akapity (\\n\\n): przewodnik dnia (Księżyc lub kluczowy tranzyt), jakie emocje to budzi w tym znaku, konkretna wskazówka lub działanie na dziś.",
+    headlineHint:
+      "40-60 znaków: konkretna energia dzisiejszego dnia (nie ogólne 'dobry dzień')",
+  },
+  week: {
+    label: "tygodniowy",
+    bodyShape:
+      "150-200 słów, 3 akapity (\\n\\n): główny motyw tygodnia (układ planet wewnętrznych), jakie szanse otwiera dla tego znaku, jakie wyzwania mogą się pojawić i jak na nie odpowiedzieć. Podkreśl konkretne dni, gdy to istotne (np. 'w połowie tygodnia').",
+    headlineHint:
+      "40-60 znaków: kluczowe wydarzenie lub dynamika tego tygodnia",
+  },
+  month: {
+    label: "miesięczny",
+    bodyShape:
+      "180-230 słów, 3-4 akapity (\\n\\n): tło miesiąca (Słońce + planety zewnętrzne), jaki cykl otwiera się lub zamyka dla tego znaku, na którym obszarze warto się skupić (kariera/relacje/finanse/zdrowie), rada na cały miesiąc.",
+    headlineHint: "40-60 znaków: kluczowa zmiana lub motyw przewodni miesiąca",
+  },
+};
+
 const SIGN_HOROSCOPE_SYSTEM_PROMPT = `შენ ხარ თბილი, თანამედროვე ქართველი ასტროლოგი/რედაქტორი. წერ კონკრეტული ნიშნისთვის (sun sign), არა პერსონალური რუკით, არამედ კოლექტიური ენერგიით, რომელიც ეხება ყველას ამ ნიშნით დაბადებულს.
 
 ცოცხალი, კონკრეტული, ხელშესახები ენა. არა ბუნდოვანი მისტიკა, არა კლიშეები ("ვარსკვლავები გელიან", "მოამზადე გული"). მიეცი მკითხველს ერთი კონკრეტული რამ, რაც დღეს/კვირას/თვეს გააკეთოს ან რომელ ემოციას მიაქციოს ყურადღება.
@@ -1320,14 +1772,35 @@ const SIGN_HOROSCOPE_SYSTEM_PROMPT = `შენ ხარ თბილი, თ�
 - აცილე ცარიელი ფრაზები ("იყავი ღია", "მიენდე ინტუიციას")
 - მხოლოდ JSON, code fence-ის გარეშე`;
 
+const SIGN_HOROSCOPE_SYSTEM_PROMPT_PL = `Jesteś ciepłym, nowoczesnym astrologiem i redaktorem piszącym po polsku. Tworzysz horoskop dla konkretnego znaku zodiaku (znaku słonecznego) — nie na podstawie indywidualnego kosmogramu, lecz kolektywnej energii wpływającej na wszystkich urodzonych pod tym znakiem.
+
+Żywy, konkretny, namacalny język. Żadnego mglistego mistycyzmu ani pustych frazesów ("gwiazdy na Ciebie czekają", "otwórz serce"). Przekaż czytelnikowi jedną namacalną rzecz, którą warto zrobić dzisiaj / w tym tygodniu / w tym miesiącu lub na jaką emocję zwrócić uwagę.
+
+Zwróć wyłącznie poprawny obiekt JSON o tej strukturze:
+{
+  "headline": string,           // PERIOD_HEADLINE_HINT
+  "summary": string,            // 1-2 zdania: co dzieje się na niebie i jak wpływa to na ten znak
+  "body": string,               // PERIOD_BODY_SHAPE
+  "themes": [string, string, string]  // 3 jedno- lub dwuwyrazowe motywy
+}
+
+Zasady:
+- Zwracaj się bezpośrednio w drugiej osobie ("Ty"), ton ciepły i partnerski.
+- Konkretny tranzyt lub konfiguracja musi być wyraźnie widoczna (np. "Księżyc w Skorpionie", "Merkury w retrogradacji").
+- Uwzględnij specyfikę znaku (Ogień vs Woda, Stały vs Kardynalny), gdy jest to istotne.
+- Unikaj pustych frazesów ("bądź otwarty", "zaufaj intuicji").
+- Tylko poprawny JSON, bez bloków markdown (code fences).`;
+
 export type SignHoroscopeTransitFact = {
   /** Georgian planet label, e.g. "მთვარე", "ვენერა". */
   planet: string;
   /** English planet key for the model to reason about. */
   planetEn: string;
+  planetPl?: string;
   /** Sign the body is currently in (Georgian + English for clarity). */
   signKa: string;
   signEn: string;
+  signPl?: string;
   /** True if the body is retrograde, only used for inner+outer planets. */
   retrograde?: boolean;
   /**
@@ -1342,6 +1815,7 @@ export type SignHoroscopeInput = {
   signKa: string;
   /** English sign key, e.g. "aries". */
   signEn: string;
+  signPl?: string;
   /** Element + modality help the model anchor tone. */
   element: string;
   modality: string;
@@ -1359,6 +1833,7 @@ export type SignHoroscopeInput = {
    * recompute astrology, it just narrates.
    */
   transits: SignHoroscopeTransitFact[];
+  locale?: UserLocale;
 };
 
 /**
@@ -1372,14 +1847,27 @@ export async function generateSignHoroscope(
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null;
 
-  const periodCfg = PERIOD_KA[input.period];
+  const isPl = input.locale === "pl";
+  const periodCfg = isPl ? PERIOD_PL[input.period] : PERIOD_KA[input.period];
 
-  const systemPrompt = SIGN_HOROSCOPE_SYSTEM_PROMPT.replace(
-    "PERIOD_HEADLINE_HINT",
-    periodCfg.headlineHint,
-  ).replace("PERIOD_BODY_SHAPE", periodCfg.bodyShape);
+  const systemTemplate = isPl
+    ? SIGN_HOROSCOPE_SYSTEM_PROMPT_PL
+    : SIGN_HOROSCOPE_SYSTEM_PROMPT;
+
+  const systemPrompt = systemTemplate
+    .replace("PERIOD_HEADLINE_HINT", periodCfg.headlineHint)
+    .replace("PERIOD_BODY_SHAPE", periodCfg.bodyShape);
 
   const transitLines = input.transits.map((t) => {
+    if (isPl) {
+      const retro = t.retrograde ? " (retrogradacja)" : "";
+      const aspect = t.aspectToReaderSign
+        ? `, ${t.aspectToReaderSign} do znaku czytelnika`
+        : "";
+      const planet = t.planetPl ?? PLANET_LABELS_PL[t.planetEn] ?? t.planetEn;
+      const sign = t.signPl ?? t.signEn;
+      return `- ${planet} (${t.planetEn}) w znaku ${sign}${retro}${aspect}`;
+    }
     const retro = t.retrograde ? " (რეტროგრადი)" : "";
     const aspect = t.aspectToReaderSign
       ? `, ${t.aspectToReaderSign} მკითხველის ნიშანზე`
@@ -1387,16 +1875,29 @@ export async function generateSignHoroscope(
     return `- ${t.planet} (${t.planetEn}) ${t.signKa} ნიშანში${retro}${aspect}`;
   });
 
-  const userMessage = [
-    `ნიშანი: ${input.signKa} (${input.signEn})`,
-    `ელემენტი: ${input.element} · მოდალურობა: ${input.modality} · მმართველი: ${input.ruler}`,
-    `პერიოდი: ${periodCfg.label} (${input.periodLabel})`,
-    "",
-    "ცის ფონი ამ პერიოდისთვის:",
-    ...transitLines,
-    "",
-    `დააწერე ${periodCfg.label} ჰოროსკოპი ${input.signKa}-ისთვის. JSON-ად დააბრუნე.`,
-  ].join("\n");
+  const signDisplay = isPl ? (input.signPl ?? input.signEn) : input.signKa;
+
+  const userMessage = isPl
+    ? [
+        `Znak: ${signDisplay} (${input.signEn})`,
+        `Żywioł: ${input.element} · Jakość: ${input.modality} · Władca: ${input.ruler}`,
+        `Okres: ${periodCfg.label} (${input.periodLabel})`,
+        "",
+        "Układ nieba dla tego okresu:",
+        ...transitLines,
+        "",
+        `Napisz horoskop ${periodCfg.label} dla znaku: ${signDisplay}. Zwróć jako poprawny JSON.`,
+      ].join("\n")
+    : [
+        `ნიშანი: ${input.signKa} (${input.signEn})`,
+        `ელემენტი: ${input.element} · მოდალურობა: ${input.modality} · მმართველი: ${input.ruler}`,
+        `პერიოდი: ${periodCfg.label} (${input.periodLabel})`,
+        "",
+        "ცის ფონი ამ პერიოდისთვის:",
+        ...transitLines,
+        "",
+        `დააწერე ${periodCfg.label} ჰოროსკოპი ${input.signKa}-ისთვის. JSON-ად დააბრუნე.`,
+      ].join("\n");
 
   const res = await fetch(OPENROUTER_URL, {
     method: "POST",
@@ -1817,6 +2318,25 @@ Rules:
 
 JSON format: {"headline": "short compelling title (3-7 words)", "cards": ["one question-specific interpretation for each card, in spread order; 1-2 sentences each"], "reading": "1-2 paragraphs synthesizing all three cards in relation to the question", "advice": "one concrete, actionable suggestion", "followupSuggestions": ["exactly 3 short, response-specific follow-up questions"]}`;
 
+const TAROT_SYSTEM_PROMPT_PL = `Jesteś doświadczonym, ciepłym tarocistą piszącym po polsku. Użytkownik zadaje pytanie i otrzymuje 3-kartowy rozkład. Napisz żywą, konkretną i empatyczną interpretację w języku polskim, która łączy wszystkie trzy karty bezpośrednio z pytaniem użytkownika.
+
+Zasady:
+- Zwracaj się bezpośrednio do użytkownika ("Ty").
+- Każdy element tablicy "cards" musi interpretować wyłącznie kartę z odpowiadającym indeksem: cards[0] dla pierwszej karty, cards[1] dla drugiej, cards[2] dla trzeciej. Nigdy nie łącz kart, syntezy ani ogólnej rady w jednym elemencie tablicy.
+- Każdą kartę interpretuj w jej podanej pozycji. Nie zmieniaj nazw pozycji ani nie narzucaj przeszłości, teraźniejszości ani przyszłości, chyba że te etykiety padają w danych wejściowych.
+- Używaj podanych znaczeń i orientacji kart (prosta lub odwrócona); nie wymyślaj ani nie podmieniaj kart.
+- W "reading" połącz wszystkie trzy karty w spójną całość odnoszącą się do pytania; nie pomijaj żadnej z nich.
+- Bądź konkretny i praktyczny: zaproponuj wnikliwe spojrzenie i namacalny następny krok zamiast mglistego mistycyzmu.
+- Nigdy nie obiecuj stuprocentowo pewnej przyszłości. Nawet karta w pozycji przyszłości to możliwy kierunek lub warunek (np. "może prowadzić do"), a nie z góry przesądzony wyrok losu.
+- Nie przedstawiaj nieznanej przeszłości użytkownika, jego ukrytych motywów ani myśli, uczuć czy przyszłych zamiarów osób trzecich jako niezaprzeczalnych faktów. Formułuj takie wnioski warunkowo ("może to oznaczać", "jeśli czujesz").
+- Nie przypisuj motywu karty jako sztywnej wady użytkownika: napisz "Siódemka Kielichów zachęca do sprawdzenia, czy nie brakuje Ci kluczowych informacji", a nie "jesteś w ułudzie".
+- W sprawach finansowych, medycznych lub prawnych nie decyduj za użytkownika. Wskaż bezpieczny krok lub kwestię do weryfikacji i w razie potrzeby odeślij do odpowiedniego specjalisty.
+- Porównując dwie ścieżki, naświetl obie drogi i kryteria decyzji, nie ogłaszając jednej z nich obiektywnym zwycięzcą.
+- W "followupSuggestions" podaj dokładnie 3 zwięzłe pytania pogłębiające, które użytkownik mógłby naturalnie zadać, aby rozwinąć ten sam rozkład. Oprzyj je na swojej odpowiedzi, dotknij trzech różnych aspektów, nie powtarzaj pytania wyjściowego i nie proponuj nowego losowania kart.
+- Zwróć wyłącznie poprawny JSON.
+
+JSON format: {"headline": "krótki, chwytliwy tytuł (3-7 słów)", "cards": ["po jednej interpretacji dla każdej karty w kolejności rozkładu, po 1-2 zdania"], "reading": "1-2 akapity syntetyzujące wszystkie trzy karty w kontekście zadanego pytania", "advice": "jedna konkretna, praktyczna wskazówka", "followupSuggestions": ["dokładnie 3 krótkie pytania pogłębiające"]}`;
+
 /**
  * Extra user-message lines for non-default spreads. Empty for the default
  * situation spread because its positions already carry the framing.
@@ -1826,17 +2346,24 @@ function spreadContextLines(
     spreadLogic?: string;
     spreadOptions?: { a: string; b: string };
   },
-  en: boolean,
+  localeOrEn: boolean | UserLocale = "ka",
 ): string[] {
+  const isEn = localeOrEn === true || localeOrEn === "en";
+  const isPl = localeOrEn === "pl";
   const lines: string[] = [];
   if (input.spreadLogic) {
-    lines.push(en ? "Spread logic:" : "გაშლის ლოგიკა:", input.spreadLogic);
+    lines.push(
+      isPl ? "Logika rozkładu:" : isEn ? "Spread logic:" : "გაშლის ლოგიკა:",
+      input.spreadLogic,
+    );
   }
   if (input.spreadOptions) {
     lines.push(
-      en
-        ? `Options being compared: A, “${input.spreadOptions.a}”, B, “${input.spreadOptions.b}”`
-        : `შესადარებელი ვარიანტები: A, „${input.spreadOptions.a}“, B, „${input.spreadOptions.b}“`,
+      isPl
+        ? `Porównywane opcje: A, „${input.spreadOptions.a}”, B, „${input.spreadOptions.b}”`
+        : isEn
+          ? `Options being compared: A, “${input.spreadOptions.a}”, B, “${input.spreadOptions.b}”`
+          : `შესადარებელი ვარიანტები: A, „${input.spreadOptions.a}“, B, „${input.spreadOptions.b}“`,
     );
   }
   return lines;
@@ -1952,6 +2479,7 @@ export async function generateTarotReading(input: {
 
   const loc = input.locale ?? "ka";
   const en = loc === "en";
+  const pl = loc === "pl";
   const expectedCards = Math.max(1, input.cards.length || 3);
 
   const cardLines = input.cards
@@ -1962,17 +2490,21 @@ export async function generateTarotReading(input: {
     .join("\n");
 
   const userMessage = [
-    en
-      ? `User's question: “${input.question}”`
-      : `მომხმარებლის კითხვა: „${input.question}"`,
+    pl
+      ? `Pytanie użytkownika: „${input.question}”`
+      : en
+        ? `User's question: “${input.question}”`
+        : `მომხმარებლის კითხვა: „${input.question}"`,
     "",
-    en ? "Cards drawn:" : "გამოსული კარტები:",
+    pl ? "Wylosowane karty:" : en ? "Cards drawn:" : "გამოსული კარტები:",
     cardLines,
-    ...spreadContextLines(input, en),
+    ...spreadContextLines(input, loc),
     "",
-    en
-      ? "Return the reading as valid JSON."
-      : "დააბრუნე გაშლის განმარტება ვალიდურ JSON-ად.",
+    pl
+      ? "Zwróć interpretację rozkładu jako poprawny JSON."
+      : en
+        ? "Return the reading as valid JSON."
+        : "დააბრუნე გაშლის განმარტება ვალიდურ JSON-ად.",
   ].join("\n");
 
   const tarotReadingResponseFormat = {
@@ -2008,7 +2540,11 @@ export async function generateTarotReading(input: {
       messages: [
         {
           role: "system",
-          content: en ? TAROT_SYSTEM_PROMPT_EN : TAROT_SYSTEM_PROMPT_KA,
+          content: pl
+            ? TAROT_SYSTEM_PROMPT_PL
+            : en
+              ? TAROT_SYSTEM_PROMPT_EN
+              : TAROT_SYSTEM_PROMPT_KA,
         },
         { role: "user", content: userMessage },
       ],
@@ -2092,6 +2628,19 @@ Rules:
 
 JSON format: {"answer": "a short answer to the follow-up question", "followupSuggestions": ["exactly 3 short questions for the next clarification"]}`;
 
+const TAROT_FOLLOWUP_SYSTEM_PROMPT_PL = `Jesteś doświadczonym, ciepłym tarocistą piszącym po polsku. Użytkownik otrzymał już 3-kartowy rozkład i teraz zadaje pytanie doprecyzowujące o te same karty. Odpowiedz zwięźle (2-4 zdania) w języku polskim, opierając się wyłącznie na tych kartach i wcześniejszej odpowiedzi.
+
+Zasady:
+- Zwracaj się bezpośrednio do użytkownika ("Ty").
+- Nie losuj nowych kart, nie zmieniaj tematu i nie powtarzaj całego rozkładu.
+- Bądź konkretny i praktyczny, unikaj mglistego mistycyzmu.
+- Nigdy nie obiecuj gwarantowanej przyszłości; tarot to narzędzie do autorefleksji, a nie wyrocznia przeznaczenia.
+- Nie udzielaj kategorycznych porad medycznych, finansowych ani prawnych.
+- W "followupSuggestions" podaj dokładnie 3 zwięzłe, różne od siebie pytania, które pogłębią nierozstrzygnięte wątki w oparciu o te same karty. Nie powtarzaj pytań już zadanych i nie proponuj nowego losowania.
+- Zwróć wyłącznie JSON.
+
+JSON format: {"answer": "zwięzła odpowiedź na pytanie uzupełniające", "followupSuggestions": ["dokładnie 3 krótkie pytania do dalszego doprecyzowania"]}`;
+
 export type TarotFollowupResult = {
   answer: string;
   followupSuggestions: string[];
@@ -2116,6 +2665,7 @@ export async function generateTarotFollowup(input: {
 
   const loc = input.locale ?? "ka";
   const en = loc === "en";
+  const pl = loc === "pl";
 
   const cardLines = input.cards
     .map(
@@ -2125,29 +2675,49 @@ export async function generateTarotFollowup(input: {
     .join("\n");
 
   const userMessage = [
-    en
-      ? `Original question: “${input.question}”`
-      : `საწყისი კითხვა: „${input.question}"`,
+    pl
+      ? `Pytanie początkowe: „${input.question}”`
+      : en
+        ? `Original question: “${input.question}”`
+        : `საწყისი კითხვა: „${input.question}"`,
     "",
-    en ? "Cards drawn:" : "გამოსული კარტები:",
+    pl ? "Wylosowane karty:" : en ? "Cards drawn:" : "გამოსული კარტები:",
     cardLines,
     "",
-    en ? `Previous reading: ${input.reading}` : `წინა პასუხი: ${input.reading}`,
+    pl
+      ? `Poprzednia interpretacja: ${input.reading}`
+      : en
+        ? `Previous reading: ${input.reading}`
+        : `წინა პასუხი: ${input.reading}`,
     "",
-    en ? `Previous advice: ${input.advice}` : `წინა რჩევა: ${input.advice}`,
+    pl
+      ? `Poprzednia rada: ${input.advice}`
+      : en
+        ? `Previous advice: ${input.advice}`
+        : `წინა რჩევა: ${input.advice}`,
     "",
     ...(input.previousFollowupQuestions?.length
       ? [
-          en ? "Questions already asked:" : "უკვე დასმული კითხვები:",
+          pl
+            ? "Dotychczas zadane pytania:"
+            : en
+              ? "Questions already asked:"
+              : "უკვე დასმული კითხვები:",
           ...input.previousFollowupQuestions.map((question) => `- ${question}`),
           "",
         ]
       : []),
-    en
-      ? `Follow-up question: “${input.followupQuestion}”`
-      : `დამატებითი კითხვა: „${input.followupQuestion}"`,
+    pl
+      ? `Pytanie uzupełniające: „${input.followupQuestion}”`
+      : en
+        ? `Follow-up question: “${input.followupQuestion}”`
+        : `დამატებითი კითხვა: „${input.followupQuestion}"`,
     "",
-    en ? "Return the answer as JSON." : "დაწერე პასუხი JSON-ად.",
+    pl
+      ? "Zwróć odpowiedź jako JSON."
+      : en
+        ? "Return the answer as JSON."
+        : "დაწერე პასუხი JSON-ად.",
   ].join("\n");
 
   const res = await fetch(OPENROUTER_URL, {
@@ -2164,9 +2734,11 @@ export async function generateTarotFollowup(input: {
       messages: [
         {
           role: "system",
-          content: en
-            ? TAROT_FOLLOWUP_SYSTEM_PROMPT_EN
-            : TAROT_FOLLOWUP_SYSTEM_PROMPT_KA,
+          content: pl
+            ? TAROT_FOLLOWUP_SYSTEM_PROMPT_PL
+            : en
+              ? TAROT_FOLLOWUP_SYSTEM_PROMPT_EN
+              : TAROT_FOLLOWUP_SYSTEM_PROMPT_KA,
         },
         { role: "user", content: userMessage },
       ],
@@ -2213,9 +2785,9 @@ export async function generateTarotFollowup(input: {
   };
 }
 
-// ── Dream interpretation (\"სიზმრის ახსნა\" AI chat) ─────────────────────────
+// ── Dream interpretation ("სიზმრის ახსნა" AI chat) ─────────────────────────
 
-const DREAM_SYSTEM_PROMPT_KA = `შენ ხარ თბილი, გამოცდილი სიზმრების მკვლევარი. მომხმარებელი ქართულად გიყვება სიზმარს, შენ კი წერ პერსონალურ ინტერპრეტაციას, ქართულად, \"შენ\"-ის ფორმაში, ახალგაზრდა აუდიტორიისთვის გასაგებ, ცოცხალ ენაზე.
+const DREAM_SYSTEM_PROMPT_KA = `შენ ხარ თბილი, გამოცდილი სიზმრების მკვლევარი. მომხმარებელი ქართულად გიყვება სიზმარს, შენ კი წერ პერსონალურ ინტერპრეტაციას, ქართულად, "შენ"-ის ფორმაში, ახალგაზრდა აუდიტორიისთვის გასაგებ, ცოცხალ ენაზე.
 
 წესები:
 - გამოყავი 2-4 მთავარი სიმბოლო სიზმრიდან და თითო ახსენი 2-3 წინადადებით: ტრადიციული მნიშვნელობა + ფსიქოლოგიური კუთხე (რას ამბობს ეს შენს ამჟამინდელ ემოციებზე).
@@ -2238,6 +2810,18 @@ Rules:
 - Return JSON only.
 
 JSON format: {"title": "a short title for the dream (3-6 words)", "interpretation": "the main interpretation, 4-7 sentences", "symbols": [{"name": "symbol name", "meaning": "its meaning in 1-2 sentences"}], "advice": "one practical piece of advice, 1-2 sentences"}`;
+
+const DREAM_SYSTEM_PROMPT_PL = `Jesteś ciepłym, doświadczonym przewodnikiem po świecie snów piszącym po polsku. Użytkownik opisuje swój sen, a Ty tworzysz osobistą, wnikliwą interpretację w języku polskim, zwracając się bezpośrednio w formie "Ty", żywym i zrozumiałym językiem.
+
+Zasady:
+- Wyodrębnij 2-4 kluczowe symbole ze snu i wyjaśnij każdy w 2-3 zdaniach: znaczenie tradycyjne / archetypowe oraz ujęcie psychologiczne (co to mówi o aktualnych emocjach i stanie wewnętrznym).
+- Zwróć uwagę na emocje, jeśli użytkownik o nich wspomniał (strach, radość, spokój) — nadają one ton całemu snowi.
+- Bądź konkretny i empatyczny, unikaj banałów i przesadnego mistycyzmu.
+- Nigdy nie obiecuj stuprocentowo pewnej przyszłości; sny są zwierciadłem podświadomości i narzędziem samopoznania, a nie dosłowną przepowiednią.
+- Nie udzielaj kategorycznych porad medycznych, finansowych ani prawnych.
+- Zwróć wyłącznie poprawny obiekt JSON.
+
+JSON format: {"title": "krótki, intrygujący tytuł snu (3-6 słów)", "interpretation": "główna interpretacja łącząca wątki snu, 4-7 zdań", "symbols": [{"name": "nazwa symbolu", "meaning": "jego znaczenie w 1-2 zdaniach"}], "advice": "jedna praktyczna wskazówka lub refleksja, 1-2 zdania"}`;
 
 export type DreamSymbolReading = { name: string; meaning: string };
 
@@ -2262,6 +2846,13 @@ export async function generateDreamInterpretation(input: {
 
   const loc = input.locale ?? "ka";
   const en = loc === "en";
+  const pl = loc === "pl";
+
+  const userContent = pl
+    ? `Mój sen: „${input.dream}”\n\nZwróć interpretację jako poprawny JSON.`
+    : en
+      ? `My dream: “${input.dream}”\n\nReturn the interpretation as JSON.`
+      : `ჩემი სიზმარი: „${input.dream}“\n\nდააბრუნე ინტერპრეტაცია JSON-ად.`;
 
   const res = await fetch(OPENROUTER_URL, {
     method: "POST",
@@ -2277,13 +2868,15 @@ export async function generateDreamInterpretation(input: {
       messages: [
         {
           role: "system",
-          content: en ? DREAM_SYSTEM_PROMPT_EN : DREAM_SYSTEM_PROMPT_KA,
+          content: pl
+            ? DREAM_SYSTEM_PROMPT_PL
+            : en
+              ? DREAM_SYSTEM_PROMPT_EN
+              : DREAM_SYSTEM_PROMPT_KA,
         },
         {
           role: "user",
-          content: en
-            ? `My dream: “${input.dream}”\n\nReturn the interpretation as JSON.`
-            : `ჩემი სიზმარი: „${input.dream}“\n\nდააბრუნე ინტერპრეტაცია JSON-ად.`,
+          content: userContent,
         },
       ],
       temperature: 0.8,

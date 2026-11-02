@@ -23,9 +23,11 @@ import {
   type RosenbergResult,
 } from "@/lib/rosenberg/scoring";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { localizedHref } from "@/lib/seo/public-paths";
 import { cn } from "@/lib/utils";
 
 export function RosenbergTest({ locale = "ka" }: { locale?: UserLocale }) {
+  const pl = locale === "pl";
   const en = locale === "en";
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [index, setIndex] = useState(0);
@@ -107,7 +109,7 @@ export function RosenbergTest({ locale = "ka" }: { locale?: UserLocale }) {
                     {result.score}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {en ? "of 30" : "30-დან"}
+                    {pl ? "z 30" : en ? "of 30" : "30-დან"}
                   </div>
                 </div>
               </div>
@@ -115,13 +117,17 @@ export function RosenbergTest({ locale = "ka" }: { locale?: UserLocale }) {
 
             <div className="min-w-0 text-center sm:text-left">
               <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                {en ? "Your result" : "შენი შედეგი"}
+                {pl ? "Twój wynik" : en ? "Your result" : "შენი შედეგი"}
               </div>
               <h2 className="mt-1 text-balance text-2xl font-semibold tracking-tight">
-                {en ? result.labelEn : result.labelKa}
+                {pl ? result.labelPl : en ? result.labelEn : result.labelKa}
               </h2>
               <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-                {en ? result.summaryEn : result.summaryKa}
+                {pl
+                  ? result.summaryPl
+                  : en
+                    ? result.summaryEn
+                    : result.summaryKa}
               </p>
             </div>
           </div>
@@ -131,13 +137,19 @@ export function RosenbergTest({ locale = "ka" }: { locale?: UserLocale }) {
           <ResultSection
             icon={<Check className="size-4" />}
             eyebrow={
-              en
-                ? "What reads as a strength in your answers"
-                : "რაც შენს პასუხებში საყრდენად ჩანს"
+              pl
+                ? "Mocne strony w Twoich odpowiedziach"
+                : en
+                  ? "What reads as a strength in your answers"
+                  : "რაც შენს პასუხებში საყრდენად ჩანს"
             }
             items={result.strengths.map((item) => ({
-              title: en ? item.themeEn : item.themeKa,
-              text: en ? item.strengthEn : item.strengthKa,
+              title: pl ? item.themePl : en ? item.themeEn : item.themeKa,
+              text: pl
+                ? item.strengthPl
+                : en
+                  ? item.strengthEn
+                  : item.strengthKa,
             }))}
             accent="var(--vivida-cyan)"
           />
@@ -147,13 +159,19 @@ export function RosenbergTest({ locale = "ka" }: { locale?: UserLocale }) {
           <ResultSection
             icon={<Heart className="size-4" />}
             eyebrow={
-              en
-                ? "Where a little more attention may help"
-                : "სად შეიძლება მეტი ყურადღება გამოგადგეს"
+              pl
+                ? "Obszary do refleksji i uwagi"
+                : en
+                  ? "Where a little more attention may help"
+                  : "სად შეიძლება მეტი ყურადღება გამოგადგეს"
             }
             items={result.reflections.map((item) => ({
-              title: en ? item.themeEn : item.themeKa,
-              text: en ? item.reflectionEn : item.reflectionKa,
+              title: pl ? item.themePl : en ? item.themeEn : item.themeKa,
+              text: pl
+                ? item.reflectionPl
+                : en
+                  ? item.reflectionEn
+                  : item.reflectionKa,
             }))}
             accent="var(--vivida-pink)"
           />
@@ -162,10 +180,19 @@ export function RosenbergTest({ locale = "ka" }: { locale?: UserLocale }) {
         <section className="rounded-3xl border border-border bg-card/50 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
           <div className="flex items-center gap-2 text-sm font-semibold">
             <Sparkles className="size-4 text-[var(--vivida-violet)]" />
-            {en ? "One practical step" : "ერთი პრაქტიკული ნაბიჯი"}
+            {pl
+              ? "Praktyczny krok"
+              : en
+                ? "One practical step"
+                : "ერთი პრაქტიკული ნაბიჯი"}
           </div>
           <ul className="mt-4 space-y-3">
-            {(en ? result.nextStepsEn : result.nextStepsKa).map((step) => (
+            {(pl
+              ? result.nextStepsPl
+              : en
+                ? result.nextStepsEn
+                : result.nextStepsKa
+            ).map((step) => (
               <li
                 key={step}
                 className="flex gap-3 text-sm leading-relaxed text-foreground/85"
@@ -185,20 +212,22 @@ export function RosenbergTest({ locale = "ka" }: { locale?: UserLocale }) {
             className="gap-1.5"
           >
             <RotateCcw className="size-4" />
-            {en ? "Retake" : "თავიდან გავლა"}
+            {pl ? "Rozwiąż ponownie" : en ? "Retake" : "თავიდან გავლა"}
           </Button>
           <Button asChild variant="ghost">
-            <Link href="/tests">
-              {en ? "More tests" : "სხვა ტესტები"}{" "}
+            <Link href={localizedHref("/tests", locale)}>
+              {pl ? "Więcej testów" : en ? "More tests" : "სხვა ტესტები"}{" "}
               <ArrowRight className="size-4" />
             </Link>
           </Button>
         </div>
 
         <p className="mx-auto max-w-xl text-center text-xs leading-relaxed text-muted-foreground">
-          {en
-            ? "The 0–14, 15–25 and 26–30 ranges are orienting descriptions to help you read your result, not clinical cutoffs. This test does not diagnose anything and does not define your worth as a person."
-            : "0–14, 15–25 და 26–30 დიაპაზონები მხოლოდ შედეგის გასაგებად წარმოდგენილი საორიენტაციო აღწერებია და არა კლინიკური ზღვარი. ეს ტესტი არ ადგენს დიაგნოზს და შენი პიროვნების ღირებულებას არ განსაზღვრავს."}
+          {pl
+            ? "Przedziały 0–14, 15–25 i 26–30 to opisy orientacyjne, które pomagają odczytać wynik, a nie progi kliniczne. Test ten nie stawia diagnozy ani nie definiuje Twojej wartości jako człowieka."
+            : en
+              ? "The 0–14, 15–25 and 26–30 ranges are orienting descriptions to help you read your result, not clinical cutoffs. This test does not diagnose anything and does not define your worth as a person."
+              : "0–14, 15–25 და 26–30 დიაპაზონები მხოლოდ შედეგის გასაგებად წარმოდგენილი საორიენტაციო აღწერებია და არა კლინიკური ზღვარი. ეს ტესტი არ ადგენს დიაგნოზს და შენი პიროვნების ღირებულებას არ განსაზღვრავს."}
         </p>
       </div>
     );
@@ -209,9 +238,11 @@ export function RosenbergTest({ locale = "ka" }: { locale?: UserLocale }) {
       <div className="mb-7">
         <div className="mb-2 flex items-center justify-between text-xs font-medium text-muted-foreground">
           <span>
-            {en
-              ? `Question ${index + 1} of ${ROSENBERG_QUESTIONS.length}`
-              : `კითხვა ${index + 1} / ${ROSENBERG_QUESTIONS.length}`}
+            {pl
+              ? `Pytanie ${index + 1} z ${ROSENBERG_QUESTIONS.length}`
+              : en
+                ? `Question ${index + 1} of ${ROSENBERG_QUESTIONS.length}`
+                : `კითხვა ${index + 1} / ${ROSENBERG_QUESTIONS.length}`}
           </span>
           <span className="tabular-nums">{progress}%</span>
         </div>
@@ -225,17 +256,21 @@ export function RosenbergTest({ locale = "ka" }: { locale?: UserLocale }) {
 
       <div key={question.id} className="animate-in fade-in duration-300">
         <p className="text-balance text-xl font-medium leading-snug sm:min-h-16 sm:text-2xl">
-          {en ? question.textEn : question.textKa}
+          {pl ? question.textPl : en ? question.textEn : question.textKa}
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          {en
-            ? "Choose the answer closest to how you usually feel."
-            : "მონიშნე პასუხი, რომელიც ყველაზე ახლოსაა შენს ჩვეულ განცდასთან."}
+          {pl
+            ? "Wybierz odpowiedź najbliższą Twojemu codziennemu poczuciu."
+            : en
+              ? "Choose the answer closest to how you usually feel."
+              : "მონიშნე პასუხი, რომელიც ყველაზე ახლოსაა შენს ჩვეულ განცდასთან."}
         </p>
 
         <div
           role="radiogroup"
-          aria-label={en ? "Your answer" : "შენი პასუხი"}
+          aria-label={
+            pl ? "Twoja odpowiedź" : en ? "Your answer" : "შენი პასუხი"
+          }
           className="mt-6 grid gap-2.5"
         >
           {ROSENBERG_OPTIONS.map((option) => {
@@ -264,7 +299,7 @@ export function RosenbergTest({ locale = "ka" }: { locale?: UserLocale }) {
                 >
                   {selected && <Check className="size-3" />}
                 </span>
-                {en ? option.labelEn : option.labelKa}
+                {pl ? option.labelPl : en ? option.labelEn : option.labelKa}
               </button>
             );
           })}
@@ -282,7 +317,7 @@ export function RosenbergTest({ locale = "ka" }: { locale?: UserLocale }) {
           className="gap-1"
         >
           <ChevronLeft className="size-4" />
-          {en ? "Back" : "წინა"}
+          {pl ? "Wstecz" : en ? "Back" : "წინა"}
         </Button>
 
         {isLast ? (
@@ -294,7 +329,7 @@ export function RosenbergTest({ locale = "ka" }: { locale?: UserLocale }) {
             disabled={current === undefined}
           >
             <Sparkles className="size-4" />
-            {en ? "See my result" : "ნახე შედეგი"}
+            {pl ? "Zobacz mój wynik" : en ? "See my result" : "ნახე შედეგი"}
           </Button>
         ) : (
           <Button
@@ -307,16 +342,18 @@ export function RosenbergTest({ locale = "ka" }: { locale?: UserLocale }) {
             }
             disabled={current === undefined}
           >
-            {en ? "Next" : "შემდეგი"}
+            {pl ? "Dalej" : en ? "Next" : "შემდეგი"}
           </Button>
         )}
       </div>
 
       <div className="mt-6 flex items-start gap-2.5 border-t border-border/70 pt-5 text-xs leading-relaxed text-muted-foreground">
         <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[var(--vivida-cyan)]" />
-        {en
-          ? "Your answers are processed only on this page. They are not sent to Vivida's servers and disappear when you refresh."
-          : "პასუხები მხოლოდ ამ გვერდზე მუშავდება, ისინი Vivida-ს სერვერზე არ იგზავნება და გვერდის განახლების შემდეგ ქრება."}
+        {pl
+          ? "Twoje odpowiedzi są przetwarzane wyłącznie w przeglądarce. Nie są przesyłane na serwery Vivida i znikają po odświeżeniu strony."
+          : en
+            ? "Your answers are processed only on this page. They are not sent to Vivida's servers and disappear when you refresh."
+            : "პასუხები მხოლოდ ამ გვერდზე მუშავდება, ისინი Vivida-ს სერვერზე არ იგზავნება და გვერდის განახლების შემდეგ ქრება."}
       </div>
     </div>
   );

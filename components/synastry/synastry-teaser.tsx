@@ -14,6 +14,12 @@ import {
   overallVerdictEn,
 } from "@/lib/synastry-en";
 import {
+  CATEGORY_LABEL_PL,
+  ELEMENT_LABEL_PL,
+  overallNarrativePl,
+  overallVerdictPl,
+} from "@/lib/synastry-pl";
+import {
   aspectGlyph,
   aspectValence,
   bodyLabel,
@@ -30,6 +36,8 @@ const LOCKED_PLACEHOLDER_EN =
   "The full interpretation of this section opens with the complete reading.";
 const LOCKED_PLACEHOLDER_KA =
   "ამ სექციის სრული ანალიზი სრული კითხვის გახსნასთან ერთად გამოჩნდება.";
+const LOCKED_PLACEHOLDER_PL =
+  "Pełna interpretacja tej sekcji zostanie otwarta po odblokowaniu raportu.";
 
 /** What the paid reading answers, stated as a promise rather than a category. */
 const LOCKED_TITLES_EN = [
@@ -42,6 +50,12 @@ const LOCKED_TITLES_KA = [
   "ემოციური და ინტიმური მიზიდულობა (ვენერა–მარსის ასპექტი)",
   "თქვენი მთავარი კონფლიქტის წერტილი: რამ შეიძლება დაგაშოროთ?",
   "კარმული კავშირი და 2026–2027 წლების პროგნოზი ამ ურთიერთობისთვის",
+] as const;
+
+const LOCKED_TITLES_PL = [
+  "Przyciąganie emocjonalne i intymne (aspekt Wenus–Mars)",
+  "Główny punkt napięć: co może Was poróżnić?",
+  "Więź karmiczna i prognoza na lata 2026–2027 dla tej relacji",
 ] as const;
 
 /** Same element, or the two elements that share a polarity (fire/air, earth/water). */
@@ -81,6 +95,13 @@ const MOON_NEED_KA: Record<ChartElement, string> = {
   earth: "რუტინა, შეხება და შესრულებული დაპირება",
   air: "საუბარი, სივრცე და ცნობისმოყვარეობა",
   water: "სინაზე, სიჩუმე და ჩახუტება",
+};
+
+const MOON_NEED_PL: Record<ChartElement, string> = {
+  fire: "ruchu, ciepła i bezpośrednich odpowiedzi",
+  earth: "rutyny, dotyku i dotrzymanych obietnic",
+  air: "rozmowy, przestrzeni i ciekawości",
+  water: "czułości, ciszy i bezpiecznego objęcia",
 };
 
 function sunLineEn(
@@ -145,6 +166,37 @@ function moonLineKa(
   return `მთვარე-მთვარეს: ${genitive[a]}ა და ${genitive[b]} მთვარეები სხვანაირად ნუგეშინდებიან, ერთს სჭირდება ${need[a]}, მეორეს ${need[b]}, ამიტომ სიმშვიდე ერთმანეთისგან უნდა ისწავლოთ და არა ვივარაუდოთ.`;
 }
 
+function sunLinePl(
+  a: ChartElement,
+  b: ChartElement,
+  label: Record<ChartElement, string>,
+): string {
+  const rel = elementRelation(a, b);
+  if (rel === "same") {
+    return `Słońce ze Słońcem, ${label[a]} spotyka ${label[b]}: ten sam odruch i ten sam instynkt dotyczący tego, jak należy żyć, dzięki czemu rozpoznajecie się błyskawicznie.`;
+  }
+  if (rel === "flow") {
+    return `Słońce ze Słońcem, ${label[a]} spotyka ${label[b]}: jedno wnosi iskrę, drugie daje przestrzeń, a rytm między Wami układa się niezwykle lekko.`;
+  }
+  return `Słońce ze Słońcem, ${label[a]} spotyka ${label[b]}: oczekujecie różnych rzeczy od tej samej chwili i to właśnie ten kąt tworzy silne przyciąganie.`;
+}
+
+function moonLinePl(
+  a: ChartElement,
+  b: ChartElement,
+  label: Record<ChartElement, string>,
+  need: Record<ChartElement, string>,
+): string {
+  const rel = elementRelation(a, b);
+  if (rel === "same") {
+    return `Księżyc z Księżycem, oboje opieracie się na żywiole: ${label[a]}: każde z Was czuje się bezpiecznie dzięki ${need[a]}.`;
+  }
+  if (rel === "flow") {
+    return `Księżyc z Księżycem, ${label[a]} i ${label[b]} karmią się wzajemnie: z jednej strony potrzeba ${need[a]}, z drugiej ${need[b]}, i nikt nie musi niczego tłumaczyć.`;
+  }
+  return `Księżyc z Księżycem, ${label[a]} i ${label[b]} koją emocje inaczej: z jednej strony potrzeba ${need[a]}, z drugiej ${need[b]}, więc komfortu trzeba się nauczyć, a nie zakładać go z góry.`;
+}
+
 export function SynastryTeaser({
   result,
   locale,
@@ -153,21 +205,34 @@ export function SynastryTeaser({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
-  const verdict = en
-    ? overallVerdictEn(result.overall)
-    : overallVerdict(result.overall);
-  const elementLabel = en ? ELEMENT_LABEL_EN : ELEMENT_LABEL_KA;
+  const isPl = locale === "pl";
+  const verdict = isPl
+    ? overallVerdictPl(result.overall)
+    : en
+      ? overallVerdictEn(result.overall)
+      : overallVerdict(result.overall);
+  const elementLabel = isPl
+    ? ELEMENT_LABEL_PL
+    : en
+      ? ELEMENT_LABEL_EN
+      : ELEMENT_LABEL_KA;
 
   // Deterministic, no AI call: the free 30% has to be real insight, not a
   // countdown. Elements come straight from the computed result.
   const { sunA, sunB, moonA, moonB } = result.elements;
-  const sunLine = en
-    ? sunLineEn(sunA, sunB, elementLabel)
-    : sunLineKa(sunA, sunB, elementLabel);
-  const moonLine = en
-    ? moonLineEn(moonA, moonB, elementLabel, MOON_NEED_EN)
-    : moonLineKa(moonA, moonB, ELEMENT_GENITIVE_KA, MOON_NEED_KA);
-  const overallLine = overallNarrative(result.overall, locale);
+  const sunLine = isPl
+    ? sunLinePl(sunA, sunB, elementLabel)
+    : en
+      ? sunLineEn(sunA, sunB, elementLabel)
+      : sunLineKa(sunA, sunB, elementLabel);
+  const moonLine = isPl
+    ? moonLinePl(moonA, moonB, elementLabel, MOON_NEED_PL)
+    : en
+      ? moonLineEn(moonA, moonB, elementLabel, MOON_NEED_EN)
+      : moonLineKa(moonA, moonB, ELEMENT_GENITIVE_KA, MOON_NEED_KA);
+  const overallLine = isPl
+    ? overallNarrativePl(result.overall)
+    : overallNarrative(result.overall, locale);
   const topHarmonious = result.topAspects.find(
     (asp) => aspectValence(asp.kind) !== "tense",
   );
@@ -178,22 +243,34 @@ export function SynastryTeaser({
     `${bodyLabel(asp.a, locale)} ${aspectGlyph(asp.kind)} ${bodyLabel(asp.b, locale)} · ${asp.orb.toFixed(1)}°`;
   const dynamicLockedTitles = [
     topHarmonious
-      ? en
-        ? `Strongest attraction contact: ${formatAspectBadge(topHarmonious)}`
-        : `მთავარი მიზიდულობის ასპექტი: ${formatAspectBadge(topHarmonious)}`
-      : en
-        ? LOCKED_TITLES_EN[0]
-        : LOCKED_TITLES_KA[0],
+      ? isPl
+        ? `Główny aspekt przyciągania: ${formatAspectBadge(topHarmonious)}`
+        : en
+          ? `Strongest attraction contact: ${formatAspectBadge(topHarmonious)}`
+          : `მთავარი მიზიდულობის ასპექტი: ${formatAspectBadge(topHarmonious)}`
+      : isPl
+        ? LOCKED_TITLES_PL[0]
+        : en
+          ? LOCKED_TITLES_EN[0]
+          : LOCKED_TITLES_KA[0],
     topTension
-      ? en
-        ? `Main friction point (${formatAspectBadge(topTension)}): what could pull you apart?`
-        : `მთავარი კონფლიქტის წერტილი (${formatAspectBadge(topTension)}): რამ შეიძლება დაგაშოროთ?`
-      : en
-        ? LOCKED_TITLES_EN[1]
-        : LOCKED_TITLES_KA[1],
-    en ? LOCKED_TITLES_EN[2] : LOCKED_TITLES_KA[2],
+      ? isPl
+        ? `Główny punkt napięć (${formatAspectBadge(topTension)}): co może Was poróżnić?`
+        : en
+          ? `Main friction point (${formatAspectBadge(topTension)}): what could pull you apart?`
+          : `მთავარი კონფლიქტის წერტილი (${formatAspectBadge(topTension)}): რამ შეიძლება დაგაშოროთ?`
+      : isPl
+        ? LOCKED_TITLES_PL[1]
+        : en
+          ? LOCKED_TITLES_EN[1]
+          : LOCKED_TITLES_KA[1],
+    isPl ? LOCKED_TITLES_PL[2] : en ? LOCKED_TITLES_EN[2] : LOCKED_TITLES_KA[2],
   ];
-  const lockedPlaceholder = en ? LOCKED_PLACEHOLDER_EN : LOCKED_PLACEHOLDER_KA;
+  const lockedPlaceholder = isPl
+    ? LOCKED_PLACEHOLDER_PL
+    : en
+      ? LOCKED_PLACEHOLDER_EN
+      : LOCKED_PLACEHOLDER_KA;
 
   return (
     <div className="relative mb-6 overflow-hidden rounded-sm border border-border bg-card p-5 sm:p-6">
@@ -203,7 +280,11 @@ export function SynastryTeaser({
       <CornerCrosshair position="br" />
 
       <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
-        {en ? "SYNASTRY INDEX · PREVIEW" : "თავსებადობის ინდექსი · მიმოხილვა"}
+        {isPl
+          ? "INDEKS ZGODNOŚCI · ZAPOWIEDŹ"
+          : en
+            ? "SYNASTRY INDEX · PREVIEW"
+            : "თავსებადობის ინდექსი · მიმოხილვა"}
       </div>
       <div className="mt-2 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-4">
         <div>
@@ -231,9 +312,11 @@ export function SynastryTeaser({
 
       <section className="mt-5 border-t border-border pt-5">
         <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--vivida-pink)]">
-          {en
-            ? "SUN–MOON CONNECTION · FREE TEASER"
-            : "მზე–მთვარის კავშირი · უფასო მიმოხილვა"}
+          {isPl
+            ? "POŁĄCZENIE SŁOŃCE–KSIĘŻYC · DARMOWY WGLĄD"
+            : en
+              ? "SUN–MOON CONNECTION · FREE TEASER"
+              : "მზე–მთვარის კავშირი · უფასო მიმოხილვა"}
         </div>
         <p className="mt-2 text-pretty text-sm leading-relaxed text-foreground/90">
           {sunLine} {moonLine}{" "}
@@ -247,7 +330,11 @@ export function SynastryTeaser({
           return (
             <div key={cat} className="flex items-center gap-3">
               <span className="w-40 shrink-0 truncate text-xs text-foreground/85">
-                {en ? CATEGORY_LABEL_EN[cat] : CATEGORY_LABEL_KA[cat]}
+                {isPl
+                  ? CATEGORY_LABEL_PL[cat]
+                  : en
+                    ? CATEGORY_LABEL_EN[cat]
+                    : CATEGORY_LABEL_KA[cat]}
               </span>
               <div className="h-1.5 min-w-0 flex-1 overflow-hidden bg-secondary">
                 <div
@@ -264,9 +351,11 @@ export function SynastryTeaser({
       </div>
       <p className="mt-4 flex items-center justify-center gap-1.5 border-t border-border pt-3 text-center font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
         <Lock className="size-3.5 text-primary" />
-        {en
-          ? "Key aspects, strengths and friction points unlock below"
-          : "მთავარი ასპექტები, ძლიერი მხარეები და ხახუნის წერტილები ქვემოთ გაიხსნება"}
+        {isPl
+          ? "Kluczowe aspekty, mocne strony i punkty napięć odblokujesz poniżej"
+          : en
+            ? "Key aspects, strengths and friction points unlock below"
+            : "მთავარი ასპექტები, ძლიერი მხარეები და ხახუნის წერტილები ქვემოთ გაიხსნება"}
       </p>
 
       <ul className="mt-3 space-y-2">

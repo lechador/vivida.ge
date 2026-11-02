@@ -57,23 +57,50 @@ const ROWS_EN: EarnRow[] = [
   },
 ];
 
+const ROWS_PL: EarnRow[] = [
+  {
+    Icon: UserPlus,
+    title: "Zaproś znajomego",
+    detail: "Gdy zarejestruje się i uzupełni profil",
+    amount: REFERRAL_REWARD,
+  },
+  {
+    Icon: PenLine,
+    title: "Napisz post na tablicy",
+    detail: "Za Twój pierwszy post w każdym tygodniu",
+    amount: CREDIT_REWARD.feedPost,
+  },
+  {
+    Icon: Camera,
+    title: "Dodaj zdjęcie profilowe",
+    detail: "Jednorazowo, po przesłaniu zdjęcia",
+    amount: CREDIT_REWARD.profilePhoto,
+  },
+];
+
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export function CreditEarnInfo({ locale }: { locale: UserLocale }) {
   const en = locale !== "ka";
-  const rows = en ? ROWS_EN : ROWS_KA;
+  const rows = locale === "pl" ? ROWS_PL : locale === "ka" ? ROWS_KA : ROWS_EN;
   return (
     <div className="rounded-3xl border border-[var(--vivida-cyan)]/30 bg-card/55 p-5 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-6">
       <div className="mb-1 flex items-center gap-2">
         <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
         <h2 className="text-base font-semibold tracking-tight">
-          {en ? "How to earn free credits" : "როგორ დააგროვო კრედიტები უფასოდ"}
+          {locale === "pl"
+            ? "Jak zdobyć darmowe kredyty"
+            : en
+              ? "How to earn free credits"
+              : "როგორ დააგროვო კრედიტები უფასოდ"}
         </h2>
       </div>
       <p className="mb-4 text-sm text-muted-foreground">
-        {en
-          ? "You don't have to buy credits, you can earn them by being active."
-          : "კრედიტების ყიდვა სავალდებულო არ არის, შეგიძლია დააგროვო აქტიურობით."}
+        {locale === "pl"
+          ? "Nie musisz kupować kredytów — możesz je zdobywać dzięki swojej aktywności."
+          : en
+            ? "You don't have to buy credits, you can earn them by being active."
+            : "კრედიტების ყიდვა სავალდებულო არ არის, შეგიძლია დააგროვო აქტიურობით."}
       </p>
 
       <ul className="space-y-2.5">

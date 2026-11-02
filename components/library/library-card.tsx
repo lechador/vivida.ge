@@ -16,6 +16,7 @@ import { LibraryFavoriteButton } from "./favorite-button";
 const DATE_LOCALE: Record<UserLocale, string> = {
   ka: "ka-GE",
   en: "en-GB",
+  pl: "pl-PL",
 };
 
 export function dailyLibraryDate(entry: LibraryEntry, locale: UserLocale) {
@@ -33,12 +34,13 @@ export function dailyLibraryDate(entry: LibraryEntry, locale: UserLocale) {
 
 const KIND: Record<
   LibraryEntryKind,
-  { Icon: LucideIcon; ka: string; en: string; badgeClass: string }
+  { Icon: LucideIcon; ka: string; en: string; pl: string; badgeClass: string }
 > = {
   daily: {
     Icon: Sparkles,
     ka: "დღიური ჰოროსკოპი",
     en: "Daily horoscope",
+    pl: "Horoskop dzienny",
     badgeClass:
       "border-[var(--vivida-gold)]/40 bg-[var(--vivida-gold)]/15 text-[var(--vivida-gold)]",
   },
@@ -46,6 +48,7 @@ const KIND: Record<
     Icon: CalendarDays,
     ka: "7-დღიანი პროგნოზი",
     en: "7-day forecast",
+    pl: "Prognoza 7-dniowa",
     badgeClass:
       "border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/15 text-[var(--vivida-cyan)]",
   },
@@ -53,12 +56,14 @@ const KIND: Record<
     Icon: Wand2,
     ka: "ტარო კითხვა",
     en: "Tarot reading",
+    pl: "Czytanie tarota",
     badgeClass: "border-primary/40 bg-primary/15 text-primary",
   },
   ai: {
     Icon: Bot,
     ka: "კონსულტაცია",
     en: "Chart insight",
+    pl: "Wgląd w horoskop",
     badgeClass:
       "border-[var(--vivida-cyan)]/40 bg-[var(--vivida-cyan)]/15 text-[var(--vivida-cyan)]",
   },
@@ -66,6 +71,7 @@ const KIND: Record<
     Icon: FileText,
     ka: "PDF რეპორტი",
     en: "PDF report",
+    pl: "Raport PDF",
     badgeClass:
       "border-[var(--vivida-pink)]/40 bg-[var(--vivida-pink)]/15 text-[var(--vivida-pink)]",
   },
@@ -73,6 +79,7 @@ const KIND: Record<
 
 export function libraryKindLabel(kind: LibraryEntryKind, locale: UserLocale) {
   const meta = KIND[kind];
+  if (locale === "pl") return meta.pl;
   return locale === "en" ? meta.en : meta.ka;
 }
 

@@ -33,6 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
 const DATE_LOCALE: Record<UserLocale, string> = {
   ka: "ka-GE",
   en: "en-GB",
+  pl: "pl-PL",
 };
 
 export default async function LibraryEntryPage({

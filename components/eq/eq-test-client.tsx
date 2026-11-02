@@ -9,6 +9,7 @@ import {
   EQ_ANSWERS_STORAGE_KEY,
   EQ_QUESTIONS,
   EQ_QUESTIONS_EN,
+  EQ_QUESTIONS_PL,
 } from "@/lib/eq/questions";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
@@ -20,8 +21,13 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function EqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
+  const isPl = locale === "pl";
   const en = locale === "en";
-  const questions = en ? EQ_QUESTIONS_EN : EQ_QUESTIONS;
+  const questions = isPl
+    ? EQ_QUESTIONS_PL
+    : en
+      ? EQ_QUESTIONS_EN
+      : EQ_QUESTIONS;
 
   async function onSubmit(
     answers: Record<number, number>,
@@ -51,8 +57,14 @@ export function EqTestClient({ locale = "ka" }: { locale?: UserLocale }) {
       questions={questions}
       onSubmit={onSubmit}
       locale={locale}
-      submitLabel={en ? "See my result" : "ნახე შედეგი"}
-      workingLabel={en ? "Calculating your profile…" : "ვთვლი შენს პროფილს…"}
+      submitLabel={isPl ? "Zobacz wynik" : en ? "See my result" : "ნახე შედეგი"}
+      workingLabel={
+        isPl
+          ? "Obliczanie profilu…"
+          : en
+            ? "Calculating your profile…"
+            : "ვთვლი შენს პროფილს…"
+      }
     />
   );
 }

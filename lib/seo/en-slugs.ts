@@ -1,11 +1,11 @@
 /**
- * English URL slugs for clusters whose internal route slugs are Georgian
- * transliterations (dreams, EQ articles, planets).
+ * English and Polish URL slugs for clusters whose internal route slugs are
+ * Georgian transliterations (dreams, EQ articles, planets).
  *
  * Georgian URLs are UNTOUCHED, same slug, same canonical, same content.
- * On the English host these pages additionally resolve at a keyword-rich
- * English slug (canonical there), and the old transliterated English URL
- * 308-redirects to it (host-scoped, see next.config.ts).
+ * On English and Polish hosts these pages additionally resolve at keyword-rich
+ * localized slugs (canonical there), and the old transliterated URL
+ * resolves as a fallback.
  *
  * Zero imports on purpose: next.config.ts imports this file with a relative
  * path (outside the tsconfig `@/` alias), so it must stay dependency-free.
@@ -16,130 +16,192 @@ export type SlugPair = {
   ka: string;
   /** English public slug. Must be unique within its cluster. */
   en: string;
+  /** Polish public slug. Clean ASCII hyphenated, unique within its cluster. */
+  pl: string;
 };
 
 function buildIndexes(pairs: SlugPair[]) {
   const enByKa = new Map(pairs.map((p) => [p.ka, p.en]));
   const kaByEn = new Map(pairs.map((p) => [p.en, p.ka]));
-  return { enByKa, kaByEn };
+  const plByKa = new Map(pairs.map((p) => [p.ka, p.pl]));
+  const kaByPl = new Map(pairs.map((p) => [p.pl, p.ka]));
+  return { enByKa, kaByEn, plByKa, kaByPl };
 }
 
-/** Dream symbols: /sizmris-akhsna/<ka> → /dream-meanings/<en>. */
+/** Dream symbols: /sizmris-akhsna/<ka> → /dream-meanings/<en> or /pl/sennik/<pl>. */
 export const DREAM_EN_SLUGS: SlugPair[] = [
-  { ka: "gveli", en: "snake" },
-  { ka: "wyali", en: "water" },
-  { ka: "kbili", en: "teeth-falling-out" },
-  { ka: "micvalebuli", en: "deceased-loved-one" },
-  { ka: "orsuloba", en: "pregnancy" },
-  { ka: "bavshvi", en: "baby" },
-  { ka: "qorwili", en: "wedding" },
-  { ka: "sisxli", en: "blood" },
-  { ka: "tevzi", en: "fish" },
-  { ka: "fuli", en: "money" },
-  { ka: "oqro", en: "gold" },
-  { ka: "cecxli", en: "fire" },
-  { ka: "saxli", en: "house" },
-  { ka: "kari", en: "door" },
-  { ka: "gza", en: "road" },
-  { ka: "manqana", en: "car" },
-  { ka: "frena", en: "flying" },
-  { ka: "dacema", en: "falling" },
-  { ka: "devna", en: "being-chased" },
-  { ka: "sikvdili", en: "death" },
-  { ka: "zgva", en: "sea" },
-  { ka: "wvima", en: "rain" },
-  { ka: "tovli", en: "snow" },
-  { ka: "tma", en: "hair" },
-  { ka: "sarke", en: "mirror" },
-  { ka: "kibe", en: "stairs" },
-  { ka: "dzagli", en: "playful-dog" },
-  { ka: "kata", en: "cat" },
-  { ka: "cxeni", en: "horse" },
-  { ka: "tagvi", en: "mouse" },
-  { ka: "oboba", en: "spider" },
-  { ka: "futkari", en: "bee" },
-  { ka: "yvavilebi", en: "flowers" },
-  { ka: "puri", en: "bread" },
-  { ka: "eklesia", en: "church" },
-  { ka: "tirili", en: "crying" },
-  { ka: "bechedi", en: "ring" },
-  { ka: "dzroxa", en: "cow" },
-  { ka: "mze", en: "sun" },
-  { ka: "mtvare", en: "moon" },
-  { ka: "varskvlavi", en: "star" },
-  { ka: "mdinare", en: "river" },
-  { ka: "cha", en: "well" },
-  { ka: "karishkhali", en: "storm" },
-  { ka: "micisdzvra", en: "earthquake" },
-  { ka: "kvamli", en: "smoke" },
-  { ka: "nisli", en: "fog" },
-  { ka: "bagi", en: "garden" },
-  { ka: "tye", en: "forest" },
-  { ka: "xe", en: "tree" },
-  { ka: "vashli", en: "apple" },
-  { ka: "yurdzeni", en: "grapes" },
-  { ka: "ghvino", en: "wine" },
-  { ka: "tapli", en: "honey" },
-  { ka: "mgeli", en: "wolf" },
-  { ka: "dzaghli", en: "dog" },
-  { ka: "lomi", en: "lion" },
-  { ka: "datvi", en: "bear" },
-  { ka: "txa", en: "goat" },
-  { ka: "cxvari", en: "sheep" },
-  { ka: "qatami", en: "chicken" },
-  { ka: "kvercxi", en: "egg" },
-  { ka: "rdze", en: "milk" },
-  { ka: "gamocda", en: "exam" },
-  { ka: "omi", en: "war" },
-  { ka: "dana", en: "knife" },
+  { ka: "gveli", en: "snake", pl: "waz" },
+  { ka: "wyali", en: "water", pl: "woda" },
+  { ka: "kbili", en: "teeth-falling-out", pl: "wypadajace-zeby" },
+  { ka: "micvalebuli", en: "deceased-loved-one", pl: "zmarla-bliska-osoba" },
+  { ka: "orsuloba", en: "pregnancy", pl: "ciaza" },
+  { ka: "bavshvi", en: "baby", pl: "dziecko" },
+  { ka: "qorwili", en: "wedding", pl: "slub" },
+  { ka: "sisxli", en: "blood", pl: "krew" },
+  { ka: "tevzi", en: "fish", pl: "ryba" },
+  { ka: "fuli", en: "money", pl: "pieniadze" },
+  { ka: "oqro", en: "gold", pl: "zloto" },
+  { ka: "cecxli", en: "fire", pl: "ogien" },
+  { ka: "saxli", en: "house", pl: "dom" },
+  { ka: "kari", en: "door", pl: "drzwi" },
+  { ka: "gza", en: "road", pl: "droga" },
+  { ka: "manqana", en: "car", pl: "samochod" },
+  { ka: "frena", en: "flying", pl: "latanie" },
+  { ka: "dacema", en: "falling", pl: "spadanie" },
+  { ka: "devna", en: "being-chased", pl: "ucieczka" },
+  { ka: "sikvdili", en: "death", pl: "smierc" },
+  { ka: "zgva", en: "sea", pl: "morze" },
+  { ka: "wvima", en: "rain", pl: "deszcz" },
+  { ka: "tovli", en: "snow", pl: "snieg" },
+  { ka: "tma", en: "hair", pl: "wlosy" },
+  { ka: "sarke", en: "mirror", pl: "lustro" },
+  { ka: "kibe", en: "stairs", pl: "schody" },
+  { ka: "dzagli", en: "playful-dog", pl: "przyjazny-pies" },
+  { ka: "kata", en: "cat", pl: "kot" },
+  { ka: "cxeni", en: "horse", pl: "kon" },
+  { ka: "tagvi", en: "mouse", pl: "mysz" },
+  { ka: "oboba", en: "spider", pl: "pajak" },
+  { ka: "futkari", en: "bee", pl: "pszczola" },
+  { ka: "yvavilebi", en: "flowers", pl: "kwiaty" },
+  { ka: "puri", en: "bread", pl: "chleb" },
+  { ka: "eklesia", en: "church", pl: "kosciol" },
+  { ka: "tirili", en: "crying", pl: "placz" },
+  { ka: "bechedi", en: "ring", pl: "pierscionek" },
+  { ka: "dzroxa", en: "cow", pl: "krowa" },
+  { ka: "mze", en: "sun", pl: "slonce" },
+  { ka: "mtvare", en: "moon", pl: "ksiezyc" },
+  { ka: "varskvlavi", en: "star", pl: "gwiazda" },
+  { ka: "mdinare", en: "river", pl: "rzeka" },
+  { ka: "cha", en: "well", pl: "studnia" },
+  { ka: "karishkhali", en: "storm", pl: "burza" },
+  { ka: "micisdzvra", en: "earthquake", pl: "trzesienie-ziemi" },
+  { ka: "kvamli", en: "smoke", pl: "dym" },
+  { ka: "nisli", en: "fog", pl: "mgla" },
+  { ka: "bagi", en: "garden", pl: "ogrod" },
+  { ka: "tye", en: "forest", pl: "las" },
+  { ka: "xe", en: "tree", pl: "drzewo" },
+  { ka: "vashli", en: "apple", pl: "jablko" },
+  { ka: "yurdzeni", en: "grapes", pl: "winogrona" },
+  { ka: "ghvino", en: "wine", pl: "wino" },
+  { ka: "tapli", en: "honey", pl: "miod" },
+  { ka: "mgeli", en: "wolf", pl: "wilk" },
+  { ka: "dzaghli", en: "dog", pl: "pies" },
+  { ka: "lomi", en: "lion", pl: "lew" },
+  { ka: "datvi", en: "bear", pl: "niedzwiedz" },
+  { ka: "txa", en: "goat", pl: "koza" },
+  { ka: "cxvari", en: "sheep", pl: "owca" },
+  { ka: "qatami", en: "chicken", pl: "kura" },
+  { ka: "kvercxi", en: "egg", pl: "jajko" },
+  { ka: "rdze", en: "milk", pl: "mleko" },
+  { ka: "gamocda", en: "exam", pl: "egzamin" },
+  { ka: "omi", en: "war", pl: "wojna" },
+  { ka: "dana", en: "knife", pl: "noz" },
 ];
 
-/** EQ articles: /emociuri-inteleqti/<ka> → /emotional-intelligence/<en>. */
+/** EQ articles: /emociuri-inteleqti/<ka> → /emotional-intelligence/<en> or /pl/inteligencja-emocjonalna/<pl>. */
 export const EQ_EN_SLUGS: SlugPair[] = [
-  { ka: "ra-aris-emociuri-inteleqti", en: "what-is-eq" },
-  { ka: "rogor-avimaghlo-empathia", en: "how-to-build-empathy" },
-  { ka: "aqtiuri-mosmena", en: "active-listening" },
-  { ka: "tvitshgmecnebis-ganvitareba", en: "developing-self-awareness" },
-  { ka: "emociuri-dghiuri", en: "emotional-journal" },
-  { ka: "emociis-martva", en: "how-to-regulate-emotions" },
-  { ka: "suntqva-da-grounding", en: "breathing-and-grounding" },
-  { ka: "sibradzis-martva", en: "anger-management" },
-  { ka: "shinagani-motivacia", en: "intrinsic-motivation" },
-  { ka: "prokrastinaciis-dadzleva", en: "overcoming-procrastination" },
-  { ka: "konfliqtis-martva", en: "conflict-management" },
-  { ka: "asertiuli-komunikacia", en: "assertive-communication" },
-  { ka: "emociuri-inteleqti-urtiertobebshi", en: "eq-in-relationships" },
-  { ka: "emociuri-inteleqti-samsaxurshi", en: "eq-at-work" },
-  { ka: "eq-da-iq-gansxvaveba", en: "eq-vs-iq" },
+  {
+    ka: "ra-aris-emociuri-inteleqti",
+    en: "what-is-eq",
+    pl: "co-to-jest-inteligencja-emocjonalna",
+  },
+  {
+    ka: "rogor-avimaghlo-empathia",
+    en: "how-to-build-empathy",
+    pl: "jak-rozwinac-empatie",
+  },
+  {
+    ka: "aqtiuri-mosmena",
+    en: "active-listening",
+    pl: "aktywne-sluchanie",
+  },
+  {
+    ka: "tvitshgmecnebis-ganvitareba",
+    en: "developing-self-awareness",
+    pl: "rozwijanie-samoswiadomosci",
+  },
+  {
+    ka: "emociuri-dghiuri",
+    en: "emotional-journal",
+    pl: "dziennik-emocji",
+  },
+  {
+    ka: "emociis-martva",
+    en: "how-to-regulate-emotions",
+    pl: "regulacja-emocji",
+  },
+  {
+    ka: "suntqva-da-grounding",
+    en: "breathing-and-grounding",
+    pl: "oddychanie-i-uziemienie",
+  },
+  {
+    ka: "sibradzis-martva",
+    en: "anger-management",
+    pl: "radzenie-sobie-ze-zloscia",
+  },
+  {
+    ka: "shinagani-motivacia",
+    en: "intrinsic-motivation",
+    pl: "wewnetrzna-motywacja",
+  },
+  {
+    ka: "prokrastinaciis-dadzleva",
+    en: "overcoming-procrastination",
+    pl: "jak-pokonac-prokrastynacje",
+  },
+  {
+    ka: "konfliqtis-martva",
+    en: "conflict-management",
+    pl: "rozwiazywanie-konfliktow",
+  },
+  {
+    ka: "asertiuli-komunikacia",
+    en: "assertive-communication",
+    pl: "asertywna-komunikacja",
+  },
+  {
+    ka: "emociuri-inteleqti-urtiertobebshi",
+    en: "eq-in-relationships",
+    pl: "inteligencja-emocjonalna-w-zwiazku",
+  },
+  {
+    ka: "emociuri-inteleqti-samsaxurshi",
+    en: "eq-at-work",
+    pl: "inteligencja-emocjonalna-w-pracy",
+  },
+  {
+    ka: "eq-da-iq-gansxvaveba",
+    en: "eq-vs-iq",
+    pl: "eq-a-iq-roznice",
+  },
 ];
 
-/** Planets: /planetebi/<ka> → /astrology-planets/<en>. */
+/** Planets: /planetebi/<ka> → /astrology-planets/<en> or /pl/planety-w-astrologii/<pl>. */
 export const PLANET_EN_SLUGS: SlugPair[] = [
-  { ka: "mze", en: "sun" },
-  { ka: "mtvare", en: "moon" },
-  { ka: "merkuri", en: "mercury" },
-  { ka: "venera", en: "venus" },
-  { ka: "marsi", en: "mars" },
-  { ka: "iupiteri", en: "jupiter" },
-  { ka: "saturni", en: "saturn" },
-  { ka: "urani", en: "uranus" },
-  { ka: "neptuni", en: "neptune" },
-  { ka: "plutoni", en: "pluto" },
+  { ka: "mze", en: "sun", pl: "slonce" },
+  { ka: "mtvare", en: "moon", pl: "ksiezyc" },
+  { ka: "merkuri", en: "mercury", pl: "merkury" },
+  { ka: "venera", en: "venus", pl: "wenus" },
+  { ka: "marsi", en: "mars", pl: "mars" },
+  { ka: "iupiteri", en: "jupiter", pl: "jowisz" },
+  { ka: "saturni", en: "saturn", pl: "saturn" },
+  { ka: "urani", en: "uranus", pl: "uran" },
+  { ka: "neptuni", en: "neptune", pl: "neptun" },
+  { ka: "plutoni", en: "pluto", pl: "pluton" },
 ];
 
 const dreamIndexes = buildIndexes(DREAM_EN_SLUGS);
 const eqIndexes = buildIndexes(EQ_EN_SLUGS);
 const planetIndexes = buildIndexes(PLANET_EN_SLUGS);
 
-export type SlugLocale = "ka" | "en";
+export type SlugLocale = "ka" | "en" | "pl";
 
 /**
  * Resolve a URL slug segment to the internal (Georgian) slug.
- * - Georgian host: only the internal slug resolves (English slugs 404,
- *   Georgian URLs never move).
- * - English host: the English slug resolves, and the internal slug still
- *   resolves as a fallback (the host-scoped 308 in next.config.ts sends it
- *   to the canonical English URL before the page renders).
+ * - Georgian host: only the internal slug resolves (English/Polish slugs 404).
+ * - Polish host: resolves from kaByPl (falling back to kaByEn and internal ka slug).
+ * - English host: the English slug resolves, with fallback to internal slug.
  */
 function resolveSlug(
   input: string,
@@ -148,17 +210,25 @@ function resolveSlug(
   isInternalSlug: (slug: string) => boolean,
 ): string | null {
   if (locale === "ka") return isInternalSlug(input) ? input : null;
+  if (locale === "pl") {
+    const fromPl = indexes.kaByPl.get(input);
+    if (fromPl) return fromPl;
+    const fromEn = indexes.kaByEn.get(input);
+    if (fromEn) return fromEn;
+    return isInternalSlug(input) ? input : null;
+  }
   const fromEn = indexes.kaByEn.get(input);
   if (fromEn) return fromEn;
   return isInternalSlug(input) ? input : null;
 }
 
-/** The slug to render in links for this locale (English gets keywords). */
+/** The slug to render in links for this locale (English and Polish get keywords). */
 function publicSlug(
   kaSlug: string,
   locale: SlugLocale,
   indexes: ReturnType<typeof buildIndexes>,
 ): string {
+  if (locale === "pl") return indexes.plByKa.get(kaSlug) ?? kaSlug;
   if (locale === "en") return indexes.enByKa.get(kaSlug) ?? kaSlug;
   return kaSlug;
 }
@@ -199,15 +269,25 @@ export function planetPublicSlug(kaSlug: string, locale: SlugLocale): string {
   return publicSlug(kaSlug, locale, planetIndexes);
 }
 
-/** English detail slugs for generateStaticParams. */
+/** Detail slugs for generateStaticParams. */
 export const ALL_DREAM_EN_SLUGS = DREAM_EN_SLUGS.map((p) => p.en);
 export const ALL_EQ_EN_SLUGS = EQ_EN_SLUGS.map((p) => p.en);
 export const ALL_PLANET_EN_SLUGS = PLANET_EN_SLUGS.map((p) => p.en);
+
+export const ALL_DREAM_PL_SLUGS = DREAM_EN_SLUGS.map((p) => p.pl);
+export const ALL_EQ_PL_SLUGS = EQ_EN_SLUGS.map((p) => p.pl);
+export const ALL_PLANET_PL_SLUGS = PLANET_EN_SLUGS.map((p) => p.pl);
 
 const DETAIL_PREFIXES: Array<{ prefix: string; pairs: SlugPair[] }> = [
   { prefix: "/dream-meanings/", pairs: DREAM_EN_SLUGS },
   { prefix: "/emotional-intelligence/", pairs: EQ_EN_SLUGS },
   { prefix: "/astrology-planets/", pairs: PLANET_EN_SLUGS },
+];
+
+const PL_DETAIL_PREFIXES: Array<{ prefix: string; pairs: SlugPair[] }> = [
+  { prefix: "/pl/sennik/", pairs: DREAM_EN_SLUGS },
+  { prefix: "/pl/inteligencja-emocjonalna/", pairs: EQ_EN_SLUGS },
+  { prefix: "/pl/planety-w-astrologii/", pairs: PLANET_EN_SLUGS },
 ];
 
 /**
@@ -226,6 +306,22 @@ export function upgradeEnglishDetailSlug(cleanPath: string): string {
     if (!rest || rest.includes("/")) return cleanPath;
     const match = pairs.find((p) => p.ka === rest);
     return match ? `${prefix}${match.en}` : cleanPath;
+  }
+  return cleanPath;
+}
+
+/**
+ * Upgrade a Polish detail URL carrying a Georgian (`ka`) or English (`en`)
+ * slug to its canonical Polish keyword slug
+ * (`/pl/sennik/gveli` or `/pl/sennik/snake` → `/pl/sennik/waz`).
+ */
+export function upgradePolishDetailSlug(cleanPath: string): string {
+  for (const { prefix, pairs } of PL_DETAIL_PREFIXES) {
+    if (!cleanPath.startsWith(prefix)) continue;
+    const rest = cleanPath.slice(prefix.length);
+    if (!rest || rest.includes("/")) return cleanPath;
+    const match = pairs.find((p) => p.ka === rest || p.en === rest);
+    return match ? `${prefix}${match.pl}` : cleanPath;
   }
   return cleanPath;
 }

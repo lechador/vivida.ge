@@ -19,7 +19,9 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   const en = locale !== "ka";
-  return { title: en ? "Compatibility" : "თავსებადობა" };
+  return {
+    title: locale === "pl" ? "Zgodność" : en ? "Compatibility" : "თავსებადობა",
+  };
 }
 
 export default async function SynastryPage() {
@@ -47,7 +49,9 @@ export default async function SynastryPage() {
         <header className="mb-8 flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--vivida-pink)]">
-              RELATIONAL SYNASTRY · თავსებადობა
+              {locale === "pl"
+                ? "SYNASTRIA RELACYJNA · ZGODNOŚĆ"
+                : "RELATIONAL SYNASTRY · თავსებადობა"}
             </div>
             <h1
               className={
@@ -56,22 +60,35 @@ export default async function SynastryPage() {
                   : "mt-2 text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-5xl"
               }
             >
-              {en ? "Chart " : "რუკების "}
-              <span className="text-[var(--vivida-pink)]">
-                {en ? "Compatibility" : "თავსებადობა"}
-              </span>
+              {locale === "pl" ? (
+                <>
+                  Zgodność{" "}
+                  <span className="text-[var(--vivida-pink)]">kosmogramów</span>
+                </>
+              ) : (
+                <>
+                  {en ? "Chart " : "რუკების "}
+                  <span className="text-[var(--vivida-pink)]">
+                    {en ? "Compatibility" : "თავსებადობა"}
+                  </span>
+                </>
+              )}
             </h1>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
-              {en
-                ? "Add someone who matters to you and explore how your birth charts connect across planets, houses, and aspects."
-                : "დაამატე ადამიანი, რომელიც შენთვის მნიშვნელოვანია, ნახე, როგორ ერთვით ცაში ერთმანეთს."}
+              {locale === "pl"
+                ? "Dodaj bliską osobę i odkryj, jak Wasze kosmogramy urodzeniowe łączą się poprzez planety, domy i aspekty."
+                : en
+                  ? "Add someone who matters to you and explore how your birth charts connect across planets, houses, and aspects."
+                  : "დაამატე ადამიანი, რომელიც შენთვის მნიშვნელოვანია, ნახე, როგორ ერთვით ცაში ერთმანეთს."}
             </p>
             {!premium && (
               <div className="mt-3">
                 <CreditHint>
-                  {en
-                    ? `Free compatibility preview · full reading ${CREDIT_COST.synastry} credits`
-                    : `თავსებადობის მიმოხილვა უფასოა · სრული ანალიზი −${CREDIT_COST.synastry} კრედიტი`}
+                  {locale === "pl"
+                    ? `Bezpłatny podgląd zgodności · pełna interpretacja ${CREDIT_COST.synastry} kredytów`
+                    : en
+                      ? `Free compatibility preview · full reading ${CREDIT_COST.synastry} credits`
+                      : `თავსებადობის მიმოხილვა უფასოა · სრული ანალიზი −${CREDIT_COST.synastry} კრედიტი`}
                 </CreditHint>
               </div>
             )}
@@ -81,13 +98,21 @@ export default async function SynastryPage() {
               <Button asChild size="lg">
                 <Link href="/synastry/new">
                   <Plus className="size-4" />
-                  {en ? "Add partner" : "ახალი პარტნიორი"}
+                  {locale === "pl"
+                    ? "Dodaj partnera"
+                    : en
+                      ? "Add partner"
+                      : "ახალი პარტნიორი"}
                 </Link>
               </Button>
             ) : (
               <Button variant="outline" size="lg" disabled>
                 <Plus className="size-4" />
-                {en ? "Available next month" : "შემდეგი თვიდან"}
+                {locale === "pl"
+                  ? "Dostępne w przyszłym miesiącu"
+                  : en
+                    ? "Available next month"
+                    : "შემდეგი თვიდან"}
               </Button>
             )}
           </div>
@@ -131,18 +156,28 @@ function EmptyState({
         <Heart className="size-5" aria-hidden />
       </div>
       <h2 className="mt-4 text-balance text-xl font-semibold tracking-tight text-foreground">
-        {en ? "You haven't added anyone yet" : "ჯერ პარტნიორი არ დაგიმატებია"}
+        {locale === "pl"
+          ? "Nie masz jeszcze dodanej żadnej osoby"
+          : en
+            ? "You haven't added anyone yet"
+            : "ჯერ პარტნიორი არ დაგიმატებია"}
       </h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-        {en
-          ? "Add a partner, close friend, family member, or anyone you're curious about to see how your charts fit together."
-          : "დაამატე ახლო ადამიანი, ძველი მეგობარი, თუ ვინც გაინტერესებს, ნახე თქვენი ცის რუკების ერთობლივი თავსებადობა."}
+        {locale === "pl"
+          ? "Dodaj partnera, bliskiego przyjaciela, członka rodziny lub kogokolwiek, czyj kosmogram Cię ciekawi, aby zobaczyć Waszą astrologiczną dynamikę."
+          : en
+            ? "Add a partner, close friend, family member, or anyone you're curious about to see how your charts fit together."
+            : "დაამატე ახლო ადამიანი, ძველი მეგობარი, თუ ვინც გაინტერესებს, ნახე თქვენი ცის რუკების ერთობლივი თავსებადობა."}
       </p>
       {canAdd && (
         <Button asChild className="mt-6" size="lg">
           <Link href="/synastry/new">
             <Plus className="size-4" />
-            {en ? "Add your first person" : "დაამატე პირველი"}
+            {locale === "pl"
+              ? "Dodaj pierwszą osobę"
+              : en
+                ? "Add your first person"
+                : "დაამატე პირველი"}
           </Link>
         </Button>
       )}

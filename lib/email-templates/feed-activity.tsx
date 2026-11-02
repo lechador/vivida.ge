@@ -6,7 +6,7 @@ import {
   mutedStyle,
   paragraphStyle,
 } from "./_layout";
-import { usesEnglishCopy, type UserLocale } from "@/lib/i18n/locale";
+import { type UserLocale } from "@/lib/i18n/locale";
 
 const REACTION_KA: Record<string, string> = {
   like: "მოეწონა შენი პოსტი",
@@ -20,6 +20,13 @@ const REACTION_EN: Record<string, string> = {
   funny: "found your post funny",
   sad: "reacted sadly to your post",
   dislike: "disliked your post",
+};
+
+const REACTION_PL: Record<string, string> = {
+  like: "polubił(a) Twój post",
+  funny: "zareagował(a) uśmiechem na Twój post",
+  sad: "zareagował(a) smutkiem na Twój post",
+  dislike: "nie polubił(a) Twojego postu",
 };
 
 /**
@@ -49,33 +56,48 @@ export function FeedActivityEmail({
   unsubscribeUrl: string;
   locale?: UserLocale;
 }) {
-  const en = usesEnglishCopy(locale);
+  const pl = locale === "pl";
+  const en = locale === "en";
   const greeting = recipientName
-    ? en
-      ? `Hello, ${recipientName}!`
-      : `სალამი, ${recipientName}!`
-    : en
-      ? "Hello!"
-      : "სალამი!";
+    ? pl
+      ? `Cześć, ${recipientName}!`
+      : en
+        ? `Hello, ${recipientName}!`
+        : `სალამი, ${recipientName}!`
+    : pl
+      ? "Cześć!"
+      : en
+        ? "Hello!"
+        : "სალამი!";
   const fromHandle = fromUsername ? `@${fromUsername}` : null;
   const isComment = kind === "post_comment";
-  const reactionLine = en
-    ? (REACTION_EN[reaction ?? ""] ?? "reacted to your post")
-    : (REACTION_KA[reaction ?? ""] ?? "გამოეხმაურა შენს პოსტს");
+  const reactionLine = pl
+    ? (REACTION_PL[reaction ?? ""] ?? "zareagował(a) na Twój post")
+    : en
+      ? (REACTION_EN[reaction ?? ""] ?? "reacted to your post")
+      : (REACTION_KA[reaction ?? ""] ?? "გამოეხმაურა შენს პოსტს");
   const heading = isComment
-    ? en
-      ? "New comment on your post"
-      : "ახალი კომენტარი შენს პოსტზე"
-    : en
-      ? "New reaction to your post"
-      : "ახალი რეაქცია შენს პოსტზე";
+    ? pl
+      ? "Nowy komentarz do Twojego postu"
+      : en
+        ? "New comment on your post"
+        : "ახალი კომენტარი შენს პოსტზე"
+    : pl
+      ? "Nowa reakcja na Twój post"
+      : en
+        ? "New reaction to your post"
+        : "ახალი რეაქცია შენს პოსტზე";
   const previewText = isComment
-    ? en
-      ? `${fromName} commented on your post`
-      : `${fromName}-მ შენს პოსტს დააკომენტარა`
-    : en
+    ? pl
+      ? `${fromName} skomentował(a) Twój post`
+      : en
+        ? `${fromName} commented on your post`
+        : `${fromName}-მ შენს პოსტს დააკომენტარა`
+    : pl
       ? `${fromName} ${reactionLine}`
-      : `${fromName}, ${reactionLine}`;
+      : en
+        ? `${fromName} ${reactionLine}`
+        : `${fromName}, ${reactionLine}`;
 
   return (
     <EmailLayout
@@ -104,12 +126,16 @@ export function FeedActivityEmail({
           <span style={{ color: "#9b94ad" }}> ({fromHandle})</span>
         ) : null}{" "}
         {isComment
-          ? en
-            ? " commented on your post on Vivida:"
-            : " შენს პოსტს დააკომენტარა Vivida-ზე:"
-          : en
-            ? ` ${reactionLine} on Vivida.`
-            : ` ${reactionLine} Vivida-ზე.`}
+          ? pl
+            ? " skomentował(a) Twój post na Vivida:"
+            : en
+              ? " commented on your post on Vivida:"
+              : " შენს პოსტს დააკომენტარა Vivida-ზე:"
+          : pl
+            ? ` ${reactionLine} na Vivida.`
+            : en
+              ? ` ${reactionLine} on Vivida.`
+              : ` ${reactionLine} Vivida-ზე.`}
       </Text>
 
       {isComment && preview ? (
@@ -131,13 +157,15 @@ export function FeedActivityEmail({
       ) : null}
 
       <Button href={postUrl} style={buttonStyle}>
-        {en ? "View post" : "ნახე პოსტი"}
+        {pl ? "Zobacz post" : en ? "View post" : "ნახე პოსტი"}
       </Button>
 
       <Text style={mutedStyle}>
-        {en
-          ? "You received this notification because you have not visited Vivida recently."
-          : "ეს შეტყობინება მიიღე, რადგან გარკვეული ხნის წინ არ ეწვიე vivida.ge-ს."}
+        {pl
+          ? "Otrzymujesz to powiadomienie, ponieważ od pewnego czasu nie odwiedzałeś Vivida."
+          : en
+            ? "You received this notification because you have not visited Vivida recently."
+            : "ეს შეტყობინება მიიღე, რადგან გარკვეული ხნის წინ არ ეწვიე vivida.ge-ს."}
       </Text>
     </EmailLayout>
   );

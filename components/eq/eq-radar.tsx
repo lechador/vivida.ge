@@ -28,9 +28,7 @@ export function EqRadar({
 
   const rings = [0.25, 0.5, 0.75, 1];
   const ringPoly = (frac: number) =>
-    domains
-      .map((_, i) => pointAt(i, maxR * frac).join(","))
-      .join(" ");
+    domains.map((_, i) => pointAt(i, maxR * frac).join(",")).join(" ");
 
   const dataPoly = domains
     .map((d, i) => pointAt(i, maxR * (d.score / 100)).join(","))
@@ -41,13 +39,31 @@ export function EqRadar({
       viewBox={`0 0 ${size} ${size}`}
       className="mx-auto h-auto w-full max-w-[340px]"
       role="img"
-      aria-label={locale !== "ka" ? "Emotional intelligence domain radar" : "ემოციური ინტელექტის დომენების რადარი"}
+      aria-label={
+        locale === "pl"
+          ? "Wykres radarowy inteligencji emocjonalnej"
+          : locale !== "ka"
+            ? "Emotional intelligence domain radar"
+            : "ემოციური ინტელექტის დომენების რადარი"
+      }
     >
       <defs>
         <linearGradient id="eq-radar-fill" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="oklch(0.78 0.18 305)" stopOpacity="0.45" />
-          <stop offset="55%" stopColor="oklch(0.75 0.20 350)" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="oklch(0.80 0.15 200)" stopOpacity="0.4" />
+          <stop
+            offset="0%"
+            stopColor="oklch(0.78 0.18 305)"
+            stopOpacity="0.45"
+          />
+          <stop
+            offset="55%"
+            stopColor="oklch(0.75 0.20 350)"
+            stopOpacity="0.35"
+          />
+          <stop
+            offset="100%"
+            stopColor="oklch(0.80 0.15 200)"
+            stopOpacity="0.4"
+          />
         </linearGradient>
       </defs>
 
@@ -107,7 +123,11 @@ export function EqRadar({
               fontWeight={600}
               fill="oklch(0.92 0.02 290)"
             >
-              {locale !== "ka" ? d.nameEn : d.nameKa}
+              {locale === "pl"
+                ? (d.namePl ?? d.nameEn)
+                : locale !== "ka"
+                  ? d.nameEn
+                  : d.nameKa}
             </text>
             <text
               x={x}

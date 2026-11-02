@@ -43,6 +43,15 @@ const WEEKDAYS = {
     "Friday",
     "Saturday",
   ],
+  pl: [
+    "Niedziela",
+    "Poniedziałek",
+    "Wtorek",
+    "Środa",
+    "Czwartek",
+    "Piątek",
+    "Sobota",
+  ],
 };
 
 export function ReminderPreferencesCard({

@@ -20,23 +20,32 @@ const LANGUAGES = {
     nativeName: "ქართული",
     hrefLang: "ka-GE",
   },
+  pl: {
+    flag: "🇵🇱",
+    name: "Polish",
+    nativeName: "Polski",
+    hrefLang: "pl-PL",
+  },
 } as const;
 
-const ORDER: readonly UserLocale[] = ["en", "ka"];
+const ORDER: readonly UserLocale[] = ["en", "ka", "pl"];
 
 export function LanguageSelector({
   currentLocale,
   englishHref,
   georgianHref,
+  polishHref,
 }: {
   currentLocale: UserLocale;
   englishHref: string;
   georgianHref: string;
+  polishHref?: string;
 }) {
   const current = LANGUAGES[currentLocale];
   const hrefs: Record<UserLocale, string> = {
     en: englishHref,
     ka: georgianHref,
+    pl: polishHref ?? englishHref,
   };
 
   return (

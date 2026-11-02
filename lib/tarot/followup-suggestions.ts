@@ -17,6 +17,14 @@ const FALLBACK_SUGGESTIONS: Record<UserLocale, readonly string[]> = {
     "What should I clarify before deciding?",
     "How can I apply this insight day to day?",
   ],
+  pl: [
+    "Który temat wymaga teraz największej uwagi?",
+    "Jak to łączy się z moją obecną sytuacją?",
+    "Jaki praktyczny krok warto rozważyć?",
+    "Jaką przeszkodę mogę nieświadomie pomijać?",
+    "Co warto wyjaśnić przed podjęciem decyzji?",
+    "Jak zastosować tę wskazówkę na co dzień?",
+  ],
 };
 
 export function tarotFollowupFallback(locale: UserLocale): string[] {

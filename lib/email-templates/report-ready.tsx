@@ -31,19 +31,28 @@ export function ReportReadyEmail({
   locale?: UserLocale;
   reportTitle?: string;
 }) {
-  const en = locale !== "ka";
+  const pl = locale === "pl";
+  const en = locale === "en";
 
   const preview =
     reportTitle ??
-    (en ? "Your complete personal report" : "შენი სრული პერსონალური რეპორტი");
+    (pl
+      ? "Twój pełny raport osobisty"
+      : en
+        ? "Your complete personal report"
+        : "შენი სრული პერსონალური რეპორტი");
 
   const greeting = name
-    ? en
-      ? `Hello, ${name}!`
-      : `სალამი, ${name}!`
-    : en
-      ? "Hello!"
-      : "სალამი!";
+    ? pl
+      ? `Cześć, ${name}!`
+      : en
+        ? `Hello, ${name}!`
+        : `სალამი, ${name}!`
+    : pl
+      ? "Cześć!"
+      : en
+        ? "Hello!"
+        : "სალამი!";
 
   return (
     <EmailLayout preview={preview} locale={locale}>
@@ -58,29 +67,36 @@ export function ReportReadyEmail({
           margin: "0 0 16px",
         }}
       >
-        {reportTitle ?? (en ? "Your report" : "შენი რეპორტი")}
+        {reportTitle ??
+          (pl ? "Twój raport" : en ? "Your report" : "შენი რეპორტი")}
       </Heading>
 
       <Text style={paragraphStyle}>{greeting}</Text>
 
       <Text style={paragraphStyle}>
         {attached
-          ? en
-            ? "Your personal report is attached to this email as a PDF. Save it, it's yours to keep and read whenever you like."
-            : "შენი პერსონალური რეპორტი ამ წერილს PDF-ად ახლავს. შეინახე, ის სამუდამოდ შენთან რჩება."
-          : en
-            ? "Your personal report is ready. Download it from the link below."
-            : "შენი პერსონალური რეპორტი მზადაა. ჩამოტვირთე ქვემოთ მოცემული ბმულით."}
+          ? pl
+            ? "Twój osobisty raport został dołączony do tej wiadomości w formacie PDF. Zachowaj go — należy do Ciebie i możesz do niego wracać w każdej chwili."
+            : en
+              ? "Your personal report is attached to this email as a PDF. Save it, it's yours to keep and read whenever you like."
+              : "შენი პერსონალური რეპორტი ამ წერილს PDF-ად ახლავს. შეინახე, ის სამუდამოდ შენთან რჩება."
+          : pl
+            ? "Twój raport osobisty jest gotowy. Pobierz go, klikając poniższy link."
+            : en
+              ? "Your personal report is ready. Download it from the link below."
+              : "შენი პერსონალური რეპორტი მზადაა. ჩამოტვირთე ქვემოთ მოცემული ბმულით."}
       </Text>
 
       <Button href={reportUrl} style={buttonStyle}>
-        {en ? "Open your report" : "გახსენი ანგარიში"}
+        {pl ? "Otwórz raport" : en ? "Open your report" : "გახსენი ანგარიში"}
       </Button>
 
       <Text style={mutedStyle}>
-        {en
-          ? "The report also stays in your account, ready to download any time. If you have a question, just reply to this email."
-          : "ანგარიში შენს პროფილზეც რჩება, ჩამოტვირთვა ნებისმიერ დროს შეგიძლია. თუ შეკითხვა გაქვს, უპასუხე ამ წერილს."}
+        {pl
+          ? "Raport pozostaje na Twoim koncie i możesz go pobrać w dowolnym momencie. Jeśli masz pytania, po prostu odpowiedz na tę wiadomość."
+          : en
+            ? "The report also stays in your account, ready to download any time. If you have a question, just reply to this email."
+            : "ანგარიში შენს პროფილზეც რჩება, ჩამოტვირთვა ნებისმიერ დროს შეგიძლია. თუ შეკითხვა გაქვს, უპასუხე ამ წერილს."}
       </Text>
     </EmailLayout>
   );

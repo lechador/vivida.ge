@@ -14,6 +14,7 @@
 
 import rawContent from "./seo/synastry-aspects.json";
 import rawContentEn from "./seo/synastry-aspects-en.json";
+import rawContentPl from "./seo/synastry-aspects-pl.json";
 import type { AspectKind } from "./aspects";
 
 export type AspectDetailContent = {
@@ -46,13 +47,13 @@ export const BODY_ORDER = [
 export type BodyKey = (typeof BODY_ORDER)[number];
 
 const BODY_INDEX: Record<string, number> = Object.fromEntries(
-  BODY_ORDER.map((b, i) => [b, i])
+  BODY_ORDER.map((b, i) => [b, i]),
 );
 
 export function aspectDetailKey(
   kind: AspectKind,
   a: string,
-  b: string
+  b: string,
 ): string {
   const ia = BODY_INDEX[a] ?? -1;
   const ib = BODY_INDEX[b] ?? -1;
@@ -62,6 +63,7 @@ export function aspectDetailKey(
 
 const CONTENT = rawContent as Record<string, AspectDetailContent>;
 const CONTENT_EN = rawContentEn as Record<string, AspectDetailContent>;
+const CONTENT_PL = rawContentPl as Record<string, AspectDetailContent>;
 
 import type { UserLocale } from "./i18n/user-locale";
 
@@ -69,9 +71,14 @@ export function aspectDetailContent(
   kind: AspectKind,
   a: string,
   b: string,
-  locale: UserLocale = "ka"
+  locale: UserLocale = "ka",
 ): AspectDetailContent | null {
-  const table = locale === "en" ? CONTENT_EN : CONTENT;
+  const table =
+    locale === "pl"
+      ? (CONTENT_PL ?? CONTENT_EN)
+      : locale === "en"
+        ? CONTENT_EN
+        : CONTENT;
   return table[aspectDetailKey(kind, a, b)] ?? null;
 }
 

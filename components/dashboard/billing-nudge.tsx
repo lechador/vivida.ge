@@ -20,7 +20,9 @@ export function DashboardBillingNudge({
   countryCode?: string | null;
 }) {
   const en = locale === "en";
-  const pro = featuredPremiumPlanForCountry(countryCode);
+  const pro = featuredPremiumPlanForCountry(
+    countryCode || (locale === "pl" ? "PL" : undefined),
+  );
   const months = pro.intervalCount ?? 1;
   const placement = "dashboard_inline";
 
@@ -57,18 +59,27 @@ export function DashboardBillingNudge({
               </h2>
               {months > 1 && (
                 <span className="font-mono text-xs font-medium uppercase tracking-wider text-primary">
-                  · {en ? "Special price" : "სპეციალური ფასი"}
+                  ·{" "}
+                  {locale === "pl"
+                    ? "Specjalna cena"
+                    : en
+                      ? "Special price"
+                      : "სპეციალური ფასი"}
                 </span>
               )}
             </div>
             <p className="mt-1 max-w-xl text-sm text-muted-foreground">
               {months > 1
-                ? en
-                  ? `Unlock everything for ${months} months for ${formatBillingAmount(pro.amountMinor, pro.currency, locale)}.`
-                  : `გახსენი ყველაფერი ${months} თვით, ${formatBillingAmount(pro.amountMinor, pro.currency, locale)}-ად.`
-                : en
-                  ? "Unlock every paid feature without credit limits."
-                  : "გახსენი ყველა ფასიანი ფუნქცია კრედიტების ლიმიტის გარეშე."}
+                ? locale === "pl"
+                  ? `Odblokuj wszystko na ${months} miesięcy za ${formatBillingAmount(pro.amountMinor, pro.currency, locale)}.`
+                  : en
+                    ? `Unlock everything for ${months} months for ${formatBillingAmount(pro.amountMinor, pro.currency, locale)}.`
+                    : `გახსენი ყველაფერი ${months} თვით, ${formatBillingAmount(pro.amountMinor, pro.currency, locale)}-ად.`
+                : locale === "pl"
+                  ? "Odblokuj wszystkie płatne funkcje bez limitów kredytów."
+                  : en
+                    ? "Unlock every paid feature without credit limits."
+                    : "გახსენი ყველა ფასიანი ფუნქცია კრედიტების ლიმიტის გარეშე."}
             </p>
           </div>
         </div>
@@ -79,7 +90,7 @@ export function DashboardBillingNudge({
               href="/credits?next=%2Fdashboard"
               onClick={() => track("credits")}
             >
-              {en ? "Credits" : "კრედიტები"}
+              {locale === "pl" ? "Kredyty" : en ? "Credits" : "კრედიტები"}
             </Link>
           </Button>
           <Button asChild variant="default" size="sm">
@@ -88,12 +99,16 @@ export function DashboardBillingNudge({
               onClick={() => track("subscription")}
             >
               {months > 1
-                ? en
-                  ? `Get ${months} months`
-                  : `მიიღე ${months} თვე`
-                : en
-                  ? "Get PRO"
-                  : "გახდი PRO"}
+                ? locale === "pl"
+                  ? `Wybierz ${months} mies.`
+                  : en
+                    ? `Get ${months} months`
+                    : `მიიღე ${months} თვე`
+                : locale === "pl"
+                  ? "Przejdź na PRO"
+                  : en
+                    ? "Get PRO"
+                    : "გახდი PRO"}
               <ArrowRight className="size-4" />
             </Link>
           </Button>

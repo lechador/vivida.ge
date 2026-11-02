@@ -28,8 +28,10 @@ export type EqDomain = {
   key: EqDomainKey;
   nameKa: string;
   nameEn: string;
+  namePl?: string;
   taglineKa: string;
   taglineEn: string;
+  taglinePl?: string;
   /** Fallback glyph + radar/accent hue (oklch), 5 distinct hues. */
   glyph: string;
   hue: string;
@@ -41,17 +43,43 @@ export type EqQuestion = {
   domain: EqDomainKey;
   textKa: string;
   textEn?: string;
+  textPl?: string;
   /** Reverse-keyed: disagreement indicates higher EQ (scored 6 - raw). */
   reverse: boolean;
 };
 
 /** 5-point agreement scale (value → Georgian label). */
-export const EQ_LIKERT: { value: number; labelKa: string; labelEn: string }[] = [
-  { value: 1, labelKa: "სრულიად არ ვეთანხმები", labelEn: "Strongly disagree" },
-  { value: 2, labelKa: "არ ვეთანხმები", labelEn: "Disagree" },
-  { value: 3, labelKa: "ნეიტრალურად", labelEn: "Neither agree nor disagree" },
-  { value: 4, labelKa: "ვეთანხმები", labelEn: "Agree" },
-  { value: 5, labelKa: "სრულიად ვეთანხმები", labelEn: "Strongly agree" },
+export const EQ_LIKERT: {
+  value: number;
+  labelKa: string;
+  labelEn: string;
+  labelPl?: string;
+}[] = [
+  {
+    value: 1,
+    labelKa: "სრულიად არ ვეთანხმები",
+    labelEn: "Strongly disagree",
+    labelPl: "Zdecydowanie się nie zgadzam",
+  },
+  {
+    value: 2,
+    labelKa: "არ ვეთანხმები",
+    labelEn: "Disagree",
+    labelPl: "Nie zgadzam się",
+  },
+  {
+    value: 3,
+    labelKa: "ნეიტრალურად",
+    labelEn: "Neither agree nor disagree",
+    labelPl: "Ani się zgadzam, ani nie zgadzam",
+  },
+  { value: 4, labelKa: "ვეთანხმები", labelEn: "Agree", labelPl: "Zgadzam się" },
+  {
+    value: 5,
+    labelKa: "სრულიად ვეთანხმები",
+    labelEn: "Strongly agree",
+    labelPl: "Zdecydowanie się zgadzam",
+  },
 ];
 
 export const EQ_DOMAINS: EqDomain[] = [
@@ -59,8 +87,10 @@ export const EQ_DOMAINS: EqDomain[] = [
     key: "self-awareness",
     nameKa: "თვითშემეცნება",
     nameEn: "Self-awareness",
+    namePl: "Samoświadomość",
     taglineKa: "საკუთარი ემოციების ამოცნობა და გაცნობიერება",
     taglineEn: "Recognizing and understanding your emotions",
+    taglinePl: "Rozpoznawanie i rozumienie własnych emocji",
     glyph: "🪞",
     hue: "oklch(0.78 0.18 305)",
   },
@@ -68,8 +98,10 @@ export const EQ_DOMAINS: EqDomain[] = [
     key: "self-regulation",
     nameKa: "თვითრეგულაცია",
     nameEn: "Self-regulation",
+    namePl: "Samoregulacja",
     taglineKa: "ემოციების მართვა და იმპულსების კონტროლი",
     taglineEn: "Managing emotions and controlling impulses",
+    taglinePl: "Zarządzanie emocjami i kontrola impulsów",
     glyph: "⚓",
     hue: "oklch(0.80 0.15 200)",
   },
@@ -77,8 +109,10 @@ export const EQ_DOMAINS: EqDomain[] = [
     key: "motivation",
     nameKa: "მოტივაცია",
     nameEn: "Motivation",
+    namePl: "Motywacja",
     taglineKa: "შინაგანი ბიძგი, ოპტიმიზმი და მიზანდასახულობა",
     taglineEn: "Inner drive, optimism and persistence",
+    taglinePl: "Wewnętrzny napęd, optymizm i determinacja",
     glyph: "🔥",
     hue: "oklch(0.82 0.16 85)",
   },
@@ -86,8 +120,10 @@ export const EQ_DOMAINS: EqDomain[] = [
     key: "empathy",
     nameKa: "ემპათია",
     nameEn: "Empathy",
+    namePl: "Empatia",
     taglineKa: "სხვისი ემოციების აღქმა და გაგება",
     taglineEn: "Recognizing and understanding others' emotions",
+    taglinePl: "Rozpoznawanie i rozumienie emocji innych ludzi",
     glyph: "💗",
     hue: "oklch(0.75 0.20 350)",
   },
@@ -95,67 +131,276 @@ export const EQ_DOMAINS: EqDomain[] = [
     key: "social-skills",
     nameKa: "სოციალური უნარები",
     nameEn: "Social skills",
+    namePl: "Umiejętności społeczne",
     taglineKa: "ურთიერთობების აგება და მართვა",
     taglineEn: "Building and navigating relationships",
+    taglinePl: "Budowanie i pielęgnowanie relacji",
     glyph: "🤝",
     hue: "oklch(0.78 0.16 160)",
   },
 ];
 
-export const EQ_DOMAIN_BY_KEY: Record<EqDomainKey, EqDomain> = Object.fromEntries(
-  EQ_DOMAINS.map((d) => [d.key, d])
-) as Record<EqDomainKey, EqDomain>;
+export const EQ_DOMAIN_BY_KEY: Record<EqDomainKey, EqDomain> =
+  Object.fromEntries(EQ_DOMAINS.map((d) => [d.key, d])) as Record<
+    EqDomainKey,
+    EqDomain
+  >;
 
 export const EQ_QUESTIONS: EqQuestion[] = [
   // ── Self-awareness ─────────────────────────────────────────────────────
-  { id: 1, domain: "self-awareness", reverse: false, textKa: "ჩვეულებრივ ზუსტად შემიძლია დავასახელო, რას ვგრძნობ და რატომ." },
-  { id: 2, domain: "self-awareness", reverse: false, textKa: "ვამჩნევ ჩემი განწყობის ცვლილებას, სანამ ის სრულად დამეუფლება." },
-  { id: 3, domain: "self-awareness", reverse: false, textKa: "ვაცნობიერებ, როგორ მოქმედებს ჩემი ემოციები ჩემ გარშემო მყოფებზე." },
-  { id: 4, domain: "self-awareness", reverse: true, textKa: "ხშირად საკუთარი ემოციური რეაქცია მიკვირს." },
-  { id: 5, domain: "self-awareness", reverse: false, textKa: "ვიცი, რომელი სიტუაციები აღვიძებს ჩემში ძლიერ ემოციებს." },
-  { id: 6, domain: "self-awareness", reverse: false, textKa: "შემიძლია ერთმანეთისგან გავარჩიო მსგავსი ემოციები, მაგალითად, შფოთვა და აღელვება." },
-  { id: 7, domain: "self-awareness", reverse: true, textKa: "იშვიათად ვჩერდები იმაზე დასაფიქრებლად, თუ რატომ ვგრძნობ ასე." },
-  { id: 8, domain: "self-awareness", reverse: false, textKa: "რეალურად ვაფასებ ჩემს ემოციურ ძლიერ და სუსტ მხარეებს." },
+  {
+    id: 1,
+    domain: "self-awareness",
+    reverse: false,
+    textKa: "ჩვეულებრივ ზუსტად შემიძლია დავასახელო, რას ვგრძნობ და რატომ.",
+  },
+  {
+    id: 2,
+    domain: "self-awareness",
+    reverse: false,
+    textKa: "ვამჩნევ ჩემი განწყობის ცვლილებას, სანამ ის სრულად დამეუფლება.",
+  },
+  {
+    id: 3,
+    domain: "self-awareness",
+    reverse: false,
+    textKa: "ვაცნობიერებ, როგორ მოქმედებს ჩემი ემოციები ჩემ გარშემო მყოფებზე.",
+  },
+  {
+    id: 4,
+    domain: "self-awareness",
+    reverse: true,
+    textKa: "ხშირად საკუთარი ემოციური რეაქცია მიკვირს.",
+  },
+  {
+    id: 5,
+    domain: "self-awareness",
+    reverse: false,
+    textKa: "ვიცი, რომელი სიტუაციები აღვიძებს ჩემში ძლიერ ემოციებს.",
+  },
+  {
+    id: 6,
+    domain: "self-awareness",
+    reverse: false,
+    textKa:
+      "შემიძლია ერთმანეთისგან გავარჩიო მსგავსი ემოციები, მაგალითად, შფოთვა და აღელვება.",
+  },
+  {
+    id: 7,
+    domain: "self-awareness",
+    reverse: true,
+    textKa: "იშვიათად ვჩერდები იმაზე დასაფიქრებლად, თუ რატომ ვგრძნობ ასე.",
+  },
+  {
+    id: 8,
+    domain: "self-awareness",
+    reverse: false,
+    textKa: "რეალურად ვაფასებ ჩემს ემოციურ ძლიერ და სუსტ მხარეებს.",
+  },
 
   // ── Self-regulation ────────────────────────────────────────────────────
-  { id: 9, domain: "self-regulation", reverse: false, textKa: "როცა ვღელავ, შემიძლია დავმშვიდდე რეაქციამდე." },
-  { id: 10, domain: "self-regulation", reverse: false, textKa: "წნეხის ქვეშ სიმშვიდეს ვინარჩუნებ." },
-  { id: 11, domain: "self-regulation", reverse: true, textKa: "ხშირად გაცხარებისას ისეთ რამეს ვამბობ, რასაც შემდეგ ვნანობ." },
-  { id: 12, domain: "self-regulation", reverse: false, textKa: "ცუდი განწყობისგან შედარებით სწრაფად ვთავისუფლდები." },
-  { id: 13, domain: "self-regulation", reverse: false, textKa: "ჩემს ქცევას ვცვლი, როცა სიტუაცია ამას მოითხოვს." },
-  { id: 14, domain: "self-regulation", reverse: true, textKa: "როცა რაღაც მაღიზიანებს, ეს მთელ დღეს მიფუჭებს." },
-  { id: 15, domain: "self-regulation", reverse: false, textKa: "ვფიქრობ, სანამ ვიმოქმედებ, მაშინაც კი, როცა ემოციები მძაფრია." },
-  { id: 16, domain: "self-regulation", reverse: false, textKa: "შემიძლია შევიკავო იმპულსი, როცა მისი დრო არ არის." },
+  {
+    id: 9,
+    domain: "self-regulation",
+    reverse: false,
+    textKa: "როცა ვღელავ, შემიძლია დავმშვიდდე რეაქციამდე.",
+  },
+  {
+    id: 10,
+    domain: "self-regulation",
+    reverse: false,
+    textKa: "წნეხის ქვეშ სიმშვიდეს ვინარჩუნებ.",
+  },
+  {
+    id: 11,
+    domain: "self-regulation",
+    reverse: true,
+    textKa: "ხშირად გაცხარებისას ისეთ რამეს ვამბობ, რასაც შემდეგ ვნანობ.",
+  },
+  {
+    id: 12,
+    domain: "self-regulation",
+    reverse: false,
+    textKa: "ცუდი განწყობისგან შედარებით სწრაფად ვთავისუფლდები.",
+  },
+  {
+    id: 13,
+    domain: "self-regulation",
+    reverse: false,
+    textKa: "ჩემს ქცევას ვცვლი, როცა სიტუაცია ამას მოითხოვს.",
+  },
+  {
+    id: 14,
+    domain: "self-regulation",
+    reverse: true,
+    textKa: "როცა რაღაც მაღიზიანებს, ეს მთელ დღეს მიფუჭებს.",
+  },
+  {
+    id: 15,
+    domain: "self-regulation",
+    reverse: false,
+    textKa: "ვფიქრობ, სანამ ვიმოქმედებ, მაშინაც კი, როცა ემოციები მძაფრია.",
+  },
+  {
+    id: 16,
+    domain: "self-regulation",
+    reverse: false,
+    textKa: "შემიძლია შევიკავო იმპულსი, როცა მისი დრო არ არის.",
+  },
 
   // ── Motivation ─────────────────────────────────────────────────────────
-  { id: 17, domain: "motivation", reverse: false, textKa: "იმედს ვინარჩუნებ მაშინაც, როცა საქმე ცუდად მიდის." },
-  { id: 18, domain: "motivation", reverse: false, textKa: "მიზნისკენ ვაგრძელებ სვლას წარუმატებლობის მიუხედავად." },
-  { id: 19, domain: "motivation", reverse: true, textKa: "როცა რაღაცაში ვმარცხდები, ხელს ვიღებ." },
-  { id: 20, domain: "motivation", reverse: false, textKa: "ჩემს ემოციებს ენერგიის მოსაცემად და წინ წასაწევად ვიყენებ." },
-  { id: 21, domain: "motivation", reverse: false, textKa: "მოტივაციის შენარჩუნების საშუალებას ვპოულობ მოსაწყენ საქმეშიც კი." },
-  { id: 22, domain: "motivation", reverse: false, textKa: "იმედგაცრუების შემდეგ სწრაფად ვბრუნდები ფორმაში." },
-  { id: 23, domain: "motivation", reverse: true, textKa: "ინტერესს ვკარგავ, როგორც კი საქმე რთულდება." },
-  { id: 24, domain: "motivation", reverse: false, textKa: "საკუთარ თავს მიზნებს ვუსახავ და ენერგიულად მივყვები მათ." },
+  {
+    id: 17,
+    domain: "motivation",
+    reverse: false,
+    textKa: "იმედს ვინარჩუნებ მაშინაც, როცა საქმე ცუდად მიდის.",
+  },
+  {
+    id: 18,
+    domain: "motivation",
+    reverse: false,
+    textKa: "მიზნისკენ ვაგრძელებ სვლას წარუმატებლობის მიუხედავად.",
+  },
+  {
+    id: 19,
+    domain: "motivation",
+    reverse: true,
+    textKa: "როცა რაღაცაში ვმარცხდები, ხელს ვიღებ.",
+  },
+  {
+    id: 20,
+    domain: "motivation",
+    reverse: false,
+    textKa: "ჩემს ემოციებს ენერგიის მოსაცემად და წინ წასაწევად ვიყენებ.",
+  },
+  {
+    id: 21,
+    domain: "motivation",
+    reverse: false,
+    textKa: "მოტივაციის შენარჩუნების საშუალებას ვპოულობ მოსაწყენ საქმეშიც კი.",
+  },
+  {
+    id: 22,
+    domain: "motivation",
+    reverse: false,
+    textKa: "იმედგაცრუების შემდეგ სწრაფად ვბრუნდები ფორმაში.",
+  },
+  {
+    id: 23,
+    domain: "motivation",
+    reverse: true,
+    textKa: "ინტერესს ვკარგავ, როგორც კი საქმე რთულდება.",
+  },
+  {
+    id: 24,
+    domain: "motivation",
+    reverse: false,
+    textKa: "საკუთარ თავს მიზნებს ვუსახავ და ენერგიულად მივყვები მათ.",
+  },
 
   // ── Empathy ────────────────────────────────────────────────────────────
-  { id: 25, domain: "empathy", reverse: false, textKa: "ჩვეულებრივ ვგრძნობ, როგორ არის ადამიანი, მაშინაც კი, თუ ამას არ ამბობს." },
-  { id: 26, domain: "empathy", reverse: false, textKa: "სწრაფად ვგრძნობ ოთახის საერთო განწყობას." },
-  { id: 27, domain: "empathy", reverse: false, textKa: "ვცდილობ სიტუაცია სხვისი კუთხიდანაც დავინახო." },
-  { id: 28, domain: "empathy", reverse: true, textKa: "მიჭირს იმის შემჩნევა, როცა ვინმე ნაწყენია." },
-  { id: 29, domain: "empathy", reverse: false, textKa: "ხალხი ხშირად ჩემთან მოდის, როცა გაგებას საჭიროებს." },
-  { id: 30, domain: "empathy", reverse: false, textKa: "ვამჩნევ მცირე ცვლილებასაც ადამიანის ტონსა თუ სახის გამომეტყველებაში." },
-  { id: 31, domain: "empathy", reverse: true, textKa: "იშვიათად ვფიქრობ იმაზე, თუ როგორ აისახება ჩემი ქმედება სხვებზე." },
-  { id: 32, domain: "empathy", reverse: false, textKa: "შემიძლია ვიგრძნო ის, რასაც მეგობარი განიცდის, როცა მტკივნეულს მიზიარებს." },
+  {
+    id: 25,
+    domain: "empathy",
+    reverse: false,
+    textKa:
+      "ჩვეულებრივ ვგრძნობ, როგორ არის ადამიანი, მაშინაც კი, თუ ამას არ ამბობს.",
+  },
+  {
+    id: 26,
+    domain: "empathy",
+    reverse: false,
+    textKa: "სწრაფად ვგრძნობ ოთახის საერთო განწყობას.",
+  },
+  {
+    id: 27,
+    domain: "empathy",
+    reverse: false,
+    textKa: "ვცდილობ სიტუაცია სხვისი კუთხიდანაც დავინახო.",
+  },
+  {
+    id: 28,
+    domain: "empathy",
+    reverse: true,
+    textKa: "მიჭირს იმის შემჩნევა, როცა ვინმე ნაწყენია.",
+  },
+  {
+    id: 29,
+    domain: "empathy",
+    reverse: false,
+    textKa: "ხალხი ხშირად ჩემთან მოდის, როცა გაგებას საჭიროებს.",
+  },
+  {
+    id: 30,
+    domain: "empathy",
+    reverse: false,
+    textKa:
+      "ვამჩნევ მცირე ცვლილებასაც ადამიანის ტონსა თუ სახის გამომეტყველებაში.",
+  },
+  {
+    id: 31,
+    domain: "empathy",
+    reverse: true,
+    textKa: "იშვიათად ვფიქრობ იმაზე, თუ როგორ აისახება ჩემი ქმედება სხვებზე.",
+  },
+  {
+    id: 32,
+    domain: "empathy",
+    reverse: false,
+    textKa:
+      "შემიძლია ვიგრძნო ის, რასაც მეგობარი განიცდის, როცა მტკივნეულს მიზიარებს.",
+  },
 
   // ── Social skills ──────────────────────────────────────────────────────
-  { id: 33, domain: "social-skills", reverse: false, textKa: "ადვილად ვამყარებ კავშირს ახალ ადამიანებთან." },
-  { id: 34, domain: "social-skills", reverse: false, textKa: "შემიძლია დავამშვიდო ადამიანებს შორის დაძაბული სიტუაცია." },
-  { id: 35, domain: "social-skills", reverse: false, textKa: "ვამბობ იმას, რაც მჭირდება, სხვისი გულის ტკენის გარეშე." },
-  { id: 36, domain: "social-skills", reverse: true, textKa: "მიჭირს საუბრის გაბმა და გაგრძელება." },
-  { id: 37, domain: "social-skills", reverse: false, textKa: "უთანხმოებას ისე ვაგვარებ, რომ ურთიერთობა არ ზიანდება." },
-  { id: 38, domain: "social-skills", reverse: false, textKa: "ხალხს ჩემთან საუბარი უადვილდება." },
-  { id: 39, domain: "social-skills", reverse: true, textKa: "ჯგუფურ გარემოში ხშირად უხერხულად ვგრძნობ თავს." },
-  { id: 40, domain: "social-skills", reverse: false, textKa: "სხვების დარწმუნება შემიძლია იმის გაგებით, რაც მათთვის მნიშვნელოვანია." },
+  {
+    id: 33,
+    domain: "social-skills",
+    reverse: false,
+    textKa: "ადვილად ვამყარებ კავშირს ახალ ადამიანებთან.",
+  },
+  {
+    id: 34,
+    domain: "social-skills",
+    reverse: false,
+    textKa: "შემიძლია დავამშვიდო ადამიანებს შორის დაძაბული სიტუაცია.",
+  },
+  {
+    id: 35,
+    domain: "social-skills",
+    reverse: false,
+    textKa: "ვამბობ იმას, რაც მჭირდება, სხვისი გულის ტკენის გარეშე.",
+  },
+  {
+    id: 36,
+    domain: "social-skills",
+    reverse: true,
+    textKa: "მიჭირს საუბრის გაბმა და გაგრძელება.",
+  },
+  {
+    id: 37,
+    domain: "social-skills",
+    reverse: false,
+    textKa: "უთანხმოებას ისე ვაგვარებ, რომ ურთიერთობა არ ზიანდება.",
+  },
+  {
+    id: 38,
+    domain: "social-skills",
+    reverse: false,
+    textKa: "ხალხს ჩემთან საუბარი უადვილდება.",
+  },
+  {
+    id: 39,
+    domain: "social-skills",
+    reverse: true,
+    textKa: "ჯგუფურ გარემოში ხშირად უხერხულად ვგრძნობ თავს.",
+  },
+  {
+    id: 40,
+    domain: "social-skills",
+    reverse: false,
+    textKa:
+      "სხვების დარწმუნება შემიძლია იმის გაგებით, რაც მათთვის მნიშვნელოვანია.",
+  },
 ];
 
 const EQ_QUESTION_TEXT_EN: Record<number, string> = {
@@ -204,6 +449,54 @@ const EQ_QUESTION_TEXT_EN: Record<number, string> = {
 export const EQ_QUESTIONS_EN: EqQuestion[] = EQ_QUESTIONS.map((question) => ({
   ...question,
   textEn: EQ_QUESTION_TEXT_EN[question.id],
+}));
+
+const EQ_QUESTION_TEXT_PL: Record<number, string> = {
+  1: "Zazwyczaj potrafię dokładnie nazwać to, co czuję i dlaczego.",
+  2: "Zauważam zmiany nastroju, zanim całkowicie nade mną zapanują.",
+  3: "Rozumiem, jak moje emocje wpływają na ludzi wokół mnie.",
+  4: "Moje własne reakcje emocjonalne często mnie zaskakują.",
+  5: "Wiem, jakie sytuacje wywołują we mnie silne emocje.",
+  6: "Potrafię odróżnić podobne stany emocjonalne, np. niepokój od podekscytowania.",
+  7: "Rzadko zastanawiam się nad tym, dlaczego czuję się w dany sposób.",
+  8: "Realistycznie oceniam swoje emocjonalne mocne strony i ograniczenia.",
+  9: "Kiedy jestem zdenerwowany(-a), potrafię się uspokoić przed reakcją.",
+  10: "Zachowuję spokój w sytuacjach pod presją.",
+  11: "Kiedy jestem zły(-a), często mówię rzeczy, których później żałuję.",
+  12: "Stosunkowo szybko dochodzę do siebie po złym nastroju.",
+  13: "Dostosowuję swoje zachowanie, gdy wymaga tego sytuacja.",
+  14: "Kiedy coś mnie zirytuje, potrafi to zepsuć mi cały dzień.",
+  15: "Zastanawiam się przed podjęciem działania, nawet przy silnych emocjach.",
+  16: "Potrafię powstrzymać impuls, gdy moment na działanie jest niewłaściwy.",
+  17: "Zachowuję nadzieję nawet wtedy, gdy sprawy przybierają zły obrót.",
+  18: "Dążę do celu pomimo niepowodzeń i trudności.",
+  19: "Gdy coś mi się nie udaje, mam tendencję do poddawania się.",
+  20: "Potrafię wykorzystać emocje jako energię do działania.",
+  21: "Potrafię utrzymać motywację nawet podczas nudnych zadań.",
+  22: "Szybko odzyskuję siły po rozczarowaniu.",
+  23: "Tracę zainteresowanie, gdy tylko coś staje się trudne.",
+  24: "Wyznaczam sobie cele i energicznie do nich dążę.",
+  25: "Zazwyczaj wyczuwam, jak ktoś się czuje, nawet jeśli o tym nie mówi.",
+  26: "Szybko wyczuwam ogólną atmosferę panującą w pomieszczeniu.",
+  27: "Staram się patrzeć na sytuację z perspektywy innych ludzi.",
+  28: "Trudno mi zauważyć, kiedy ktoś jest przygnębiony lub zmartwiony.",
+  29: "Ludzie często przychodzą do mnie, gdy potrzebują zrozumienia.",
+  30: "Zauważam drobne zmiany w tonie głosu lub wyrazie twarzy rozmówcy.",
+  31: "Rzadko zastanawiam się nad tym, jak moje zachowanie wpływa na innych.",
+  32: "Głęboko współodczuwam to, przez co przechodzi przyjaciel, gdy dzieli się czymś bolesnym.",
+  33: "Z łatwością nawiązuję kontakt z nowymi ludźmi.",
+  34: "Potrafię załagodzić napiętą sytuację między ludźmi.",
+  35: "Potrafię wyrazić swoje potrzeby bez ranienia uczuć innych.",
+  36: "Trudno mi rozpocząć i podtrzymać rozmowę.",
+  37: "Rozwiązuję nieporozumienia w sposób, który nie niszczy relacji.",
+  38: "Ludziom zazwyczaj łatwo się ze mną rozmawia.",
+  39: "Często czuję się niezręcznie w sytuacjach grupowych.",
+  40: "Potrafię przekonać innych, rozumiejąc to, co jest dla nich ważne.",
+};
+
+export const EQ_QUESTIONS_PL: EqQuestion[] = EQ_QUESTIONS.map((question) => ({
+  ...question,
+  textPl: EQ_QUESTION_TEXT_PL[question.id],
 }));
 
 export const EQ_QUESTION_COUNT = EQ_QUESTIONS.length;

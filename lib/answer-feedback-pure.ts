@@ -36,10 +36,11 @@ export const ANSWER_FEEDBACK_REASON_LABELS: Record<
   no_answer: {
     ka: "კითხვას არ პასუხობს",
     en: "Doesn't answer my question",
+    pl: "Nie odpowiada na moje pytanie",
   },
-  incorrect: { ka: "არასწორია", en: "Incorrect" },
-  unclear: { ka: "ბუნდოვანია", en: "Unclear" },
-  cut_off: { ka: "შეწყდა", en: "Cut off" },
+  incorrect: { ka: "არასწორია", en: "Incorrect", pl: "Niepoprawne" },
+  unclear: { ka: "ბუნდოვანია", en: "Unclear", pl: "Niejasne" },
+  cut_off: { ka: "შეწყდა", en: "Cut off", pl: "Ucięte" },
 };
 
 export type NormalizedAnswerFeedback = {

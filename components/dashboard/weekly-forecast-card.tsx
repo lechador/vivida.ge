@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
 import type { WeeklyForecastDay } from "@/db/schema";
-import { BODIES } from "@/lib/zodiac";
+import { BODIES, SIGNS } from "@/lib/zodiac";
 import { cn } from "@/lib/utils";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
@@ -22,6 +22,13 @@ const ASPECT_LABEL_EN: Record<string, string> = {
   trine: "trine",
   opposition: "opposition",
 };
+const ASPECT_LABEL_PL: Record<string, string> = {
+  conjunction: "koniunkcja",
+  sextile: "sekstyl",
+  square: "kwadratura",
+  trine: "trygon",
+  opposition: "opozycja",
+};
 
 const FAMILY_HINT_KA: Record<string, string> = {
   harmonic: "ჰარმონიული",
@@ -32,6 +39,11 @@ const FAMILY_HINT_EN: Record<string, string> = {
   harmonic: "harmonious",
   tense: "challenging",
   neutral: "neutral",
+};
+const FAMILY_HINT_PL: Record<string, string> = {
+  harmonic: "harmonijny",
+  tense: "wymagający",
+  neutral: "neutralny",
 };
 
 const WEEKDAY_SHORT_KA: Record<string, string> = {
@@ -64,14 +76,22 @@ export function WeeklyForecastCard({
       <header className="mb-5 flex items-baseline justify-between gap-3 border-b border-border pb-4">
         <div>
           <div className="text-[11px] font-medium uppercase tracking-[0.2em] text-[var(--vivida-cyan)]">
-            {en ? "7-Day Ephemeris Forecast" : "შემდეგი 7 დღის ეფემერიდა"}
+            {locale === "pl"
+              ? "7-dniowa prognoza efemeryd"
+              : en
+                ? "7-Day Ephemeris Forecast"
+                : "შემდეგი 7 დღის ეფემერიდა"}
           </div>
           <h2 className="mt-1 text-balance text-lg font-semibold tracking-tight text-foreground sm:text-xl">
-            {en ? "Your week in the sky" : "შენი კვირის ცის რუკა"}
+            {locale === "pl"
+              ? "Twój tydzień na niebie"
+              : en
+                ? "Your week in the sky"
+                : "შენი კვირის ცის რუკა"}
           </h2>
         </div>
         <span className="font-mono text-xs tabular-nums text-muted-foreground">
-          {days.length} {en ? "days" : "დღე"}
+          {days.length} {locale === "pl" ? "dni" : en ? "days" : "დღე"}
         </span>
       </header>
 
@@ -88,9 +108,11 @@ export function WeeklyForecastCard({
       </ol>
 
       <p className="mt-4 text-xs text-muted-foreground">
-        {en
-          ? "Scores reflect each day's transit-to-natal aspects. Select a day to see why."
-          : "ქულები ეფუძნება ამ დღის ტრანზიტ-ნატალურ ასპექტებს. დააჭირე დღეს დეტალების სანახავად."}
+        {locale === "pl"
+          ? "Oceny odzwierciedlają dzienne tranzyty do Twojego kosmogramu. Wybierz dzień, aby dowiedzieć się więcej."
+          : en
+            ? "Scores reflect each day's transit-to-natal aspects. Select a day to see why."
+            : "ქულები ეფუძნება ამ დღის ტრანზიტ-ნატალურ ასპექტებს. დააჭირე დღეს დეტალების სანახავად."}
       </p>
     </article>
   );
@@ -111,12 +133,18 @@ export function DayRow({
 }) {
   const en = locale !== "ka";
   const dayNum = parseDateNum(day.dateIso);
-  const weekShort = en
-    ? new Intl.DateTimeFormat("en", {
-        weekday: "short",
-        timeZone: "UTC",
-      }).format(new Date(`${day.dateIso}T00:00:00Z`))
-    : (WEEKDAY_SHORT_KA[day.weekdayKa] ?? day.weekdayKa.slice(0, 3));
+  const weekShort =
+    locale === "pl"
+      ? new Intl.DateTimeFormat("pl", {
+          weekday: "short",
+          timeZone: "UTC",
+        }).format(new Date(`${day.dateIso}T00:00:00Z`))
+      : en
+        ? new Intl.DateTimeFormat("en", {
+            weekday: "short",
+            timeZone: "UTC",
+          }).format(new Date(`${day.dateIso}T00:00:00Z`))
+        : (WEEKDAY_SHORT_KA[day.weekdayKa] ?? day.weekdayKa.slice(0, 3));
   const total = day.harmonyScore + day.challengeScore;
   const harmonicPct = total > 0 ? (day.harmonyScore / total) * 100 : 50;
   const challengePct = total > 0 ? (day.challengeScore / total) * 100 : 50;
@@ -137,6 +165,18 @@ export function DayRow({
       : tilt === "challenging"
         ? "bg-[var(--vivida-pink)]"
         : "bg-primary";
+
+  const sign = SIGNS.find(
+    (s) =>
+      s.labelEn.toLowerCase() === day.moonSignEn?.toLowerCase() ||
+      s.key.toLowerCase() === day.moonSignEn?.toLowerCase(),
+  );
+  const moonSign =
+    locale === "pl"
+      ? (sign?.labelPl ?? day.moonSignEn)
+      : en
+        ? day.moonSignEn
+        : day.moonSignKa;
 
   return (
     <li className="bg-transparent">
@@ -173,9 +213,8 @@ export function DayRow({
                   {day.headline || "—"}
                 </p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  {en ? "Moon" : "მთვარე"}{" "}
-                  {en ? day.moonSignEn : day.moonSignKa} ·{" "}
-                  {labelForTilt(tilt, locale)}
+                  {locale === "pl" ? "Księżyc" : en ? "Moon" : "მთვარე"}{" "}
+                  {moonSign} · {labelForTilt(tilt, locale)}
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-3">
@@ -204,9 +243,11 @@ export function DayRow({
               style={{ opacity: 0.65 + intensity * 0.35 }}
               role="img"
               aria-label={
-                en
-                  ? `Harmony ${day.harmonyScore}, challenge ${day.challengeScore}`
-                  : `ჰარმონია ${day.harmonyScore}, დაძაბულობა ${day.challengeScore}`
+                locale === "pl"
+                  ? `Harmonia ${day.harmonyScore}, wyzwanie ${day.challengeScore}`
+                  : en
+                    ? `Harmony ${day.harmonyScore}, challenge ${day.challengeScore}`
+                    : `ჰარმონია ${day.harmonyScore}, დაძაბულობა ${day.challengeScore}`
               }
             >
               <div
@@ -230,12 +271,20 @@ export function DayRow({
         <div className="space-y-3 border-t border-border bg-secondary/20 p-4 pl-5">
           <div className="grid gap-3 sm:grid-cols-2">
             <Block
-              label={en ? "Supportive" : "ჰარმონიული"}
+              label={
+                locale === "pl"
+                  ? "Harmonijny"
+                  : en
+                    ? "Supportive"
+                    : "ჰარმონიული"
+              }
               toneClass="text-[var(--vivida-cyan)]"
               text={day.harmonicReason || "—"}
             />
             <Block
-              label={en ? "Challenging" : "დაძაბული"}
+              label={
+                locale === "pl" ? "Wymagający" : en ? "Challenging" : "დაძაბული"
+              }
               toneClass="text-[var(--vivida-pink)]"
               text={day.challengingReason || "—"}
             />
@@ -249,22 +298,29 @@ export function DayRow({
           {day.drivers && day.drivers.length > 0 && (
             <div>
               <div className="mb-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                {en ? "Active aspects" : "მოქმედი ასპექტები"}
+                {locale === "pl"
+                  ? "Aktywne aspekty"
+                  : en
+                    ? "Active aspects"
+                    : "მოქმედი ასპექტები"}
               </div>
               <ul className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-muted-foreground">
                 {day.drivers.slice(0, 4).map((dr, j) => (
                   <li
                     key={j}
                     className="inline-flex items-center gap-1"
-                    title={`${(en ? FAMILY_HINT_EN : FAMILY_HINT_KA)[dr.family] ?? ""} · orb ${dr.orb.toFixed(1)}°`}
+                    title={`${(locale === "pl" ? FAMILY_HINT_PL : en ? FAMILY_HINT_EN : FAMILY_HINT_KA)[dr.family] ?? ""} · orb ${dr.orb.toFixed(1)}°`}
                   >
                     {j > 0 && <span aria-hidden>·</span>}
                     <span className="text-foreground">
                       {bodyLabel(dr.transit, locale)}
                     </span>
                     <span className="text-primary">
-                      {(en ? ASPECT_LABEL_EN : ASPECT_LABEL_KA)[dr.kind] ??
-                        dr.kind}
+                      {(locale === "pl"
+                        ? ASPECT_LABEL_PL
+                        : en
+                          ? ASPECT_LABEL_EN
+                          : ASPECT_LABEL_KA)[dr.kind] ?? dr.kind}
                     </span>
                     <span className="text-foreground">
                       {bodyLabel(dr.natal, locale)}
@@ -308,6 +364,11 @@ function labelForTilt(
   tilt: "harmonic" | "challenging" | "balanced",
   locale: UserLocale,
 ): string {
+  if (locale === "pl") {
+    if (tilt === "harmonic") return "dzień harmonijny";
+    if (tilt === "challenging") return "dzień wymagający";
+    return "dzień zrównoważony";
+  }
   if (locale !== "ka") {
     if (tilt === "harmonic") return "supportive day";
     if (tilt === "challenging") return "challenging day";
@@ -320,7 +381,13 @@ function labelForTilt(
 
 function bodyLabel(key: string, locale: UserLocale): string {
   const body = BODIES[key];
-  return (locale !== "ka" ? body?.labelEn : body?.labelKa) ?? key;
+  return (
+    (locale === "pl"
+      ? body?.labelPl
+      : locale !== "ka"
+        ? body?.labelEn
+        : body?.labelKa) ?? key
+  );
 }
 
 function parseDateNum(iso: string): string {

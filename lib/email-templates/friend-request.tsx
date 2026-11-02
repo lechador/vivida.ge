@@ -29,14 +29,29 @@ export function FriendRequestEmail({
   unsubscribeUrl: string;
   locale?: UserLocale;
 }) {
+  const pl = locale === "pl";
   const en = locale === "en";
   const greeting = recipientName
-    ? en ? `Hello, ${recipientName}!` : `სალამი, ${recipientName}!`
-    : en ? "Hello!" : "სალამი!";
+    ? pl
+      ? `Cześć, ${recipientName}!`
+      : en
+        ? `Hello, ${recipientName}!`
+        : `სალამი, ${recipientName}!`
+    : pl
+      ? "Cześć!"
+      : en
+        ? "Hello!"
+        : "სალამი!";
   const fromHandle = fromUsername ? `@${fromUsername}` : null;
   return (
     <EmailLayout
-      preview={en ? `${fromName} sent you a friend request` : `${fromName}-მ მეგობრობის მოთხოვნა გამოგიგზავნა`}
+      preview={
+        pl
+          ? `${fromName} wysłał(a) Ci zaproszenie do znajomych`
+          : en
+            ? `${fromName} sent you a friend request`
+            : `${fromName}-მ მეგობრობის მოთხოვნა გამოგიგზავნა`
+      }
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
     >
@@ -51,7 +66,11 @@ export function FriendRequestEmail({
           margin: "0 0 16px",
         }}
       >
-        {en ? "New friend request" : "ახალი მეგობრობის მოთხოვნა"}
+        {pl
+          ? "Nowe zaproszenie do znajomych"
+          : en
+            ? "New friend request"
+            : "ახალი მეგობრობის მოთხოვნა"}
       </Heading>
 
       <Text style={paragraphStyle}>{greeting}</Text>
@@ -60,17 +79,23 @@ export function FriendRequestEmail({
         {fromHandle ? (
           <span style={{ color: "#9b94ad" }}> ({fromHandle})</span>
         ) : null}{" "}
-        {en
-          ? " wants to connect with you on Vivida. Accept the request to explore your compatibility."
-          : " გსურს დაგიმეგობრდეს Vivida-ზე. დაამატე და გაიგე, რამდენად თავსებადი ხართ ერთმანეთთან."}
+        {pl
+          ? " chce połączyć się z Tobą na Vivida. Zaakceptuj zaproszenie, aby sprawdzić Waszą kompatybilność."
+          : en
+            ? " wants to connect with you on Vivida. Accept the request to explore your compatibility."
+            : " გსურს დაგიმეგობრდეს Vivida-ზე. დაამატე და გაიგე, რამდენად თავსებადი ხართ ერთმანეთთან."}
       </Text>
 
       <Button href={friendsUrl} style={buttonStyle}>
-        {en ? "View request" : "ნახე მოთხოვნა"}
+        {pl ? "Zobacz zaproszenie" : en ? "View request" : "ნახე მოთხოვნა"}
       </Button>
 
       <Text style={mutedStyle}>
-        {en ? "You received this notification because you have not visited Vivida recently." : "ეს შეტყობინება მიიღე, რადგან გარკვეული ხნის წინ არ ეწვიე vivida.ge-ს."}
+        {pl
+          ? "Otrzymujesz to powiadomienie, ponieważ od pewnego czasu nie odwiedzałeś Vivida."
+          : en
+            ? "You received this notification because you have not visited Vivida recently."
+            : "ეს შეტყობინება მიიღე, რადგან გარკვეული ხნის წინ არ ეწვიე vivida.ge-ს."}
       </Text>
     </EmailLayout>
   );

@@ -137,9 +137,11 @@ export function TopUpCard({
         reason,
       });
       setError(
-        en
-          ? "Checkout could not start. Check your connection and try again, you won't be charged twice."
-          : "გადახდა ვერ დაიწყო. შეამოწმე ინტერნეტი და ცადე ისევ, ორჯერ ჩამოჭრა არ მოხდება.",
+        locale === "pl"
+          ? "Nie udało się rozpocząć płatności. Sprawdź połączenie i spróbuj ponownie, opłata nie zostanie naliczona podwójnie."
+          : en
+            ? "Checkout could not start. Check your connection and try again, you won't be charged twice."
+            : "გადახდა ვერ დაიწყო. შეამოწმე ინტერნეტი და ცადე ისევ, ორჯერ ჩამოჭრა არ მოხდება.",
       );
       setPending(null);
     } catch {
@@ -150,9 +152,11 @@ export function TopUpCard({
         reason: "network",
       });
       setError(
-        en
-          ? "Checkout could not start. Check your connection and try again, you won't be charged twice."
-          : "გადახდა ვერ დაიწყო. შეამოწმე ინტერნეტი და ცადე ისევ, ორჯერ ჩამოჭრა არ მოხდება.",
+        locale === "pl"
+          ? "Nie udało się rozpocząć płatności. Sprawdź połączenie i spróbuj ponownie, opłata nie zostanie naliczona podwójnie."
+          : en
+            ? "Checkout could not start. Check your connection and try again, you won't be charged twice."
+            : "გადახდა ვერ დაიწყო. შეამოწმე ინტერნეტი და ცადე ისევ, ორჯერ ჩამოჭრა არ მოხდება.",
       );
       setPending(null);
     }
@@ -163,31 +167,47 @@ export function TopUpCard({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
           <CreditCard className="size-4 text-[var(--vivida-cyan)]" />
-          {en ? "Top up balance" : "ბალანსის შევსება"}
+          {locale === "pl"
+            ? "Doładowanie salda"
+            : en
+              ? "Top up balance"
+              : "ბალანსის შევსება"}
         </div>
         <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
           <Check className="size-3.5 text-[var(--vivida-cyan)]" />
-          {en ? "Secure one-time payment" : "ერთჯერადი უსაფრთხო გადახდა"}
+          {locale === "pl"
+            ? "Bezpieczna płatność jednorazowa"
+            : en
+              ? "Secure one-time payment"
+              : "ერთჯერადი უსაფრთხო გადახდა"}
         </span>
       </div>
       <h2 className="mt-2 text-xl font-semibold tracking-tight">
         {isTarot
-          ? en
-            ? "How many more readings do you want?"
-            : "რამდენი დამატებითი კითხვა გინდა?"
-          : en
-            ? "How many credits do you need?"
-            : "რამდენი კრედიტი გჭირდება?"}
+          ? locale === "pl"
+            ? "Ile dodatkowych pytań chcesz zadać?"
+            : en
+              ? "How many more readings do you want?"
+              : "რამდენი დამატებითი კითხვა გინდა?"
+          : locale === "pl"
+            ? "Ile kredytów potrzebujesz?"
+            : en
+              ? "How many credits do you need?"
+              : "რამდენი კრედიტი გჭირდება?"}
       </h2>
       {deficit && (
         <p className="mt-2 rounded-xl border border-[var(--vivida-cyan)]/25 bg-[var(--vivida-cyan)]/8 px-3 py-2 text-sm text-foreground/80">
           {balance > 0
-            ? en
-              ? `You already have ${balance} credit${balance === 1 ? "" : "s"} in your wallet — only ${deficit} more needed for this unlock.`
-              : `ბალანსზე უკვე გაქვს ${balance} კრედიტი — ამ გახსნისთვის გაკლია მხოლოდ ${deficit} კრედიტი.`
-            : en
-              ? `You need ${deficit} more credit${deficit === 1 ? "" : "s"} for this unlock.`
-              : `ამ გახსნისთვის გაკლია ${deficit} კრედიტი.`}
+            ? locale === "pl"
+              ? `Masz już ${balance} kredytów na koncie — do tego odblokowania brakuje tylko ${deficit}.`
+              : en
+                ? `You already have ${balance} credit${balance === 1 ? "" : "s"} in your wallet — only ${deficit} more needed for this unlock.`
+                : `ბალანსზე უკვე გაქვს ${balance} კრედიტი — ამ გახსნისთვის გაკლია მხოლოდ ${deficit} კრედიტი.`
+            : locale === "pl"
+              ? `Do tego odblokowania potrzebujesz jeszcze ${deficit} kredytów.`
+              : en
+                ? `You need ${deficit} more credit${deficit === 1 ? "" : "s"} for this unlock.`
+                : `ამ გახსნისთვის გაკლია ${deficit} კრედიტი.`}
         </p>
       )}
 
@@ -211,20 +231,28 @@ export function TopUpCard({
                 ) : (
                   <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
                 )}
-                {en
-                  ? `Quick unlock · ${impulsePack.credits} credits`
-                  : `სწრაფი შევსება · ${impulsePack.credits} კრედიტი`}
+                {locale === "pl"
+                  ? `Szybkie odblokowanie · ${impulsePack.credits} kredytów`
+                  : en
+                    ? `Quick unlock · ${impulsePack.credits} credits`
+                    : `სწრაფი შევსება · ${impulsePack.credits} კრედიტი`}
               </span>
               {impulseFeatured && (
                 <span className="rounded-full bg-[var(--vivida-cyan)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.14_0.02_260)]">
-                  {en ? "Fastest unlock" : "სწრაფი გახსნა"}
+                  {locale === "pl"
+                    ? "Najszybsze odblokowanie"
+                    : en
+                      ? "Fastest unlock"
+                      : "სწრაფი გახსნა"}
                 </span>
               )}
             </div>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              {en
-                ? "1-click instant top-up · no subscription"
-                : "მყისიერი ერთჯერადი შევსება · გამოწერის გარეშე"}
+              {locale === "pl"
+                ? "Błyskawiczne doładowanie 1 kliknięciem · bez subskrypcji"
+                : en
+                  ? "1-click instant top-up · no subscription"
+                  : "მყისიერი ერთჯერადი შევსება · გამოწერის გარეშე"}
             </p>
           </div>
           <span className="shrink-0 rounded-xl bg-primary px-3.5 py-1.5 text-sm font-semibold tabular-nums text-primary-foreground">
@@ -242,24 +270,34 @@ export function TopUpCard({
           const featured = p.id === recommendedId;
           const badge =
             p.id === selectedPack?.id
-              ? en
-                ? "Your choice"
-                : "შენი არჩევანი"
+              ? locale === "pl"
+                ? "Twój wybór"
+                : en
+                  ? "Your choice"
+                  : "შენი არჩევანი"
               : featured && deficit
-                ? en
-                  ? "Recommended"
-                  : "რეკომენდებული"
+                ? locale === "pl"
+                  ? "Polecany"
+                  : en
+                    ? "Recommended"
+                    : "რეკომენდებული"
                 : i === 0
-                  ? en
-                    ? "Starter"
-                    : "საწყისი"
-                  : i === 1
-                    ? en
-                      ? "Most popular"
-                      : "რჩეული"
+                  ? locale === "pl"
+                    ? "Podstawowy"
                     : en
-                      ? "Best value"
-                      : "საუკეთესო ფასი";
+                      ? "Starter"
+                      : "საწყისი"
+                  : i === 1
+                    ? locale === "pl"
+                      ? "Najpopularniejszy"
+                      : en
+                        ? "Most popular"
+                        : "რჩეული"
+                    : locale === "pl"
+                      ? "Najlepsza wartość"
+                      : en
+                        ? "Best value"
+                        : "საუკეთესო ფასი";
           const cardClass = cn(
             "relative flex h-auto min-w-0 flex-col items-center gap-1 rounded-2xl border-2 px-2 py-4 transition-all hover:-translate-y-0.5 disabled:opacity-60 sm:p-5",
             featured
@@ -289,15 +327,15 @@ export function TopUpCard({
                 )}
               </div>
               <div className="text-xs text-muted-foreground">
-                {en ? "credits" : "კრედიტი"}
+                {locale === "pl" ? "kredytów" : en ? "credits" : "კრედიტი"}
               </div>
               <div className="mt-1 text-lg font-semibold">
                 {formatBillingAmount(p.amountMinor, p.currency, locale)}
               </div>
               <div className="text-[10px] text-muted-foreground">
                 {isTarot
-                  ? `${Math.floor(p.credits / CREDIT_COST.tarot)} ${en ? "tarot readings" : "ტარო კითხვა"}`
-                  : `≈ ${Math.floor(p.credits / 5)} ${en ? "unlocks" : "გახსნა"}`}
+                  ? `${Math.floor(p.credits / CREDIT_COST.tarot)} ${locale === "pl" ? "rozkładów tarota" : en ? "tarot readings" : "ტარო კითხვა"}`
+                  : `≈ ${Math.floor(p.credits / 5)} ${locale === "pl" ? "odblokowań" : en ? "unlocks" : "გახსნა"}`}
               </div>
             </>
           );
@@ -315,9 +353,11 @@ export function TopUpCard({
         })}
       </div>
       <p className="mt-3 text-center text-xs text-muted-foreground">
-        {en
-          ? "Select a pack to continue to secure checkout."
-          : "ღილაკზე დაჭერით პირდაპირ გადახდაზე გადახვალ."}
+        {locale === "pl"
+          ? "Wybierz pakiet, aby przejść do bezpiecznej płatności."
+          : en
+            ? "Select a pack to continue to secure checkout."
+            : "ღილაკზე დაჭერით პირდაპირ გადახდაზე გადახვალ."}
       </p>
       {cryptoAvailable && (
         <div className="mt-5 border-t border-border/60 pt-4">

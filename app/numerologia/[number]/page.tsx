@@ -5,6 +5,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { LifePathNumberPageEn } from "@/components/seo/numerology-en";
+import { LifePathNumberPagePl } from "@/components/seo/numerology-pl";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
@@ -13,6 +14,7 @@ import { LIFE_PATH_NUMBERS, isLifePathNumber } from "@/lib/numerology";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { LIFE_PATH_CONTENT } from "@/lib/seo/numerology-content";
 import { LIFE_PATH_CONTENT_EN } from "@/lib/seo/numerology-content-en";
+import { LIFE_PATH_CONTENT_PL } from "@/lib/seo/numerology-content-pl";
 
 import { articleLd, breadcrumbLd, serializeLd } from "@/lib/seo/jsonld";
 import {
@@ -37,6 +39,29 @@ export async function generateMetadata({
   const { number } = await params;
   if (!isLifePathNumber(number)) return {};
   const locale = await getRequestLocale();
+
+  if (locale === "pl") {
+    const content = LIFE_PATH_CONTENT_PL[number];
+    if (!content) return {};
+    const path = `/numerologia/${number}`;
+    const title = `${content.title} – Znaczenie, Miłość i Kariera | Vivida`;
+    const description = `${content.essence} Poznaj mocne strony, wyzwania, relacje i predyspozycje zawodowe dla Drogi Życia ${number}.`;
+    return {
+      title: { absolute: title },
+      description,
+      alternates: localizedAlternates(path, path, "pl"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "article",
+        url: `https://www.vividaastro.com/pl/numerologia/${number}`,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "pl_PL",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
 
   if (locale === "en") {
     const content = LIFE_PATH_CONTENT_EN[number];
@@ -101,6 +126,15 @@ export default async function LifePathNumberPage({
   const { number } = await params;
   if (!isLifePathNumber(number)) notFound();
   const locale = await getRequestLocale();
+  if (locale === "pl") {
+    return (
+      <LifePathNumberPagePl
+        number={number}
+        content={LIFE_PATH_CONTENT_PL[number]}
+      />
+    );
+  }
+
   if (locale === "en") {
     return (
       <LifePathNumberPageEn
@@ -277,7 +311,6 @@ export default async function LifePathNumberPage({
             </Link>
           </Button>
         </div>
-
       </section>
 
       <SiteFooter />

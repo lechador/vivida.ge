@@ -93,10 +93,18 @@ export function WeeklyForecastLocked({
       <header className="mb-5 flex items-baseline justify-between gap-3 border-b border-border pb-4">
         <div>
           <div className="text-[11px] font-medium uppercase tracking-[0.2em] text-[var(--vivida-cyan)]">
-            {en ? "7-Day Ephemeris Forecast" : "შემდეგი 7 დღის ეფემერიდა"}
+            {locale === "pl"
+              ? "7-dniowa prognoza efemeryd"
+              : en
+                ? "7-Day Ephemeris Forecast"
+                : "შემდეგი 7 დღის ეფემერიდა"}
           </div>
           <h2 className="mt-1 text-balance text-lg font-semibold tracking-tight text-foreground sm:text-xl">
-            {en ? "Your week in the sky" : "შენი კვირის ცის რუკა"}
+            {locale === "pl"
+              ? "Twój tydzień na niebie"
+              : en
+                ? "Your week in the sky"
+                : "შენი კვირის ცის რუკა"}
           </h2>
         </div>
         <Lock
@@ -153,9 +161,11 @@ export function WeeklyForecastLocked({
                 <div className="flex w-12 flex-col items-center rounded-md border border-border bg-card py-1.5 font-mono">
                   <span className="text-[10px] uppercase text-muted-foreground">
                     {
-                      (en
-                        ? ["Mon", "Tue", "Wed", "Thu"]
-                        : ["ორშ", "სამ", "ოთხ", "ხუთ"])[i]
+                      (locale === "pl"
+                        ? ["Pon", "Wt", "Śr", "Czw"]
+                        : en
+                          ? ["Mon", "Tue", "Wed", "Thu"]
+                          : ["ორშ", "სამ", "ოთხ", "ხუთ"])[i]
                     }
                   </span>
                   <span className="text-base font-semibold">{12 + i}</span>
@@ -174,19 +184,23 @@ export function WeeklyForecastLocked({
       {/* Lock CTA */}
       <div className="mt-5 flex flex-col items-center gap-3 rounded-lg border border-border bg-background/70 px-4 py-6 text-center">
         <div className="font-mono text-xs uppercase tracking-widest text-primary">
-          {cost} {en ? "credits" : "კრედიტი"} ·{" "}
+          {cost} {locale === "pl" ? "kredytów" : en ? "credits" : "კრედიტი"} ·{" "}
           <span className="text-muted-foreground">
-            {en ? "balance" : "ბალანსი"} {balance}
+            {locale === "pl" ? "saldo" : en ? "balance" : "ბალანსი"} {balance}
           </span>
         </div>
         <p className="max-w-md text-sm text-foreground/85">
           {teaser
-            ? en
-              ? "That was just the first day — unlock the full seven with reasons and guidance for each."
-              : "ეს მხოლოდ პირველი დღე იყო — გახსენი სრული შვიდეული მიზეზებითა და რჩევებით ყოველ დღეს."
-            : en
-              ? "Unlock a detailed seven-day forecast with daily harmony and challenge scores, reasons, and guidance."
-              : "გახსენი მომდევნო 7 დღის დეტალური პროგნოზი ჰარმონიისა და დაძაბულობის ქულებით, მიზეზებითა და რჩევებით."}
+            ? locale === "pl"
+              ? "To był tylko pierwszy dzień — odblokuj pełne siedem dni ze szczegółami i wskazówkami na każdy dzień."
+              : en
+                ? "That was just the first day — unlock the full seven with reasons and guidance for each."
+                : "ეს მხოლოდ პირველი დღე იყო — გახსენი სრული შვიდეული მიზეზებითა და რჩევებით ყოველ დღეს."
+            : locale === "pl"
+              ? "Odblokuj szczegółową prognozę na 7 dni ze wskaźnikami harmonii i napięcia, opisami tranzytów i poradami."
+              : en
+                ? "Unlock a detailed seven-day forecast with daily harmony and challenge scores, reasons, and guidance."
+                : "გახსენი მომდევნო 7 დღის დეტალური პროგნოზი ჰარმონიისა და დაძაბულობის ქულებით, მიზეზებითა და რჩევებით."}
         </p>
 
         {!short ? (
@@ -203,7 +217,11 @@ export function WeeklyForecastLocked({
             ) : (
               <Lock className="size-4" />
             )}
-            {en ? `Unlock for ${cost} credits` : `გახსნა ${cost} კრედიტით`}
+            {locale === "pl"
+              ? `Odblokuj za ${cost} kredytów`
+              : en
+                ? `Unlock for ${cost} credits`
+                : `გახსნა ${cost} კრედიტით`}
           </Button>
         ) : (
           <ContextualPaywallActions

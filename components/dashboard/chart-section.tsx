@@ -34,6 +34,7 @@ import {
 } from "@/components/report/positions-table";
 import { signByIndex } from "@/lib/zodiac";
 import { buildEnglishChartInterpretation } from "@/lib/report-content-en";
+import { buildPolishChartInterpretation } from "@/lib/report-content-pl";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export async function ChartSection({
@@ -72,9 +73,11 @@ export async function ChartSection({
   if (!chart) {
     return (
       <div className="rounded-md border border-border bg-card p-6 text-center text-sm text-muted-foreground">
-        {en
-          ? "Add your birth details to see your natal chart."
-          : "შენი რუკის სანახავად, შეავსე დაბადების მონაცემები."}
+        {locale === "pl"
+          ? "Dodaj dane urodzenia, aby zobaczyć swój kosmogram."
+          : en
+            ? "Add your birth details to see your natal chart."
+            : "შენი რუკის სანახავად, შეავსე დაბადების მონაცემები."}
       </div>
     );
   }
@@ -82,9 +85,12 @@ export async function ChartSection({
   const data = chart.data;
   const sun = data.bodies.sun;
   const moon = data.bodies.moon;
-  const interp = en
-    ? buildEnglishChartInterpretation(data)
-    : (chart.interpretation ?? null);
+  const interp =
+    locale === "pl"
+      ? buildPolishChartInterpretation(data)
+      : en
+        ? buildEnglishChartInterpretation(data)
+        : (chart.interpretation ?? null);
 
   const ascSign = signByIndex(data.ascendant.signIndex);
 
@@ -109,25 +115,35 @@ export async function ChartSection({
                       : "mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl"
                   }
                 >
-                  {en ? "Your sky " : "შენი ცის "}
-                  {en ? (
+                  {locale === "pl"
+                    ? "Twoje niebo "
+                    : en
+                      ? "Your sky "
+                      : "შენი ცის "}
+                  {locale === "pl" ? (
+                    <Accent>w chwili narodzin</Accent>
+                  ) : en ? (
                     <Accent>at birth</Accent>
                   ) : (
                     <span className="text-primary">მომენტი</span>
                   )}
                 </h2>
                 <p className="mt-3 max-w-md text-[15px] leading-relaxed text-muted-foreground">
-                  {en
-                    ? `The ecliptic horizon at the moment you were born. Your Ascendant rises in ${ascSign.labelEn}.`
-                    : `ეკლიპტიკის ჰორიზონტი ზუსტად შენი დაბადების წამში. ამომავალი ნიშანი ${ascSign.labelKa}-შია.`}
+                  {locale === "pl"
+                    ? `Horyzont ekliptyki dokładnie w chwili Twoich narodzin. Twój Ascendent wschodzi w znaku: ${ascSign.labelPl}.`
+                    : en
+                      ? `The ecliptic horizon at the moment you were born. Your Ascendant rises in ${ascSign.labelEn}.`
+                      : `ეკლიპტიკის ჰორიზონტი ზუსტად შენი დაბადების წამში. ამომავალი ნიშანი ${ascSign.labelKa}-შია.`}
                 </p>
 
                 {interp?.summary && (
                   <div className="mt-6 rounded-lg border border-border/80 bg-background/60 p-4">
                     <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
-                      {en
-                        ? "SYNTHESIS · ABOUT YOUR CHART"
-                        : "სინთეზი · შენი რუკის შესახებ"}
+                      {locale === "pl"
+                        ? "SYNTEZA · O TWOIM KOSMOGRAMIE"
+                        : en
+                          ? "SYNTHESIS · ABOUT YOUR CHART"
+                          : "სინთეზი · შენი რუკის შესახებ"}
                     </div>
                     <p className="text-sm leading-relaxed text-foreground/90">
                       {interp.summary}
@@ -147,13 +163,23 @@ export async function ChartSection({
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-start">
             <div>
               <h2 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--vivida-cyan)]">
-                02 · {en ? "Planetary Positions" : "პლანეტარული პოზიციები"}
+                02 ·{" "}
+                {locale === "pl"
+                  ? "Pozycje planetarne"
+                  : en
+                    ? "Planetary Positions"
+                    : "პლანეტარული პოზიციები"}
               </h2>
               <PositionsTable chart={data} locale={locale} />
             </div>
             <div>
               <h2 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
-                03 · {en ? "House Cusps" : "სახლების კუსპიდები"}
+                03 ·{" "}
+                {locale === "pl"
+                  ? "Wierzchołki domów"
+                  : en
+                    ? "House Cusps"
+                    : "სახლების კუსპიდები"}
               </h2>
               <div className="rounded-xl border border-border bg-card px-4 py-2 shadow-sm sm:px-5">
                 <HousesTable chart={data} locale={locale} />
@@ -166,11 +192,19 @@ export async function ChartSection({
         <CollapsibleSection
           id="big-three"
           icon={<Sparkles className="size-4.5" />}
-          title={en ? "The big three" : "დიდი სამეული"}
+          title={
+            locale === "pl"
+              ? "Wielka Trójka"
+              : en
+                ? "The big three"
+                : "დიდი სამეული"
+          }
           subtitle={
-            en
-              ? "Sun, Moon and Ascendant, your core pattern"
-              : "მზე, მთვარე და ამომავალი, შენი ბირთვი"
+            locale === "pl"
+              ? "Słońce, Księżyc i Ascendent — Twój profil podstawowy"
+              : en
+                ? "Sun, Moon and Ascendant, your core pattern"
+                : "მზე, მთვარე და ამომავალი, შენი ბირთვი"
           }
           defaultOpen
         >
@@ -204,11 +238,13 @@ export async function ChartSection({
         <CollapsibleSection
           id="elements"
           icon={<Flame className="size-4.5" />}
-          title={en ? "Elements" : "ელემენტები"}
+          title={locale === "pl" ? "Żywioły" : en ? "Elements" : "ელემენტები"}
           subtitle={
-            en
-              ? "The energies that carry the most weight in your chart"
-              : "რომელი ენერგიები დომინირებენ შენს ცაში"
+            locale === "pl"
+              ? "Energie dominujące w Twoim kosmogramie"
+              : en
+                ? "The energies that carry the most weight in your chart"
+                : "რომელი ენერგიები დომინირებენ შენს ცაში"
           }
           defaultOpen
         >
@@ -222,11 +258,19 @@ export async function ChartSection({
               <CollapsibleSection
                 id="highlights"
                 icon={<Lightbulb className="size-4.5" />}
-                title={en ? "What stands out" : "რა ვამჩნევთ შენს რუკაში"}
+                title={
+                  locale === "pl"
+                    ? "Co się wyróżnia"
+                    : en
+                      ? "What stands out"
+                      : "რა ვამჩნევთ შენს რუკაში"
+                }
                 subtitle={
-                  en
-                    ? "The patterns that carry special emphasis"
-                    : "ის ნაწილები, რომლებიც განსაკუთრებით გამოირჩევა"
+                  locale === "pl"
+                    ? "Wzorce o szczególnym znaczeniu"
+                    : en
+                      ? "The patterns that carry special emphasis"
+                      : "ის ნაწილები, რომლებიც განსაკუთრებით გამოირჩევა"
                 }
                 defaultOpen
               >
@@ -252,11 +296,13 @@ export async function ChartSection({
             <CollapsibleSection
               id="planets"
               icon={<Globe2 className="size-4.5" />}
-              title={en ? "Planets" : "პლანეტები"}
+              title={locale === "pl" ? "Planety" : en ? "Planets" : "პლანეტები"}
               subtitle={
-                en
-                  ? "Eight distinct functions working as one system"
-                  : "რვა პლანეტა, რვა ხასიათი, ერთად შენ ხარ"
+                locale === "pl"
+                  ? "Osiem odrębnych funkcji działających jako jeden system"
+                  : en
+                    ? "Eight distinct functions working as one system"
+                    : "რვა პლანეტა, რვა ხასიათი, ერთად შენ ხარ"
               }
               defaultOpen
             >
@@ -271,11 +317,19 @@ export async function ChartSection({
             <CollapsibleSection
               id="houses"
               icon={<Home className="size-4.5" />}
-              title={en ? "The 12 areas of life" : "ცხოვრების 12 სფერო"}
+              title={
+                locale === "pl"
+                  ? "12 sfer życia"
+                  : en
+                    ? "The 12 areas of life"
+                    : "ცხოვრების 12 სფერო"
+              }
               subtitle={
-                en
-                  ? "Where each part of your chart tends to show up"
-                  : "სად რა ენერგია ვლინდება შენს ცხოვრებაში"
+                locale === "pl"
+                  ? "Gdzie przejawia się każda część Twojego kosmogramu"
+                  : en
+                    ? "Where each part of your chart tends to show up"
+                    : "სად რა ენერგია ვლინდება შენს ცხოვრებაში"
               }
               defaultOpen
             >
@@ -290,11 +344,13 @@ export async function ChartSection({
             <CollapsibleSection
               id="aspects"
               icon={<Triangle className="size-4.5" />}
-              title={en ? "Aspects" : "ასპექტები"}
+              title={locale === "pl" ? "Aspekty" : en ? "Aspects" : "ასპექტები"}
               subtitle={
-                en
-                  ? "How the planets in your chart interact"
-                  : "როგორ ელაპარაკებიან პლანეტები ერთმანეთს"
+                locale === "pl"
+                  ? "Jak planety w Twoim kosmogramie wchodzą w relacje"
+                  : en
+                    ? "How the planets in your chart interact"
+                    : "როგორ ელაპარაკებიან პლანეტები ერთმანეთს"
               }
               defaultOpen
             >
@@ -314,17 +370,25 @@ export async function ChartSection({
               />
               <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/10 px-2.5 py-0.5 text-xs font-medium text-[var(--vivida-violet)]">
                 <Lock className="size-3" />
-                {en ? "Deep dossier locked" : "ღრმა დოსიე დახურულია"}
+                {locale === "pl"
+                  ? "Głębokie dossier zablokowane"
+                  : en
+                    ? "Deep dossier locked"
+                    : "ღრმა დოსიე დახურულია"}
               </div>
               <h2 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
-                {en
-                  ? "Your deep chart reading is waiting inside"
-                  : "შენი ღრმა ანალიზი აქ გელოდება"}
+                {locale === "pl"
+                  ? "Twoja szczegółowa interpretacja kosmogramu czeka w środku"
+                  : en
+                    ? "Your deep chart reading is waiting inside"
+                    : "შენი ღრმა ანალიზი აქ გელოდება"}
               </h2>
               <p className="mt-1.5 max-w-xl text-sm text-foreground/75">
-                {en
-                  ? "Unlock the planets, houses, aspects and the full PDF dossier in one step."
-                  : "გახსენი პლანეტები, სახლები, ასპექტები და სრული PDF დოსიე ერთი ნაბიჯით."}
+                {locale === "pl"
+                  ? "Odblokuj planety, domy, aspekty i pełne dossier PDF w jednym kroku."
+                  : en
+                    ? "Unlock the planets, houses, aspects and the full PDF dossier in one step."
+                    : "გახსენი პლანეტები, სახლები, ასპექტები და სრული PDF დოსიე ერთი ნაბიჯით."}
               </p>
 
               <div className="mt-6 grid gap-3.5 sm:grid-cols-3">
@@ -335,9 +399,11 @@ export async function ChartSection({
                   <div className="flex items-center gap-2">
                     <Lock className="size-4 text-[var(--vivida-violet)]" />
                     <h3 className="text-sm font-semibold text-foreground">
-                      {en
-                        ? "Karmic mission & soul direction"
-                        : "კარმული მისია და სულის მიმართულება"}
+                      {locale === "pl"
+                        ? "Misja karmiczna i kierunek duszy"
+                        : en
+                          ? "Karmic mission & soul direction"
+                          : "კარმული მისია და სულის მიმართულება"}
                     </h3>
                   </div>
                   <div aria-hidden className="mt-3 space-y-1.5 select-none">
@@ -353,9 +419,11 @@ export async function ChartSection({
                   <div className="flex items-center gap-2">
                     <Lock className="size-4 text-[var(--vivida-violet)]" />
                     <h3 className="text-sm font-semibold text-foreground">
-                      {en
-                        ? "7th house of love & marriage"
-                        : "სიყვარულისა და ქორწინების მე-7 სახლი"}
+                      {locale === "pl"
+                        ? "7. dom miłości i relacji partnerskich"
+                        : en
+                          ? "7th house of love & marriage"
+                          : "სიყვარულისა და ქორწინების მე-7 სახლი"}
                     </h3>
                   </div>
                   <div aria-hidden className="mt-3 space-y-1.5 select-none">
@@ -366,9 +434,11 @@ export async function ChartSection({
                   <div className="mt-4 flex items-center gap-2 border-t border-border pt-4">
                     <Lock className="size-4 text-[var(--vivida-violet)]" />
                     <h3 className="text-sm font-semibold text-foreground">
-                      {en
-                        ? "2nd & 8th houses of finances & resources"
-                        : "ფინანსებისა და რესურსების მე-2 და მე-8 სახლები"}
+                      {locale === "pl"
+                        ? "2. i 8. dom finansów i zasobów"
+                        : en
+                          ? "2nd & 8th houses of finances & resources"
+                          : "ფინანსებისა და რესურსების მე-2 და მე-8 სახლები"}
                     </h3>
                   </div>
                   <div aria-hidden className="mt-3 space-y-1.5 select-none">
@@ -383,9 +453,11 @@ export async function ChartSection({
                   <div className="flex items-center gap-2">
                     <Lock className="size-4 text-[var(--vivida-violet)]" />
                     <h3 className="text-sm font-semibold text-foreground">
-                      {en
-                        ? "All planets, 12 houses, aspects & full PDF dossier"
-                        : "ყველა პლანეტა, 12 სახლი, ასპექტები და სრული PDF დოსიე"}
+                      {locale === "pl"
+                        ? "Wszystkie planety, 12 domów, aspekty i pełne dossier PDF"
+                        : en
+                          ? "All planets, 12 houses, aspects & full PDF dossier"
+                          : "ყველა პლანეტა, 12 სახლი, ასპექტები და სრული PDF დოსიე"}
                     </h3>
                   </div>
                   <div aria-hidden className="mt-3 space-y-1.5 select-none">

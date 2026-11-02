@@ -42,6 +42,7 @@ export function AhaResult({
   locale: UserLocale;
 }) {
   const en = locale === "en";
+  const pl = locale === "pl";
   const starters = chartStarterOptions(locale).slice(0, 3);
   const featureDestination = next !== "/report";
   const resultTracked = useRef(false);
@@ -115,16 +116,26 @@ export function AhaResult({
           <Sparkles className="size-6" />
         </div>
         <p className="mt-4 text-xs font-medium uppercase tracking-[0.22em] text-[var(--vivida-cyan)]">
-          {en ? "Your chart is ready" : "შენი რუკა მზადაა"}
+          {pl
+            ? "Twój kosmogram jest gotowy"
+            : en
+              ? "Your chart is ready"
+              : "შენი რუკა მზადაა"}
         </p>
         <h1 className="mt-2 text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
           {firstName ? `${firstName}, ` : ""}
-          {en ? "meet your Big Three" : "გაიცანი შენი დიდი სამეული"}
+          {pl
+            ? "poznaj swoją Wielką Trójkę"
+            : en
+              ? "meet your Big Three"
+              : "გაიცანი შენი დიდი სამეული"}
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-pretty text-sm text-foreground/75 sm:text-base">
-          {en
-            ? "Your Sun describes your core, your Moon your inner world, and your Rising sign how you meet life."
-            : "მზე შენს ბირთვს აღწერს, მთვარე, შინაგან სამყაროს, ამომავალი კი, როგორ ხვდები ცხოვრებას."}
+          {pl
+            ? "Twoje Słońce opisuje Twoją istotę, Księżyc Twój świat wewnętrzny, a Ascendent sposób, w jaki wchodzisz w relacje ze światem."
+            : en
+              ? "Your Sun describes your core, your Moon your inner world, and your Rising sign how you meet life."
+              : "მზე შენს ბირთვს აღწერს, მთვარე, შინაგან სამყაროს, ამომავალი კი, როგორ ხვდები ცხოვრებას."}
         </p>
       </div>
 
@@ -164,9 +175,11 @@ export function AhaResult({
       <section className="mt-6 rounded-2xl border border-[var(--vivida-violet)]/25 bg-[var(--vivida-violet)]/8 p-5 text-center backdrop-blur-xl sm:p-6">
         <div className="flex items-center justify-center gap-2 text-sm font-medium">
           <MessageCircle className="size-4 text-[var(--vivida-violet)]" />
-          {en
-            ? "What do you want to discover first?"
-            : "რის გაგებას ისურვებდი პირველად?"}
+          {pl
+            ? "O co chcesz zapytać najpierw?"
+            : en
+              ? "What do you want to discover first?"
+              : "რის გაგებას ისურვებდი პირველად?"}
         </div>
         <div className="mt-4 flex flex-wrap justify-center gap-2">
           {starters.map((starter) => (
@@ -181,9 +194,11 @@ export function AhaResult({
           ))}
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          {en
-            ? "Your question will be prefilled, never sent without your confirmation."
-            : "შეკითხვა წინასწარ შეივსება და შენი დასტურის გარეშე არ გაიგზავნება."}
+          {pl
+            ? "Pytanie zostanie wstępnie uzupełnione i nie zostanie wysłane bez Twojej zgody."
+            : en
+              ? "Your question will be prefilled, never sent without your confirmation."
+              : "შეკითხვა წინასწარ შეივსება და შენი დასტურის გარეშე არ გაიგზავნება."}
         </p>
       </section>
 
@@ -199,12 +214,16 @@ export function AhaResult({
             }
           >
             {featureDestination
-              ? en
-                ? "Continue"
-                : "გაგრძელება"
-              : en
-                ? "Explore my full chart"
-                : "სრული რუკის ნახვა"}
+              ? pl
+                ? "Kontynuuj"
+                : en
+                  ? "Continue"
+                  : "გაგრძელება"
+              : pl
+                ? "Odkryj mój pełny kosmogram"
+                : en
+                  ? "Explore my full chart"
+                  : "სრული რუკის ნახვა"}
             <ArrowRight className="size-4" />
           </Link>
         </Button>
@@ -214,7 +233,11 @@ export function AhaResult({
             onClick={() => trackRecommendation("daily_dashboard", "see_today")}
           >
             <CalendarDays className="size-4" />
-            {en ? "See today's guidance" : "დღევანდელი გზავნილის ნახვა"}
+            {pl
+              ? "Zobacz dzisiejsze wskazówki"
+              : en
+                ? "See today's guidance"
+                : "დღევანდელი გზავნილის ნახვა"}
           </Link>
         </Button>
       </div>

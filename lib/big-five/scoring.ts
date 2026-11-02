@@ -5,11 +5,7 @@
  * neutral, non-judgmental meaning. Recomputed authoritatively on the server.
  */
 
-import {
-  BIG5_QUESTIONS,
-  BIG5_TRAITS,
-  type BigFiveTraitKey,
-} from "./questions";
+import { BIG5_QUESTIONS, BIG5_TRAITS, type BigFiveTraitKey } from "./questions";
 
 export type BigFiveLevel = "low" | "mid" | "high";
 
@@ -18,8 +14,10 @@ export type BigFiveTraitScore = {
   letter: string;
   nameKa: string;
   nameEn: string;
+  namePl: string;
   taglineKa: string;
   taglineEn: string;
+  taglinePl: string;
   glyph: string;
   hue: string;
   /** 0–100. */
@@ -48,7 +46,18 @@ export const BIG5_LEVEL_LABEL: Record<BigFiveLevel, string> = {
   mid: "საშუალო",
   high: "მაღალი",
 };
-export const BIG5_LEVEL_LABEL_EN: Record<BigFiveLevel, string> = { low: "Low", mid: "Moderate", high: "High" };
+
+export const BIG5_LEVEL_LABEL_EN: Record<BigFiveLevel, string> = {
+  low: "Low",
+  mid: "Moderate",
+  high: "High",
+};
+
+export const BIG5_LEVEL_LABEL_PL: Record<BigFiveLevel, string> = {
+  low: "Niski",
+  mid: "Umiarkowany",
+  high: "Wysoki",
+};
 
 /**
  * Neutral interpretation for each (trait × level). Both poles are valid
@@ -113,8 +122,39 @@ export const BIG5_TRAIT_INTERP_EN: typeof BIG5_TRAIT_INTERP = {
   },
 };
 
+export const BIG5_TRAIT_INTERP_PL: typeof BIG5_TRAIT_INTERP = {
+  openness: {
+    high: "Jesteś osobą ciekawą świata, pomysłową i otwartą na nowości. Przyciągają Cię świeże idee, sztuka i niecodzienne doświadczenia.",
+    mid: "Łączysz ciekawość z pragmatyzmem — z zainteresowaniem przyjmujesz nowe pomysły, doceniając zarazem sprawdzone i tradycyjne rozwiązania.",
+    low: "Cechuje Cię praktyczne i rzeczowe podejście. Preferujesz konkretne działania oraz sprawdzone, dobrze znane metody.",
+  },
+  conscientiousness: {
+    high: "Jesteś osobą zorganizowaną, zdyscyplinowaną i godną zaufania. Skutecznie planujesz i konsekwentnie doprowadzasz sprawy do końca.",
+    mid: "Łączysz porządek z elastycznością — działasz odpowiedzialnie, zostawiając jednocześnie przestrzeń na spontaniczność.",
+    low: "Cechuje Cię elastyczność i spontaniczność. Wyżej cenisz swobodę i zdolność adaptacji niż sztywne plany i rutynę.",
+  },
+  extraversion: {
+    high: "Jesteś osobą energiczną i towarzyską. Kontakty z innymi ładują Twoje baterie, a podejmowanie inicjatywy przychodzi Ci z łatwością.",
+    mid: "Równoważysz potrzebę kontaktów z potrzebą samotności — cieszysz się obecnością ludzi, ale potrzebujesz też chwil ciszy na regenerację.",
+    low: "Masz naturę introwertyczną i refleksyjną. Energię odzyskujesz w spokojnym otoczeniu, w samotności lub w wąskim gronie bliskich.",
+  },
+  agreeableness: {
+    high: "Jesteś osobą ciepłą, empatyczną i nastawioną na współpracę. Ufasz ludziom i szczerze troszczysz się o ich samopoczucie.",
+    mid: "Łączysz życzliwość z asertywnością — chętnie współpracujesz, potrafiąc jednak w razie potrzeby stanowczo bronić własnych granic.",
+    low: "Jesteś osobą bezpośrednią, krytyczną i niezależną. Wyżej cenisz szczerość i rzeczowe stanowisko niż łatwe ustępstwa.",
+  },
+  neuroticism: {
+    high: "Cechuje Cię wysoka wrażliwość emocjonalna. Głęboko przeżywasz wydarzenia i intensywniej reagujesz na stres, potrzebując więcej czasu na powrót do równowagi.",
+    mid: "Jesteś osobą emocjonalnie zrównoważoną — odczuwasz stres, lecz zazwyczaj sprawnie odzyskujesz wewnętrzny spokój.",
+    low: "Wyróżniasz się stabilnością emocjonalną i opanowaniem. Nawet w trudnych, stresujących momentach rzadko tracisz zimną krew.",
+  },
+};
+
 /** Sum of a trait's items (reverse-keyed applied), normalised to 0–100. */
-function traitScore(trait: BigFiveTraitKey, answers: Record<number, number>): number {
+function traitScore(
+  trait: BigFiveTraitKey,
+  answers: Record<number, number>,
+): number {
   const items = BIG5_QUESTIONS.filter((q) => q.trait === trait);
   let sum = 0;
   for (const q of items) {
@@ -126,7 +166,9 @@ function traitScore(trait: BigFiveTraitKey, answers: Record<number, number>): nu
   return Math.round(((sum - min) / (max - min)) * 100);
 }
 
-export function calculateBigFive(answers: Record<number, number>): BigFiveResult {
+export function calculateBigFive(
+  answers: Record<number, number>,
+): BigFiveResult {
   const traits: BigFiveTraitScore[] = BIG5_TRAITS.map((t) => {
     const score = traitScore(t.key, answers);
     return {
@@ -134,8 +176,10 @@ export function calculateBigFive(answers: Record<number, number>): BigFiveResult
       letter: t.letter,
       nameKa: t.nameKa,
       nameEn: t.nameEn,
+      namePl: t.namePl,
       taglineKa: t.taglineKa,
       taglineEn: t.taglineEn,
+      taglinePl: t.taglinePl,
       glyph: t.glyph,
       hue: t.hue,
       score,
@@ -156,10 +200,21 @@ export function calculateBigFive(answers: Record<number, number>): BigFiveResult
 /** Short headline built from the most-pronounced trait. */
 export function big5HeadlineKa(result: BigFiveResult): string {
   const top = result.traits.find((t) => t.key === result.topKey);
-  return top ? `შენი ყველაზე გამოკვეთილი თვისებაა ${top.nameKa}` : "შენი პიროვნების პროფილი";
+  return top
+    ? `შენი ყველაზე გამოკვეთილი თვისებაა ${top.nameKa}`
+    : "შენი პიროვნების პროფილი";
 }
 
 export function big5HeadlineEn(result: BigFiveResult): string {
   const top = result.traits.find((trait) => trait.key === result.topKey);
-  return top ? `Your most pronounced trait is ${top.nameEn}` : "Your personality profile";
+  return top
+    ? `Your most pronounced trait is ${top.nameEn}`
+    : "Your personality profile";
+}
+
+export function big5HeadlinePl(result: BigFiveResult): string {
+  const top = result.traits.find((trait) => trait.key === result.topKey);
+  return top
+    ? `Twoja najbardziej wyrazista cecha to ${top.namePl}`
+    : "Twój profil osobowości";
 }

@@ -48,7 +48,11 @@ export function PlanetCards({
                 {meta?.symbol ?? "?"}
               </span>
               <span className="font-semibold text-foreground">
-                {en ? (meta?.labelEn ?? key) : (meta?.labelKa ?? key)}
+                {(locale === "pl"
+                  ? meta?.labelPl
+                  : en
+                    ? meta?.labelEn
+                    : meta?.labelKa) ?? key}
               </span>
               <span className="text-muted-foreground">·</span>
               <span className="flex min-w-0 items-center gap-1.5 text-foreground/90">
@@ -60,13 +64,19 @@ export function PlanetCards({
                   {`${sign.symbol}︎`}
                 </span>
                 <span className="truncate font-medium">
-                  {en ? sign.labelEn : sign.labelKa}
+                  {locale === "pl"
+                    ? sign.labelPl
+                    : en
+                      ? sign.labelEn
+                      : sign.labelKa}
                 </span>
               </span>
               <span className="ml-auto shrink-0 whitespace-nowrap font-mono text-xs tabular-nums text-muted-foreground">
                 {formatDegree(body.signDegree)}
                 {body.retrograde ? " ℞" : ""}
-                {body.house ? ` · ${body.house} ${en ? "H" : "სახ."}` : ""}
+                {body.house
+                  ? ` · ${body.house} ${locale === "pl" ? "dom" : en ? "H" : "სახ."}`
+                  : ""}
               </span>
             </div>
             {text && (

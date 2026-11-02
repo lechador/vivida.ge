@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { DreamSymbolPageEn } from "@/components/seo/dreams-en";
+import { DreamSymbolPagePl } from "@/components/seo/dreams-pl";
 import { ContentFeedback } from "@/components/analytics/content-feedback";
 
 import { getRequestLocale } from "@/lib/i18n/request-locale";
@@ -17,8 +18,10 @@ import {
   isDreamSlug,
 } from "@/lib/seo/dreams";
 import { DREAM_EN_BY_SLUG } from "@/lib/seo/dreams-en";
+import { DREAM_PL_BY_SLUG } from "@/lib/seo/dreams-pl";
 import {
   ALL_DREAM_EN_SLUGS,
+  ALL_DREAM_PL_SLUGS,
   dreamPublicSlug,
   resolveDreamSlug,
 } from "@/lib/seo/en-slugs";
@@ -35,11 +38,11 @@ const SITE_URL = "https://www.vivida.ge";
 type Params = { symbol: string };
 
 export function generateStaticParams() {
-  // English keyword slugs pre-render on the English deployment; Georgian
-  // slugs stay the only params that resolve on the Georgian host.
+  // English and Polish keyword slugs pre-render; Georgian slugs resolve on the Georgian host.
   return [
     ...ALL_DREAM_SLUGS.map((symbol) => ({ symbol })),
     ...ALL_DREAM_EN_SLUGS.map((symbol) => ({ symbol })),
+    ...ALL_DREAM_PL_SLUGS.map((symbol) => ({ symbol })),
   ];
 }
 
@@ -50,16 +53,40 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { symbol: rawSymbol } = await params;
   const locale = await getRequestLocale();
-  // English host resolves both the keyword slug and (as a fallback behind
-  // the host-scoped 308) the internal slug; Georgian host only the internal.
+  // English and Polish hosts resolve keyword slugs and internal fallback; Georgian host only internal.
   const symbol =
-    locale === "en"
-      ? resolveDreamSlug(rawSymbol, "en", isDreamSlug)
+    locale === "en" || locale === "pl"
+      ? resolveDreamSlug(rawSymbol, locale, isDreamSlug)
       : isDreamSlug(rawSymbol)
         ? rawSymbol
         : null;
   if (!symbol) return {};
   const s = DREAM_BY_SLUG[symbol];
+
+  if (locale === "pl") {
+    const content = DREAM_PL_BY_SLUG[symbol];
+    if (!content) return {};
+    const kaPath = `/sizmris-akhsna/${symbol}`;
+    const plSlug = dreamPublicSlug(symbol, "pl");
+    const path = `/pl/sennik/${plSlug}`;
+    const title = `${content.title} – Znaczenie Snu w Senniku: Symbolika i Scenariusze`;
+    const description = `${content.summary} Poznaj znaczenie snu, pozytywny znak oraz na co warto zwrócić uwagę.`;
+    return {
+      title: { absolute: title },
+      description,
+      alternates: localizedAlternates(path, kaPath, "pl"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "article",
+        url: `https://www.vividaastro.com${path}`,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "pl_PL",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
 
   if (locale === "en") {
     const content = DREAM_EN_BY_SLUG[symbol];
@@ -132,13 +159,18 @@ export default async function DreamSymbolPage({
   const { symbol: rawSymbol } = await params;
   const locale = await getRequestLocale();
   const symbol =
-    locale === "en"
-      ? resolveDreamSlug(rawSymbol, "en", isDreamSlug)
+    locale === "en" || locale === "pl"
+      ? resolveDreamSlug(rawSymbol, locale, isDreamSlug)
       : isDreamSlug(rawSymbol)
         ? rawSymbol
         : null;
   if (!symbol) notFound();
   const s = DREAM_BY_SLUG[symbol];
+  if (locale === "pl") {
+    const content = DREAM_PL_BY_SLUG[symbol];
+    if (!content) notFound();
+    return <DreamSymbolPagePl base={s} content={content} />;
+  }
   if (locale === "en") {
     const content = DREAM_EN_BY_SLUG[symbol];
     if (!content) notFound();

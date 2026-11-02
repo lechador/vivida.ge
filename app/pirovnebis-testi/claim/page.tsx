@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { auth } from "@/auth";
 import { getMbtiQuestions } from "@/lib/mbti-questions-db";
-import { MBTI_QUESTIONS_EN } from "@/lib/mbti-questions";
+import { MBTI_QUESTIONS_EN, MBTI_QUESTIONS_PL } from "@/lib/mbti-questions";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
@@ -12,11 +12,16 @@ import { MbtiClaimRunner } from "@/components/mbti/mbti-claim-runner";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  const en = locale !== "ka";
+  const title =
+    locale === "pl"
+      ? "Twój wynik Astro-MBTI"
+      : locale === "en"
+        ? "Your Astro-MBTI result"
+        : "შენი შედეგი";
   // Transient per-user result state, like the /shedegi pages, keep it out of
   // the index rather than letting it self-canonicalize as content.
   return {
-    title: en ? "Your Astro-MBTI result" : "შენი შედეგი",
+    title,
     robots: { index: false },
   };
 }
@@ -33,15 +38,18 @@ export const maxDuration = 60;
  */
 export default async function TestClaimPage() {
   const [session, locale] = await Promise.all([auth(), getRequestLocale()]);
-  const en = locale !== "ka";
+  const pl = locale === "pl";
+  const en = locale === "en";
   const authed = !!session?.user?.id;
   // The anonymous teaser recomputes the type client-side from the stored
   // answers, so it needs the question structure. Only loaded when anon.
   const questions = authed
     ? null
-    : en
-      ? MBTI_QUESTIONS_EN
-      : await getMbtiQuestions();
+    : pl
+      ? MBTI_QUESTIONS_PL
+      : en
+        ? MBTI_QUESTIONS_EN
+        : await getMbtiQuestions();
 
   return (
     <main className="relative isolate flex min-h-screen flex-col overflow-hidden">

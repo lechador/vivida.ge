@@ -3,10 +3,13 @@ import { Sparkles } from "lucide-react";
 import {
   BIG5_LEVEL_LABEL,
   BIG5_LEVEL_LABEL_EN,
+  BIG5_LEVEL_LABEL_PL,
   BIG5_TRAIT_INTERP,
   BIG5_TRAIT_INTERP_EN,
+  BIG5_TRAIT_INTERP_PL,
   big5HeadlineEn,
   big5HeadlineKa,
+  big5HeadlinePl,
   type BigFiveResult,
 } from "@/lib/big-five/scoring";
 import type { UserLocale } from "@/lib/i18n/user-locale";
@@ -17,13 +20,39 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * personality. Pure/server-safe so it renders on the saved page and (blurred)
  * on the anonymous teaser.
  */
-export function BigFiveDetail({ result, locale = "ka" }: { result: BigFiveResult; locale?: UserLocale }) {
-  const en = locale !== "ka";
+export function BigFiveDetail({
+  result,
+  locale = "ka",
+}: {
+  result: BigFiveResult;
+  locale?: UserLocale;
+}) {
+  const pl = locale === "pl";
+  const en = locale === "en";
+
+  const headline = pl
+    ? big5HeadlinePl(result)
+    : en
+      ? big5HeadlineEn(result)
+      : big5HeadlineKa(result);
+
+  const levelLabels = pl
+    ? BIG5_LEVEL_LABEL_PL
+    : en
+      ? BIG5_LEVEL_LABEL_EN
+      : BIG5_LEVEL_LABEL;
+
+  const traitInterp = pl
+    ? BIG5_TRAIT_INTERP_PL
+    : en
+      ? BIG5_TRAIT_INTERP_EN
+      : BIG5_TRAIT_INTERP;
+
   return (
     <div className="space-y-3">
       <div className="rounded-2xl border border-[var(--vivida-violet)]/30 bg-[var(--vivida-violet)]/8 p-4 text-center ring-1 ring-foreground/5">
         <Sparkles className="mx-auto mb-1.5 size-5 text-[var(--vivida-violet)]" />
-        <p className="text-base font-semibold">{en ? big5HeadlineEn(result) : big5HeadlineKa(result)}</p>
+        <p className="text-base font-semibold">{headline}</p>
       </div>
 
       {result.traits.map((t) => (
@@ -35,8 +64,12 @@ export function BigFiveDetail({ result, locale = "ka" }: { result: BigFiveResult
             <div className="flex items-center gap-2.5">
               <span className="text-xl">{t.glyph}</span>
               <div>
-                <h3 className="font-semibold leading-tight">{en ? t.nameEn : t.nameKa}</h3>
-                <p className="text-[11px] text-muted-foreground">{en ? t.taglineEn : t.taglineKa}</p>
+                <h3 className="font-semibold leading-tight">
+                  {pl ? t.namePl : en ? t.nameEn : t.nameKa}
+                </h3>
+                <p className="text-[11px] text-muted-foreground">
+                  {pl ? t.taglinePl : en ? t.taglineEn : t.taglineKa}
+                </p>
               </div>
             </div>
             <div className="text-right">
@@ -53,12 +86,12 @@ export function BigFiveDetail({ result, locale = "ka" }: { result: BigFiveResult
                   background: `color-mix(in oklch, ${t.hue} 16%, transparent)`,
                 }}
               >
-                {(en ? BIG5_LEVEL_LABEL_EN : BIG5_LEVEL_LABEL)[t.level]}
+                {levelLabels[t.level]}
               </div>
             </div>
           </div>
           <p className="mt-3 text-sm leading-relaxed text-foreground/90">
-            {(en ? BIG5_TRAIT_INTERP_EN : BIG5_TRAIT_INTERP)[t.key][t.level]}
+            {traitInterp[t.key][t.level]}
           </p>
         </article>
       ))}

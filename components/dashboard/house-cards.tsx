@@ -29,7 +29,12 @@ export function HouseCards({
     const meta = bodyMeta(key);
     (occupants[body.house] ??= []).push({
       key,
-      label: en ? (meta?.labelEn ?? key) : (meta?.labelKa ?? key),
+      label:
+        (locale === "pl"
+          ? meta?.labelPl
+          : en
+            ? meta?.labelEn
+            : meta?.labelKa) ?? key,
       symbol: meta?.symbol ?? "?",
     });
   }
@@ -58,7 +63,7 @@ export function HouseCards({
                 {HOUSE_LABEL[n] ?? n}
               </span>
               <span className="truncate font-semibold text-foreground">
-                {en ? def.themeEn : def.themeKa}
+                {locale === "pl" ? def.themePl : en ? def.themeEn : def.themeKa}
               </span>
               {cuspSign && (
                 <span className="flex shrink-0 items-center gap-1 text-foreground/85">
@@ -70,7 +75,11 @@ export function HouseCards({
                     {`${cuspSign.symbol}︎`}
                   </span>
                   <span className="text-xs text-muted-foreground">
-                    {en ? cuspSign.labelEn : cuspSign.labelKa}
+                    {locale === "pl"
+                      ? cuspSign.labelPl
+                      : en
+                        ? cuspSign.labelEn
+                        : cuspSign.labelKa}
                   </span>
                 </span>
               )}

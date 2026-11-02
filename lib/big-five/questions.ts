@@ -26,8 +26,10 @@ export type BigFiveTrait = {
   letter: string;
   nameKa: string;
   nameEn: string;
+  namePl: string;
   taglineKa: string;
   taglineEn: string;
+  taglinePl: string;
   glyph: string;
   hue: string;
 };
@@ -37,17 +39,48 @@ export type BigFiveQuestion = {
   trait: BigFiveTraitKey;
   textKa: string;
   textEn?: string;
+  textPl?: string;
   /** Reverse-keyed: agreement indicates a LOWER level of the trait. */
   reverse: boolean;
 };
 
 /** 5-point agreement scale. */
-export const BIG5_LIKERT: { value: number; labelKa: string; labelEn: string }[] = [
-  { value: 1, labelKa: "სრულიად არ ვეთანხმები", labelEn: "Strongly disagree" },
-  { value: 2, labelKa: "არ ვეთანხმები", labelEn: "Disagree" },
-  { value: 3, labelKa: "არც ვეთანხმები, არც არ ვეთანხმები", labelEn: "Neither agree nor disagree" },
-  { value: 4, labelKa: "ვეთანხმები", labelEn: "Agree" },
-  { value: 5, labelKa: "სრულიად ვეთანხმები", labelEn: "Strongly agree" },
+export const BIG5_LIKERT: {
+  value: number;
+  labelKa: string;
+  labelEn: string;
+  labelPl: string;
+}[] = [
+  {
+    value: 1,
+    labelKa: "სრულიად არ ვეთანხმები",
+    labelEn: "Strongly disagree",
+    labelPl: "Zdecydowanie się nie zgadzam",
+  },
+  {
+    value: 2,
+    labelKa: "არ ვეთანხმები",
+    labelEn: "Disagree",
+    labelPl: "Nie zgadzam się",
+  },
+  {
+    value: 3,
+    labelKa: "არც ვეთანხმები, არც არ ვეთანხმები",
+    labelEn: "Neither agree nor disagree",
+    labelPl: "Ani się zgadzam, ani nie zgadzam",
+  },
+  {
+    value: 4,
+    labelKa: "ვეთანხმები",
+    labelEn: "Agree",
+    labelPl: "Zgadzam się",
+  },
+  {
+    value: 5,
+    labelKa: "სრულიად ვეთანხმები",
+    labelEn: "Strongly agree",
+    labelPl: "Zdecydowanie się zgadzam",
+  },
 ];
 
 export const BIG5_TRAITS: BigFiveTrait[] = [
@@ -56,8 +89,10 @@ export const BIG5_TRAITS: BigFiveTrait[] = [
     letter: "O",
     nameKa: "ღიაობა",
     nameEn: "Openness",
+    namePl: "Otwartość na doświadczenie",
     taglineKa: "წარმოსახვა, ცნობისმოყვარეობა, ახლის ძიება",
     taglineEn: "Imagination, curiosity and openness to novelty",
+    taglinePl: "Wyobraźnia, ciekawość świata i otwartość na nowości",
     glyph: "🎨",
     hue: "oklch(0.78 0.18 305)",
   },
@@ -66,8 +101,10 @@ export const BIG5_TRAITS: BigFiveTrait[] = [
     letter: "C",
     nameKa: "კეთილსინდისიერება",
     nameEn: "Conscientiousness",
+    namePl: "Sumienność",
     taglineKa: "ორგანიზებულობა, დისციპლინა, პასუხისმგებლობა",
     taglineEn: "Organization, discipline and responsibility",
+    taglinePl: "Organizacja, dyscyplina i odpowiedzialność",
     glyph: "📐",
     hue: "oklch(0.80 0.15 200)",
   },
@@ -76,8 +113,10 @@ export const BIG5_TRAITS: BigFiveTrait[] = [
     letter: "E",
     nameKa: "ექსტრავერსია",
     nameEn: "Extraversion",
+    namePl: "Ekstrawersja",
     taglineKa: "სოციალურობა, ენერგიულობა, თავდაჯერებულობა",
     taglineEn: "Sociability, energy and assertiveness",
+    taglinePl: "Towarzyskość, energia i asertywność",
     glyph: "⚡",
     hue: "oklch(0.82 0.16 85)",
   },
@@ -86,8 +125,10 @@ export const BIG5_TRAITS: BigFiveTrait[] = [
     letter: "A",
     nameKa: "კეთილგანწყობა",
     nameEn: "Agreeableness",
+    namePl: "Ugodowość",
     taglineKa: "თანაგრძნობა, ნდობა, თანამშრომლობა",
     taglineEn: "Compassion, trust and cooperation",
+    taglinePl: "Empatia, zaufanie i gotowość do współpracy",
     glyph: "🤲",
     hue: "oklch(0.75 0.20 350)",
   },
@@ -96,8 +137,10 @@ export const BIG5_TRAITS: BigFiveTrait[] = [
     letter: "N",
     nameKa: "ნევროტიზმი",
     nameEn: "Neuroticism",
+    namePl: "Neurotyczność",
     taglineKa: "ემოციური მგრძნობელობა, სტრესისადმი მიდრეკილება",
     taglineEn: "Emotional sensitivity and stress reactivity",
+    taglinePl: "Wrażliwość emocjonalna i reakcja na stres",
     glyph: "🌊",
     hue: "oklch(0.78 0.16 160)",
   },
@@ -111,68 +154,357 @@ export const BIG5_TRAIT_BY_KEY: Record<BigFiveTraitKey, BigFiveTrait> =
 
 export const BIG5_QUESTIONS: BigFiveQuestion[] = [
   // ── Openness ───────────────────────────────────────────────────────────
-  { id: 1, trait: "openness", reverse: false, textKa: "მიყვარს ახალი იდეების შესწავლა და სხვადასხვა მოსაზრებაზე დაფიქრება." },
-  { id: 2, trait: "openness", reverse: false, textKa: "მდიდარი წარმოსახვა მაქვს." },
-  { id: 3, trait: "openness", reverse: false, textKa: "მიზიდავს ხელოვნება, მუსიკა და სილამაზე." },
-  { id: 4, trait: "openness", reverse: true, textKa: "ახალი რამის ცდას ნაცნობი საქმეების კეთება მირჩევნია." },
-  { id: 5, trait: "openness", reverse: false, textKa: "ხშირად ვფიქრობ აბსტრაქტულ ან ფილოსოფიურ საკითხებზე." },
-  { id: 6, trait: "openness", reverse: false, textKa: "მაინტერესებს სხვადასხვა კულტურა და ცხოვრების წესი." },
-  { id: 7, trait: "openness", reverse: true, textKa: "იშვიათად მებადება შემოქმედებითი იდეები." },
-  { id: 8, trait: "openness", reverse: false, textKa: "ცნობისმოყვარეობა ახალი საკითხების შესწავლისკენ მიბიძგებს." },
+  {
+    id: 1,
+    trait: "openness",
+    reverse: false,
+    textKa:
+      "მიყვარს ახალი იდეების შესწავლა და სხვადასხვა მოსაზრებაზე დაფიქრება.",
+  },
+  {
+    id: 2,
+    trait: "openness",
+    reverse: false,
+    textKa: "მდიდარი წარმოსახვა მაქვს.",
+  },
+  {
+    id: 3,
+    trait: "openness",
+    reverse: false,
+    textKa: "მიზიდავს ხელოვნება, მუსიკა და სილამაზე.",
+  },
+  {
+    id: 4,
+    trait: "openness",
+    reverse: true,
+    textKa: "ახალი რამის ცდას ნაცნობი საქმეების კეთება მირჩევნია.",
+  },
+  {
+    id: 5,
+    trait: "openness",
+    reverse: false,
+    textKa: "ხშირად ვფიქრობ აბსტრაქტულ ან ფილოსოფიურ საკითხებზე.",
+  },
+  {
+    id: 6,
+    trait: "openness",
+    reverse: false,
+    textKa: "მაინტერესებს სხვადასხვა კულტურა და ცხოვრების წესი.",
+  },
+  {
+    id: 7,
+    trait: "openness",
+    reverse: true,
+    textKa: "იშვიათად მებადება შემოქმედებითი იდეები.",
+  },
+  {
+    id: 8,
+    trait: "openness",
+    reverse: false,
+    textKa: "ცნობისმოყვარეობა ახალი საკითხების შესწავლისკენ მიბიძგებს.",
+  },
 
   // ── Conscientiousness ──────────────────────────────────────────────────
-  { id: 9, trait: "conscientiousness", reverse: false, textKa: "ყოველთვის ვასრულებ დანაპირებს." },
-  { id: 10, trait: "conscientiousness", reverse: false, textKa: "მიყვარს წესრიგი და წინასწარ დაგეგმვა." },
-  { id: 11, trait: "conscientiousness", reverse: false, textKa: "დაწყებული საქმე ბოლომდე მიმყავს და მხოლოდ შემდეგ ვიწყებ ახალს." },
-  { id: 12, trait: "conscientiousness", reverse: true, textKa: "ხშირად ვაჭიანურებ საქმეებს." },
-  { id: 13, trait: "conscientiousness", reverse: false, textKa: "დეტალებს დიდ ყურადღებას ვაქცევ." },
-  { id: 14, trait: "conscientiousness", reverse: true, textKa: "ჩემი ნივთები ხშირად არეულია." },
-  { id: 15, trait: "conscientiousness", reverse: false, textKa: "მიზნის მისაღწევად დისციპლინირებულად ვმოქმედებ." },
-  { id: 16, trait: "conscientiousness", reverse: false, textKa: "სანდო და პასუხისმგებლიანი ადამიანი ვარ." },
+  {
+    id: 9,
+    trait: "conscientiousness",
+    reverse: false,
+    textKa: "ყოველთვის ვასრულებ დანაპირებს.",
+  },
+  {
+    id: 10,
+    trait: "conscientiousness",
+    reverse: false,
+    textKa: "მიყვარს წესრიგი და წინასწარ დაგეგმვა.",
+  },
+  {
+    id: 11,
+    trait: "conscientiousness",
+    reverse: false,
+    textKa: "დაწყებული საქმე ბოლომდე მიმყავს და მხოლოდ შემდეგ ვიწყებ ახალს.",
+  },
+  {
+    id: 12,
+    trait: "conscientiousness",
+    reverse: true,
+    textKa: "ხშირად ვაჭიანურებ საქმეებს.",
+  },
+  {
+    id: 13,
+    trait: "conscientiousness",
+    reverse: false,
+    textKa: "დეტალებს დიდ ყურადღებას ვაქცევ.",
+  },
+  {
+    id: 14,
+    trait: "conscientiousness",
+    reverse: true,
+    textKa: "ჩემი ნივთები ხშირად არეულია.",
+  },
+  {
+    id: 15,
+    trait: "conscientiousness",
+    reverse: false,
+    textKa: "მიზნის მისაღწევად დისციპლინირებულად ვმოქმედებ.",
+  },
+  {
+    id: 16,
+    trait: "conscientiousness",
+    reverse: false,
+    textKa: "სანდო და პასუხისმგებლიანი ადამიანი ვარ.",
+  },
 
   // ── Extraversion ───────────────────────────────────────────────────────
-  { id: 17, trait: "extraversion", reverse: false, textKa: "ახალ ადამიანებს ადვილად ვეცნობი." },
-  { id: 18, trait: "extraversion", reverse: false, textKa: "ხალხთან ურთიერთობა ენერგიას მმატებს." },
-  { id: 19, trait: "extraversion", reverse: true, textKa: "ადამიანთა დიდ ჯგუფში ყოფნას მარტო ყოფნა მირჩევნია." },
-  { id: 20, trait: "extraversion", reverse: false, textKa: "საუბარსა თუ საქმეში ინიციატივას ხშირად მე ვიღებ." },
-  { id: 21, trait: "extraversion", reverse: false, textKa: "ხალისიანი და ცოცხალი ხასიათი მაქვს." },
-  { id: 22, trait: "extraversion", reverse: true, textKa: "წყნარი და ჩუმი ადამიანი ვარ." },
-  { id: 23, trait: "extraversion", reverse: false, textKa: "ყურადღების ცენტრში ყოფნა მახარებს." },
-  { id: 24, trait: "extraversion", reverse: false, textKa: "სოციალურ ღონისძიებებზე თავს კომფორტულად ვგრძნობ." },
+  {
+    id: 17,
+    trait: "extraversion",
+    reverse: false,
+    textKa: "ახალ ადამიანებს ადვილად ვეცნობი.",
+  },
+  {
+    id: 18,
+    trait: "extraversion",
+    reverse: false,
+    textKa: "ხალხთან ურთიერთობა ენერგიას მმატებს.",
+  },
+  {
+    id: 19,
+    trait: "extraversion",
+    reverse: true,
+    textKa: "ადამიანთა დიდ ჯგუფში ყოფნას მარტო ყოფნა მირჩევნია.",
+  },
+  {
+    id: 20,
+    trait: "extraversion",
+    reverse: false,
+    textKa: "საუბარსა თუ საქმეში ინიციატივას ხშირად მე ვიღებ.",
+  },
+  {
+    id: 21,
+    trait: "extraversion",
+    reverse: false,
+    textKa: "ხალისიანი და ცოცხალი ხასიათი მაქვს.",
+  },
+  {
+    id: 22,
+    trait: "extraversion",
+    reverse: true,
+    textKa: "წყნარი და ჩუმი ადამიანი ვარ.",
+  },
+  {
+    id: 23,
+    trait: "extraversion",
+    reverse: false,
+    textKa: "ყურადღების ცენტრში ყოფნა მახარებს.",
+  },
+  {
+    id: 24,
+    trait: "extraversion",
+    reverse: false,
+    textKa: "სოციალურ ღონისძიებებზე თავს კომფორტულად ვგრძნობ.",
+  },
 
   // ── Agreeableness ──────────────────────────────────────────────────────
-  { id: 25, trait: "agreeableness", reverse: false, textKa: "სხვისი გრძნობები ჩემთვის მნიშვნელოვანია." },
-  { id: 26, trait: "agreeableness", reverse: false, textKa: "სხვების განცდებს ადვილად ვუთანაგრძნობ." },
-  { id: 27, trait: "agreeableness", reverse: false, textKa: "ვცდილობ, ყველას კეთილად და პატივისცემით მოვექცე." },
-  { id: 28, trait: "agreeableness", reverse: true, textKa: "ზოგჯერ ცივი ან უყურადღებო ვარ სხვების მიმართ." },
-  { id: 29, trait: "agreeableness", reverse: false, textKa: "მზად ვარ, გაჭირვებულ ადამიანს დავეხმარო." },
-  { id: 30, trait: "agreeableness", reverse: true, textKa: "ხშირად მეპარება ეჭვი ადამიანების ზრახვებში." },
-  { id: 31, trait: "agreeableness", reverse: false, textKa: "კონფლიქტის დროს კომპრომისსა და მოლაპარაკებას ვირჩევ." },
-  { id: 32, trait: "agreeableness", reverse: false, textKa: "მინდა, ჩემ გარშემო ყველა კარგად იყოს." },
+  {
+    id: 25,
+    trait: "agreeableness",
+    reverse: false,
+    textKa: "სხვისი გრძნობები ჩემთვის მნიშვნელოვანია.",
+  },
+  {
+    id: 26,
+    trait: "agreeableness",
+    reverse: false,
+    textKa: "სხვების განცდებს ადვილად ვუთანაგრძნობ.",
+  },
+  {
+    id: 27,
+    trait: "agreeableness",
+    reverse: false,
+    textKa: "ვცდილობ, ყველას კეთილად და პატივისცემით მოვექცე.",
+  },
+  {
+    id: 28,
+    trait: "agreeableness",
+    reverse: true,
+    textKa: "ზოგჯერ ცივი ან უყურადღებო ვარ სხვების მიმართ.",
+  },
+  {
+    id: 29,
+    trait: "agreeableness",
+    reverse: false,
+    textKa: "მზად ვარ, გაჭირვებულ ადამიანს დავეხმარო.",
+  },
+  {
+    id: 30,
+    trait: "agreeableness",
+    reverse: true,
+    textKa: "ხშირად მეპარება ეჭვი ადამიანების ზრახვებში.",
+  },
+  {
+    id: 31,
+    trait: "agreeableness",
+    reverse: false,
+    textKa: "კონფლიქტის დროს კომპრომისსა და მოლაპარაკებას ვირჩევ.",
+  },
+  {
+    id: 32,
+    trait: "agreeableness",
+    reverse: false,
+    textKa: "მინდა, ჩემ გარშემო ყველა კარგად იყოს.",
+  },
 
   // ── Neuroticism ────────────────────────────────────────────────────────
-  { id: 33, trait: "neuroticism", reverse: false, textKa: "ხშირად ვღელავ ან ვნერვიულობ." },
-  { id: 34, trait: "neuroticism", reverse: false, textKa: "ჩემი განწყობა სწრაფად იცვლება." },
-  { id: 35, trait: "neuroticism", reverse: true, textKa: "იშვიათად ვგრძნობ სევდას ან დაძაბულობას." },
-  { id: 36, trait: "neuroticism", reverse: false, textKa: "მცირე პრობლემებიც კი ადვილად მაწუხებს." },
-  { id: 37, trait: "neuroticism", reverse: true, textKa: "სტრესის დროს სიმშვიდეს ვინარჩუნებ." },
-  { id: 38, trait: "neuroticism", reverse: false, textKa: "ხშირად ვნერვიულობ, რომ შეიძლება რაღაც ცუდად წავიდეს." },
-  { id: 39, trait: "neuroticism", reverse: false, textKa: "თავს ხშირად დაუცველად ან მოწყვლადად ვგრძნობ." },
-  { id: 40, trait: "neuroticism", reverse: true, textKa: "ემოციურად სტაბილური და მდგრადი ვარ." },
+  {
+    id: 33,
+    trait: "neuroticism",
+    reverse: false,
+    textKa: "ხშირად ვღელავ ან ვნერვიულობ.",
+  },
+  {
+    id: 34,
+    trait: "neuroticism",
+    reverse: false,
+    textKa: "ჩემი განწყობა სწრაფად იცვლება.",
+  },
+  {
+    id: 35,
+    trait: "neuroticism",
+    reverse: true,
+    textKa: "იშვიათად ვგრძნობ სევდას ან დაძაბულობას.",
+  },
+  {
+    id: 36,
+    trait: "neuroticism",
+    reverse: false,
+    textKa: "მცირე პრობლემებიც კი ადვილად მაწუხებს.",
+  },
+  {
+    id: 37,
+    trait: "neuroticism",
+    reverse: true,
+    textKa: "სტრესის დროს სიმშვიდეს ვინარჩუნებ.",
+  },
+  {
+    id: 38,
+    trait: "neuroticism",
+    reverse: false,
+    textKa: "ხშირად ვნერვიულობ, რომ შეიძლება რაღაც ცუდად წავიდეს.",
+  },
+  {
+    id: 39,
+    trait: "neuroticism",
+    reverse: false,
+    textKa: "თავს ხშირად დაუცველად ან მოწყვლადად ვგრძნობ.",
+  },
+  {
+    id: 40,
+    trait: "neuroticism",
+    reverse: true,
+    textKa: "ემოციურად სტაბილური და მდგრადი ვარ.",
+  },
 ];
 
 const BIG5_TEXT_EN = [
-  "I enjoy exploring new ideas and considering different perspectives.", "I have a vivid imagination.", "I am drawn to art, music and beauty.", "I prefer familiar activities to trying something new.", "I often think about abstract or philosophical questions.", "I am interested in different cultures and ways of life.", "I rarely have creative ideas.", "Curiosity drives me to learn about unfamiliar subjects.",
-  "I follow through on my promises.", "I like order and planning ahead.", "I finish what I start before moving to something new.", "I often procrastinate.", "I pay close attention to details.", "My belongings are often disorganized.", "I work with discipline toward my goals.", "I am a dependable and responsible person.",
-  "I find it easy to meet new people.", "Interacting with people gives me energy.", "I prefer being alone to spending time in a large group.", "I often take the initiative in conversations or activities.", "I have an energetic and lively manner.", "I am a quiet and reserved person.", "I enjoy being the center of attention.", "I feel comfortable at social events.",
-  "Other people's feelings matter to me.", "I empathize easily with what others are experiencing.", "I try to treat everyone with kindness and respect.", "I can sometimes be cold or inattentive toward others.", "I am willing to help someone who is struggling.", "I often question other people's intentions.", "During conflict, I look for compromise and dialogue.", "I want the people around me to be well.",
-  "I often feel worried or nervous.", "My mood changes quickly.", "I rarely feel sad or tense.", "Even small problems can upset me easily.", "I remain calm under stress.", "I often worry that something may go wrong.", "I frequently feel vulnerable or insecure.", "I am emotionally stable and resilient.",
+  "I enjoy exploring new ideas and considering different perspectives.",
+  "I have a vivid imagination.",
+  "I am drawn to art, music and beauty.",
+  "I prefer familiar activities to trying something new.",
+  "I often think about abstract or philosophical questions.",
+  "I am interested in different cultures and ways of life.",
+  "I rarely have creative ideas.",
+  "Curiosity drives me to learn about unfamiliar subjects.",
+  "I follow through on my promises.",
+  "I like order and planning ahead.",
+  "I finish what I start before moving to something new.",
+  "I often procrastinate.",
+  "I pay close attention to details.",
+  "My belongings are often disorganized.",
+  "I work with discipline toward my goals.",
+  "I am a dependable and responsible person.",
+  "I find it easy to meet new people.",
+  "Interacting with people gives me energy.",
+  "I prefer being alone to spending time in a large group.",
+  "I often take the initiative in conversations or activities.",
+  "I have an energetic and lively manner.",
+  "I am a quiet and reserved person.",
+  "I enjoy being the center of attention.",
+  "I feel comfortable at social events.",
+  "Other people's feelings matter to me.",
+  "I empathize easily with what others are experiencing.",
+  "I try to treat everyone with kindness and respect.",
+  "I can sometimes be cold or inattentive toward others.",
+  "I am willing to help someone who is struggling.",
+  "I often question other people's intentions.",
+  "During conflict, I look for compromise and dialogue.",
+  "I want the people around me to be well.",
+  "I often feel worried or nervous.",
+  "My mood changes quickly.",
+  "I rarely feel sad or tense.",
+  "Even small problems can upset me easily.",
+  "I remain calm under stress.",
+  "I often worry that something may go wrong.",
+  "I frequently feel vulnerable or insecure.",
+  "I am emotionally stable and resilient.",
 ];
 
-export const BIG5_QUESTIONS_EN: BigFiveQuestion[] = BIG5_QUESTIONS.map((question, index) => ({
-  ...question,
-  textEn: BIG5_TEXT_EN[index],
-}));
+const BIG5_TEXT_PL = [
+  "Lubię odkrywać nowe idee i rozważać różne punkty widzenia.",
+  "Mam bogatą wyobraźnię.",
+  "Pociąga mnie sztuka, muzyka i piękno.",
+  "Wolę znane mi zajęcia niż próbowanie czegoś nowego.",
+  "Często zastanawiam się nad abstrakcyjnymi lub filozoficznymi kwestiami.",
+  "Interesują mnie różne kultury i style życia.",
+  "Rzadko przychodzą mi do głowy twórcze pomysły.",
+  "Ciekawość motywuje mnie do zgłębiania nieznanych tematów.",
+  "Dotrzymuję złożonych obietnic.",
+  "Lubię porządek i planowanie z wyprzedzeniem.",
+  "Doprowadzam rozpoczętą pracę do końca, zanim zacznę coś nowego.",
+  "Często odkładam sprawy na później (prokrastynuję).",
+  "Zwracam dużą uwagę na szczegóły.",
+  "Moje rzeczy bywają w nieładzie.",
+  "Pracuję z dyscypliną, aby osiągnąć zamierzone cele.",
+  "Jestem osobą godną zaufania i odpowiedzialną.",
+  "Z łatwością nawiązuję kontakty z nowo poznanymi ludźmi.",
+  "Przebywanie wśród ludzi dodaje mi energii.",
+  "Wolę spędzać czas w samotności niż w dużej grupie.",
+  "Często przejmuję inicjatywę w rozmowie lub działaniu.",
+  "Mam pogodne, żywiołowe usposobienie.",
+  "Jestem osobą raczej cichą i powściągliwą.",
+  "Lubię znajdować się w centrum uwagi.",
+  "Czuję się swobodnie podczas wydarzeń towarzyskich.",
+  "Uczucia innych ludzi mają dla mnie duże znaczenie.",
+  "Łatwo wczuwam się w to, co przeżywają inni.",
+  "Staram się traktować każdego z życzliwością i szacunkiem.",
+  "Czasami bywam chłodny/-a lub obojętny/-a wobec innych.",
+  "Chętnie pomagam komuś, kto przeżywa trudności.",
+  "Często powątpiewam w intencje innych ludzi.",
+  "Podczas konfliktu dążę do kompromisu i dialogu.",
+  "Zależy mi na tym, aby ludzie wokół mnie czuli się dobrze.",
+  "Często odczuwam niepokój lub zdenerwowanie.",
+  "Mój nastrój szybko ulega zmianom.",
+  "Rzadko odczuwam smutek lub napięcie.",
+  "Nawet drobne problemy potrafią mnie łatwo wyprowadzić z równowagi.",
+  "W stresujących sytuacjach zachowuję spokój.",
+  "Często martwię się, że coś pójdzie nie tak.",
+  "Często czuję się bezbronny/-a lub niepewny/-a.",
+  "Jestem osobą stabilną emocjonalnie i odporną na stres.",
+];
+
+export const BIG5_QUESTIONS_EN: BigFiveQuestion[] = BIG5_QUESTIONS.map(
+  (question, index) => ({
+    ...question,
+    textEn: BIG5_TEXT_EN[index],
+  }),
+);
+
+export const BIG5_QUESTIONS_PL: BigFiveQuestion[] = BIG5_QUESTIONS.map(
+  (question, index) => ({
+    ...question,
+    textEn: BIG5_TEXT_EN[index],
+    textPl: BIG5_TEXT_PL[index],
+  }),
+);
 
 export const BIG5_QUESTION_COUNT = BIG5_QUESTIONS.length;
 

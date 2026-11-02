@@ -55,6 +55,16 @@ const ERRORS_EN: Record<string, string> = {
   needs_credits: "Not enough credits, top up and try again.",
 };
 
+const ERRORS_PL: Record<string, string> = {
+  invalid_dream: "Opisz swój sen nieco dokładniej, minimum 10 znaków.",
+  rate_limited: "Wykorzystano dzisiejszy limit. Spróbuj ponownie jutro.",
+  unavailable: "Usługa jest chwilowo niedostępna.",
+  generation_failed:
+    "Nie udało się wygenerować interpretacji snu. Spróbuj ponownie.",
+  needs_credits:
+    "Niewystarczająca liczba kredytów, doładuj konto i spróbuj ponownie.",
+};
+
 const EXAMPLES_KA = [
   "ვფრინავდი მაღლა ღრუბლებზე და არ მეშინოდა",
   "სახლში წყალი ჩამოდიოდა ჭერიდან",
@@ -65,6 +75,12 @@ const EXAMPLES_EN = [
   "I was flying above the clouds and wasn't afraid",
   "Water was leaking through the ceiling at home",
   "I got lost in an unknown city at night",
+];
+
+const EXAMPLES_PL = [
+  "Latałem wysoko ponad chmurami i nie czułem strachu",
+  "W moim domu woda kapała z sufitu",
+  "Zgubiłem się nocą w nieznanym wielkim mieście",
 ];
 
 /**
@@ -82,6 +98,7 @@ export function DreamInterpreter({
   countryCode?: string | null;
 }) {
   const en = locale === "en";
+  const pl = locale === "pl";
   const router = useRouter();
   const [dream, setDream] = useState(() => {
     if (typeof window === "undefined") return "";
@@ -97,8 +114,8 @@ export function DreamInterpreter({
     cost: CREDIT_COST.dream,
   });
 
-  const examples = en ? EXAMPLES_EN : EXAMPLES_KA;
-  const errors = en ? ERRORS_EN : ERRORS_KA;
+  const examples = pl ? EXAMPLES_PL : en ? EXAMPLES_EN : EXAMPLES_KA;
+  const errors = pl ? ERRORS_PL : en ? ERRORS_EN : ERRORS_KA;
 
   async function interpret() {
     const text = dream.trim();
@@ -142,7 +159,13 @@ export function DreamInterpreter({
   return (
     <section
       id="dream-interpreter"
-      aria-label={en ? "AI dream interpretation" : "სიზმრის AI ახსნა"}
+      aria-label={
+        pl
+          ? "Interpretacja snu przez AI"
+          : en
+            ? "AI dream interpretation"
+            : "სიზმრის AI ახსნა"
+      }
       className="relative mb-10 overflow-hidden rounded-3xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/14 via-card/60 to-[var(--vivida-cyan)]/10 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8"
     >
       <div
@@ -161,20 +184,24 @@ export function DreamInterpreter({
           </span>
           <div>
             <h2 className="text-balance text-xl font-semibold tracking-tight sm:text-2xl">
-              {en
-                ? "Tell me your dream, AI interprets it"
-                : "მოუყევი სიზმარი, AI აგიხსნის"}
+              {pl
+                ? "Opowiedz swój sen, AI go zinterpretuje"
+                : en
+                  ? "Tell me your dream, AI interprets it"
+                  : "მოუყევი სიზმარი, AI აგიხსნის"}
             </h2>
             <p className="mt-0.5 text-[13px] text-muted-foreground">
-              {en
-                ? "Personal interpretation, not a dictionary entry"
-                : "პერსონალური ინტერპრეტაცია, არა ლექსიკონის სტატია"}
+              {pl
+                ? "Indywidualna interpretacja symboliczna, a nie zwykły sennik"
+                : en
+                  ? "Personal interpretation, not a dictionary entry"
+                  : "პერსონალური ინტერპრეტაცია, არა ლექსიკონის სტატია"}
             </p>
           </div>
         </div>
 
         <label htmlFor="dream-input" className="sr-only">
-          {en ? "Your dream" : "შენი სიზმარი"}
+          {pl ? "Twój sen" : en ? "Your dream" : "შენი სიზმარი"}
         </label>
         <textarea
           id="dream-input"
@@ -182,9 +209,11 @@ export function DreamInterpreter({
           onChange={(e) => setDream(e.target.value.slice(0, 2000))}
           rows={4}
           placeholder={
-            en
-              ? "Last night I dreamed that I was… (who, where, what did you feel?)"
-              : "გუშინ სიზმრად ვნახე, რომ… (ვინ, სად, რას გრძნობდი?)"
+            pl
+              ? "Dzisiejszej nocy śniło mi się, że… (kto tam był, gdzie, jakie emocje Ci towarzyszyły?)"
+              : en
+                ? "Last night I dreamed that I was… (who, where, what did you feel?)"
+                : "გუშინ სიზმრად ვნახე, რომ… (ვინ, სად, რას გრძნობდი?)"
           }
           className="mt-4 w-full resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-base leading-relaxed outline-none placeholder:text-muted-foreground/70 focus-visible:border-[var(--vivida-violet)] focus-visible:ring-2 focus-visible:ring-[var(--vivida-violet)]/30 lg:text-[15px]"
         />
@@ -215,17 +244,23 @@ export function DreamInterpreter({
               <SendHorizonal className="size-4" />
             )}
             {status === "sending"
-              ? en
-                ? "Interpreting…"
-                : "იშიფრება…"
-              : en
-                ? "Interpret my dream"
-                : "ახსენი ჩემი სიზმარი"}
+              ? pl
+                ? "Analizowanie snu…"
+                : en
+                  ? "Interpreting…"
+                  : "იშიფრება…"
+              : pl
+                ? "Interpretuj mój sen"
+                : en
+                  ? "Interpret my dream"
+                  : "ახსენი ჩემი სიზმარი"}
           </button>
           <CreditHint>
-            {en
-              ? `Costs ${CREDIT_COST.dream} credits per dream · sign-in required`
-              : `თითო სიზმარი ${CREDIT_COST.dream} კრედიტი · საჭიროა ავტორიზაცია`}
+            {pl
+              ? `Koszt: ${CREDIT_COST.dream} kredyty za sen · wymagane logowanie`
+              : en
+                ? `Costs ${CREDIT_COST.dream} credits per dream · sign-in required`
+                : `თითო სიზმარი ${CREDIT_COST.dream} კრედიტი · საჭიროა ავტორიზაცია`}
           </CreditHint>
         </div>
 
@@ -235,9 +270,11 @@ export function DreamInterpreter({
             <div className="h-4 w-full animate-pulse rounded-lg bg-foreground/10" />
             <div className="h-4 w-5/6 animate-pulse rounded-lg bg-foreground/10" />
             <p className="pt-1 text-[13px] text-muted-foreground">
-              {en
-                ? "Reading the symbols in your dream…"
-                : "შენი სიზმრის სიმბოლოებს ვკითხულობ…"}
+              {pl
+                ? "Odczytuję symbole z Twojego snu…"
+                : en
+                  ? "Reading the symbols in your dream…"
+                  : "შენი სიზმრის სიმბოლოებს ვკითხულობ…"}
             </p>
           </div>
         )}
@@ -251,9 +288,11 @@ export function DreamInterpreter({
         {status === "short" && (
           <div className="mt-4 rounded-2xl border border-border bg-background/60 p-4">
             <p className="text-sm font-medium">
-              {en
-                ? "Not enough credits for this dream."
-                : "ამ სიზმრისთვის კრედიტები არ გყოფნის."}
+              {pl
+                ? "Brak wystarczającej liczby kredytów na tę interpretację."
+                : en
+                  ? "Not enough credits for this dream."
+                  : "ამ სიზმრისთვის კრედიტები არ გყოფნის."}
             </p>
             <div className="mt-3">
               <ContextualPaywallActions
@@ -294,7 +333,7 @@ export function DreamInterpreter({
             </ul>
             <p className="mt-4 rounded-xl bg-[var(--vivida-cyan)]/10 px-3.5 py-2.5 text-sm leading-relaxed text-foreground/85 ring-1 ring-[var(--vivida-cyan)]/25">
               <span className="font-semibold">
-                ✨ {en ? "Advice: " : "რჩევა: "}
+                ✨ {pl ? "Wskazówka: " : en ? "Advice: " : "რჩევა: "}
               </span>
               {result.advice}
             </p>

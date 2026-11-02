@@ -32,15 +32,20 @@ import { SynastryTeaser } from "@/components/synastry/synastry-teaser";
 import { SynastryDisplayLazy } from "@/components/profile/synastry-display-lazy";
 import { SynastryDeepReport } from "@/components/synastry/synastry-deep-report";
 import { SynastryDisplayEn } from "@/components/synastry/synastry-display-en";
+import { SynastryDisplayPl } from "@/components/synastry/synastry-display-pl";
 import { RelationshipControls } from "@/components/synastry/relationship-controls";
 import { RelationshipWeeklyCard } from "@/components/synastry/relationship-weekly-card";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  const en = locale !== "ka";
   return {
-    title: en ? "Compatibility" : "თავსებადობა",
+    title:
+      locale === "pl"
+        ? "Zgodność"
+        : locale !== "ka"
+          ? "Compatibility"
+          : "თავსებადობა",
     robots: { index: false },
   };
 }
@@ -69,11 +74,17 @@ export default async function SynastryDetailPage({
       >
         <AppHeader authed active="synastry" />
         <section className="mx-auto w-full max-w-xl p-8 text-center text-sm text-muted-foreground">
-          {en
-            ? "Your chart hasn't been created yet. "
-            : "შენი რუკა ჯერ შედგენილი არ არის. ჯერ "}
+          {locale === "pl"
+            ? "Twój kosmogram nie został jeszcze utworzony. "
+            : en
+              ? "Your chart hasn't been created yet. "
+              : "შენი რუკა ჯერ შედგენილი არ არის. ჯერ "}
           <Link href="/onboarding" className="text-primary underline">
-            {en ? "Add your birth details" : "შეავსე დაბადების მონაცემები"}
+            {locale === "pl"
+              ? "Uzupełnij dane urodzenia"
+              : en
+                ? "Add your birth details"
+                : "შეავსე დაბადების მონაცემები"}
           </Link>
           .
         </section>
@@ -108,12 +119,18 @@ export default async function SynastryDetailPage({
             className="mb-4 inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-primary"
           >
             <ArrowLeft className="size-3.5" />
-            {en ? "All partners" : "ყველა პარტნიორი"}
+            {locale === "pl"
+              ? "Wszyscy partnerzy"
+              : en
+                ? "All partners"
+                : "ყველა პარტნიორი"}
           </Link>
 
           <header className="mb-6 border-b border-border pb-5">
             <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--vivida-pink)]">
-              SYNASTRY SPECIMEN · LOCKED DOSSIER
+              {locale === "pl"
+                ? "SYNASTRIA · ZABLOKOWANY RAPORT"
+                : "SYNASTRY SPECIMEN · LOCKED DOSSIER"}
             </div>
             <h1
               className={
@@ -122,7 +139,7 @@ export default async function SynastryDetailPage({
                   : "mt-2 text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl"
               }
             >
-              {viewerName ?? (en ? "You" : "შენ")}{" "}
+              {viewerName ?? (locale === "pl" ? "Ty" : en ? "You" : "შენ")}{" "}
               <span className="text-muted-foreground">×</span>{" "}
               <span className="text-[var(--vivida-pink)]">{partner.name}</span>
             </h1>
@@ -142,23 +159,29 @@ export default async function SynastryDetailPage({
                 cost={CREDIT_COST.synastry}
                 balance={balance}
                 title={
-                  en
-                    ? `Unlock full synastry (${CREDIT_COST.synastry} credits)`
-                    : `გახსენი სრული სინასტრია (${CREDIT_COST.synastry} კრედიტი / 7.90 ₾)`
+                  locale === "pl"
+                    ? `Odblokuj pełną analizę synastrii (${CREDIT_COST.synastry} kredytów)`
+                    : en
+                      ? `Unlock full synastry (${CREDIT_COST.synastry} credits)`
+                      : `გახსენი სრული სინასტრია (${CREDIT_COST.synastry} კრედიტი / 7.90 ₾)`
                 }
                 blurb={
-                  en
-                    ? "Unlock Venus–Mars attraction, main conflict points, karmic bond, and all aspect interpretations. One-time unlock for this partner."
-                    : "გახსენი ვენერა–მარსის მიზიდულობა, მთავარი კონფლიქტის წერტილი, კარმული კავშირი და ყველა ასპექტის სრული ანალიზი. გადაიხადე ერთხელ, ეს პარტნიორი სამუდამოდ გახსნილია."
+                  locale === "pl"
+                    ? "Odkryj przyciąganie Wenus–Mars, główne punkty napięć, więź karmiczną i pełną analizę wszystkich aspektów. Płatność jednorazowa dla tej relacji."
+                    : en
+                      ? "Unlock Venus–Mars attraction, main conflict points, karmic bond, and all aspect interpretations. One-time unlock for this partner."
+                      : "გახსენი ვენერა–მარსის მიზიდულობა, მთავარი კონფლიქტის წერტილი, კარმული კავშირი და ყველა ასპექტის სრული ანალიზი. გადაიხადე ერთხელ, ეს პარტნიორი სამუდამოდ გახსნილია."
                 }
                 locale={locale}
               />
             </>
           ) : (
             <div className="rounded-xl border border-border bg-card p-6 text-sm text-muted-foreground shadow-sm">
-              {en
-                ? "The relationship owner needs to unlock this reading first."
-                : "ამ თავსებადობის შედეგი ჯერ ურთიერთობის მფლობელმა უნდა გახსნას."}
+              {locale === "pl"
+                ? "Właściciel relacji musi najpierw odblokować ten raport."
+                : en
+                  ? "The relationship owner needs to unlock this reading first."
+                  : "ამ თავსებადობის შედეგი ჯერ ურთიერთობის მფლობელმა უნდა გახსნას."}
             </div>
           )}
         </section>
@@ -200,12 +223,18 @@ export default async function SynastryDetailPage({
           className="mb-4 inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-primary"
         >
           <ArrowLeft className="size-3.5" />
-          {en ? "All partners" : "ყველა პარტნიორი"}
+          {locale === "pl"
+            ? "Wszyscy partnerzy"
+            : en
+              ? "All partners"
+              : "ყველა პარტნიორი"}
         </Link>
 
         <header className="mb-8 border-b border-border pb-6">
           <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--vivida-pink)]">
-            RELATIONAL EPHEMERIS · SYNASTRY DOSSIER
+            {locale === "pl"
+              ? "EFEMERYDY RELACJI · RAPORT SYNASTRII"
+              : "RELATIONAL EPHEMERIS · SYNASTRY DOSSIER"}
           </div>
           <h1
             className={
@@ -214,7 +243,7 @@ export default async function SynastryDetailPage({
                 : "mt-2 text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-5xl"
             }
           >
-            {viewerName ?? (en ? "You" : "შენ")}{" "}
+            {viewerName ?? (locale === "pl" ? "Ty" : en ? "You" : "შენ")}{" "}
             <span className="text-muted-foreground">×</span>{" "}
             <span className="text-[var(--vivida-pink)]">{partner.name}</span>
           </h1>
@@ -254,9 +283,11 @@ export default async function SynastryDetailPage({
               <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--vivida-pink)]">
                 <Sparkles className="size-3.5" aria-hidden />
                 <span>
-                  {en
-                    ? "SYNTHESIS · RELATIONAL NARRATIVE"
-                    : "სინთეზი · ურთიერთობის ნარატივი"}
+                  {locale === "pl"
+                    ? "SYNTEZA · NARRACJA RELACJI"
+                    : en
+                      ? "SYNTHESIS · RELATIONAL NARRATIVE"
+                      : "სინთეზი · ურთიერთობის ნარატივი"}
                 </span>
               </div>
             </div>
@@ -271,9 +302,11 @@ export default async function SynastryDetailPage({
                   {ai.strengths.length > 0 && (
                     <div className="rounded-lg border border-border bg-background/75 p-4 sm:p-5">
                       <div className="mb-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--vivida-cyan)]">
-                        {en
-                          ? "HARMONIC CONVERGENCE · STRENGTHS"
-                          : "ჰარმონიული გადაკვეთა · რას გაერთიანებთ"}
+                        {locale === "pl"
+                          ? "HARMONIJNA ZBIEŻNOŚĆ · MOCNE STRONY"
+                          : en
+                            ? "HARMONIC CONVERGENCE · STRENGTHS"
+                            : "ჰარმონიული გადაკვეთა · რას გაერთიანებთ"}
                       </div>
                       <ul className="space-y-2 text-sm leading-relaxed text-foreground/90">
                         {ai.strengths.map((s, i) => (
@@ -291,9 +324,11 @@ export default async function SynastryDetailPage({
                   {ai.growth.length > 0 && (
                     <div className="rounded-lg border border-border bg-background/75 p-4 sm:p-5">
                       <div className="mb-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
-                        {en
-                          ? "DYNAMIC TENSION · GROWTH POINTS"
-                          : "დინამიკური კვანძი · სად არის ხახუნი"}
+                        {locale === "pl"
+                          ? "NAPIĘCIE DYNAMICZNE · PUNKTY WZROSTU"
+                          : en
+                            ? "DYNAMIC TENSION · GROWTH POINTS"
+                            : "დინამიკური კვანძი · სად არის ხახუნი"}
                       </div>
                       <ul className="space-y-2 text-sm leading-relaxed text-foreground/90">
                         {ai.growth.map((g, i) => (
@@ -314,7 +349,9 @@ export default async function SynastryDetailPage({
           </article>
         )}
 
-        {en ? (
+        {locale === "pl" ? (
+          <SynastryDisplayPl result={synastry} partnerName={partner.name} />
+        ) : en ? (
           <SynastryDisplayEn result={synastry} partnerName={partner.name} />
         ) : (
           <SynastryDisplayLazy

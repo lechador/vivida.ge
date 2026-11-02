@@ -28,27 +28,60 @@ type Section = {
   id: SectionId;
   label: string;
   labelEn: string;
+  labelPl: string;
   Icon: LucideIcon;
 };
 
 const SECTIONS: Section[] = [
-  { id: "wheel", label: "რუკა", labelEn: "Chart", Icon: Compass },
+  {
+    id: "wheel",
+    label: "რუკა",
+    labelEn: "Chart",
+    labelPl: "Kosmogram",
+    Icon: Compass,
+  },
   {
     id: "positions",
     label: "პოზიციები",
     labelEn: "Positions",
+    labelPl: "Pozycje",
     Icon: LayoutList,
   },
   {
     id: "big-three",
     label: "დიდი სამეული",
     labelEn: "Big three",
+    labelPl: "Wielka Trójka",
     Icon: Sparkles,
   },
-  { id: "elements", label: "ელემენტები", labelEn: "Elements", Icon: Flame },
-  { id: "planets", label: "პლანეტები", labelEn: "Planets", Icon: Globe2 },
-  { id: "houses", label: "სახლები", labelEn: "Houses", Icon: Home },
-  { id: "aspects", label: "ასპექტები", labelEn: "Aspects", Icon: Triangle },
+  {
+    id: "elements",
+    label: "ელემენტები",
+    labelEn: "Elements",
+    labelPl: "Żywioły",
+    Icon: Flame,
+  },
+  {
+    id: "planets",
+    label: "პლანეტები",
+    labelEn: "Planets",
+    labelPl: "Planety",
+    Icon: Globe2,
+  },
+  {
+    id: "houses",
+    label: "სახლები",
+    labelEn: "Houses",
+    labelPl: "Domy",
+    Icon: Home,
+  },
+  {
+    id: "aspects",
+    label: "ასპექტები",
+    labelEn: "Aspects",
+    labelPl: "Aspekty",
+    Icon: Triangle,
+  },
 ];
 
 const SCROLL_OFFSET_DESKTOP = 156;
@@ -115,7 +148,13 @@ export function ReportNav({ locale = "ka" }: { locale?: UserLocale }) {
 
   return (
     <nav
-      aria-label={locale !== "ka" ? "Chart navigation" : "რუკის ნავიგაცია"}
+      aria-label={
+        locale === "pl"
+          ? "Nawigacja kosmogramu"
+          : locale !== "ka"
+            ? "Chart navigation"
+            : "რუკის ნავიგაცია"
+      }
       className="sticky top-24 z-20 -mx-4 border-b border-border bg-[oklch(0.14_0.035_280/0.95)] px-4 backdrop-blur-md sm:-mx-6 sm:px-6"
     >
       <div className="relative mx-auto max-w-6xl">
@@ -144,7 +183,13 @@ export function ReportNav({ locale = "ka" }: { locale?: UserLocale }) {
                 )}
               >
                 <Icon className="size-3.5" />
-                <span>{locale !== "ka" ? section.labelEn : section.label}</span>
+                <span>
+                  {locale === "pl"
+                    ? section.labelPl
+                    : locale !== "ka"
+                      ? section.labelEn
+                      : section.label}
+                </span>
               </a>
             );
           })}

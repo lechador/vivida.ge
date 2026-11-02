@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { BellRing, CalendarDays, Check, Copy, Link2, Loader2 } from "lucide-react";
+import {
+  BellRing,
+  CalendarDays,
+  Check,
+  Copy,
+  Link2,
+  Loader2,
+} from "lucide-react";
 
 import {
   createRelationshipInvite,
@@ -34,16 +41,17 @@ export function RelationshipControls({
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const createInvite = () => startTransition(async () => {
-    setMessage(null);
-    const result = await createRelationshipInvite(partnerId);
-    if (!result.ok) return setMessage(result.error);
-    const url = `${window.location.origin}${result.path}`;
-    setInviteUrl(url);
-    await navigator.clipboard.writeText(url).catch(() => undefined);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
-  });
+  const createInvite = () =>
+    startTransition(async () => {
+      setMessage(null);
+      const result = await createRelationshipInvite(partnerId);
+      if (!result.ok) return setMessage(result.error);
+      const url = `${window.location.origin}${result.path}`;
+      setInviteUrl(url);
+      await navigator.clipboard.writeText(url).catch(() => undefined);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    });
 
   const copyInvite = async () => {
     if (!inviteUrl) return;
@@ -76,25 +84,77 @@ export function RelationshipControls({
           <div className="min-w-0 flex-1">
             <h2 className="font-semibold">
               {connected
-                ? en ? "Partner connected" : "პარტნიორი დაკავშირებულია"
-                : en ? "Experience it together" : "გამოიარეთ ერთად"}
+                ? locale === "pl"
+                  ? "Partner połączony"
+                  : en
+                    ? "Partner connected"
+                    : "პარტნიორი დაკავშირებულია"
+                : locale === "pl"
+                  ? "Przeżywajcie to razem"
+                  : en
+                    ? "Experience it together"
+                    : "გამოიარეთ ერთად"}
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
               {connected
-                ? en ? `You and ${partnerName} can answer the weekly questions together.` : `შენ და ${partnerName} ყოველკვირეულ კითხვებს ერთად უპასუხებთ.`
-                : en ? `Invite ${partnerName} with a private link. They will not pay for this unlocked relationship.` : `მოიწვიე ${partnerName} პირადი ბმულით, ამ უკვე გახსნილ ურთიერთობაზე კრედიტს აღარ გადაიხდის.`}
+                ? locale === "pl"
+                  ? `Ty i ${partnerName} możecie wspólnie odpowiadać na cotygodniowe pytania.`
+                  : en
+                    ? `You and ${partnerName} can answer the weekly questions together.`
+                    : `შენ და ${partnerName} ყოველკვირეულ კითხვებს ერთად უპასუხებთ.`
+                : locale === "pl"
+                  ? `Zaproś ${partnerName} za pomocą prywatnego linku. Nie zapłaci za tę odblokowaną relację.`
+                  : en
+                    ? `Invite ${partnerName} with a private link. They will not pay for this unlocked relationship.`
+                    : `მოიწვიე ${partnerName} პირადი ბმულით, ამ უკვე გახსნილ ურთიერთობაზე კრედიტს აღარ გადაიხდის.`}
             </p>
             {isOwner && !connected && (
               <div className="mt-4 flex flex-wrap gap-2">
-                <Button type="button" size="sm" variant="mystic" onClick={inviteUrl ? copyInvite : createInvite} disabled={isPending}>
-                  {isPending ? <Loader2 className="animate-spin" /> : copied ? <Check /> : inviteUrl ? <Copy /> : <Link2 />}
-                  {copied ? (en ? "Copied" : "დაკოპირდა") : inviteUrl ? (en ? "Copy invite" : "მოწვევის კოპირება") : (en ? "Invite partner" : "პარტნიორის მოწვევა")}
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="mystic"
+                  onClick={inviteUrl ? copyInvite : createInvite}
+                  disabled={isPending}
+                >
+                  {isPending ? (
+                    <Loader2 className="animate-spin" />
+                  ) : copied ? (
+                    <Check />
+                  ) : inviteUrl ? (
+                    <Copy />
+                  ) : (
+                    <Link2 />
+                  )}
+                  {copied
+                    ? locale === "pl"
+                      ? "Skopiowano"
+                      : en
+                        ? "Copied"
+                        : "დაკოპირდა"
+                    : inviteUrl
+                      ? locale === "pl"
+                        ? "Kopiuj zaproszenie"
+                        : en
+                          ? "Copy invite"
+                          : "მოწვევის კოპირება"
+                      : locale === "pl"
+                        ? "Zaproś partnera"
+                        : en
+                          ? "Invite partner"
+                          : "პარტნიორის მოწვევა"}
                 </Button>
                 {inviteUrl && (
                   <input
                     readOnly
                     value={inviteUrl}
-                    aria-label={en ? "Private invitation link" : "პირადი მოწვევის ბმული"}
+                    aria-label={
+                      locale === "pl"
+                        ? "Prywatny link z zaproszeniem"
+                        : en
+                          ? "Private invitation link"
+                          : "პირადი მოწვევის ბმული"
+                    }
                     className="min-w-0 flex-1 rounded-lg border border-border bg-background/50 px-3 text-xs text-muted-foreground"
                     onFocus={(event) => event.currentTarget.select()}
                   />
@@ -106,28 +166,52 @@ export function RelationshipControls({
       </div>
 
       <div className="rounded-2xl border border-border/70 bg-card/65 p-4 backdrop-blur-xl sm:p-5">
-        <h2 className="font-semibold">{en ? "Relationship notifications" : "ურთიერთობის შეტყობინებები"}</h2>
+        <h2 className="font-semibold">
+          {locale === "pl"
+            ? "Powiadomienia relacji"
+            : en
+              ? "Relationship notifications"
+              : "ურთიერთობის შეტყობინებები"}
+        </h2>
         <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-          {en ? "Off by default. These settings only apply to you." : "თავიდან გამორთულია და მხოლოდ შენს ანგარიშზე მოქმედებს."}
+          {locale === "pl"
+            ? "Domyślnie wyłączone. Te ustawienia dotyczą tylko Ciebie."
+            : en
+              ? "Off by default. These settings only apply to you."
+              : "თავიდან გამორთულია და მხოლოდ შენს ანგარიშზე მოქმედებს."}
         </p>
         <div className="mt-3 space-y-2">
           <NotificationToggle
             icon={CalendarDays}
-            label={en ? "New weekly update" : "ახალი ყოველკვირეული განახლება"}
+            label={
+              locale === "pl"
+                ? "Nowa cotygodniowa aktualizacja"
+                : en
+                  ? "New weekly update"
+                  : "ახალი ყოველკვირეული განახლება"
+            }
             checked={subscription.weeklyEnabled}
             disabled={isPending}
             onClick={() => toggle("weeklyEnabled")}
           />
           <NotificationToggle
             icon={BellRing}
-            label={en ? "Important relationship transits" : "ურთიერთობის მნიშვნელოვანი ტრანზიტები"}
+            label={
+              locale === "pl"
+                ? "Ważne tranzyty w relacji"
+                : en
+                  ? "Important relationship transits"
+                  : "ურთიერთობის მნიშვნელოვანი ტრანზიტები"
+            }
             checked={subscription.transitEnabled}
             disabled={isPending}
             onClick={() => toggle("transitEnabled")}
           />
         </div>
       </div>
-      {message && <p className="text-sm text-destructive lg:col-span-2">{message}</p>}
+      {message && (
+        <p className="text-sm text-destructive lg:col-span-2">{message}</p>
+      )}
     </section>
   );
 }
@@ -156,8 +240,18 @@ function NotificationToggle({
     >
       <Icon className="size-4 text-muted-foreground" aria-hidden />
       <span className="min-w-0 flex-1">{label}</span>
-      <span className={cn("relative h-5 w-9 rounded-full transition-colors", checked ? "bg-[var(--vivida-violet)]" : "bg-muted")}>
-        <span className={cn("absolute top-0.5 size-4 rounded-full bg-white shadow transition-transform", checked ? "translate-x-[18px]" : "translate-x-0.5")} />
+      <span
+        className={cn(
+          "relative h-5 w-9 rounded-full transition-colors",
+          checked ? "bg-[var(--vivida-violet)]" : "bg-muted",
+        )}
+      >
+        <span
+          className={cn(
+            "absolute top-0.5 size-4 rounded-full bg-white shadow transition-transform",
+            checked ? "translate-x-[18px]" : "translate-x-0.5",
+          )}
+        />
       </span>
     </button>
   );

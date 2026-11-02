@@ -14,12 +14,18 @@ import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { getUserLocale } from "@/lib/i18n/user-locale";
 import { normalizeReturnPath } from "@/lib/safe-return-path";
 import { buildEnglishChartInterpretation } from "@/lib/report-content-en";
+import { buildPolishChartInterpretation } from "@/lib/report-content-pl";
 import { BODIES, signByIndex } from "@/lib/zodiac";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   return {
-    title: locale === "en" ? "Your Big Three" : "შენი დიდი სამეული",
+    title:
+      locale === "pl"
+        ? "Twoja Wielka Trójka"
+        : locale === "en"
+          ? "Your Big Three"
+          : "შენი დიდი სამეული",
   };
 }
 
@@ -49,13 +55,14 @@ export default async function OnboardingResultPage({
 
   if (!chart) redirect("/onboarding");
 
-  // Persisted/shared interpretations are Georgian. Match the established
-  // /report behavior and build the translated English fallback for every
-  // non-Georgian interface until a dedicated Armenian library is available.
+  // Persisted/shared interpretations are Georgian. Build the translated
+  // fallback for non-Georgian interfaces (English or Polish).
   const interpretation =
-    locale === "ka"
-      ? chart.interpretation
-      : buildEnglishChartInterpretation(chart.data);
+    locale === "pl"
+      ? buildPolishChartInterpretation(chart.data)
+      : locale === "en"
+        ? buildEnglishChartInterpretation(chart.data)
+        : chart.interpretation;
   const kinds = ["sun", "moon", "ascendant"] as const;
   const placements: AhaPlacement[] = kinds.flatMap((kind) => {
     const point =
@@ -66,11 +73,26 @@ export default async function OnboardingResultPage({
     return [
       {
         kind,
-        label: locale === "en" ? body.labelEn : body.labelKa,
+        label:
+          locale === "pl"
+            ? body.labelPl
+            : locale === "en"
+              ? body.labelEn
+              : body.labelKa,
         glyph: body.symbol,
-        sign: locale === "en" ? sign.labelEn : sign.labelKa,
+        sign:
+          locale === "pl"
+            ? sign.labelPl
+            : locale === "en"
+              ? sign.labelEn
+              : sign.labelKa,
         signSymbol: sign.symbol,
-        meaning: locale === "en" ? body.meaningEn : body.meaningKa,
+        meaning:
+          locale === "pl"
+            ? body.meaningPl
+            : locale === "en"
+              ? body.meaningEn
+              : body.meaningKa,
         interpretation: firstSentence(interpretation?.bigThree?.[kind]),
       },
     ];
@@ -107,9 +129,11 @@ export default async function OnboardingResultPage({
           href="/account#profile-photos"
           className="mt-8 text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
         >
-          {locale === "en"
-            ? "Add a profile photo later in Account"
-            : "პროფილის ფოტო მოგვიანებით დაამატე ანგარიშში"}
+          {locale === "pl"
+            ? "Dodaj zdjęcie profilowe później w Koncie"
+            : locale === "en"
+              ? "Add a profile photo later in Account"
+              : "პროფილის ფოტო მოგვიანებით დაამატე ანგარიშში"}
         </Link>
       </section>
     </main>

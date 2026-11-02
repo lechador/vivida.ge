@@ -49,9 +49,29 @@ describe("country billing catalogue", () => {
     expect(premiumPlanForCountry("CA")!.currency).toBe("cad");
     expect(premiumPlanForCountry("AU")!.currency).toBe("aud");
     expect(premiumPlanForCountry("NZ")!.currency).toBe("nzd");
+    expect(premiumPlanForCountry("PL")!.currency).toBe("pln");
     expect(premiumPlanForCountry("GE")!.amountMinor).not.toBe(
       premiumPlanForCountry("GB")!.amountMinor,
     );
+  });
+
+  it("offers the Polish 39,99 zł monthly PRO plan", () => {
+    expect(premiumPlanForCountry("pl")).toEqual({
+      key: "premium_pl_monthly",
+      countryCode: "PL",
+      amountMinor: 3999,
+      currency: "pln",
+      interval: "month",
+      stripeLookupKey: "vivida_premium_pl_monthly_3999_v1",
+    });
+  });
+
+  it("uses Polish-local credit packs for PL residents", () => {
+    expect(creditPacksForCountry("PL")).toEqual([
+      { id: "s", credits: 30, amountMinor: 1299, currency: "pln" },
+      { id: "m", credits: 75, amountMinor: 2499, currency: "pln" },
+      { id: "l", credits: 180, amountMinor: 4999, currency: "pln" },
+    ]);
   });
 
   it("uses UK-local credit packs for GB residents", () => {
@@ -151,6 +171,12 @@ describe("country billing catalogue", () => {
       amountMinor: 199,
       currency: "gbp",
     });
+    expect(creditPackForCountry("PL", "xs")).toEqual({
+      id: "xs",
+      credits: 12,
+      amountMinor: 799,
+      currency: "pln",
+    });
   });
 
   it("keeps the Georgian catalogue as the rollout fallback", () => {
@@ -164,7 +190,7 @@ describe("country billing catalogue", () => {
     expect(premiumPlanForCountry(null)).toEqual(PREMIUM_PLANS_BY_COUNTRY.GE);
   });
 
-  it.each(["GE", "GB", "AM", "US", "CA", "AU", "NZ"])(
+  it.each(["GE", "GB", "AM", "US", "CA", "AU", "NZ", "PL"])(
     "makes every %s pack a better per-credit deal than the one below it",
     (country) => {
       const packs = creditPacksForCountry(country);
@@ -174,7 +200,7 @@ describe("country billing catalogue", () => {
     },
   );
 
-  it.each(["GE", "GB", "AM", "US", "CA", "AU", "NZ"])(
+  it.each(["GE", "GB", "AM", "US", "CA", "AU", "NZ", "PL"])(
     "keeps %s PRO cheaper than the largest credit pack",
     (country) => {
       const plan = premiumPlanForCountry(country)!;
@@ -330,6 +356,14 @@ describe("formatBillingAmount", () => {
     expect(formatBillingAmount(1399, "cad", "ka")).toBe("CA$13.99");
     expect(formatBillingAmount(1499, "aud", "ka")).toBe("A$14.99");
     expect(formatBillingAmount(1699, "nzd", "ka")).toBe("NZ$16.99");
+  });
+
+  it("writes Polish prices cleanly in złoty", () => {
+    expect(formatBillingAmount(799, "pln")).toBe("7,99 zł");
+    expect(formatBillingAmount(1299, "pln")).toBe("12,99 zł");
+    expect(formatBillingAmount(2499, "pln")).toBe("24,99 zł");
+    expect(formatBillingAmount(3999, "pln")).toBe("39,99 zł");
+    expect(formatBillingAmount(4999, "pln")).toBe("49,99 zł");
   });
 
   /**

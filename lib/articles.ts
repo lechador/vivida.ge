@@ -43,6 +43,14 @@ export const ARTICLE_CATEGORY_LABELS: Record<
     wellbeing: "Wellbeing",
     astrology: "Astrology",
   },
+  pl: {
+    psychology: "Psychologia",
+    philosophy: "Filozofia",
+    "self-development": "Rozwój osobisty",
+    relationships: "Relacje",
+    wellbeing: "Dobre samopoczucie",
+    astrology: "Astrologia",
+  },
 };
 
 export function isArticleCategory(

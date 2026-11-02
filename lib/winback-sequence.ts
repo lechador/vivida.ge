@@ -31,16 +31,22 @@ export type WinbackStep = {
   path: string;
   subjectKa: string;
   subjectEn: string;
+  subjectPl: string;
   preheaderKa: string;
   preheaderEn: string;
+  preheaderPl: string;
   bodyKa: readonly string[];
   bodyEn: readonly string[];
+  bodyPl: readonly string[];
   ctaKa: string;
   ctaEn: string;
+  ctaPl: string;
   pushTitleKa: string;
   pushTitleEn: string;
+  pushTitlePl: string;
   pushBodyKa: string;
   pushBodyEn: string;
+  pushBodyPl: string;
 };
 
 export const WINBACK_STEPS: readonly WinbackStep[] = [
@@ -53,10 +59,13 @@ export const WINBACK_STEPS: readonly WinbackStep[] = [
     path: "/dashboard",
     subjectKa: "ცა არ გაჩერებულა — რა ხდება დღეს შენს ნიშანთან",
     subjectEn: "The sky kept moving — today's view for your sign",
+    subjectPl: "Niebo nie czeka — sprawdź dzisiejszy układ dla Twojego znaku",
     preheaderKa:
       "ბოლო დღეებში პლანეტებმა პოზიციები შეიცვალეს. ნახე დღევანდელი ტრანზიტი.",
     preheaderEn:
       "Planetary positions have shifted over the past few days. See today's transit.",
+    preheaderPl:
+      "W ostatnich dniach planety zmieniły pozycje. Zobacz dzisiejsze tranzyty.",
     bodyKa: [
       "როცა ყოველდღიური საქმეებით ხარ დაკავებული, ცა თავის გზას განაგრძობს. ბოლო ერთი კვირის განმავლობაში პლანეტებმა ახალი ასპექტები შექმნეს, რაც შენი ნიშნის ენერგიასა და განწყობაზე უკვე აისახება.",
       "დღეს შენს ჰოროსკოპში რამდენიმე საინტერესო აქცენტი გამოიკვეთა — განსაკუთრებით ურთიერთობებისა და შინაგანი რესურსების კუთხით. ეს არ არის წინასწარ განსაზღვრული მოვლენები, არამედ მარტივი ორიენტირი, თუ როგორ გამოიყენო დღევანდელი დღის რიტმი შენს სასიკეთოდ.",
@@ -67,14 +76,23 @@ export const WINBACK_STEPS: readonly WinbackStep[] = [
       "Today's horoscope highlights several key themes — particularly around relationships and inner focus. Rather than predicting set events, it offers a steady anchor to help you align with today's rhythm.",
       "Your personal daily reading is ready on your dashboard.",
     ],
+    bodyPl: [
+      "Podczas gdy pochłaniają Cię codzienne obowiązki, kosmos nieustannie podąża swoją drogą. W ciągu ostatniego tygodnia planety utworzyły nowe aspekty, które już teraz rezonują z energią Twojego znaku.",
+      "Dzisiejszy horoskop zwraca uwagę na kilka kluczowych motywów — zwłaszcza w obszarze relacji i wewnętrznej równowagi. Zamiast sztywnych przepowiedni, daje Ci przejrzysty punkt odniesienia, by najlepiej wykorzystać dzisiejszy rytm.",
+      "Twój osobisty horoskop na dziś czeka na Twoim pulpicie.",
+    ],
     ctaKa: "ნახე დღევანდელი ჰოროსკოპი",
     ctaEn: "Read today's horoscope",
+    ctaPl: "Zobacz dzisiejszy horoskop",
     pushTitleKa: "ცა არ გაჩერებულა ✨",
     pushTitleEn: "The sky kept moving ✨",
+    pushTitlePl: "Niebo nie czeka ✨",
     pushBodyKa:
       "შენი ნიშნისთვის ახალი ასპექტი შეიქმნა. ნახე დღევანდელი სურათი.",
     pushBodyEn:
       "A new transit formed for your sign. See today's personal reading.",
+    pushBodyPl:
+      "Nowy tranzyt uformował się dla Twojego znaku. Zobacz dzisiejszą interpretację.",
   },
   {
     step: 2,
@@ -85,8 +103,11 @@ export const WINBACK_STEPS: readonly WinbackStep[] = [
     path: "/horoskopi/kvireuli",
     subjectKa: "მთვარის ახალი ციკლი — შენი ნიშნის ტრანზიტები",
     subjectEn: "The moon is shifting — this week's key transits",
+    subjectPl: "Nowy cykl Księżyca — kluczowe tranzyty Twojego znaku",
     preheaderKa: "უახლოესი დღეების ასტროლოგიური მოვლენები შენი ნიშნისთვის.",
     preheaderEn: "Upcoming astrological moments and transits for your sign.",
+    preheaderPl:
+      "Nadchodzące wydarzenia astrologiczne i tranzyty dla Twojego znaku.",
     bodyKa: [
       "ასტროლოგიაში მთავარი მოვლენები ყოველთვის ეტაპობრივად ვითარდება. ამ კვირაში მთვარე ახალ ფაზაში გადადის, რაც მიმდინარე საქმეების გადაფასებისა და ახალი მიმართულების განსაზღვრისთვის საუკეთესო პერიოდია.",
       "შენი ნიშნისთვის უახლოესი დღეები განსაკუთრებულ ყურადღებას მოითხოვს ენერგიის სწორ განაწილებასა და გეგმების დალაგებაზე. კვირის ტრანზიტების ცოდნა დაგეხმარება, წინასწარ იგრძნო საერთო ფონი და ზედმეტი აჩქარების გარეშე მიიღო გადაწყვეტილებები.",
@@ -97,12 +118,21 @@ export const WINBACK_STEPS: readonly WinbackStep[] = [
       "For your sign, the coming days emphasize steady energy management and clear planning. Understanding this week's planetary transits helps you gauge the overall atmosphere and move forward without unnecessary rush.",
       "See which days are most favorable for you and where to focus your attention through the end of the week.",
     ],
+    bodyPl: [
+      "Najważniejsze procesy astrologiczne rozwijają się stopniowo. W tym tygodniu Księżyc wkracza w nową fazę, co sprzyja refleksji nad bieżącymi sprawami i wyznaczaniu nowych kierunków.",
+      "Dla Twojego znaku najbliższe dni wymagają mądrego gospodarowania siłami i spokojnego planowania. Świadomość tranzytów planetarnych pozwoli Ci lepiej wyczuć ogólny klimat i podejmować decyzje bez pośpiechu.",
+      "Sprawdź, które dni będą dla Ciebie najbardziej pomyślne i na co warto zwrócić szczególną uwagę do końca tygodnia.",
+    ],
     ctaKa: "ნახე კვირის პროგნოზი",
     ctaEn: "Explore weekly forecast",
+    ctaPl: "Sprawdź prognozę tygodniową",
     pushTitleKa: "მთვარე ფაზას იცვლის 🌙",
     pushTitleEn: "The moon is shifting 🌙",
+    pushTitlePl: "Księżyc zmienia fazę 🌙",
     pushBodyKa: "ნახე, როგორ აისახება ამ კვირის ტრანზიტები შენს ნიშანზე.",
     pushBodyEn: "See how this week's planetary transits influence your sign.",
+    pushBodyPl:
+      "Zobacz, jak tranzyty tego tygodnia wpływają na Twój znak zodiaku.",
   },
   {
     step: 3,
@@ -113,9 +143,12 @@ export const WINBACK_STEPS: readonly WinbackStep[] = [
     path: "/taro",
     subjectKa: "ერთი კითხვა სიცხადისთვის — გაშალე ტარო",
     subjectEn: "A question on your mind? Draw a tarot card",
+    subjectPl: "Szukasz jasności? Wylosuj kartę Tarota",
     preheaderKa: "ტარო არ წყვეტს შენ ნაცვლად — ის ახალ პერსპექტივას გაჩვენებს.",
     preheaderEn:
       "Tarot doesn't decide for you — it offers a fresh perspective.",
+    preheaderPl:
+      "Tarot nie decyduje za Ciebie — daje Ci nowe spojrzenie na sytuację.",
     bodyKa: [
       "ხანდახან ყველაზე რთული არა პასუხის პოვნა, არამედ სიტუაციის სხვა კუთხით დანახვაა. თუ ბოლო დროს რაიმე გადაწყვეტილებაზე ყოყმანობ, პირად ურთიერთობაში თუ საქმეში, ტარო კარგი საშუალებაა შინაგანი სიცხადის მოსაპოვებლად.",
       "ტარო მომავალს კი არ გიწინასწარმეტყველებს, არამედ გეხმარება დაინახო ის დეტალები და ემოციური ფონი, რომლებსაც ყოველდღიურ აურზაურში შესაძლოა ყურადღებას არ აქცევდე.",
@@ -126,12 +159,20 @@ export const WINBACK_STEPS: readonly WinbackStep[] = [
       "Tarot doesn't predict an inevitable future; rather, it highlights nuances and emotional undercurrents that might get lost in daily commotion.",
       "Frame a sincere question for yourself, draw a card, and see what symbolic perspective emerges.",
     ],
+    bodyPl: [
+      "Czasami najtrudniejsze wcale nie jest znalezienie odpowiedzi, ale spojrzenie na sprawę z innej perspektywy. Jeśli wahałeś się ostatnio nad ważną decyzją — w relacjach lub codziennych sprawach — Tarot jest doskonałym narzędziem do odzyskania jasności.",
+      "Tarot nie przesądza o nieuchronnej przyszłości, lecz pomaga dostrzec niuanse i emocjonalny kontekst, które w codziennym zabieganiu mogą umknąć Twojej uwadze.",
+      "Zadaj sobie jedno szczere pytanie, wylosuj kartę i sprawdź, jaka symboliczna wskazówka się przed Tobą wyłoni.",
+    ],
     ctaKa: "გაშალე ტარო",
     ctaEn: "Draw a tarot card",
+    ctaPl: "Wylosuj kartę Tarota",
     pushTitleKa: "ტაროს გაშლა 🃏",
     pushTitleEn: "Tarot reading 🃏",
+    pushTitlePl: "Rozkład Tarota 🃏",
     pushBodyKa: "დაუსვი კითხვა და მიიღე სიმბოლური მინიშნება.",
     pushBodyEn: "Ask your question and discover a symbolic reflection.",
+    pushBodyPl: "Zadaj pytanie i odkryj symboliczną podpowiedź.",
   },
 ] as const;
 

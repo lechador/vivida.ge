@@ -33,6 +33,7 @@ export function LifePathCalculator({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
+  const pl = locale === "pl";
   const [date, setDate] = useState("");
   const [result, setResult] = useState<{
     number: LifePathNumber;
@@ -75,9 +76,11 @@ export function LifePathCalculator({
       {/* Top Instrument Bar */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background/60 px-5 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground sm:px-7">
         <span className="text-primary">
-          {en
-            ? "01 · Pythagorean Digit Reduction Instrument"
-            : "01 · პითაგორული რიცხვითი რედუქციის ინსტრუმენტი"}
+          {pl
+            ? "01 · Pitagorejski instrument redukcji cyfr"
+            : en
+              ? "01 · Pythagorean Digit Reduction Instrument"
+              : "01 · პითაგორული რიცხვითი რედუქციის ინსტრუმენტი"}
         </span>
         <span className="tabular-nums">1–9 · 11 · 22 · 33</span>
       </div>
@@ -88,10 +91,14 @@ export function LifePathCalculator({
             htmlFor="lifepath-date"
             className="block font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground"
           >
-            {en ? "Enter birth date" : "შეიყვანე დაბადების თარიღი"}
+            {pl
+              ? "Wprowadź datę urodzenia"
+              : en
+                ? "Enter birth date"
+                : "შეიყვანე დაბადების თარიღი"}
           </label>
           <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] text-muted-foreground">
-            <span>{en ? "Examples:" : "ნიმუში:"}</span>
+            <span>{pl ? "Przykłady:" : en ? "Examples:" : "ნიმუში:"}</span>
             {SAMPLE_DATES.map((sample) => (
               <button
                 key={sample.value}
@@ -120,7 +127,11 @@ export function LifePathCalculator({
             disabled={!date}
             className="h-12 shrink-0 px-6"
           >
-            {en ? "Calculate my number" : "გამოთვალე ჩემი რიცხვი"}
+            {pl
+              ? "Oblicz moją liczbę"
+              : en
+                ? "Calculate my number"
+                : "გამოთვალე ჩემი რიცხვი"}
           </Button>
           {result && (
             <Button
@@ -130,7 +141,7 @@ export function LifePathCalculator({
               className="h-12 shrink-0 gap-1.5 px-4"
             >
               <RotateCcw className="size-4" />
-              {en ? "Reset" : "თავიდან"}
+              {pl ? "Od nowa" : en ? "Reset" : "თავიდან"}
             </Button>
           )}
         </div>
@@ -142,7 +153,11 @@ export function LifePathCalculator({
               {result.steps.map((step, idx) => (
                 <div key={idx} className="bg-card px-4 py-3">
                   <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-                    {en ? `Step 0${idx + 1}` : `ეტაპი 0${idx + 1}`}
+                    {pl
+                      ? `Krok 0${idx + 1}`
+                      : en
+                        ? `Step 0${idx + 1}`
+                        : `ეტაპი 0${idx + 1}`}
                   </div>
                   <div className="mt-1 font-mono text-sm font-semibold tabular-nums text-foreground">
                     {step}
@@ -160,12 +175,16 @@ export function LifePathCalculator({
                 <div>
                   <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-primary">
                     {result.number.length > 1
-                      ? en
-                        ? "Master Number"
-                        : "მასტერ-რიცხვი"
-                      : en
-                        ? "Your Life Path Number"
-                        : "შენი ბედის რიცხვი"}
+                      ? pl
+                        ? "Liczba Mistrzowska"
+                        : en
+                          ? "Master Number"
+                          : "მასტერ-რიცხვი"
+                      : pl
+                        ? "Twoja Liczba Drogi Życia"
+                        : en
+                          ? "Your Life Path Number"
+                          : "შენი ბედის რიცხვი"}
                   </div>
                   <div className="mt-0.5 text-xl font-semibold tracking-tight text-foreground">
                     {archetypes[result.number]}
@@ -175,12 +194,18 @@ export function LifePathCalculator({
               <Button asChild variant="default" className="shrink-0 gap-1.5">
                 <Link
                   href={
-                    en
-                      ? `/en/numerology/${result.number}`
-                      : `/numerologia/${result.number}`
+                    pl
+                      ? `/pl/numerologia/${result.number}`
+                      : en
+                        ? `/en/numerology/${result.number}`
+                        : `/numerologia/${result.number}`
                   }
                 >
-                  {en ? "Read Full Monograph" : "სრული აღწერა"}
+                  {pl
+                    ? "Pełny opis"
+                    : en
+                      ? "Read Full Monograph"
+                      : "სრული აღწერა"}
                   <ArrowRight className="size-4" />
                 </Link>
               </Button>

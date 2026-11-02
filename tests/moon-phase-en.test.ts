@@ -8,6 +8,7 @@ describe("englishMoonPhaseReading", () => {
     const snapshot: MoonPhaseSnapshot = {
       phaseKey: "full_moon",
       phaseLabelKa: "სავსე მთვარე",
+      phaseLabelPl: "Pełnia Księżyca",
       phaseAngle: 180,
       moonLongitude: 120,
       sunLongitude: 300,
@@ -16,6 +17,7 @@ describe("englishMoonPhaseReading", () => {
       signIndex: 4,
       signKa: "ლომი",
       signEn: "Leo",
+      signPl: "Lew",
       signSymbol: "♌",
     };
 

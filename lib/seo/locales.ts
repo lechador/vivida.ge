@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 
 // Relative, not "@/": this module is imported by next.config.ts, which is
 // loaded outside the app's tsconfig path aliases.
-import { internationalPublicPath } from "./public-paths";
+import { upgradeEnglishDetailSlug, upgradePolishDetailSlug } from "./en-slugs";
+import { internationalPublicPath, polishPublicPath } from "./public-paths";
 
 export const GEORGIAN_SITE_URL = "https://www.vivida.ge";
 export const ENGLISH_SITE_URL = "https://www.vividaastro.com";
+export const POLISH_SITE_URL = "https://www.vividaastro.com/pl";
 
 export const GEORGIAN_HOSTS = ["vivida.ge", "www.vivida.ge"] as const;
 export const ENGLISH_HOSTS = [
@@ -105,7 +107,7 @@ export function resolveEnglishPath(path: string): string {
 export function localizedAlternates(
   canonicalPath: string,
   pairedPath: string,
-  locale: "ka" | "en" | string,
+  locale: "ka" | "en" | "pl" | string,
 ): NonNullable<Metadata["alternates"]> {
   const kaPath =
     locale === "ka"
@@ -121,20 +123,27 @@ export function localizedAlternates(
     locale === "en"
       ? publicEnglishPath(canonicalPath)
       : resolveEnglishPath(pairedPath);
-  const enPath = internationalPublicPath(rawEnPath);
+  const enPath = upgradeEnglishDetailSlug(internationalPublicPath(rawEnPath));
 
-  const canonical =
-    locale === "en"
-      ? `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`
-      : `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
+  const rawPlPath =
+    locale === "pl" &&
+    (canonicalPath === "/pl" || canonicalPath.startsWith("/pl/"))
+      ? canonicalPath
+      : polishPublicPath(kaPath);
+  const polishPublic = upgradePolishDetailSlug(rawPlPath);
+  const polishUrl = `${ENGLISH_SITE_URL}${polishPublic}`;
   const englishUrl = `${ENGLISH_SITE_URL}${enPath === "/" ? "" : enPath}`;
   const georgianUrl = `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
+
+  const canonical =
+    locale === "pl" ? polishUrl : locale === "en" ? englishUrl : georgianUrl;
 
   return {
     canonical,
     languages: {
       "ka-GE": georgianUrl,
       en: englishUrl,
+      "pl-PL": polishUrl,
       "x-default": englishUrl,
     },
   };
@@ -161,6 +170,15 @@ export const DEFAULT_OG_IMAGE = "/opengraph-image";
  */
 export function englishSiteHref(path: string, onEnglishHost: boolean): string {
   const publicPath = internationalPublicPath(path);
+  if (onEnglishHost) return publicPath;
+  return `${ENGLISH_SITE_URL}${publicPath === "/" ? "" : publicPath}`;
+}
+
+/**
+ * Resolve a Polish-site content link for whichever host is serving.
+ */
+export function polishSiteHref(path: string, onEnglishHost: boolean): string {
+  const publicPath = polishPublicPath(path);
   if (onEnglishHost) return publicPath;
   return `${ENGLISH_SITE_URL}${publicPath === "/" ? "" : publicPath}`;
 }

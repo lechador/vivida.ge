@@ -68,7 +68,13 @@ function originForLocale(locale: UserLocale): string {
 function localeForOrigin(origin: string | undefined): UserLocale {
   if (!origin) return "ka";
   try {
-    return isEnglishHost(new URL(origin).hostname) ? "en" : "ka";
+    const url = new URL(origin);
+    if (
+      url.pathname.startsWith("/pl") ||
+      url.searchParams.get("locale") === "pl"
+    )
+      return "pl";
+    return isEnglishHost(url.hostname) ? "en" : "ka";
   } catch {
     return "ka";
   }
@@ -85,6 +91,7 @@ export async function sendVerificationEmail({
   token,
   code,
   origin,
+  locale: explicitLocale,
 }: {
   to: string;
   name: string | null;
@@ -93,6 +100,7 @@ export async function sendVerificationEmail({
   code?: string | null;
   /** Recognized request origin; lets one deployment serve both brand domains. */
   origin?: string;
+  locale?: UserLocale;
 }): Promise<void> {
   const c = client();
   const verifyUrl = absUrl(`/api/auth/verify-email?token=${token}`, origin);
@@ -105,11 +113,13 @@ export async function sendVerificationEmail({
     );
     return;
   }
-  const locale = localeForOrigin(origin);
+  const locale = explicitLocale ?? localeForOrigin(origin);
   const subject =
-    locale === "en"
-      ? "Verify your email · Vivida"
-      : "დაადასტურე შენი ელფოსტა · Vivida";
+    locale === "pl"
+      ? "Potwierdź swój adres e-mail · Vivida"
+      : locale === "en"
+        ? "Verify your email · Vivida"
+        : "დაადასტურე შენი ელფოსტა · Vivida";
   const result = await c.emails.send({
     from: FROM,
     to,
@@ -135,11 +145,13 @@ export async function sendPasswordResetEmail({
   name,
   token,
   origin,
+  locale: explicitLocale,
 }: {
   to: string;
   name: string | null;
   token: string;
   origin?: string;
+  locale?: UserLocale;
 }): Promise<void> {
   const c = client();
   const resetUrl = absUrl(`/reset-password?token=${token}`, origin);
@@ -152,11 +164,13 @@ export async function sendPasswordResetEmail({
     );
     return;
   }
-  const locale = localeForOrigin(origin);
+  const locale = explicitLocale ?? localeForOrigin(origin);
   const subject =
-    locale === "en"
-      ? "Reset your password · Vivida"
-      : "პაროლის აღდგენა · Vivida";
+    locale === "pl"
+      ? "Zresetuj swoje hasło · Vivida"
+      : locale === "en"
+        ? "Reset your password · Vivida"
+        : "პაროლის აღდგენა · Vivida";
   const result = await c.emails.send({
     from: FROM,
     to,
@@ -312,9 +326,11 @@ export async function sendWelcomeEmail({
 
   const dashboardUrl = absUrl("/dashboard", originForLocale(locale));
   const subject =
-    locale === "en"
-      ? "Your cosmic journey begins · Vivida"
-      : "შენი კოსმიური მოგზაურობა იწყება · Vivida";
+    locale === "pl"
+      ? "Twoja kosmiczna podróż się zaczyna · Vivida"
+      : locale === "en"
+        ? "Your cosmic journey begins · Vivida"
+        : "შენი კოსმიური მოგზაურობა იწყება · Vivida";
 
   try {
     const result = await c.emails.send(
@@ -374,9 +390,11 @@ export async function sendVerifiedBadgeGiftEmail({
     originForLocale(locale),
   );
   const subject =
-    locale === "en"
-      ? "You received a Verified Badge as a gift · Vivida"
-      : "Verified Badge საჩუქრად მიიღე · Vivida";
+    locale === "pl"
+      ? "Otrzymałeś odznakę Zweryfikowanego Profilu w prezencie · Vivida"
+      : locale === "en"
+        ? "You received a Verified Badge as a gift · Vivida"
+        : "Verified Badge საჩუქრად მიიღე · Vivida";
 
   try {
     const result = await c.emails.send(
@@ -446,9 +464,11 @@ export async function sendMbtiResultEmail({
     return;
   }
   const subject =
-    locale === "en"
-      ? `Your type is ${mbtiType}, ${archetypeNameGe} · Vivida`
-      : `შენი ტიპია ${mbtiType}, ${archetypeNameGe} · Vivida`;
+    locale === "pl"
+      ? `Twój typ to ${mbtiType}, ${archetypeNameGe} · Vivida`
+      : locale === "en"
+        ? `Your type is ${mbtiType}, ${archetypeNameGe} · Vivida`
+        : `შენი ტიპია ${mbtiType}, ${archetypeNameGe} · Vivida`;
   try {
     const result = await c.emails.send(
       {
@@ -463,9 +483,11 @@ export async function sendMbtiResultEmail({
           locale,
           excerpt:
             excerpt?.trim() ||
-            (locale === "en"
-              ? "Your detailed personality profile is ready."
-              : "შენი პიროვნების ღრმა ფსიქოლოგიური და ასტროლოგიური ანალიზი მზადაა."),
+            (locale === "pl"
+              ? "Twój szczegółowy profil osobowości jest gotowy."
+              : locale === "en"
+                ? "Your detailed personality profile is ready."
+                : "შენი პიროვნების ღრმა ფსიქოლოგიური და ასტროლოგიური ანალიზი მზადაა."),
         }),
       },
       { idempotencyKey: `mbti:${resultId}` },
@@ -529,7 +551,7 @@ export async function sendReportPdfEmail({
   }
 
   const reportUrl = absUrl(`/reports/${reportId}`, originForLocale(locale));
-  const subject = `${reportTitle ?? (locale === "en" ? "Your natal report" : "შენი ნატალური ანგარიში")} · Vivida`;
+  const subject = `${reportTitle ?? (locale === "pl" ? "Twój horoskop urodzeniowy" : locale === "en" ? "Your natal report" : "შენი ნატალური ანგარიში")} · Vivida`;
 
   try {
     // Dynamic import so the AWS SDK stays out of every module that merely
@@ -744,9 +766,11 @@ export async function sendFriendRequestEmail({
   const unsubUrl = absUrl(`/unsubscribe?token=${token}&type=nudges`, origin);
   const friendsUrl = absUrl("/friends", origin);
   const subject =
-    locale === "en"
-      ? `${fromName} sent you a friend request · Vivida`
-      : `${fromName}-მ მეგობრობა გთხოვა · Vivida`;
+    locale === "pl"
+      ? `${fromName} wysłał(a) Ci zaproszenie do znajomych · Vivida`
+      : locale === "en"
+        ? `${fromName} sent you a friend request · Vivida`
+        : `${fromName}-მ მეგობრობა გთხოვა · Vivida`;
 
   try {
     const result = await c.emails.send(
@@ -843,9 +867,11 @@ export async function sendMessageEmail({
     origin,
   );
   const subject =
-    locale === "en"
-      ? `${fromName} sent you a message · Vivida`
-      : `${fromName}-მ წერილი მოგწერა · Vivida`;
+    locale === "pl"
+      ? `${fromName} wysłał(a) Ci wiadomość · Vivida`
+      : locale === "en"
+        ? `${fromName} sent you a message · Vivida`
+        : `${fromName}-მ წერილი მოგწერა · Vivida`;
 
   const snippet = body.length > 140 ? `${body.slice(0, 140).trimEnd()}…` : body;
 
@@ -900,6 +926,13 @@ const REACTION_SUBJECT_EN: Record<string, string> = {
   funny: "found your post funny",
   sad: "reacted sadly to your post",
   dislike: "disliked your post",
+};
+
+const REACTION_SUBJECT_PL: Record<string, string> = {
+  like: "polubił(a) Twój post",
+  funny: "zareagował(a) uśmiechem na Twój post",
+  sad: "zareagował(a) smutkiem na Twój post",
+  dislike: "nie polubił(a) Twojego postu",
 };
 
 /**
@@ -962,12 +995,16 @@ export async function sendFeedActivityEmail({
 
   const subject =
     kind === "post_comment"
-      ? en
-        ? `${fromName} commented on your post · Vivida`
-        : `${fromName}-მ შენს პოსტს დააკომენტარა · Vivida`
-      : en
-        ? `${fromName} ${REACTION_SUBJECT_EN[reaction ?? ""] ?? "reacted to your post"} · Vivida`
-        : `${fromName}, ${REACTION_SUBJECT_KA[reaction ?? ""] ?? "გამოეხმაურა შენს პოსტს"} · Vivida`;
+      ? locale === "pl"
+        ? `${fromName} skomentował(a) Twój post · Vivida`
+        : en
+          ? `${fromName} commented on your post · Vivida`
+          : `${fromName}-მ შენს პოსტს დააკომენტარა · Vivida`
+      : locale === "pl"
+        ? `${fromName} ${REACTION_SUBJECT_PL[reaction ?? ""] ?? "zareagował(a) na Twój post"} · Vivida`
+        : en
+          ? `${fromName} ${REACTION_SUBJECT_EN[reaction ?? ""] ?? "reacted to your post"} · Vivida`
+          : `${fromName}, ${REACTION_SUBJECT_KA[reaction ?? ""] ?? "გამოეხმაურა შენს პოსტს"} · Vivida`;
 
   try {
     const result = await c.emails.send(
@@ -1129,16 +1166,18 @@ export async function sendBazaarBookingPaidEmail({
       email: users.email,
       name: users.name,
       bazaarUpdates: users.bazaarUpdates,
+      locale: users.interfaceLanguage,
     })
     .from(users)
     .where(eq(users.id, recipientUserId))
     .limit(1);
   if (!recipient?.email || recipient.bazaarUpdates === false) return;
 
+  const locale = normalizeUserLocale(recipient.locale);
   const { bookingPaidSubject, BookingPaidEmail } =
     await import("@/lib/email-templates/bazaar-booking-paid");
-  const subject = bookingPaidSubject(serviceTitle, "en");
-  const orderUrl = `${ENGLISH_SITE_URL}/readings?view=bookings`;
+  const subject = bookingPaidSubject(serviceTitle, locale);
+  const orderUrl = `${originForLocale(locale)}/readings?view=bookings`;
 
   try {
     const result = await c.emails.send({
@@ -1151,7 +1190,7 @@ export async function sendBazaarBookingPaidEmail({
         serviceTitle,
         amountUsdc,
         orderUrl,
-        locale: "en",
+        locale,
       }),
     });
     if (result.error) {
@@ -1184,16 +1223,18 @@ export async function sendBazaarReadingDeliveredEmail({
       email: users.email,
       name: users.name,
       bazaarUpdates: users.bazaarUpdates,
+      locale: users.interfaceLanguage,
     })
     .from(users)
     .where(eq(users.id, recipientUserId))
     .limit(1);
   if (!recipient?.email || recipient.bazaarUpdates === false) return;
 
+  const locale = normalizeUserLocale(recipient.locale);
   const { readingDeliveredSubject, ReadingDeliveredEmail } =
     await import("@/lib/email-templates/bazaar-reading-delivered");
-  const subject = readingDeliveredSubject("en");
-  const readingUrl = `${ENGLISH_SITE_URL}/readings?view=bookings`;
+  const subject = readingDeliveredSubject(locale);
+  const readingUrl = `${originForLocale(locale)}/readings?view=bookings`;
 
   try {
     const result = await c.emails.send({
@@ -1205,7 +1246,7 @@ export async function sendBazaarReadingDeliveredEmail({
         readerName,
         serviceTitle,
         readingUrl,
-        locale: "en",
+        locale,
       }),
     });
     if (result.error) {

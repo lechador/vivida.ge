@@ -19,8 +19,10 @@ import type { MbtiScores } from "@/lib/mbti-questions";
 import {
   AXIS_LABEL_EN,
   AXIS_LABEL_KA,
+  AXIS_LABEL_PL,
   mbtiArchetypeEn,
   mbtiArchetypeKa,
+  mbtiArchetypePl,
   mbtiBaseType,
 } from "@/lib/mbti-questions";
 import { getTypeAndSun } from "@/lib/mbti-library";
@@ -64,6 +66,16 @@ const SYSTEM_PROMPT_EN =
   "Astrology may appear only as one light metaphor when a Sun sign is provided; do not list planets, houses or aspects. " +
   'Return valid JSON only: {"archetypeNameGe": string, "analysisText": string}. archetypeNameGe is a short English archetype label; analysisText uses paragraphs separated by \\n\\n.';
 
+const SYSTEM_PROMPT_PL =
+  "Jesteś doświadczonym psychologiem i autorem profili osobowości. Wyjaśnij wynik testu MBTI " +
+  "(16 typów osobowości) w naturalnym, precyzyjnym i ciepłym języku polskim (zwracając się bezpośrednio na «Ty»). " +
+  "Skup się na preferencjach, sposobie myślenia, podejmowaniu decyzji, mocnych stronach i obszarach rozwoju. " +
+  "Nie przedstawiaj typologii jako diagnozy czy sztywnej etykiety. " +
+  "Astrologia może pojawić się jedynie jako jedna subtelna metafora w odniesieniu do znaku Słońca; " +
+  "nie wymieniaj planet, domów ani aspektów. " +
+  'Zwróć poprawny JSON w formacie: {"archetypeNameGe": string, "analysisText": string}. ' +
+  "archetypeNameGe to krótka polska nazwa archetypu (np. «Strategiczny Architekt»); analysisText to treść podzielona na akapity (\\n\\n).";
+
 function scoresSummaryKa(scores: MbtiScores): string {
   return (["EI", "SN", "TF", "JP", "AT"] as const)
     .map((axis) => {
@@ -86,7 +98,38 @@ function scoresSummaryEn(scores: MbtiScores): string {
     .join(", ");
 }
 
+function scoresSummaryPl(scores: MbtiScores): string {
+  return (["EI", "SN", "TF", "JP", "AT"] as const)
+    .map((axis) => {
+      const score = scores[axis];
+      const [first, second] = AXIS_LABEL_PL[axis];
+      const name = score.letter === axis[0] ? first : second;
+      return `${score.letter} (${name}), ${score.pct}%`;
+    })
+    .join(", ");
+}
+
 async function buildUserPrompt(input: MbtiSynthesisInput): Promise<string> {
+  if (input.locale === "pl") {
+    const sunSign =
+      input.chart != null
+        ? signByIndex(input.chart.bodies.sun?.signIndex ?? 0).labelPl
+        : null;
+    const lines: string[] = [];
+    if (input.firstName) lines.push(`Imię: ${input.firstName}`);
+    lines.push(`Typ: ${input.type} (${mbtiArchetypePl(input.type)})`);
+    lines.push(`Rozkład wymiarów: ${scoresSummaryPl(input.scores)}`);
+    if (sunSign)
+      lines.push(
+        `Znak Słońca: ${sunSign}. Użyj tego wyłącznie jako jednej subtelnej metafory, nie jako dowodu ani odrębnej analizy.`,
+      );
+    lines.push(
+      "Napisz spójny, zindywidualizowany portret psychologiczny w 5–6 zwięzłych akapitach. Wyjaśnij, jak ten wzorzec przejawia się w myśleniu, emocjach, relacjach, pracy i pod wpływem stresu; uwzględnij konkretne mocne strony i zrównoważone wskazówki rozwojowe. " +
+        "Używaj wyważonego języka («ma skłonność do», «może»), unikaj sztywnych stereotypów i zaznacz, że wyniki bliskie środka osi mogą wskazywać na elastyczność.",
+    );
+    return lines.join("\n");
+  }
+
   if (input.locale === "en") {
     const sunSign =
       input.chart != null
@@ -194,7 +237,12 @@ async function viaOpenRouter(
       messages: [
         {
           role: "system",
-          content: locale === "en" ? SYSTEM_PROMPT_EN : SYSTEM_PROMPT,
+          content:
+            locale === "pl"
+              ? SYSTEM_PROMPT_PL
+              : locale === "en"
+                ? SYSTEM_PROMPT_EN
+                : SYSTEM_PROMPT,
         },
         { role: "user", content: prompt },
       ],
@@ -235,7 +283,12 @@ async function viaGoogle(
     model: GOOGLE_MODEL,
     contents: prompt,
     config: {
-      systemInstruction: locale === "en" ? SYSTEM_PROMPT_EN : SYSTEM_PROMPT,
+      systemInstruction:
+        locale === "pl"
+          ? SYSTEM_PROMPT_PL
+          : locale === "en"
+            ? SYSTEM_PROMPT_EN
+            : SYSTEM_PROMPT,
       temperature: 0.85,
       responseMimeType: "application/json",
       // Gemini 3.8 supports low/medium/high thinking; use low for this live task.

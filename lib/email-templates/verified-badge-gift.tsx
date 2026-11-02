@@ -18,23 +18,33 @@ export function VerifiedBadgeGiftEmail({
   locale?: UserLocale;
 }) {
   const copy =
-    locale === "en"
+    locale === "pl"
       ? {
-          preview: "Your Vivida profile received a Verified Badge",
-          heading: "You received a Verified Badge as a gift",
-          greeting: name ? `Hi, ${name}!` : "Hi!",
-          body: "The Vivida team gifted your profile a Verified Badge. It is now visible beside your name on your profile, in the community, and in comments.",
-          note: "The badge is a gift and does not require a paid subscription.",
-          cta: "View my profile",
+          preview:
+            "Twój profil na Vivida otrzymał odznakę Zweryfikowanego Profilu",
+          heading: "Otrzymałeś odznakę Zweryfikowanego Profilu w prezencie",
+          greeting: name ? `Cześć, ${name}!` : "Cześć!",
+          body: "Zespół Vivida podarował Twojemu profilowi odznakę Zweryfikowanego Profilu. Odznaka jest już widoczna obok Twojego imienia na profilu, w społeczności i w komentarzach.",
+          note: "Odznaka jest prezentem i nie wymaga płatnej subskrypcji.",
+          cta: "Zobacz mój profil",
         }
-      : {
-          preview: "შენს Vivida პროფილს Verified Badge მიენიჭა",
-          heading: "Verified Badge საჩუქრად მიიღე",
-          greeting: name ? `გამარჯობა, ${name}!` : "გამარჯობა!",
-          body: "Vivida-ს გუნდმა შენს პროფილს Verified Badge აჩუქა. ნიშანი უკვე ჩანს შენი სახელის გვერდით, პროფილში, საზოგადოებასა და კომენტარებში.",
-          note: "Badge საჩუქარია და ფასიან გამოწერას არ საჭიროებს.",
-          cta: "ნახე ჩემი პროფილი",
-        };
+      : locale === "en"
+        ? {
+            preview: "Your Vivida profile received a Verified Badge",
+            heading: "You received a Verified Badge as a gift",
+            greeting: name ? `Hi, ${name}!` : "Hi!",
+            body: "The Vivida team gifted your profile a Verified Badge. It is now visible beside your name on your profile, in the community, and in comments.",
+            note: "The badge is a gift and does not require a paid subscription.",
+            cta: "View my profile",
+          }
+        : {
+            preview: "შენს Vivida პროფილს Verified Badge მიენიჭა",
+            heading: "Verified Badge საჩუქრად მიიღე",
+            greeting: name ? `გამარჯობა, ${name}!` : "გამარჯობა!",
+            body: "Vivida-ს გუნდმა შენს პროფილს Verified Badge აჩუქა. ნიშანი უკვე ჩანს შენი სახელის გვერდით, პროფილში, საზოგადოებასა და კომენტარებში.",
+            note: "Badge საჩუქარია და ფასიან გამოწერას არ საჭიროებს.",
+            cta: "ნახე ჩემი პროფილი",
+          };
 
   return (
     <EmailLayout preview={copy.preview} locale={locale}>

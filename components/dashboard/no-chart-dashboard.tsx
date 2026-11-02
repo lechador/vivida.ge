@@ -49,10 +49,14 @@ export function NoChartDashboard({
         <div className="mb-6 flex flex-col gap-1 border-b border-border/80 pb-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="text-[11px] font-medium uppercase tracking-[0.2em] text-primary">
-              {en ? "Personal Observatory" : "პირადი ობსერვატორია"}
+              {locale === "pl"
+                ? "Osobiste obserwatorium"
+                : en
+                  ? "Personal Observatory"
+                  : "პირადი ობსერვატორია"}
             </div>
             <h1 className="mt-1 text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-              {en ? "Welcome," : "სალამი,"}{" "}
+              {locale === "pl" ? "Witaj," : en ? "Welcome," : "სალამი,"}{" "}
               <span className="text-primary">{firstName}</span>
             </h1>
           </div>

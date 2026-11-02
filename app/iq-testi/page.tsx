@@ -25,9 +25,42 @@ const DESCRIPTION_KA =
 const TITLE_EN = "Free Online IQ Test, Adaptive Reasoning Assessment";
 const DESCRIPTION_EN =
   "Take a free, adaptive 25-task IQ test covering numerical, logical, spatial and pattern reasoning. Receive an estimated IQ score and percentile in about 25 minutes.";
+const TITLE_PL =
+  "Darmowy Test IQ Online, Adaptacyjny Test Inteligencji | Vivida";
+const DESCRIPTION_PL =
+  "Wypełnij darmowy, adaptacyjny test IQ z 25 zadaniami (ok. 25 minut). Sprawdź swoje myślenie logiczne, liczbowe, przestrzenne i analizę wzorców. Bez rejestracji.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
+  if (locale === "pl") {
+    return {
+      title: { absolute: TITLE_PL },
+      description: DESCRIPTION_PL,
+      keywords: [
+        "darmowy test iq",
+        "test iq online",
+        "test inteligencji",
+        "test logiczny",
+        "adaptacyjny test iq",
+        "badanie inteligencji",
+      ],
+      alternates: localizedAlternates("/iq-testi", "/iq-testi", "pl"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: `${ENGLISH_SITE_URL}/pl/test-iq`,
+        title: TITLE_PL,
+        description: DESCRIPTION_PL,
+        siteName: "Vivida",
+        locale: "pl_PL",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: TITLE_PL,
+        description: DESCRIPTION_PL,
+      },
+    };
+  }
   const en = locale === "en";
   const title = en ? TITLE_EN : TITLE_KA;
   const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
@@ -96,6 +129,21 @@ const IQ_FAQ_EN = [
   },
 ];
 
+const IQ_FAQ_PL = [
+  {
+    q: "Jak obliczany jest wynik IQ?",
+    a: "Wzorzec Twoich odpowiedzi jest oceniany na podstawie trudności zadań (model IRT/Rasch), a następnie przekształcany na klasyczną skalę IQ ze średnią 100 i odchyleniem standardowym 15.",
+  },
+  {
+    q: "Czy test jest bezpłatny i czy wymaga rejestracji?",
+    a: "Test i wynik IQ są całkowicie bezpłatne i dostępne bez rejestracji. Założenie darmowego konta pozwala zapisać wynik w profilu.",
+  },
+  {
+    q: "Jak dokładny jest internetowy test IQ?",
+    a: "Wynik jest szacunkiem zdolności poznawczych z typowym zakresem błędu około ±6 punktów. Normy opierają się na rzeczywistych uczestnikach testu Vivida. Test ma charakter rozwojowy i nie stanowi diagnozy klinicznej.",
+  },
+];
+
 /**
  * Free, timed, culture-fair IQ test. Anyone can take it; the score is computed
  * client-side (see /iq-testi/shedegi), the deep domain breakdown is gated
@@ -105,33 +153,49 @@ export default async function IqTestPage() {
   const session = await auth();
   const authed = !!session?.user?.id;
   const locale = await getRequestLocale();
+  const pl = locale === "pl";
   const en = locale === "en";
-  const siteUrl = en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL;
-  const description = en ? DESCRIPTION_EN : DESCRIPTION_KA;
-  const faq = en ? IQ_FAQ_EN : IQ_FAQ;
+  const siteUrl = pl
+    ? `${ENGLISH_SITE_URL}/pl`
+    : en
+      ? ENGLISH_SITE_URL
+      : GEORGIAN_SITE_URL;
+  const description = pl
+    ? DESCRIPTION_PL
+    : en
+      ? DESCRIPTION_EN
+      : DESCRIPTION_KA;
+  const faq = pl ? IQ_FAQ_PL : en ? IQ_FAQ_EN : IQ_FAQ;
 
   const ld = [
     {
       "@context": "https://schema.org",
       "@type": "Quiz",
-      name: en ? "Vivida IQ Test" : "Vivida IQ ტესტი",
+      name: pl ? "Test IQ Vivida" : en ? "Vivida IQ Test" : "Vivida IQ ტესტი",
       description,
-      inLanguage: en ? "en" : "ka-GE",
+      inLanguage: pl ? "pl-PL" : en ? "en" : "ka-GE",
       url: `${siteUrl}${localizedHref("/iq-testi", locale)}`,
       educationalLevel: "beginner",
       numberOfQuestions: IQ_ADAPTIVE_LENGTH,
       about: {
         "@type": "Thing",
-        name: en ? "Intelligence quotient (IQ)" : "ინტელექტის კოეფიციენტი (IQ)",
+        name: pl
+          ? "Iloraz inteligencji (IQ)"
+          : en
+            ? "Intelligence quotient (IQ)"
+            : "ინტელექტის კოეფიციენტი (IQ)",
         alternateName: "IQ",
       },
     },
     faqLd(faq),
     breadcrumbLd([
-      { name: en ? "Home" : "მთავარი", url: siteUrl },
-      { name: en ? "Tests" : "ტესტები", url: `${siteUrl}/tests` },
+      { name: pl ? "Strona główna" : en ? "Home" : "მთავარი", url: siteUrl },
       {
-        name: en ? "IQ Test" : "IQ ტესტი",
+        name: pl ? "Testy" : en ? "Tests" : "ტესტები",
+        url: `${siteUrl}/tests`,
+      },
+      {
+        name: pl ? "Test IQ" : en ? "IQ Test" : "IQ ტესტი",
         url: `${siteUrl}${localizedHref("/iq-testi", locale)}`,
       },
     ]),
@@ -164,15 +228,21 @@ export default async function IqTestPage() {
             Vivida IQ
           </div>
           <h1 className="mt-1 text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
-            {en ? "Your " : "შენი"}{" "}
+            {pl ? "Twój " : en ? "Your " : "შენი"}{" "}
             <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-              {en ? "adaptive IQ test" : "ინტელექტის ტესტი"}
+              {pl
+                ? "adaptacyjny test IQ"
+                : en
+                  ? "adaptive IQ test"
+                  : "ინტელექტის ტესტი"}
             </span>
           </h1>
           <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
-            {en
-              ? `${IQ_ADAPTIVE_LENGTH} tasks · about 25 minutes · adaptive`
-              : `${IQ_ADAPTIVE_LENGTH} დავალება · ~25 წუთი · ადაპტიური`}
+            {pl
+              ? `${IQ_ADAPTIVE_LENGTH} zadań · ok. 25 minut · test adaptacyjny`
+              : en
+                ? `${IQ_ADAPTIVE_LENGTH} tasks · about 25 minutes · adaptive`
+                : `${IQ_ADAPTIVE_LENGTH} დავალება · ~25 წუთი · ადაპტიური`}
           </p>
         </header>
 
@@ -183,10 +253,23 @@ export default async function IqTestPage() {
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-24 sm:px-6">
         <div className="rounded-3xl border border-border bg-card/40 p-6 ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
           <h2 className="text-xl font-semibold tracking-tight">
-            {en ? "What does an IQ test measure?" : "რა არის IQ ტესტი?"}
+            {pl
+              ? "Co mierzy test IQ?"
+              : en
+                ? "What does an IQ test measure?"
+                : "რა არის IQ ტესტი?"}
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            {en ? (
+            {pl ? (
+              <>
+                IQ (iloraz inteligencji) szacuje wybrane aspekty myślenia
+                abstrakcyjnego: jak trafnie rozpoznajesz wzorce, wyciągasz
+                wnioski logiczne i radzisz sobie z nowymi problemami. Test
+                Vivida jest <strong>neutralny kulturowo</strong>: opiera się
+                głównie na figurach i liczbach, dzięki czemu wynik w mniejszym
+                stopniu zależy od języka czy wykształcenia.
+              </>
+            ) : en ? (
               <>
                 IQ tests estimate aspects of abstract reasoning: how well you
                 identify patterns, draw logical conclusions and solve unfamiliar
@@ -206,10 +289,23 @@ export default async function IqTestPage() {
           </p>
 
           <h2 className="mt-8 text-xl font-semibold tracking-tight">
-            {en ? "How is your score estimated?" : "როგორ ითვლება შენი ქულა?"}
+            {pl
+              ? "Jak obliczany jest Twój wynik?"
+              : en
+                ? "How is your score estimated?"
+                : "როგორ ითვლება შენი ქულა?"}
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
-            {en ? (
+            {pl ? (
+              <>
+                Test ocenia <strong>wzorzec odpowiedzi</strong> w powiązaniu z
+                trudnością zadań, a nie tylko sumę trafień. Poprawne rozwiązanie
+                trudniejszych zadań ma większą wagę (zasada Item Response Theory
+                / model Rascha). Szacunek jest następnie przekształcany na
+                standardową skalę IQ, gdzie <strong>średnia wynosi 100</strong>,
+                a ok. 68% populacji mieści się w przedziale 85–115.
+              </>
+            ) : en ? (
               <>
                 The test evaluates the <strong>pattern of responses</strong>{" "}
                 against task difficulty, rather than only counting correct
@@ -231,43 +327,62 @@ export default async function IqTestPage() {
           </p>
 
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
-            {(en
+            {(pl
               ? [
                   {
-                    t: "Numerical reasoning",
-                    d: "Sequences, quantities and numerical rules",
+                    t: "Rozumowanie liczbowe",
+                    d: "Sekwencje, zależności i reguły matematyczne",
                   },
                   {
-                    t: "Logical reasoning",
-                    d: "Deductions, analogies and exceptions",
+                    t: "Myślenie logiczne",
+                    d: "Dedukcja, wnioskowanie, wyjątki i analogie",
                   },
                   {
-                    t: "Spatial reasoning",
-                    d: "Rotation and spatial transformations",
+                    t: "Wyobraźnia przestrzenna",
+                    d: "Rotacja figur i przekształcenia przestrzenne",
                   },
                   {
-                    t: "Pattern recognition",
-                    d: "Matrix-style visual reasoning",
+                    t: "Rozpoznawanie wzorców",
+                    d: "Wizualne myślenie matrycowe (w stylu Ravena)",
                   },
                 ]
-              : [
-                  {
-                    t: "რიცხვითი ლოგიკა",
-                    d: "რიცხვთა მიმდევრობები და კანონზომიერებები",
-                  },
-                  {
-                    t: "ლოგიკური აზროვნება",
-                    d: "დასკვნები, ანალოგიები, გამონაკლისები",
-                  },
-                  {
-                    t: "სივრცითი აზროვნება",
-                    d: "ფიგურების ბრუნვა და სივრცული პატერნები",
-                  },
-                  {
-                    t: "პატერნების ამოცნობა",
-                    d: "მატრიცული ვიზუალური მსჯელობა (Raven-ის სტილი)",
-                  },
-                ]
+              : en
+                ? [
+                    {
+                      t: "Numerical reasoning",
+                      d: "Sequences, quantities and numerical rules",
+                    },
+                    {
+                      t: "Logical reasoning",
+                      d: "Deductions, analogies and exceptions",
+                    },
+                    {
+                      t: "Spatial reasoning",
+                      d: "Rotation and spatial transformations",
+                    },
+                    {
+                      t: "Pattern recognition",
+                      d: "Matrix-style visual reasoning",
+                    },
+                  ]
+                : [
+                    {
+                      t: "რიცხვითი ლოგიკა",
+                      d: "რიცხვთა მიმდევრობები და კანონზომიერებები",
+                    },
+                    {
+                      t: "ლოგიკური აზროვნება",
+                      d: "დასკვნები, ანალოგიები, გამონაკლისები",
+                    },
+                    {
+                      t: "სივრცითი აზროვნება",
+                      d: "ფიგურების ბრუნვა და სივრცული პატერნები",
+                    },
+                    {
+                      t: "პატერნების ამოცნობა",
+                      d: "მატრიცული ვიზუალური მსჯელობა (Raven-ის სტილი)",
+                    },
+                  ]
             ).map((x) => (
               <div
                 key={x.t}
@@ -282,7 +397,11 @@ export default async function IqTestPage() {
           </div>
 
           <h2 className="mt-8 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Frequently asked questions" : "ხშირად დასმული კითხვები"}
+            {pl
+              ? "Często zadawane pytania"
+              : en
+                ? "Frequently asked questions"
+                : "ხშირად დასმული კითხვები"}
           </h2>
           <div className="mt-4 space-y-3">
             {faq.map((item) => (
@@ -308,54 +427,77 @@ export default async function IqTestPage() {
             left the rest of the tests cluster orphaned from it. */}
         <section className="mt-10">
           <h2 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {en ? "Other tests" : "სხვა ტესტები"}
+            {pl ? "Inne testy" : en ? "Other tests" : "სხვა ტესტები"}
           </h2>
           <div className="grid gap-2 sm:grid-cols-2">
-            {(en
+            {(pl
               ? [
                   {
-                    href: "/personality-test",
+                    href: localizedHref("/pirovnebis-testi", locale),
                     label: "Astro-MBTI",
-                    sub: "Discover your personality type",
+                    sub: "Poznaj swój typ osobowości",
                   },
                   {
-                    href: "/eq-test",
-                    label: "EQ Test",
-                    sub: "Explore emotional intelligence",
+                    href: localizedHref("/eq-testi", locale),
+                    label: "Test EQ",
+                    sub: "Zbadaj inteligencję emocjonalną",
                   },
                   {
-                    href: "/big-five",
-                    label: "Big Five Test",
-                    sub: "Five broad personality traits",
+                    href: localizedHref("/big-five", locale),
+                    label: "Test Wielkiej Piątki",
+                    sub: "Pięć głównych cech osobowości",
                   },
                   {
-                    href: "/tests",
-                    label: "All tests",
-                    sub: "Browse every test and quiz",
+                    href: localizedHref("/tests", locale),
+                    label: "Wszystkie testy",
+                    sub: "Przeglądaj wszystkie testy i quizy",
                   },
                 ]
-              : [
-                  {
-                    href: "/pirovnebis-testi",
-                    label: "პიროვნების ტესტი",
-                    sub: "MBTI, 16 ტიპიდან რომელი ხარ",
-                  },
-                  {
-                    href: "/eq-testi",
-                    label: "EQ ტესტი",
-                    sub: "ემოციური ინტელექტის შეფასება",
-                  },
-                  {
-                    href: "/big-five",
-                    label: "Big Five ტესტი",
-                    sub: "დიდი ხუთეული, 5 ძირითადი თვისება",
-                  },
-                  {
-                    href: "/tests",
-                    label: "ყველა ტესტი",
-                    sub: "ტესტებისა და ქვიზების სრული სია",
-                  },
-                ]
+              : en
+                ? [
+                    {
+                      href: "/personality-test",
+                      label: "Astro-MBTI",
+                      sub: "Discover your personality type",
+                    },
+                    {
+                      href: "/eq-test",
+                      label: "EQ Test",
+                      sub: "Explore emotional intelligence",
+                    },
+                    {
+                      href: "/big-five",
+                      label: "Big Five Test",
+                      sub: "Five broad personality traits",
+                    },
+                    {
+                      href: "/tests",
+                      label: "All tests",
+                      sub: "Browse every test and quiz",
+                    },
+                  ]
+                : [
+                    {
+                      href: "/pirovnebis-testi",
+                      label: "პიროვნების ტესტი",
+                      sub: "MBTI, 16 ტიპიდან რომელი ხარ",
+                    },
+                    {
+                      href: "/eq-testi",
+                      label: "EQ ტესტი",
+                      sub: "ემოციური ინტელექტის შეფასება",
+                    },
+                    {
+                      href: "/big-five",
+                      label: "Big Five ტესტი",
+                      sub: "დიდი ხუთეული, 5 ძირითადი თვისება",
+                    },
+                    {
+                      href: "/tests",
+                      label: "ყველა ტესტი",
+                      sub: "ტესტებისა და ქვიზების სრული სია",
+                    },
+                  ]
             ).map((t) => (
               <Link
                 key={t.href}

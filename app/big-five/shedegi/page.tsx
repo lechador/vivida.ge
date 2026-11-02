@@ -3,18 +3,26 @@ import type { Metadata } from "next";
 import { auth } from "@/auth";
 import { AppHeader } from "@/components/nav/app-header";
 import { SmartHeader } from "@/components/smart-header";
+import { SiteFooter } from "@/components/site-footer";
 import { Starfield } from "@/components/landing/starfield";
 import { BigFiveResultClient } from "@/components/big-five/big-five-result";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  const en = locale !== "ka";
+  const pl = locale === "pl";
+  const en = locale === "en";
   return {
-    title: en ? "Your Big Five Result" : "შენი Big Five შედეგი",
-    description: en
-      ? "Your five-trait Big Five personality profile."
-      : "შენი Big Five (დიდი ხუთეული) ტესტის შედეგი, ხუთ თვისებაზე დაფუძნებული პიროვნების პროფილი.",
+    title: pl
+      ? "Twój wynik testu Big Five"
+      : en
+        ? "Your Big Five Result"
+        : "შენი Big Five შედეგი",
+    description: pl
+      ? "Twój 5-wymiarowy profil osobowości Wielkiej Piątki."
+      : en
+        ? "Your five-trait Big Five personality profile."
+        : "შენი Big Five (დიდი ხუთეული) ტესტის შედეგი, ხუთ თვისებაზე დაფუძნებული პიროვნების პროფილი.",
     robots: { index: false, follow: false },
   };
 }
@@ -53,6 +61,8 @@ export default async function BigFiveResultPage() {
       <section className="relative z-10 mx-auto w-full max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <BigFiveResultClient locale={locale} />
       </section>
+
+      <SiteFooter locale={locale} />
     </main>
   );
 }

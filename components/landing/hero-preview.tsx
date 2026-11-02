@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import type { UserLocale } from "@/lib/i18n/locale";
 import { ZodiacWheel } from "./zodiac-wheel";
 
 type DialMode = "natal" | "transit" | "synastry";
@@ -11,16 +12,21 @@ type PlacementSpec = {
   glyph: string;
   bodyKa: string;
   bodyEn: string;
+  bodyPl: string;
   signKa: string;
   signEn: string;
+  signPl: string;
   signGlyph: string;
   deg: string;
   houseKa: string;
   houseEn: string;
+  housePl: string;
   elementKa: string;
   elementEn: string;
+  elementPl: string;
   noteKa: Record<DialMode, string>;
   noteEn: Record<DialMode, string>;
+  notePl: Record<DialMode, string>;
 };
 
 const SPECIMEN_PLACEMENTS: PlacementSpec[] = [
@@ -29,19 +35,23 @@ const SPECIMEN_PLACEMENTS: PlacementSpec[] = [
     glyph: "☉",
     bodyKa: "მზე",
     bodyEn: "Sun",
+    bodyPl: "Słońce",
     signKa: "ლომი",
     signEn: "Leo",
+    signPl: "Lew",
     signGlyph: "♌",
     deg: "14°28′",
     houseKa: "X სახლი",
     houseEn: "House X",
+    housePl: "Dom X",
     elementKa: "ცეცხლი · ფიქსირებული",
     elementEn: "Fire · Fixed",
+    elementPl: "Ogień · Stały",
     noteKa: {
       natal:
         "მზე მე-10 სახლში (ზენიტი) მიუთითებს მკაფიო პროფესიულ ავტორიტეტსა და შემოქმედებით ლიდერობაზე.",
       transit:
-        "დღის ტრანზიტი: მზე ქმნის ტრიгонს ნატალურ იუპიტერთან — ხელსაყრელი დროა სტრატეგიული გადაწყვეტილებებისთვის.",
+        "დღის ტრანზიტი: მზე ქმნის ტრიგონს ნატალურ იუპიტერთან — ხელსაყრელი დროა სტრატეგიული გადაწყვეტილებებისთვის.",
       synastry:
         "სინასტრიული ღერძი: პარტნიორის მთვარე ეხება შენს მზეს (ორბისი 1°12′) — ძლიერი ურთიერთნდობის კავშირი.",
     },
@@ -53,20 +63,32 @@ const SPECIMEN_PLACEMENTS: PlacementSpec[] = [
       synastry:
         "Synastry Axis: Partner's Moon conjuncts your natal Sun (orb 1°12′), forming a classic harmonic bond of mutual recognition.",
     },
+    notePl: {
+      natal:
+        "Słońce w 10. domu (Medium Coeli) wskazuje na wyraźny autorytet zawodowy, kreatywne przywództwo i poczucie misji.",
+      transit:
+        "Aktywny tranzyt: trygon Słońca do natalnego Jowisza sprzyja dalekosiężnym decyzjom i jasnym wyborom.",
+      synastry:
+        "Oś synastrii: Księżyc partnera w koniunkcji z Twoim Słońcem (orb 1°12′) tworzy klasyczną więź wzajemnego zrozumienia.",
+    },
   },
   {
     key: "moon",
     glyph: "☽",
     bodyKa: "მთვარე",
     bodyEn: "Moon",
+    bodyPl: "Księżyc",
     signKa: "თევზები",
     signEn: "Pisces",
+    signPl: "Ryby",
     signGlyph: "♓",
     deg: "08°12′",
     houseKa: "VII სახლი",
     houseEn: "House VII",
+    housePl: "Dom VII",
     elementKa: "წყალი · ცვალებადი",
     elementEn: "Water · Mutable",
+    elementPl: "Woda · Zmienny",
     noteKa: {
       natal:
         "მთვარე მე-7 სახლში აძლიერებს ემპათიას, ინტუიციურ აღქმასა და ღრმა ემოციურ კავშირს პარტნიორობაში.",
@@ -83,20 +105,32 @@ const SPECIMEN_PLACEMENTS: PlacementSpec[] = [
       synastry:
         "Synastry Axis: Venus–Moon sextile (orb 0°52′) establishes effortless domestic warmth and intuitive understanding.",
     },
+    notePl: {
+      natal:
+        "Księżyc w Rybach w 7. domu wzmacnia empatię, intuicyjny odbiór i głębię emocjonalną w relacjach.",
+      transit:
+        "Aktywny tranzyt: przejście Księżyca przez Descendent sprzyja szczerym rozmowom i emocjonalnemu porozumieniu.",
+      synastry:
+        "Oś synastrii: sekstyl Wenus–Księżyc buduje naturalne ciepło, zaufanie i intuicyjną bliskość.",
+    },
   },
   {
     key: "ascendant",
     glyph: "↑",
     bodyKa: "ასცენდენტი",
     bodyEn: "Ascendant",
+    bodyPl: "Ascendent",
     signKa: "ქალწული",
     signEn: "Virgo",
+    signPl: "Panna",
     signGlyph: "♍",
     deg: "22°45′",
     houseKa: "I სახლი",
     houseEn: "House I",
+    housePl: "Dom I",
     elementKa: "მიწა · ცვალებადი",
     elementEn: "Earth · Mutable",
+    elementPl: "Ziemia · Zmienny",
     noteKa: {
       natal:
         "ქალწულის ასცენდენტი განსაზღვრავს ანალიტიკურ სიზუსტეს, დაკვირვებულობასა და სტრუქტურულ მიდგომას.",
@@ -113,20 +147,32 @@ const SPECIMEN_PLACEMENTS: PlacementSpec[] = [
       synastry:
         "Synastry Axis: Partner's Sun falls directly on your 7th House cusp, creating magnetic complementarity.",
     },
+    notePl: {
+      natal:
+        "Ascendent w Pannie kształtuje analityczną wnikliwość, dbałość o szczegóły i uporządkowane podejście.",
+      transit:
+        "Aktywny tranzyt: Merkury w 1. domu wyostrza koncentrację, precyzję myślenia i planowanie.",
+      synastry:
+        "Oś synastrii: Słońce partnera na wierzchołku Twojego 7. domu tworzy magnetyczne przyciąganie i dopełnienie.",
+    },
   },
   {
     key: "mercury",
     glyph: "☿",
     bodyKa: "მერკური",
     bodyEn: "Mercury",
+    bodyPl: "Merkury",
     signKa: "ქალწული",
     signEn: "Virgo",
+    signPl: "Panna",
     signGlyph: "♍",
     deg: "03°19′",
     houseKa: "I სახლი",
     houseEn: "House I",
+    housePl: "Dom I",
     elementKa: "მიწა · დომიცილი",
     elementEn: "Earth · Domicile",
+    elementPl: "Ziemia · Władztwo",
     noteKa: {
       natal:
         "მერკური საკუთარ ნიშანში (დომიცილი) იძლევა მკაფიო ლოგიკას, სისტემურ აზროვნებასა და ზუსტ კომუნიკაციას.",
@@ -143,20 +189,32 @@ const SPECIMEN_PLACEMENTS: PlacementSpec[] = [
       synastry:
         "Synastry Axis: Mercury–Mercury trine ensures frictionless communication and shared intellectual curiosity.",
     },
+    notePl: {
+      natal:
+        "Merkury we władztwie w Pannie obdarza jasną logiką, zmysłem syntezy i metodycznym rozwiązywaniem problemów.",
+      transit:
+        "Aktywny tranzyt: trygon ziemski z Uranem przynosi nagłe olśnienia i szybkie, precyzyjne rozwiązania.",
+      synastry:
+        "Oś synastrii: trygon Merkury–Merkury zapewnia płynną komunikację i wspólne pasje intelektualne.",
+    },
   },
   {
     key: "venus",
     glyph: "♀",
     bodyKa: "ვენერა",
     bodyEn: "Venus",
+    bodyPl: "Wenus",
     signKa: "სასწორი",
     signEn: "Libra",
+    signPl: "Waga",
     signGlyph: "♎",
     deg: "19°04′",
     houseKa: "II სახლი",
     houseEn: "House II",
+    housePl: "Dom II",
     elementKa: "ჰაერი · კარდინალური",
     elementEn: "Air · Cardinal",
+    elementPl: "Powietrze · Kardynalny",
     noteKa: {
       natal:
         "ვენერა სასწორში აყალიბებს დახვეწილ ესთეტიკურ გემოვნებას, დიპლომატიურობასა და ჰარმონიის მოთხოვნილებას.",
@@ -173,20 +231,32 @@ const SPECIMEN_PLACEMENTS: PlacementSpec[] = [
       synastry:
         "Synastry Axis: Exact Venus–Mars conjunction (orb 0°38′) generates unmistakable romantic chemistry.",
     },
+    notePl: {
+      natal:
+        "Wenus we władztwie w Wadze kształtuje wyrafinowany zmysł estetyczny, takt dyplomatyczny i potrzebę harmonii.",
+      transit:
+        "Aktywny tranzyt: Wenus w 2. domu sprzyja stabilizacji materialnej i owocnym przedsięwzięciom twórczym.",
+      synastry:
+        "Oś synastrii: ścisła koniunkcja Wenus–Mars (orb 0°38′) generuje niezaprzeczalną chemię romantyczną.",
+    },
   },
   {
     key: "mars",
     glyph: "♂",
     bodyKa: "მარსი",
     bodyEn: "Mars",
+    bodyPl: "Mars",
     signKa: "მორიელი",
     signEn: "Scorpio",
+    signPl: "Skorpion",
     signGlyph: "♏",
     deg: "27°51′",
     houseKa: "III სახლი",
     houseEn: "House III",
+    housePl: "Dom III",
     elementKa: "წყალი · ფიქსირებული",
     elementEn: "Water · Fixed",
+    elementPl: "Woda · Stały",
     noteKa: {
       natal:
         "მარსი მორიელში გამოირჩევა სტრატეგიული ნებისყოფით, სიღრმისეული კვლევის უნარითა და მიზანდასახულობით.",
@@ -203,6 +273,14 @@ const SPECIMEN_PLACEMENTS: PlacementSpec[] = [
       synastry:
         "Synastry Axis: Constructive Mars–Sun trine fuels shared ambition and decisive mutual support.",
     },
+    notePl: {
+      natal:
+        "Mars w tradycyjnym władztwie w Skorpionie daje niezłomną siłę woli, wnikliwość i strategiczną determinację.",
+      transit:
+        "Aktywny tranzyt: sekstyl Marsa z Saturnem daje zdyscyplinowaną wytrwałość w realizacji ambitnych zadań.",
+      synastry:
+        "Oś synastrii: harmonijny trygon Mars–Słońce napędza wspólne ambicje i wzajemne wsparcie w działaniu.",
+    },
   },
 ];
 
@@ -211,7 +289,8 @@ const SPECIMEN_PLACEMENTS: PlacementSpec[] = [
  * Visitors can switch between Natal Specimen, Live Sky Transits, and Synastry Axis,
  * and click any planet on the wheel or ephemeris table to inspect its telemetry.
  */
-export function HeroPreview({ locale = "ka" }: { locale?: "ka" | "en" }) {
+export function HeroPreview({ locale = "ka" }: { locale?: UserLocale }) {
+  const isPl = locale === "pl";
   const en = locale === "en";
   const [mode, setMode] = useState<DialMode>("natal");
   const [selectedKey, setSelectedKey] = useState<string>("sun");
@@ -220,17 +299,23 @@ export function HeroPreview({ locale = "ka" }: { locale?: "ka" | "en" }) {
     SPECIMEN_PLACEMENTS.find((p) => p.key === selectedKey) ??
     SPECIMEN_PLACEMENTS[0];
 
-  const modes: Array<{ id: DialMode; label: string; short: string }> = en
+  const modes: Array<{ id: DialMode; label: string; short: string }> = isPl
     ? [
-        { id: "natal", label: "01 · Natal Chart", short: "Natal" },
-        { id: "transit", label: "02 · Live Sky", short: "Live Sky" },
-        { id: "synastry", label: "03 · Synastry", short: "Synastry" },
+        { id: "natal", label: "01 · Kosmogram", short: "Kosmogram" },
+        { id: "transit", label: "02 · Niebo na żywo", short: "Niebo" },
+        { id: "synastry", label: "03 · Synastria", short: "Synastria" },
       ]
-    : [
-        { id: "natal", label: "01 · ნატალური", short: "ნატალური" },
-        { id: "transit", label: "02 · დღის ცა", short: "დღის ცა" },
-        { id: "synastry", label: "03 · სინასტრია", short: "სინასტრია" },
-      ];
+    : en
+      ? [
+          { id: "natal", label: "01 · Natal Chart", short: "Natal" },
+          { id: "transit", label: "02 · Live Sky", short: "Live Sky" },
+          { id: "synastry", label: "03 · Synastry", short: "Synastry" },
+        ]
+      : [
+          { id: "natal", label: "01 · ნატალური", short: "ნატალური" },
+          { id: "transit", label: "02 · დღის ცა", short: "დღის ცა" },
+          { id: "synastry", label: "03 · სინასტრია", short: "სინასტრია" },
+        ];
 
   return (
     <div className="flex h-full w-full flex-col justify-between bg-card p-5 sm:p-6">
@@ -238,19 +323,27 @@ export function HeroPreview({ locale = "ka" }: { locale?: "ka" | "en" }) {
       <div>
         <div className="flex flex-col gap-1 border-b border-border pb-3 text-xs text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-2">
           <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-primary">
-            {en
-              ? "Interactive Astrolabe · Specimen"
-              : "ინტერაქტიული ასტროლაბი · ეფემერიდა"}
+            {isPl
+              ? "Interaktywne astrolabium · Efemeryda"
+              : en
+                ? "Interactive Astrolabe · Specimen"
+                : "ინტერაქტიული ასტროლაბი · ეფემერიდა"}
           </span>
           <span className="font-mono text-[11px] tabular-nums text-foreground/80">
-            41°43′N · 44°47′E · UTC+4
+            {isPl ? "52°14′N · 21°01′E · UTC+1" : "41°43′N · 44°47′E · UTC+4"}
           </span>
         </div>
 
         {/* Interactive Mode Switcher */}
         <div
           role="tablist"
-          aria-label={en ? "Observatory mode" : "ობსერვატორიის რეჟიმი"}
+          aria-label={
+            isPl
+              ? "Tryb obserwatorium"
+              : en
+                ? "Observatory mode"
+                : "ობსერვატორიის რეჟიმი"
+          }
           className="mt-3 grid grid-cols-3 gap-1.5 rounded-lg border border-border bg-background/70 p-1"
         >
           {modes.map((m) => {
@@ -285,9 +378,11 @@ export function HeroPreview({ locale = "ka" }: { locale?: "ka" | "en" }) {
           activeMode={mode}
         />
         <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-          {en
-            ? "Select any planetary node or row to inspect coordinates"
-            : "დააჭირე პლანეტას ან ცხრილის სტრიქონს დეტალური გრადუსისთვის"}
+          {isPl
+            ? "Kliknij dowolną planetę lub wiersz, aby sprawdzić współrzędne"
+            : en
+              ? "Select any planetary node or row to inspect coordinates"
+              : "დააჭირე პლანეტას ან ცხრილის სტრიქონს დეტალური გრადუსისთვის"}
         </p>
       </div>
 
@@ -295,11 +390,19 @@ export function HeroPreview({ locale = "ka" }: { locale?: "ka" | "en" }) {
       <div className="border-t border-border pt-3">
         <div className="mb-2 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
           <span>
-            {en
-              ? "Planetary Ephemeris (Click to inspect)"
-              : "პლანეტარული ეფემერიდა"}
+            {isPl
+              ? "Efemerydy planetarne (kliknij, aby sprawdzić)"
+              : en
+                ? "Planetary Ephemeris (Click to inspect)"
+                : "პლანეტარული ეფემერიდა"}
           </span>
-          <span>{en ? "Longitude · House" : "გრადუსი · სახლი"}</span>
+          <span>
+            {isPl
+              ? "Długość · Dom"
+              : en
+                ? "Longitude · House"
+                : "გრადუსი · სახლი"}
+          </span>
         </div>
         <div className="grid grid-cols-1 divide-y divide-border/70 overflow-hidden rounded-lg border border-border bg-background/65 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
           {[
@@ -309,6 +412,16 @@ export function HeroPreview({ locale = "ka" }: { locale?: "ka" | "en" }) {
             <div key={colIdx} className="divide-y divide-border/70">
               {group.map((row) => {
                 const isSelected = row.key === activePlacement.key;
+                const bodyLabel = isPl
+                  ? row.bodyPl
+                  : en
+                    ? row.bodyEn
+                    : row.bodyKa;
+                const signLabel = isPl
+                  ? row.signPl
+                  : en
+                    ? row.signEn
+                    : row.signKa;
                 return (
                   <button
                     key={row.key}
@@ -331,10 +444,10 @@ export function HeroPreview({ locale = "ka" }: { locale?: "ka" | "en" }) {
                         {row.glyph}
                       </span>
                       <span className="truncate font-medium text-foreground">
-                        {en ? row.bodyEn : row.bodyKa}
+                        {bodyLabel}
                       </span>
                       <span className="truncate text-muted-foreground">
-                        · {row.signGlyph} {en ? row.signEn : row.signKa}
+                        · {row.signGlyph} {signLabel}
                       </span>
                     </div>
                     <div className="shrink-0 font-mono text-[11px] tabular-nums">
@@ -353,18 +466,39 @@ export function HeroPreview({ locale = "ka" }: { locale?: "ka" | "en" }) {
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 pb-2 font-mono text-[11px]">
           <span className="font-semibold text-[var(--vivida-gold)]">
             {activePlacement.glyph}{" "}
-            {en ? activePlacement.bodyEn : activePlacement.bodyKa} ·{" "}
-            {activePlacement.signGlyph}{" "}
-            {en ? activePlacement.signEn : activePlacement.signKa}{" "}
+            {isPl
+              ? activePlacement.bodyPl
+              : en
+                ? activePlacement.bodyEn
+                : activePlacement.bodyKa}{" "}
+            · {activePlacement.signGlyph}{" "}
+            {isPl
+              ? activePlacement.signPl
+              : en
+                ? activePlacement.signEn
+                : activePlacement.signKa}{" "}
             {activePlacement.deg}
           </span>
           <span className="text-[var(--vivida-cyan)]">
-            {en ? activePlacement.houseEn : activePlacement.houseKa} ·{" "}
-            {en ? activePlacement.elementEn : activePlacement.elementKa}
+            {isPl
+              ? activePlacement.housePl
+              : en
+                ? activePlacement.houseEn
+                : activePlacement.houseKa}{" "}
+            ·{" "}
+            {isPl
+              ? activePlacement.elementPl
+              : en
+                ? activePlacement.elementEn
+                : activePlacement.elementKa}
           </span>
         </div>
         <p className="mt-2 text-xs leading-relaxed text-foreground/90">
-          {en ? activePlacement.noteEn[mode] : activePlacement.noteKa[mode]}
+          {isPl
+            ? activePlacement.notePl[mode]
+            : en
+              ? activePlacement.noteEn[mode]
+              : activePlacement.noteKa[mode]}
         </p>
       </div>
     </div>

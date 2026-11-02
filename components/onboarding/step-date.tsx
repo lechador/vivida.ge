@@ -22,21 +22,26 @@ export function StepDate({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
+  const pl = locale === "pl";
   const monthRef = useRef<HTMLInputElement>(null);
   const yearRef = useRef<HTMLInputElement>(null);
 
-  const headingText = en
-    ? "When did your story begin?"
-    : "როდის დაიწყო შენი ისტორია?";
-  const descText = en
-    ? "Your birth date determines your Sun, Moon and core archetypes."
-    : "დაბადების დღე განსაზღვრავს შენს მზეს, მთვარეს და ძირითად არქეტიპებს.";
-  const dayLabel = en ? "Day" : "რიცხვი";
-  const monthLabel = en ? "Month" : "თვე";
-  const yearLabel = en ? "Year" : "წელი";
-  const genderLabel = en ? "Gender" : "სქესი";
-  const femaleLabel = en ? "Female" : "მდედრობითი";
-  const maleLabel = en ? "Male" : "მამრობითი";
+  const headingText = pl
+    ? "Kiedy zaczęła się Twoja historia?"
+    : en
+      ? "When did your story begin?"
+      : "როდის დაიწყო შენი ისტორია?";
+  const descText = pl
+    ? "Data Twojego urodzenia określa Twoje Słońce, Księżyc i główne archetypy."
+    : en
+      ? "Your birth date determines your Sun, Moon and core archetypes."
+      : "დაბადების დღე განსაზღვრავს შენს მზეს, მთვარეს და ძირითად არქეტიპებს.";
+  const dayLabel = pl ? "Dzień" : en ? "Day" : "რიცხვი";
+  const monthLabel = pl ? "Miesiąc" : en ? "Month" : "თვე";
+  const yearLabel = pl ? "Rok" : en ? "Year" : "წელი";
+  const genderLabel = pl ? "Płeć" : en ? "Gender" : "სქესი";
+  const femaleLabel = pl ? "Kobieta" : en ? "Female" : "მდედრობითი";
+  const maleLabel = pl ? "Mężczyzna" : en ? "Male" : "მამრობითი";
 
   return (
     <div className="space-y-6">
@@ -106,7 +111,13 @@ export function StepDate({
         <Label>
           {genderLabel}{" "}
           <span className="font-normal text-muted-foreground">
-            ({en ? "optional" : "სურვილისამებრ"})
+            (
+            {locale === "pl"
+              ? "opcjonalnie"
+              : en
+                ? "optional"
+                : "სურვილისამებრ"}
+            )
           </span>
         </Label>
         <div className="grid grid-cols-2 gap-3">

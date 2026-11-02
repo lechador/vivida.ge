@@ -13,6 +13,7 @@ import type { UserLocale } from "@/lib/i18n/locale";
 const COPY = {
   ka: { title: "საკითხავი შენთვის", all: "ყველა სტატია" },
   en: { title: "Recommended reading", all: "All articles" },
+  pl: { title: "Polecane artykuły", all: "Wszystkie artykuły" },
 } as const;
 
 export function DashboardArticleRecommendations({

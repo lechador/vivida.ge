@@ -3,7 +3,7 @@
 import { signByIndex } from "@/lib/zodiac";
 import { LunarPhaseDisc } from "@/components/brand/celestial-icons";
 import type { MoonPhaseRow } from "@/actions/moon-phase";
-import { PHASE_LABEL_EN } from "@/lib/moon-phase";
+import { PHASE_LABEL_EN, PHASE_LABEL_PL } from "@/lib/moon-phase";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
@@ -31,24 +31,39 @@ export function MoonPhaseCard({
       <div className="flex items-start justify-between gap-3 border-b border-border pb-4">
         <div className="min-w-0">
           <div className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--vivida-cyan)]">
-            {en ? "Lunar Telemetry" : "დღევანდელი მთვარე"}
+            {locale === "pl"
+              ? "Telemetria księżycowa"
+              : en
+                ? "Lunar Telemetry"
+                : "დღევანდელი მთვარე"}
           </div>
           <div className="mt-1.5 text-sm font-medium text-foreground">
-            {en ? PHASE_LABEL_EN[data.snapshot.phaseKey] : data.phaseLabelKa}{" "}
+            {locale === "pl"
+              ? PHASE_LABEL_PL[data.snapshot.phaseKey]
+              : en
+                ? PHASE_LABEL_EN[data.snapshot.phaseKey]
+                : data.phaseLabelKa}{" "}
             <span className="text-muted-foreground">·</span>{" "}
             <span className="font-mono text-[var(--vivida-gold)]">
               {sign.symbol}
             </span>{" "}
-            <span>{en ? sign.labelEn : data.signKa}</span>
+            <span>
+              {locale === "pl" ? sign.labelPl : en ? sign.labelEn : data.signKa}
+            </span>
           </div>
           {/* Unboxed tabular lunar metrics */}
           <div className="mt-1.5 font-mono text-xs tabular-nums text-muted-foreground">
             <span>
-              {en ? `${illumPct}% illuminated` : `${illumPct}% განათება`}
+              {locale === "pl"
+                ? `${illumPct}% oświetlenia`
+                : en
+                  ? `${illumPct}% illuminated`
+                  : `${illumPct}% განათება`}
             </span>{" "}
             ·{" "}
             <span>
-              {snapshot.ageDays.toFixed(1)} {en ? "days" : "დღე"}
+              {snapshot.ageDays.toFixed(1)}{" "}
+              {locale === "pl" ? "dni" : en ? "days" : "დღე"}
             </span>
           </div>
         </div>
@@ -90,7 +105,13 @@ export function MoonPhaseCard({
         }}
       >
         <summary className="flex cursor-pointer list-none items-center justify-between font-mono text-xs font-medium uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden">
-          <span>{en ? "Continue reading" : "გააგრძელე კითხვა"}</span>
+          <span>
+            {locale === "pl"
+              ? "Czytaj dalej"
+              : en
+                ? "Continue reading"
+                : "გააგრძელე კითხვა"}
+          </span>
           <span
             aria-hidden
             className="font-mono transition-transform group-open:rotate-90"

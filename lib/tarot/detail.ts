@@ -1,3 +1,4 @@
+import type { UserLocale } from "@/lib/i18n/locale";
 import { TAROT_BY_SLUG, TAROT_CARDS } from "@/lib/tarot/deck";
 import { TAROT_CARDS_EN, TAROT_EN_BY_SLUG } from "@/lib/tarot/deck-en";
 import { MINOR_BY_SLUG, MINOR_CARDS } from "@/lib/tarot/deck-minor";
@@ -54,9 +55,9 @@ export function tarotDetailSlugs(): string[] {
 
 export function tarotDetailCard(
   slug: string,
-  locale: "ka" | "en",
+  locale: UserLocale,
 ): TarotDetailCard | undefined {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const majorKa = TAROT_BY_SLUG[slug];
   const majorEn = TAROT_EN_BY_SLUG[slug];
   if (majorKa && majorEn) {
@@ -105,9 +106,9 @@ export function tarotDetailCard(
 }
 
 /** Locale-aware deck for prev/next navigation and card indexes. */
-export function tarotDetailDeck(locale: "ka" | "en"): TarotDetailCard[] {
+export function tarotDetailDeck(locale: UserLocale): TarotDetailCard[] {
   const cards =
-    locale === "en"
+    locale !== "ka"
       ? [...TAROT_CARDS_EN, ...MINOR_CARDS_EN]
       : [...TAROT_CARDS, ...MINOR_CARDS];
   return cards

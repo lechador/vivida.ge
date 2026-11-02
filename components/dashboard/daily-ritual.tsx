@@ -20,6 +20,7 @@ import type { TransitBreakdownItem } from "@/lib/transit-library";
 const FALLBACK_FOCUS: Record<UserLocale, string[]> = {
   ka: ["სიმშვიდე", "გამბედაობა", "ურთიერთობები"],
   en: ["Calm", "Courage", "Relationships"],
+  pl: ["Spokój", "Odwaga", "Relacje"],
 };
 
 export function DailyRitual({
@@ -35,7 +36,7 @@ export function DailyRitual({
   initialProgress: StreakProgress;
   locale: UserLocale;
 }) {
-  const en = locale === "en";
+  const en = locale !== "ka";
   const [state, setState] = useState<DailyRitualState>({
     horoscopeRead: false,
     focus: null,
@@ -117,21 +118,38 @@ export function DailyRitual({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-              {en ? "Daily Intention" : "დღის პატარა რიტუალი"}
+              {locale === "pl"
+                ? "Codzienna intencja"
+                : en
+                  ? "Daily Intention"
+                  : "დღის პატარა რიტუალი"}
             </div>
             <p className="mt-0.5 font-mono text-xs tabular-nums text-muted-foreground">
-              {progress.current} {en ? "day streak" : "დღიანი სერია"}
+              {progress.current}{" "}
+              {locale === "pl"
+                ? progress.current === 1
+                  ? "dzień w serii"
+                  : "dni w serii"
+                : en
+                  ? "day streak"
+                  : "დღიანი სერია"}
             </p>
           </div>
           {progress.next ? (
             <span className="font-mono text-xs tabular-nums text-muted-foreground">
-              {en
-                ? `+${progress.next.credits} credits in ${progress.next.daysLeft}d`
-                : `${progress.next.daysLeft} დღეში +${progress.next.credits} კრედიტი`}
+              {locale === "pl"
+                ? `+${progress.next.credits} kredytów za ${progress.next.daysLeft} dni`
+                : en
+                  ? `+${progress.next.credits} credits in ${progress.next.daysLeft}d`
+                  : `${progress.next.daysLeft} დღეში +${progress.next.credits} კრედიტი`}
             </span>
           ) : (
             <span className="text-xs text-muted-foreground">
-              {en ? "All milestones reached" : "ყველა ნიშნული გავლილია"}
+              {locale === "pl"
+                ? "Wszystkie etapy osiągnięte"
+                : en
+                  ? "All milestones reached"
+                  : "ყველა ნიშნული გავლილია"}
             </span>
           )}
         </div>
@@ -147,16 +165,22 @@ export function DailyRitual({
         <div className="mt-4">
           <p className="text-xs font-medium text-foreground/85">
             {completed
-              ? en
-                ? "Today's ritual is complete"
-                : "დღის რიტუალი დასრულებულია"
-              : state.horoscopeRead
-                ? en
-                  ? "Choose today's focus"
-                  : "აირჩიე დღევანდელი ფოკუსი"
+              ? locale === "pl"
+                ? "Dzisiejszy rytuał ukończony"
                 : en
-                  ? "Read to the end, then choose your focus"
-                  : "ჩაიკითხე ჰოროსკოპი ბოლომდე და აირჩიე ფოკუსი"}
+                  ? "Today's ritual is complete"
+                  : "დღის რიტუალი დასრულებულია"
+              : state.horoscopeRead
+                ? locale === "pl"
+                  ? "Wybierz dzisiejszy punkt skupienia"
+                  : en
+                    ? "Choose today's focus"
+                    : "აირჩიე დღევანდელი ფოკუსი"
+                : locale === "pl"
+                  ? "Przeczytaj horoskop do końca, a następnie wybierz punkt skupienia"
+                  : en
+                    ? "Read to the end, then choose your focus"
+                    : "ჩაიკითხე ჰოროსკოპი ბოლომდე და აირჩიე ფოკუსი"}
           </p>
           {!completed && (
             <div className="mt-2.5 flex flex-wrap gap-2">
@@ -186,18 +210,26 @@ export function DailyRitual({
               <p className="flex items-center gap-1.5 text-xs font-medium text-primary">
                 <Check className="size-3.5" />
                 {earned > 0
-                  ? en
-                    ? `Milestone: +${earned} credits`
-                    : `ნიშნული: +${earned} კრედიტი`
-                  : en
-                    ? "Return tomorrow to continue the streak"
-                    : "სერიის გასაგრძელებლად ხვალ დაბრუნდი"}
+                  ? locale === "pl"
+                    ? `Etap: +${earned} kredytów`
+                    : en
+                      ? `Milestone: +${earned} credits`
+                      : `ნიშნული: +${earned} კრედიტი`
+                  : locale === "pl"
+                    ? "Wróć jutro, aby kontynuować serię"
+                    : en
+                      ? "Return tomorrow to continue the streak"
+                      : "სერიის გასაგრძელებლად ხვალ დაბრუნდი"}
               </p>
               <Link
                 href="/account#reminders"
                 className="inline-block text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
-                {en ? "Choose your reminders →" : "აირჩიე შეხსენებები →"}
+                {locale === "pl"
+                  ? "Wybierz przypomnienia →"
+                  : en
+                    ? "Choose your reminders →"
+                    : "აირჩიე შეხსენებები →"}
               </Link>
             </div>
           )}

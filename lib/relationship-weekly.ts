@@ -37,6 +37,17 @@ const PLANETS: Record<UserLocale, Record<string, string>> = {
     ascendant: "Ascendant",
     midheaven: "Midheaven",
   },
+  pl: {
+    venus: "Wenus",
+    mars: "Mars",
+    jupiter: "Jowisz",
+    saturn: "Saturn",
+    sun: "Słońce",
+    moon: "Księżyc",
+    mercury: "Merkury",
+    ascendant: "Ascendent",
+    midheaven: "Medium Coeli",
+  },
 };
 
 const ASPECTS: Record<UserLocale, Record<string, string>> = {
@@ -53,6 +64,13 @@ const ASPECTS: Record<UserLocale, Record<string, string>> = {
     square: "square",
     trine: "trine",
     opposition: "opposition",
+  },
+  pl: {
+    conjunction: "koniunkcja",
+    sextile: "sekstyl",
+    square: "kwadratura",
+    trine: "trygon",
+    opposition: "opozycja",
   },
 };
 
@@ -173,6 +191,60 @@ const COPY: Record<
       "Sensitivity or friction may rise, slow down and listen more carefully.",
     neutral:
       "This theme deserves attention; honest observation can reveal a lot.",
+  },
+  pl: {
+    headlines: {
+      communication: "Tydzień na szczerą rozmowę",
+      closeness: "Tydzień na zbliżenie się do siebie",
+      emotions: "Tydzień na głębsze słuchanie",
+      boundaries: "Tydzień na cierpliwość i granice",
+      growth: "Tydzień na wspólny krok naprzód",
+    },
+    summaries: {
+      communication:
+        "Słowa mają w tym tygodniu szczególne znaczenie. Wyrażaj myśli jasno i zostaw przestrzeń na uważne słuchanie.",
+      closeness:
+        "Drobne gesty i wspólnie spędzony czas sprawią, że więź stanie się cieplejsza i trwalsza.",
+      emotions:
+        "Emocje są bliżej powierzchni; postaraj się dostrzec prawdziwą potrzebę za każdą reakcją.",
+      boundaries:
+        "Różne tempo nie oznacza dystansu. Jasne granice i chwila oddechu chronią Waszą relację.",
+      growth:
+        "Wybierzcie jeden mały wspólny cel i zróbcie pierwszy krok razem.",
+    },
+    questions: {
+      communication: [
+        "Co chciałbyś/chciałabyś, abym lepiej zrozumiał(a) w tym tygodniu?",
+        "Której rozmowy unikamy?",
+        "Jak możemy lepiej słuchać się nawzajem podczas różnicy zdań?",
+      ],
+      closeness: [
+        "Kiedy czujesz się ze mną najbliżej?",
+        "Jaki mały gest sprawiłby Ci radość w tym tygodniu?",
+        "Jaki czas zarezerwujemy tylko dla nas?",
+      ],
+      emotions: [
+        "Jak się naprawdę czujesz w tym tygodniu?",
+        "Kiedy potrzebujesz wsparcia, a kiedy przestrzeni?",
+        "Jakie uczucie najtrudniej Ci wyrazić?",
+      ],
+      boundaries: [
+        "Jaka granica ma dla Ciebie teraz największe znaczenie?",
+        "W czym potrzebujemy więcej cierpliwości?",
+        "Jak możemy mówić „nie”, nie raniąc naszej więzi?",
+      ],
+      growth: [
+        "Jaki jeden cel możemy zacząć realizować razem?",
+        "Czego nauczyliśmy się ostatnio od siebie nawzajem?",
+        "Co byłoby dla nas małym wspólnym sukcesem?",
+      ],
+    },
+    supportive:
+      "Ten dzień sprzyja relacji — wykorzystajcie go na bliskość i porozumienie.",
+    tense:
+      "Może pojawić się większa wrażliwość lub napięcie — zwolnijcie i słuchajcie uważniej.",
+    neutral:
+      "Ten temat wymaga uwagi; szczera obserwacja pozwoli wiele zrozumieć.",
   },
 };
 

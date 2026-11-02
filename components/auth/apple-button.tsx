@@ -34,11 +34,17 @@ export function AppleButton({
     >
       <AppleGlyph />
       {isPending
-        ? locale !== "ka"
-          ? "Connecting…"
-          : "ვაკავშირდებით…"
+        ? locale === "pl"
+          ? "Łączenie…"
+          : locale !== "ka"
+            ? "Connecting…"
+            : "ვაკავშირდებით…"
         : (label ??
-          (locale !== "ka" ? "Continue with Apple" : "შემოდი Apple-ით"))}
+          (locale === "pl"
+            ? "Kontynuuj przez Apple"
+            : locale !== "ka"
+              ? "Continue with Apple"
+              : "შემოდი Apple-ით"))}
     </Button>
   );
 }

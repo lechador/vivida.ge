@@ -9,6 +9,7 @@ import { signByIndex } from "@/lib/zodiac";
 import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { NatalChartPageEn } from "@/components/seo/natal-chart-page-en";
+import { NatalChartPagePl } from "@/components/seo/natal-chart-page-pl";
 
 const SITE_URL = "https://www.vivida.ge";
 const URL = `${SITE_URL}/nataluri-ruka`;
@@ -85,6 +86,43 @@ const BASE_META_EN: Metadata = {
   },
 };
 
+const BASE_META_PL: Metadata = {
+  title: {
+    absolute: "Horoskop Urodzeniowy Online – Darmowy Kosmogram i Ascendent",
+  },
+  description:
+    "Oblicz swój horoskop urodzeniowy online za darmo. Odkryj pozycje planet, ascendent, 12 domów astrologicznych i aspekty z precyzyjną efemerydą Swiss Ephemeris.",
+  keywords: [
+    "horoskop urodzeniowy",
+    "kosmogram online",
+    "darmowy kosmogram",
+    "kalkulator ascendentu",
+    "12 domów astrologicznych",
+    "aspekty astrologiczne",
+    "horoskop urodzeniowy z interpretacją",
+  ],
+  alternates: localizedAlternates(
+    "/pl/horoskop-urodzeniowy",
+    "/nataluri-ruka",
+    "pl",
+  ),
+  openGraph: {
+    images: [DEFAULT_OG_IMAGE],
+    type: "website",
+    url: "https://www.vividaastro.com/pl/horoskop-urodzeniowy",
+    title: "Horoskop Urodzeniowy Online – Darmowy Kosmogram i Ascendent",
+    description:
+      "Oblicz swój horoskop urodzeniowy online za darmo. Odkryj pozycje planet, ascendent, 12 domów astrologicznych i aspekty.",
+    siteName: "Vivida",
+    locale: "pl_PL",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Horoskop Urodzeniowy Online – Darmowy Kosmogram i Ascendent",
+    description: "Oblicz swój horoskop urodzeniowy online za darmo.",
+  },
+};
+
 /**
  * When the page is opened from a shared link (`?big=<sun>.<moon>.<asc>`) we
  * swap in a personalized OG card showing those signs. The <title> and canonical
@@ -96,31 +134,46 @@ export async function generateMetadata({
   searchParams: Promise<{ big?: string }>;
 }): Promise<Metadata> {
   const locale = await getRequestLocale();
-  const en = locale !== "ka";
   const sp = await searchParams;
   const big = typeof sp.big === "string" ? sp.big : "";
   const idxs = big.split(".").map((s) => parseInt(s, 10));
   const valid =
     idxs.length === 3 &&
     idxs.every((n) => Number.isInteger(n) && n >= 0 && n < 12);
-  if (!valid) return en ? BASE_META_EN : BASE_META;
 
-  const [sun, moon, asc] = idxs.map((i) =>
-    en ? signByIndex(i).labelEn : signByIndex(i).labelKa,
-  );
-  const ogTitle = en
-    ? `My birth chart: Sun ${sun} · Moon ${moon} · Rising ${asc}`
-    : `ჩემი ნატალური რუკა: მზე ${sun} · მთვარე ${moon} · ამომავალი ${asc}`;
-  const ogImage = `${en ? "https://www.vividaastro.com" : SITE_URL}/api/og/chart?big=${encodeURIComponent(big)}`;
+  const baseMeta =
+    locale === "pl" ? BASE_META_PL : locale === "en" ? BASE_META_EN : BASE_META;
+
+  if (!valid) return baseMeta;
+
+  const [sun, moon, asc] = idxs.map((i) => {
+    const s = signByIndex(i);
+    return locale === "pl"
+      ? s.labelPl
+      : locale === "en"
+        ? s.labelEn
+        : s.labelKa;
+  });
+
+  const ogTitle =
+    locale === "pl"
+      ? `Mój horoskop urodzeniowy: Słońce ${sun} · Księżyc ${moon} · Ascendent ${asc}`
+      : locale === "en"
+        ? `My birth chart: Sun ${sun} · Moon ${moon} · Rising ${asc}`
+        : `ჩემი ნატალური რუკა: მზე ${sun} · მთვარე ${moon} · ამომავალი ${asc}`;
+
+  const hostUrl = locale === "ka" ? SITE_URL : "https://www.vividaastro.com";
+  const ogImage = `${hostUrl}/api/og/chart?big=${encodeURIComponent(big)}`;
+
   return {
-    ...(en ? BASE_META_EN : BASE_META),
+    ...baseMeta,
     openGraph: {
-      ...(en ? BASE_META_EN.openGraph : BASE_META.openGraph),
+      ...baseMeta.openGraph,
       title: ogTitle,
       images: [{ url: ogImage, width: 1200, height: 630 }],
     },
     twitter: {
-      ...(en ? BASE_META_EN.twitter : BASE_META.twitter),
+      ...baseMeta.twitter,
       title: ogTitle,
       images: [ogImage],
     },
@@ -151,7 +204,9 @@ const FAQ = [
 ];
 
 export default async function NataluriRukaPage() {
-  if ((await getRequestLocale()) !== "ka") return <NatalChartPageEn />;
+  const locale = await getRequestLocale();
+  if (locale === "pl") return <NatalChartPagePl />;
+  if (locale === "en") return <NatalChartPageEn />;
   const faqLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",

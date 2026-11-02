@@ -15,7 +15,12 @@ import type { Metadata } from "next";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
   return {
-    title: locale !== "ka" ? "Create an account" : "რეგისტრაცია",
+    title:
+      locale === "pl"
+        ? "Rejestracja"
+        : locale !== "ka"
+          ? "Create an account"
+          : "რეგისტრაცია",
     // Auth utility page, keep it crawlable for link equity but out of the
     // index (thin copy was indexable on both hosts).
     robots: { index: false, follow: true },
@@ -23,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: localizedAlternates(
       "/signup",
       "/signup",
-      locale !== "ka" ? "en" : "ka",
+      locale === "pl" ? "pl" : locale !== "ka" ? "en" : "ka",
     ),
   };
 }
@@ -52,20 +57,32 @@ export default async function SignupPage({
   return (
     <AuthLayout
       locale={locale}
-      title={en ? "Create your account" : "შექმენი შენი ანგარიში"}
+      title={
+        locale === "pl"
+          ? "Załóż swoje konto"
+          : en
+            ? "Create your account"
+            : "შექმენი შენი ანგარიში"
+      }
       subtitle={
-        en
-          ? "It takes a minute, your cosmos is waiting."
-          : "ერთ წუთში, შენი კოსმოსი გელოდება."
+        locale === "pl"
+          ? "Zajmie to tylko minutę, Twój kosmos czeka."
+          : en
+            ? "It takes a minute, your cosmos is waiting."
+            : "ერთ წუთში, შენი კოსმოსი გელოდება."
       }
       footer={
         <>
-          {en ? "Already have an account?" : "უკვე გაქვს ანგარიში?"}{" "}
+          {locale === "pl"
+            ? "Masz już konto?"
+            : en
+              ? "Already have an account?"
+              : "უკვე გაქვს ანგარიში?"}{" "}
           <Link
             href={loginHref}
             className="text-foreground underline underline-offset-2 hover:underline"
           >
-            {en ? "Sign in" : "შესვლა"}
+            {locale === "pl" ? "Zaloguj się" : en ? "Sign in" : "შესვლა"}
           </Link>
         </>
       }
@@ -78,22 +95,34 @@ export default async function SignupPage({
           className="mb-5 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
         >
           {error === "oauth_email_unverified"
-            ? en
-              ? "Your Google or Apple account has no verified email address. Verify it with the provider, then try again."
-              : "Google-ის ან Apple-ის ანგარიშს დადასტურებული ელფოსტა არ აქვს. დაადასტურე ის პროვაიდერთან და სცადე ხელახლა."
-            : error === "duplicate_registration"
-              ? en
-                ? "This registration needs review. Try signing in to your existing account or contact support."
-                : "ამ მონაცემებით რეგისტრაცია დამატებით შემოწმებას საჭიროებს. სცადე არსებულ ანგარიშში შესვლა ან მოგვწერე მხარდაჭერას."
+            ? locale === "pl"
+              ? "Twoje konto Google lub Apple nie posiada zweryfikowanego adresu e-mail. Zweryfikuj go u dostawcy i spróbuj ponownie."
               : en
-                ? "Too many new accounts from this connection. Please try again later."
-                : "ამ კავშირიდან ძალიან ბევრი ახალი ანგარიში შეიქმნა. სცადე მოგვიანებით."}
+                ? "Your Google or Apple account has no verified email address. Verify it with the provider, then try again."
+                : "Google-ის ან Apple-ის ანგარიშს დადასტურებული ელფოსტა არ აქვს. დაადასტურე ის პროვაიდერთან და სცადე ხელახლა."
+            : error === "duplicate_registration"
+              ? locale === "pl"
+                ? "Ta rejestracja wymaga dodatkowej weryfikacji. Spróbuj zalogować się na istniejące konto lub skontaktuj się ze wsparciem."
+                : en
+                  ? "This registration needs review. Try signing in to your existing account or contact support."
+                  : "ამ მონაცემებით რეგისტრაცია დამატებით შემოწმებას საჭიროებს. სცადე არსებულ ანგარიშში შესვლა ან მოგვწერე მხარდაჭერას."
+              : locale === "pl"
+                ? "Zbyt wiele nowych kont utworzonych z tego połączenia. Spróbuj ponownie później."
+                : en
+                  ? "Too many new accounts from this connection. Please try again later."
+                  : "ამ კავშირიდან ძალიან ბევრი ახალი ანგარიში შეიქმნა. სცადე მოგვიანებით."}
         </p>
       )}
       <div className="space-y-3">
         <GoogleButton
           locale={locale}
-          label={en ? "Sign up with Google" : "რეგისტრაცია Google-ით"}
+          label={
+            locale === "pl"
+              ? "Zarejestruj się przez Google"
+              : en
+                ? "Sign up with Google"
+                : "რეგისტრაცია Google-ით"
+          }
           callbackUrl={
             dest
               ? `/post-login?next=${encodeURIComponent(dest)}`
@@ -102,7 +131,13 @@ export default async function SignupPage({
         />
         <AppleButton
           locale={locale}
-          label={en ? "Sign up with Apple" : "რეგისტრაცია Apple-ით"}
+          label={
+            locale === "pl"
+              ? "Zarejestruj się przez Apple"
+              : en
+                ? "Sign up with Apple"
+                : "რეგისტრაცია Apple-ით"
+          }
           callbackUrl={
             dest
               ? `/post-login?next=${encodeURIComponent(dest)}`

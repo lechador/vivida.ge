@@ -28,6 +28,10 @@ import {
   moonCalendarEnCopy,
   MoonCalendarPageEn,
 } from "@/components/seo/moon-calendar-en";
+import {
+  moonCalendarPlCopy,
+  MoonCalendarPagePl,
+} from "@/components/seo/moon-calendar-pl";
 
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { tbilisiCalendarParts, tbilisiNoonUtc } from "@/lib/moon-calendar-date";
@@ -101,6 +105,33 @@ export async function generateMetadata(): Promise<Metadata> {
   const currentYear = tbilisiCalendarParts(new Date()).year;
   const locale = await getRequestLocale();
   if (locale === "ka") return kaMetadata(currentYear);
+  if (locale === "pl") {
+    const path = "/pl/kalendarz-ksiezycowy";
+    const { title, description } = moonCalendarPlCopy(currentYear);
+    return {
+      title: { absolute: title },
+      description,
+      keywords: [
+        "kalendarz ksiezycowy",
+        `kalendarz ksiezycowy ${currentYear}`,
+        "faza ksiezyca dzisiaj",
+        "kiedy pelnia ksiezyca",
+        "kiedy now ksiezyca",
+        "znak ksiezyca",
+      ],
+      alternates: localizedAlternates(path, "/mtvaris-kalendari", "pl"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "website",
+        url: `https://www.vividaastro.com${path}`,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "pl_PL",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
   if (locale === "en") {
     const path = "/mtvaris-kalendari";
     const { title, description } = moonCalendarEnCopy(currentYear);
@@ -257,6 +288,7 @@ function EventList({ events, label }: { events: MajorEvent[]; label: string }) {
 export default async function MoonCalendarPage() {
   await connection();
   const locale = await getRequestLocale();
+  if (locale === "pl") return <MoonCalendarPagePl />;
   if (locale === "en") return <MoonCalendarPageEn />;
   const now = new Date();
   const currentYear = tbilisiCalendarParts(now).year;

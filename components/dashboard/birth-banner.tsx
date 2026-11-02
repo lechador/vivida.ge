@@ -19,19 +19,29 @@ export function BirthDataBanner({ locale = "ka" }: { locale?: UserLocale }) {
         </span>
         <div>
           <p className="text-sm font-semibold">
-            {en ? "Unlock your personal chart" : "გახსენი შენი პირადი რუკა"}
+            {locale === "pl"
+              ? "Odblokuj swój kosmogram urodzeniowy"
+              : en
+                ? "Unlock your personal chart"
+                : "გახსენი შენი პირადი რუკა"}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            {en
-              ? "Add your birth details once, daily horoscope, live sky and compatibility open up."
-              : "შეავსე დაბადების მონაცემები ერთხელ, გაიხსნება დღიური ჰოროსკოპი, ცოცხალი ცა და თავსებადობა."}
+            {locale === "pl"
+              ? "Wprowadź swoje dane urodzenia raz — codzienny horoskop, niebo na żywo i analiza zgodności staną się dostępne."
+              : en
+                ? "Add your birth details once, daily horoscope, live sky and compatibility open up."
+                : "შეავსე დაბადების მონაცემები ერთხელ, გაიხსნება დღიური ჰოროსკოპი, ცოცხალი ცა და თავსებადობა."}
           </p>
         </div>
       </div>
       <Button asChild variant="mystic" className="shrink-0">
         <Link href="/onboarding?next=%2Fdashboard">
           <Sparkles className="size-4" />
-          {en ? "Add birth details" : "მონაცემების დამატება"}
+          {locale === "pl"
+            ? "Dodaj dane urodzenia"
+            : en
+              ? "Add birth details"
+              : "მონაცემების დამატება"}
         </Link>
       </Button>
     </div>

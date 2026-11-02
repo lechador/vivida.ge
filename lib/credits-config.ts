@@ -190,3 +190,44 @@ export const CREDIT_REASON_LABEL_EN: Record<CreditReason, string> = {
   grandfather: "Gift",
   admin_grant: "Gift",
 };
+
+export const CREDIT_REASON_LABEL_PL: Record<CreditReason, string> = {
+  signup_bonus: "Bonus powitalny",
+  first_return_bonus: "Bonus za powrót",
+  referral: "Polecenie znajomego",
+  purchase: "Doładowanie salda",
+  monthly_bonus: "Bonus miesięczny",
+  streak_bonus: "Bonus za codzienną serię",
+  birthday_gift: "Prezent urodzinowy",
+  campaign_reward: "Bonus za uzupełnienie danych urodzenia",
+  earn_feed_post: "Post na tablicy",
+  earn_profile_photo: "Zdjęcie profilowe",
+  earn_phone_verify: "Weryfikacja telefonu",
+  earn_sms_consent: "Zgoda na SMS promocyjne",
+  spend_synastry: "Zgodność partnerska",
+  spend_chat: "Czat AI",
+  spend_dream: "Interpretacja snu AI",
+  spend_mbti: "Test osobowości",
+  spend_iq: "Test IQ",
+  spend_eq: "Test EQ",
+  spend_bigfive: "Test Wielkiej Piątki",
+  spend_audio: "Horoskop audio",
+  spend_report: "Raport kosmogramu PDF",
+  spend_weekly: "Prognoza 7-dniowa",
+  spend_tarot: "Rozkład tarota",
+  spend_tarot_followup: "Doprecyzowanie tarota",
+  grandfather: "Prezent",
+  admin_grant: "Prezent",
+};
+
+export function creditReasonLabel(
+  reason: CreditReason,
+  locale?: string,
+): string {
+  if (locale === "pl")
+    return (
+      CREDIT_REASON_LABEL_PL[reason] ?? CREDIT_REASON_LABEL_EN[reason] ?? reason
+    );
+  if (locale === "ka") return CREDIT_REASON_LABEL_KA[reason] ?? reason;
+  return CREDIT_REASON_LABEL_EN[reason] ?? reason;
+}

@@ -208,6 +208,121 @@ const SIGN_BLURBS_EN: Record<string, string> = {
     "Mutable Water sign, intuitive empathy, artistic vision, and mysticism.",
 };
 
+const SUN_PL: Record<string, string> = {
+  aries:
+    "Twoje Słońce jest w Baranie – jesteś pionierem, który nigdy się nie waha. Działanie to Twój ojczysty język; Twoja obecność natychmiast zmienia dynamikę otoczenia.",
+  taurus:
+    "Słońce w Byku – stabilność i ugruntowany spokój stanowią Twój fundament. Cenisz to, co namacalne: trwałe piękno, komfort i odporność na próbę czasu.",
+  gemini:
+    "Słońce w Bliźniętach – ciekawość jest Twoim paliwem. Wszechstronne rozmowy, szybkie skojarzenia i żywy dialog to Twój naturalny żywioł.",
+  cancer:
+    "Słońce w Raku – Twoim rdzeniem jest troska i emocjonalna ochrona. Tworzysz poczucie domu wszędzie tam, gdzie się pojawiasz.",
+  leo: "Słońce w Lwie – Twoją esencją jest promienny blask, ciepło i szczodrość. Działasz z otwartym sercem i radosną kreatywnością.",
+  virgo:
+    "Słońce w Pannie – dbałość o rzemiosło i wnikliwa precyzja to Twoje znaki rozpoznawcze. Wnosisz porządek i przejrzystość we wszystko, czego dotkniesz.",
+  libra:
+    "Słońce w Wadze – równowaga, estetyczny wdzięk i harmonijne relacje wyznaczają Twoją drogę. Szukasz piękna i sprawiedliwych proporcji.",
+  scorpio:
+    "Słońce w Skorpionie – Twoja siła budzi się tam, skąd inni odwracają wzrok. Z przenikliwą intuicją poruszasz się po głębinach życia.",
+  sagittarius:
+    "Słońce w Strzelcu – prawda i bezgraniczna wolność to Twój wewnętrzny ogień. Dążysz do poszerzania horyzontów i przemieniania odkryć w mądrość.",
+  capricorn:
+    "Słońce w Koziorożcu – Twoje mistrzostwo leży w cierpliwości i długoterminowych celach. Krok po kroku budujesz to, co trwałe.",
+  aquarius:
+    "Słońce w Wodniku – oryginalność i wizjonerska jasność to Twój podpis. Twój umysł w naturalny sposób spogląda w przyszłość.",
+  pisces:
+    "Słońce w Rybach – Twój wewnętrzny świat jest bogaty, płynny i pełen empatii. Wnosisz w życie głębokie współczucie i wyobraźnię.",
+};
+
+const MOON_PL: Record<string, string> = {
+  aries:
+    "Księżyc w Baranie – Twoje uczucia są bezpośrednie, ogniste i natychmiastowe. Spokój odnajdujesz, przekładając emocje na celowe działanie.",
+  taurus:
+    "Księżyc w Byku – bezpieczeństwo emocjonalne dają Ci stabilność, fizyczny komfort i stały rytm. Twoje uczucia są mocno zakorzenione.",
+  gemini:
+    "Księżyc w Bliźniętach – przetwarzasz emocje poprzez słowa, pytania i otwarty dialog. Cisza i zamknięcie bywają dla Ciebie przytłaczające.",
+  cancer:
+    "Księżyc w Raku – Twoje uczucia falują z głęboką intuicyjną wrażliwością. Rozkwitasz w cieple, pamięci i serdecznej trosce.",
+  leo: "Księżyc w Lwie – emocjonalne uznanie i szczery podziw są niezbędne dla Twojego ducha. Kiedy kochasz, oddajesz całe serce.",
+  virgo:
+    "Księżyc w Pannie – porządek, pomocna dłoń i przemyślana struktura przynoszą ukojenie Twoim myślom. Radzisz sobie z emocjami, szukając praktycznych rozwiązań.",
+  libra:
+    "Księżyc w Wadze – harmonia w relacjach jest kluczowa dla Twojej wewnętrznej równowagi. Konflikty przeżywasz głębiej, niż dajesz po sobie poznać.",
+  scorpio:
+    "Księżyc w Skorpionie – Twoja głębia emocjonalna jest intensywna, skryta i bezwzględnie lojalna. Ufasz w pełni dopiero po udowodnieniu szczerości.",
+  sagittarius:
+    "Księżyc w Strzelcu – przestrzeń, odkrywanie i filozoficzna perspektywa dodają Ci skrzydeł. Ograniczenia szybko Cię wyczerpują.",
+  capricorn:
+    "Księżyc w Koziorożcu – bezpieczeństwo emocjonalne opierasz na samodyscyplinie, konkretnych osiągnięciach i jasnych granicach.",
+  aquarius:
+    "Księżyc w Wodniku – potrzebujesz emocjonalnej przestrzeni i racjonalnej przejrzystości, aby naprawdę zrozumieć to, co czujesz.",
+  pisces:
+    "Księżyc w Rybach – Twoja empatia jest oceaniczna i bezgraniczna. Regenerujesz się w ciszy, muzyce i twórczej wyobraźni.",
+};
+
+const ASC_PL: Record<string, string> = {
+  aries:
+    "W oczach innych uchodzisz za osobę odważną, zdecydowaną i bezpośrednią – kogoś, kto woli działać niż zwlekać.",
+  taurus:
+    "Na pierwszy rzut oka emanujesz spokojem, cierpliwością i niezawodnością, którą inni instynktownie obdarzają zaufaniem.",
+  gemini:
+    "Sprawiasz wrażenie osoby żywiołowej, błyskotliwej i towarzyskiej, z łatwością nawiązującej rozmowę w każdym otoczeniu.",
+  cancer:
+    "Twoja powierzchowność niesie ze sobą łagodną empatię, zachęcając innych do naturalnego otwierania się przed Tobą.",
+  leo: "Emanujesz dumą, charyzmą i naturalnym dostojeństwem. Twoje wejście rozgrzewa atmosferę w każdym pomieszczeniu.",
+  virgo:
+    "Choć z początku powściągliwy, Twój bystry zmysł obserwacji i wyczucie smaku są natychmiast zauważalne.",
+  libra:
+    "Wdzięk, takt i wyważona elegancja definiują pierwsze wrażenie, jakie wywierasz w każdym towarzystwie.",
+  scorpio:
+    "Przenikliwa, magnetyczna obecność – ludzie czują, że potrafisz odczytać ich intencje na długo przed wypowiedzeniem słów.",
+  sagittarius:
+    "Roztaczasz wokół siebie otwartość, optymizm i ducha przygody, sprawiając, że inni czują się w Twoim towarzystwie swobodnie.",
+  capricorn:
+    "Promieniujesz powagą, kompetencją i opanowaniem. Twoje słowa w naturalny sposób zyskują szacunek i wagę.",
+  aquarius:
+    "Niekonwencjonalny, a zarazem przyciągający – odświeżająco wykraczasz poza utarte schematy i oczekiwania.",
+  pisces:
+    "Nosisz w sobie aurę delikatności i tajemnicy, która zaprasza do rozmów znacznie głębszych niż codzienne powierzchowności.",
+};
+
+const SIGN_BLURBS_PL: Record<string, string> = {
+  aries: "Kardynalny znak Ognia, odwaga, inicjatywa i śmiałe początki.",
+  taurus: "Stały znak Ziemi, stabilność, wytrwałość i namacalne piękno.",
+  gemini:
+    "Zmienny znak Powietrza, ciekawość, komunikacja i wszechstronny umysł.",
+  cancer: "Kardynalny znak Wody, głębia emocjonalna, troska i poczucie domu.",
+  leo: "Stały znak Ognia, promienna twórczość, ciepło i szczodre serce.",
+  virgo:
+    "Zmienny znak Ziemi, precyzja, mistrzostwo rzemiosła i praktyczny rozsądek.",
+  libra:
+    "Kardynalny znak Powietrza, harmonia, estetyczny wdzięk i partnerska równowaga.",
+  scorpio: "Stały znak Wody, transformująca głębia, przenikliwość i lojalność.",
+  sagittarius:
+    "Zmienny znak Ognia, prawda, szerokie horyzonty i wolność poszukiwań.",
+  capricorn:
+    "Kardynalny znak Ziemi, zdyscyplinowana cierpliwość, mistrzostwo i ambicja.",
+  aquarius:
+    "Stały znak Powietrza, innowacyjność, oryginalność i wspólnotowe idee.",
+  pisces:
+    "Zmienny znak Wody, intuicyjna empatia, artystyczna wizja i mistycyzm.",
+};
+
+const SIGN_NAMES_PL: Record<string, string> = {
+  aries: "Baran",
+  taurus: "Byk",
+  gemini: "Bliźnięta",
+  cancer: "Rak",
+  leo: "Lew",
+  virgo: "Panna",
+  libra: "Waga",
+  scorpio: "Skorpion",
+  sagittarius: "Strzelec",
+  capricorn: "Koziorożec",
+  aquarius: "Wodnik",
+  pisces: "Ryby",
+};
+
 /**
  * Get an interpretation paragraph for a single big-three placement in the target locale.
  * Falls back to a generic sign blurb if the specific key is unknown.
@@ -223,7 +338,11 @@ export function staticInterpretation(
 
   const sign = SIGNS.find((s) => s.key === signKey);
 
-  if (locale === "en") {
+  if (locale === "pl") {
+    dict = kind === "sun" ? SUN_PL : kind === "moon" ? MOON_PL : ASC_PL;
+    blurbs = SIGN_BLURBS_PL;
+    label = SIGN_NAMES_PL[signKey] ?? sign?.labelEn;
+  } else if (locale === "en") {
     dict = kind === "sun" ? SUN_EN : kind === "moon" ? MOON_EN : ASC_EN;
     blurbs = SIGN_BLURBS_EN;
     label = sign?.labelEn;
@@ -237,14 +356,17 @@ export function staticInterpretation(
     dict[signKey] ??
     `${label ?? signKey}, ${
       blurbs[signKey] ??
-      (locale === "en"
-        ? "Unique energy of your sign."
-        : "შენი ნიშნის უნიკალური ენერგია.")
+      (locale === "pl"
+        ? "Unikalna energia Twojego znaku."
+        : locale === "en"
+          ? "Unique energy of your sign."
+          : "შენი ნიშნის უნიკალური ენერგია.")
     }`
   );
 }
 
 export function signBlurb(signKey: string, locale: UserLocale = "ka"): string {
+  if (locale === "pl") return SIGN_BLURBS_PL[signKey] ?? "";
   if (locale === "en") return SIGN_BLURBS_EN[signKey] ?? "";
   return SIGN_BLURBS_KA[signKey] ?? "";
 }

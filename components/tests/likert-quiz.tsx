@@ -7,8 +7,18 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export type LikertSubmitResult = { ok: true } | { ok: false; error: string };
-export type LikertOption = { value: number; labelKa: string; labelEn?: string };
-export type LikertItem = { id: number; textKa: string; textEn?: string };
+export type LikertOption = {
+  value: number;
+  labelKa: string;
+  labelEn?: string;
+  labelPl?: string;
+};
+export type LikertItem = {
+  id: number;
+  textKa: string;
+  textEn?: string;
+  textPl?: string;
+};
 
 const FOCUS_KEY = "vivida_test_focus"; // shared across the tests
 
@@ -35,6 +45,7 @@ export function LikertQuiz({
   workingLabel?: string;
   locale?: UserLocale;
 }) {
+  const pl = locale === "pl";
   const en = locale === "en";
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [index, setIndex] = useState(0);
@@ -64,41 +75,42 @@ export function LikertQuiz({
     });
   }
 
-  // Agree (high) on the left → disagree (low) on the right; mid = neutral.
+  // Expects an odd length with a single neutral midpoint. If even, falls back to
+  // the first value so math stays defined.
+  const mid = useMemo(() => {
+    const sorted = [...scale].sort((a, b) => a.value - b.value);
+    return sorted[Math.floor(sorted.length / 2)]?.value ?? scale[0]?.value ?? 0;
+  }, [scale]);
+
+  // Agree on the left (matches Western convention) descending down to disagree.
   const ordered = useMemo(
     () => [...scale].sort((a, b) => b.value - a.value),
-    [scale],
-  );
-  const mid = useMemo(
-    () =>
-      (Math.max(...scale.map((s) => s.value)) +
-        Math.min(...scale.map((s) => s.value))) /
-      2,
     [scale],
   );
 
   const total = questions.length;
   const q = questions[index];
-  const answeredCount = Object.keys(answers).length;
-  const isLast = index === total - 1;
-  const allAnswered = answeredCount === total;
   const current = answers[q.id];
+  const answeredCount = Object.keys(answers).length;
   const progressPct = Math.round((answeredCount / total) * 100);
+  const isLast = index === total - 1;
 
   function pick(value: number) {
-    setAnswers((a) => ({ ...a, [q.id]: value }));
+    setAnswers((prev) => ({ ...prev, [q.id]: value }));
     setError(null);
     if (!isLast) {
-      window.setTimeout(() => setIndex((i) => Math.min(i + 1, total - 1)), 220);
+      window.setTimeout(() => setIndex((i) => Math.min(i + 1, total - 1)), 180);
     }
   }
 
   function submit() {
-    if (!allAnswered) {
-      const missing = questions.findIndex((qq) => answers[qq.id] === undefined);
-      if (missing >= 0) setIndex(missing);
+    if (answeredCount < total) {
       setError(
-        en ? "Please answer every question." : "გთხოვ, უპასუხე ყველა კითხვას.",
+        pl
+          ? "Proszę odpowiedzieć na wszystkie pytania."
+          : en
+            ? "Please answer every question."
+            : "გთხოვ, უპასუხე ყველა კითხვას.",
       );
       return;
     }
@@ -147,21 +159,29 @@ export function LikertQuiz({
           aria-pressed={focus}
           aria-label={
             focus
-              ? en
-                ? "Exit focus mode"
-                : "ფოკუს-რეჟიმის გამორთვა"
-              : en
-                ? "Enter focus mode"
-                : "ფოკუს-რეჟიმის ჩართვა"
+              ? pl
+                ? "Wyłącz tryb skupienia"
+                : en
+                  ? "Exit focus mode"
+                  : "ფოკუს-რეჟიმის გამორთვა"
+              : pl
+                ? "Włącz tryb skupienia"
+                : en
+                  ? "Enter focus mode"
+                  : "ფოკუს-რეჟიმის ჩართვა"
           }
           title={
             focus
-              ? en
-                ? "Exit focus mode"
-                : "ფოკუს-რეჟიმის გამორთვა"
-              : en
-                ? "Focus mode"
-                : "ფოკუს-რეჟიმი"
+              ? pl
+                ? "Wyłącz tryb skupienia"
+                : en
+                  ? "Exit focus mode"
+                  : "ფოკუს-რეჟიმის გამორთვა"
+              : pl
+                ? "Tryb skupienia"
+                : en
+                  ? "Focus mode"
+                  : "ფოკუს-რეჟიმი"
           }
           className={cn(
             "absolute -right-2.5 -top-2.5 grid size-8 place-items-center rounded-full border backdrop-blur-xl transition-all hover:scale-105 sm:-right-3 sm:-top-3",
@@ -176,7 +196,11 @@ export function LikertQuiz({
         <div className="mb-6">
           <div className="mb-2 flex items-center justify-between text-xs font-medium text-muted-foreground">
             <span>
-              {en ? "Question" : "კითხვა"} {index + 1} / {total}
+              {pl
+                ? `Pytanie ${index + 1} / ${total}`
+                : en
+                  ? `Question ${index + 1} / ${total}`
+                  : `კითხვა ${index + 1} / ${total}`}
             </span>
             <span className="tabular-nums">{progressPct}%</span>
           </div>
@@ -190,12 +214,18 @@ export function LikertQuiz({
 
         <div key={q.id} className="animate-in fade-in duration-300">
           <p className="min-h-[3.5rem] text-balance text-lg font-medium leading-snug sm:text-xl">
-            {en ? (q.textEn ?? q.textKa) : q.textKa}
+            {pl
+              ? (q.textPl ?? q.textEn ?? q.textKa)
+              : en
+                ? (q.textEn ?? q.textKa)
+                : q.textKa}
           </p>
 
           <div
             role="radiogroup"
-            aria-label={en ? "Your answer" : "შენი პასუხი"}
+            aria-label={
+              pl ? "Twoja odpowiedź" : en ? "Your answer" : "შენი პასუხი"
+            }
             className="mt-7 flex items-center justify-center gap-2 sm:gap-3"
           >
             {ordered.map((opt) => {
@@ -213,14 +243,19 @@ export function LikertQuiz({
                   : opt.value < mid
                     ? "var(--vivida-pink)"
                     : "var(--muted-foreground)";
+              const optLabel = pl
+                ? (opt.labelPl ?? opt.labelEn ?? opt.labelKa)
+                : en
+                  ? (opt.labelEn ?? opt.labelKa)
+                  : opt.labelKa;
               return (
                 <button
                   key={opt.value}
                   type="button"
                   role="radio"
                   aria-checked={selected}
-                  aria-label={en ? (opt.labelEn ?? opt.labelKa) : opt.labelKa}
-                  title={en ? (opt.labelEn ?? opt.labelKa) : opt.labelKa}
+                  aria-label={optLabel}
+                  title={optLabel}
                   onClick={() => pick(opt.value)}
                   className={cn(
                     "grid shrink-0 place-items-center rounded-full border-2 transition-all duration-150 hover:scale-110",
@@ -245,8 +280,10 @@ export function LikertQuiz({
             })}
           </div>
           <div className="mt-3 flex items-center justify-between px-1 text-xs text-muted-foreground">
-            <span>{en ? "Agree" : "ვეთანხმები"}</span>
-            <span>{en ? "Disagree" : "არ ვეთანხმები"}</span>
+            <span>{pl ? "Zgadzam się" : en ? "Agree" : "ვეთანხმები"}</span>
+            <span>
+              {pl ? "Nie zgadzam się" : en ? "Disagree" : "არ ვეთანხმები"}
+            </span>
           </div>
         </div>
 
@@ -265,7 +302,7 @@ export function LikertQuiz({
             className="gap-1"
           >
             <ChevronLeft className="size-4" />
-            {en ? "Previous" : "წინა"}
+            {pl ? "Wstecz" : en ? "Back" : "წინა"}
           </Button>
 
           {isLast ? (
@@ -274,7 +311,7 @@ export function LikertQuiz({
               variant="mystic"
               size="lg"
               onClick={submit}
-              disabled={current === undefined}
+              disabled={answeredCount < total}
             >
               <Sparkles className="size-4" />
               {submitLabel}
@@ -286,7 +323,7 @@ export function LikertQuiz({
               onClick={() => setIndex((i) => Math.min(total - 1, i + 1))}
               disabled={current === undefined}
             >
-              {en ? "Next" : "შემდეგი"}
+              {pl ? "Dalej" : en ? "Next" : "შემდეგი"}
             </Button>
           )}
         </div>

@@ -17,12 +17,18 @@ import { UnlockCard } from "@/components/credits/unlock-card";
 import { CREDIT_COST, getBalance, isUnlocked } from "@/lib/credits";
 import { EqArticleRecommendations } from "@/components/eq/eq-article-recommendations";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { localizedHref } from "@/lib/seo/public-paths";
 
 export async function generateMetadata() {
   const locale = await getRequestLocale();
-  const en = locale !== "ka";
+  const pl = locale === "pl";
+  const en = locale === "en";
   return {
-    title: en ? "Your EQ Result" : "შენი EQ შედეგი",
+    title: pl
+      ? "Twój wynik EQ | Vivida"
+      : en
+        ? "Your EQ Result"
+        : "შენი EQ შედეგი",
     robots: { index: false },
   };
 }
@@ -43,7 +49,8 @@ export default async function SavedEqResultPage({
   const { id } = await params;
   const user = await requireUser();
   const locale = await getRequestLocale();
-  const en = locale !== "ka";
+  const pl = locale === "pl";
+  const en = locale === "en";
 
   const [row] = await db
     .select()
@@ -86,10 +93,18 @@ export default async function SavedEqResultPage({
             style={{ color: bandMeta.hue }}
           >
             <Sparkles className="size-4" />
-            {en ? bandMeta.labelEn : bandMeta.labelKa}
+            {pl
+              ? (bandMeta.labelPl ?? bandMeta.labelEn)
+              : en
+                ? bandMeta.labelEn
+                : bandMeta.labelKa}
           </div>
           <p className="mx-auto mt-2 max-w-md text-sm text-foreground/75">
-            {en ? bandMeta.summaryEn : bandMeta.summaryKa}
+            {pl
+              ? (bandMeta.summaryPl ?? bandMeta.summaryEn)
+              : en
+                ? bandMeta.summaryEn
+                : bandMeta.summaryKa}
           </p>
         </div>
 
@@ -106,19 +121,25 @@ export default async function SavedEqResultPage({
               cost={CREDIT_COST.eqTest}
               balance={balance}
               title={
-                en ? "Unlock your emotional profile" : "ემოციური რუკის გახსნა"
+                pl
+                  ? "Odblokuj swój profil emocjonalny"
+                  : en
+                    ? "Unlock your emotional profile"
+                    : "ემოციური რუკის გახსნა"
               }
               blurb={
-                en
-                  ? "Explore all five areas, self-awareness, self-regulation, motivation, empathy and social skills, with interpretations and practical suggestions. Pay once and keep the result."
-                  : "ნახე შენი პროფილი ხუთ სფეროში, თვითშემეცნება, თვითრეგულაცია, მოტივაცია, ემპათია და სოციალური უნარები, თითოეულის ანალიზითა და რჩევებით. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."
+                pl
+                  ? "Poznaj wszystkie pięć obszarów: samoświadomość, samoregulację, motywację, empatię i relacje z interpretacją i praktycznymi radami. Płacisz raz, wynik masz na stałe."
+                  : en
+                    ? "Explore all five areas, self-awareness, self-regulation, motivation, empathy and social skills, with interpretations and practical suggestions. Pay once and keep the result."
+                    : "ნახე შენი პროფილი ხუთ სფეროში, თვითშემეცნება, თვითრეგულაცია, მოტივაცია, ემპათია და სოციალური უნარები, თითოეულის ანალიზითა და რჩევებით. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."
               }
               locale={locale}
             />
           </div>
         )}
 
-        {!en && (
+        {!en && !pl && (
           <div className="mt-4">
             <EqArticleRecommendations result={result} />
           </div>
@@ -130,9 +151,13 @@ export default async function SavedEqResultPage({
 
         <div className="mt-6 flex justify-center">
           <Button asChild variant="outline">
-            <Link href="/eq-testi">
+            <Link href={localizedHref("/eq-testi", locale)}>
               <RotateCcw className="size-4" />
-              {en ? "Retake the test" : "ტესტის თავიდან გავლა"}
+              {pl
+                ? "Rozwiąż test ponownie"
+                : en
+                  ? "Retake the test"
+                  : "ტესტის თავიდან გავლა"}
             </Link>
           </Button>
         </div>

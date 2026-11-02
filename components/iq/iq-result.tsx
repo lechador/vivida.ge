@@ -12,6 +12,7 @@ import { IQ_ANSWERS_STORAGE_KEY } from "@/lib/iq/items";
 import { IqBellCurve, DomainBar } from "@/components/iq/iq-bell-curve";
 import { ProfileVisibilityToggle } from "@/components/tests/profile-visibility-toggle";
 import { NextTestWidget } from "@/components/tests/next-test-widget";
+import { localizedHref } from "@/lib/seo/public-paths";
 
 type Stored = {
   answers: Record<string, number>;
@@ -29,7 +30,8 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  */
 export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
   const router = useRouter();
-  const en = locale !== "ka";
+  const pl = locale === "pl";
+  const en = locale === "en";
   const [stored, setStored] = useState<Stored | null | "missing">(null);
   const [authed, setAuthed] = useState<boolean | null>(null);
 
@@ -91,13 +93,15 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
     return (
       <div className="rounded-3xl border border-border bg-card/55 p-8 text-center ring-1 ring-foreground/5 backdrop-blur-xl">
         <p className="text-foreground/85">
-          {en
-            ? "Take the test first to see your result."
-            : "ჯერ ტესტი უნდა გაიარო."}
+          {pl
+            ? "Aby zobaczyć wynik, najpierw rozwiąż test."
+            : en
+              ? "Take the test first to see your result."
+              : "ჯერ ტესტი უნდა გაიარო."}
         </p>
         <Button asChild variant="mystic" className="mt-5">
-          <Link href="/iq-testi">
-            {en ? "Start the test" : "ტესტის დაწყება"}
+          <Link href={localizedHref("/iq-testi", locale)}>
+            {pl ? "Rozpocznij test" : en ? "Start the test" : "ტესტის დაწყება"}
           </Link>
         </Button>
       </div>
@@ -118,7 +122,7 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
     } catch {
       /* ignore */
     }
-    router.push("/iq-testi");
+    router.push(localizedHref("/iq-testi", locale));
   }
 
   // Too few administered items (the timer ran out early) is not a
@@ -129,9 +133,11 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
     return (
       <div className="rounded-3xl border border-border bg-card/55 p-8 text-center ring-1 ring-foreground/5 backdrop-blur-xl">
         <p className="mx-auto max-w-md text-pretty text-foreground/85">
-          {en
-            ? `Only ${result.total} tasks were completed, which is not enough for a reliable estimate. Please retake the test and answer at least 20 tasks.`
-            : `მხოლოდ ${result.total} დავალებაა შესრულებული, ეს საიმედო შეფასებისთვის საკმარისი არ არის. გაიარე ტესტი თავიდან და უპასუხე მინიმუმ 20 დავალებას.`}
+          {pl
+            ? `Rozwiązano tylko ${result.total} zadań, co nie wystarcza do wiarygodnego oszacowania. Rozwiąż test ponownie i odpowiedz na co najmniej 20 zadań.`
+            : en
+              ? `Only ${result.total} tasks were completed, which is not enough for a reliable estimate. Please retake the test and answer at least 20 tasks.`
+              : `მხოლოდ ${result.total} დავალებაა შესრულებული, ეს საიმედო შეფასებისთვის საკმარისი არ არის. გაიარე ტესტი თავიდან და უპასუხე მინიმუმ 20 დავალებას.`}
         </p>
         <Button
           type="button"
@@ -140,7 +146,11 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
           onClick={retake}
         >
           <RotateCcw className="size-4" />
-          {en ? "Retake the test" : "ტესტის თავიდან გავლა"}
+          {pl
+            ? "Rozwiąż test ponownie"
+            : en
+              ? "Retake the test"
+              : "ტესტის თავიდან გავლა"}
         </Button>
       </div>
     );
@@ -151,17 +161,29 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
       {/* Score card */}
       <div className="rounded-3xl border border-border bg-card/55 p-6 text-center ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8">
         <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          {en ? "Your IQ estimate" : "შენი IQ შედეგი"}
+          {pl
+            ? "Twój szacowany wynik IQ"
+            : en
+              ? "Your IQ estimate"
+              : "შენი IQ შედეგი"}
         </div>
         <div className="mt-2 bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-7xl font-bold leading-none tracking-tight text-transparent sm:text-8xl">
           {result.iq}
         </div>
         <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[var(--vivida-violet)]/40 bg-[var(--vivida-violet)]/10 px-4 py-1.5 text-sm font-medium text-[var(--vivida-violet)]">
           <Sparkles className="size-3.5" />
-          {en ? result.band.labelEn : result.band.labelKa}
+          {pl
+            ? result.band.labelPl
+            : en
+              ? result.band.labelEn
+              : result.band.labelKa}
         </div>
         <p className="mx-auto mt-4 max-w-md text-pretty text-sm text-foreground/80">
-          {en ? result.band.descEn : result.band.descKa}
+          {pl
+            ? result.band.descPl
+            : en
+              ? result.band.descEn
+              : result.band.descKa}
         </p>
 
         <div className="mt-6">
@@ -170,15 +192,33 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
 
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <Stat
-            label={en ? "Estimated range" : "სავარაუდო დიაპაზონი"}
+            label={
+              pl
+                ? "Szacowany zakres"
+                : en
+                  ? "Estimated range"
+                  : "სავარაუდო დიაპაზონი"
+            }
             value={`${result.range[0]}–${result.range[1]}`}
           />
           <Stat
-            label={en ? "Percentile" : "ჯობნი მოსახლეობის"}
-            value={en ? `${result.percentile}th` : `${result.percentile}%-ს`}
+            label={pl ? "Percentyl" : en ? "Percentile" : "ჯობნი მოსახლეობის"}
+            value={
+              pl
+                ? `${result.percentile}. percentyl`
+                : en
+                  ? `${result.percentile}th`
+                  : `${result.percentile}%-ს`
+            }
           />
           <Stat
-            label={en ? "Correct answers" : "სწორი პასუხი"}
+            label={
+              pl
+                ? "Poprawne odpowiedzi"
+                : en
+                  ? "Correct answers"
+                  : "სწორი პასუხი"
+            }
             value={`${result.correct} / ${result.total}`}
           />
         </div>
@@ -189,7 +229,11 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
         <div className="mb-5 flex items-center gap-2">
           <Brain className="size-5 text-[var(--vivida-cyan)]" />
           <h2 className="text-lg font-semibold tracking-tight">
-            {en ? "Your reasoning profile" : "შენი აზროვნების რუკა"}
+            {pl
+              ? "Twój profil rozumowania"
+              : en
+                ? "Your reasoning profile"
+                : "შენი აზროვნების რუკა"}
           </h2>
         </div>
 
@@ -202,7 +246,7 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
           {result.domains.map((d) => (
             <DomainBar
               key={d.domain}
-              label={en ? d.labelEn : d.labelKa}
+              label={pl ? d.labelPl : en ? d.labelEn : d.labelKa}
               pct={d.pct}
             />
           ))}
@@ -215,13 +259,19 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
                 <Lock className="size-5 text-[var(--vivida-violet)]" />
               </div>
               <p className="mx-auto mt-3 max-w-xs text-pretty text-sm text-foreground/85">
-                {en
-                  ? "Create a free account to save your result and explore your performance across all four reasoning domains."
-                  : "დარეგისტრირდი უფასოდ და ნახე შენი აზროვნების სრული ანალიზი დომენების მიხედვით, და შეინახე შედეგი."}
+                {pl
+                  ? "Załóż bezpłatne konto, aby zapisać swój wynik i zbadać swoje osiągnięcia we wszystkich czterech domenach rozumowania."
+                  : en
+                    ? "Create a free account to save your result and explore your performance across all four reasoning domains."
+                    : "დარეგისტრირდი უფასოდ და ნახე შენი აზროვნების სრული ანალიზი დომენების მიხედვით, და შეინახე შედეგი."}
               </p>
               <Button asChild variant="mystic" className="mt-4">
-                <Link href="/signup?from=iq">
-                  {en ? "Create free account" : "უფასო რეგისტრაცია"}
+                <Link href={localizedHref("/signup?from=iq", locale)}>
+                  {pl
+                    ? "Załóż bezpłatne konto"
+                    : en
+                      ? "Create free account"
+                      : "უფასო რეგისტრაცია"}
                 </Link>
               </Button>
             </div>
@@ -242,38 +292,51 @@ export function IqResultClient({ locale = "ka" }: { locale?: UserLocale }) {
           className="gap-1.5"
         >
           <RotateCcw className="size-4" />
-          {en ? "Retake" : "თავიდან გავლა"}
+          {pl ? "Rozwiąż ponownie" : en ? "Retake" : "თავიდან გავლა"}
         </Button>
         <Button asChild variant="ghost">
-          <Link href="/tests">{en ? "Other tests" : "სხვა ტესტები"}</Link>
+          <Link href={localizedHref("/tests", locale)}>
+            {pl ? "Inne testy" : en ? "Other tests" : "სხვა ტესტები"}
+          </Link>
         </Button>
       </div>
 
       <NextTestWidget completed="iq" locale={locale} />
 
       <p className="mx-auto max-w-lg text-center text-xs leading-relaxed text-muted-foreground">
-        {en
-          ? "A single online result is approximate and can be affected by fatigue, environment and attention. The range shown above reflects the measurement uncertainty. This is not a clinical or professionally administered assessment."
-          : "ერთჯერადი ონლაინ ტესტის შედეგი მიახლოებითია და დამოკიდებულია დაღლილობაზე, გარემოსა და ყურადღებაზე. ზემოთ ნაჩვენები დიაპაზონი სწორედ ამ ცდომილებას ასახავს. ეს არ არის კლინიკური დიაგნოზი."}
+        {pl
+          ? "Pojedynczy wynik testu online ma charakter przybliżony i może zależeć od zmęczenia, otoczenia oraz skupienia. Powyższy zakres odzwierciedla margines błędu pomiaru. Test nie stanowi profesjonalnej diagnozy klinicznej."
+          : en
+            ? "A single online result is approximate and can be affected by fatigue, environment and attention. The range shown above reflects the measurement uncertainty. This is not a clinical or professionally administered assessment."
+            : "ერთჯერადი ონლაინ ტესტის შედეგი მიახლოებითია და დამოკიდებულია დაღლილობაზე, გარემოსა და ყურადღებაზე. ზემოთ ნაჩვენები დიაპაზონი სწორედ ამ ცდომილებას ასახავს. ეს არ არის კლინიკური დიაგნოზი."}
       </p>
     </div>
   );
 }
 
 function ShareButton({ iq, locale }: { iq: number; locale: UserLocale }) {
-  const en = locale !== "ka";
+  const pl = locale === "pl";
+  const en = locale === "en";
   const [copied, setCopied] = useState(false);
   async function share() {
-    const url = en
-      ? "https://www.vividaastro.com/iq-test"
-      : "https://www.vivida.ge/iq-testi";
-    const text = en
-      ? `My estimated IQ on Vivida: ${iq} 🧠 What will you get?`
-      : `ჩემი IQ Vivida-ს ტესტზე: ${iq} 🧠 შენ რას მიიღებ?`;
+    const url = pl
+      ? "https://www.vividaastro.com/pl/test-iq"
+      : en
+        ? "https://www.vividaastro.com/iq-test"
+        : "https://www.vivida.ge/iq-testi";
+    const text = pl
+      ? `Mój szacowany wynik IQ w Vivida: ${iq} 🧠 Jaki będzie Twój?`
+      : en
+        ? `My estimated IQ on Vivida: ${iq} 🧠 What will you get?`
+        : `ჩემი IQ Vivida-ს ტესტზე: ${iq} 🧠 შენ რას მიიღებ?`;
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: en ? "Vivida IQ Test" : "Vivida IQ ტესტი",
+          title: pl
+            ? "Test IQ Vivida"
+            : en
+              ? "Vivida IQ Test"
+              : "Vivida IQ ტესტი",
           text,
           url,
         });
@@ -293,7 +356,17 @@ function ShareButton({ iq, locale }: { iq: number; locale: UserLocale }) {
   return (
     <Button type="button" variant="mystic" onClick={share} className="gap-1.5">
       {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
-      {copied ? (en ? "Copied" : "დაკოპირდა") : en ? "Share" : "გააზიარე"}
+      {copied
+        ? pl
+          ? "Skopiowano"
+          : en
+            ? "Copied"
+            : "დაკოპირდა"
+        : pl
+          ? "Udostępnij"
+          : en
+            ? "Share"
+            : "გააზიარე"}
     </Button>
   );
 }

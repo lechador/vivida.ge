@@ -1,4 +1,5 @@
 import { nationalDigits } from "@/lib/phone";
+import type { UserLocale } from "@/lib/i18n/locale";
 
 /**
  * sender.ge SMS client, OTP delivery for the phone flows. Lazily
@@ -31,7 +32,10 @@ export function isSmsConfigured(): boolean {
 }
 
 /** OTP text, keep it short; every extra SMS part costs money. */
-export function buildOtpSms(code: string, locale: "ka" | "en"): string {
+export function buildOtpSms(code: string, locale: UserLocale): string {
+  if (locale === "pl") {
+    return `Vivida: Twój kod weryfikacyjny to ${code}. Nie udostępniaj go nikomu. Ważny przez 10 minut.`;
+  }
   return locale === "ka"
     ? `Vivida: დადასტურების კოდი ${code}. არავის გაუზიარო. ვადა 10 წუთი.`
     : `Vivida: your verification code is ${code}. Don't share it. Expires in 10 minutes.`;
@@ -45,7 +49,7 @@ export function buildOtpSms(code: string, locale: "ka" | "en"): string {
 export async function sendOtpSms(input: {
   toE164: string;
   code: string;
-  locale?: "ka" | "en";
+  locale?: UserLocale;
 }): Promise<void> {
   const key = process.env.SENDER_GE_API_KEY;
   if (!key) throw new SmsSendError("SENDER_GE_API_KEY not configured");

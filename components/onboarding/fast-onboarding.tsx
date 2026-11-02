@@ -63,30 +63,44 @@ export function FastOnboarding({
         if (result && !result.ok) {
           setDuplicateAccount(result.code === "duplicate_account");
           setError(
-            result.code === "possible_duplicate" && en
-              ? "You may already have an account with these birth details. Review this in the next step."
-              : result.code === "duplicate_account" && en
-                ? "An account with these details already exists. Sign in to your existing account or contact support."
+            result.code === "possible_duplicate"
+              ? locale === "pl"
+                ? "Być może masz już konto z tymi danymi urodzenia. Sprawdź to w kolejnym kroku."
+                : en
+                  ? "You may already have an account with these birth details. Review this in the next step."
+                  : result.error
+              : result.code === "duplicate_account"
+                ? locale === "pl"
+                  ? "Konto z tymi danymi już istnieje. Zaloguj się na istniejące konto lub skontaktuj się ze wsparciem."
+                  : en
+                    ? "An account with these details already exists. Sign in to your existing account or contact support."
+                    : result.error
                 : result.error,
           );
         }
       });
     });
     return () => window.cancelAnimationFrame(frame);
-  }, [next, en]);
+  }, [next, en, locale]);
 
   if (missing || error) {
     return (
       <div className="w-full max-w-lg rounded-3xl border border-border bg-card/65 p-8 text-center backdrop-blur-xl">
         <Sparkles className="mx-auto size-8 text-[var(--vivida-violet)]" />
         <h1 className="mt-4 text-2xl font-semibold">
-          {en ? "One quick step" : "ერთი მოკლე ნაბიჯი"}
+          {locale === "pl"
+            ? "Jeden szybki krok"
+            : en
+              ? "One quick step"
+              : "ერთი მოკლე ნაბიჯი"}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {error ??
-            (en
-              ? "Your saved chart details expired. Add them once more to continue."
-              : "შენახული მონაცემების ვადა გავიდა. გასაგრძელებლად კიდევ ერთხელ მიუთითე.")}
+            (locale === "pl"
+              ? "Zapisane dane Twojego kosmogramu wygasły. Wprowadź je jeszcze raz, aby kontynuować."
+              : en
+                ? "Your saved chart details expired. Add them once more to continue."
+                : "შენახული მონაცემების ვადა გავიდა. გასაგრძელებლად კიდევ ერთხელ მიუთითე.")}
         </p>
         {duplicateAccount ? (
           <Button
@@ -95,14 +109,18 @@ export function FastOnboarding({
             disabled={isPending}
             onClick={() => startTransition(() => signOutAction("/login"))}
           >
-            {en ? "Sign in to existing account" : "ძველ ანგარიშში შესვლა"}
+            {locale === "pl"
+              ? "Zaloguj się na istniejące konto"
+              : en
+                ? "Sign in to existing account"
+                : "ძველ ანგარიშში შესვლა"}
           </Button>
         ) : (
           <Button asChild variant="mystic" className="mt-5">
             <Link
               href={`/onboarding${next ? `?next=${encodeURIComponent(next)}` : ""}`}
             >
-              {en ? "Continue" : "გაგრძელება"}
+              {locale === "pl" ? "Kontynuuj" : en ? "Continue" : "გაგრძელება"}
             </Link>
           </Button>
         )}
@@ -114,12 +132,18 @@ export function FastOnboarding({
     <div className="text-center">
       <Loader2 className="mx-auto size-9 animate-spin text-[var(--vivida-violet)]" />
       <h1 className="mt-5 text-2xl font-semibold">
-        {en ? "Preparing your personal chart…" : "შენი პირადი რუკა მზადდება…"}
+        {locale === "pl"
+          ? "Przygotowujemy Twój osobisty kosmogram…"
+          : en
+            ? "Preparing your personal chart…"
+            : "შენი პირადი რუკა მზადდება…"}
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        {en
-          ? "Your birth details are already saved, no need to enter them twice."
-          : "დაბადების მონაცემები უკვე შენახულია, მეორედ შეყვანა აღარ დაგჭირდება."}
+        {locale === "pl"
+          ? "Twoje dane urodzenia zostały już zapisane, nie musisz wpisywać ich ponownie."
+          : en
+            ? "Your birth details are already saved, no need to enter them twice."
+            : "დაბადების მონაცემები უკვე შენახულია, მეორედ შეყვანა აღარ დაგჭირდება."}
       </p>
     </div>
   );

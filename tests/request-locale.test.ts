@@ -2,11 +2,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { englishSiteHref } from "@/lib/seo/locales";
 
-const request = { host: "www.vivida.ge" };
+const request = { host: "www.vivida.ge", localeHeader: null as string | null };
 
 vi.mock("next/headers", () => ({
   headers: async () => ({
-    get: (name: string) => (name === "host" ? request.host : null),
+    get: (name: string) => {
+      if (name === "host") return request.host;
+      if (name === "x-vivida-locale") return request.localeHeader;
+      return null;
+    },
   }),
   // Locale must never depend on a cookie: a cookie-varying locale made the
   // SAME Georgian URL render English for some visitors and advertise
@@ -22,6 +26,7 @@ const { getRequestLocale, localeForHost, requestIsEnglishHost } =
 
 beforeEach(() => {
   request.host = "www.vivida.ge";
+  request.localeHeader = null;
 });
 
 describe("localeForHost", () => {
@@ -52,10 +57,21 @@ describe("getRequestLocale", () => {
     await expect(getRequestLocale()).resolves.toBe("ka");
   });
 
-  it("serves English on the international host regardless of preference", async () => {
+  it("serves English on the international host when no Polish preference is present", async () => {
     request.host = "www.vividaastro.com";
     await expect(getRequestLocale()).resolves.toBe("en");
     await expect(getRequestLocale("ka")).resolves.toBe("en");
+  });
+
+  it("serves Polish on the international host when x-vivida-locale header is set", async () => {
+    request.host = "www.vividaastro.com";
+    request.localeHeader = "pl";
+    await expect(getRequestLocale()).resolves.toBe("pl");
+  });
+
+  it("serves Polish on the international host when preferred is pl", async () => {
+    request.host = "www.vividaastro.com";
+    await expect(getRequestLocale("pl")).resolves.toBe("pl");
   });
 
   it("ignores a signed-in user's preference on the Georgian host", async () => {
@@ -64,6 +80,7 @@ describe("getRequestLocale", () => {
     // therefore split a single page across two languages for anyone whose
     // account was not on "ka".
     await expect(getRequestLocale("en")).resolves.toBe("ka");
+    await expect(getRequestLocale("pl")).resolves.toBe("ka");
     await expect(getRequestLocale("ka")).resolves.toBe("ka");
   });
 });

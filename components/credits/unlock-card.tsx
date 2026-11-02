@@ -119,22 +119,29 @@ export function UnlockCard({
         <Lock className="size-7 text-[var(--vivida-violet)]" />
       </div>
       <h3 className="mt-4 text-xl font-semibold tracking-tight">
-        {title ?? (en ? "Unlock the full result" : "სრული შედეგის გახსნა")}
+        {title ??
+          (locale === "pl"
+            ? "Odblokuj pełny wynik"
+            : en
+              ? "Unlock the full result"
+              : "სრული შედეგის გახსნა")}
       </h3>
       <p className="mx-auto mt-1.5 max-w-md text-sm text-foreground/80">
         {blurb ??
-          (en
-            ? "Unlock the complete analysis with a one-time payment. This result remains yours."
-            : "გახსენი სრული, ღრმა ანალიზი. გადაიხდი ერთხელ, შემდეგ ეს შედეგი სამუდამოდ შენია.")}
+          (locale === "pl"
+            ? "Odblokuj pełną, szczegółową analizę jednorazową płatnością. Ten wynik pozostanie Twój na zawsze."
+            : en
+              ? "Unlock the complete analysis with a one-time payment. This result remains yours."
+              : "გახსენი სრული, ღრმა ანალიზი. გადაიხდი ერთხელ, შემდეგ ეს შედეგი სამუდამოდ შენია.")}
       </p>
 
       <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-background/50 px-3 py-1 text-sm">
         <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
         <span className="font-semibold">
-          {cost} {en ? "credits" : "კრედიტი"}
+          {cost} {locale === "pl" ? "kredytów" : en ? "credits" : "კრედიტი"}
         </span>
         <span className="text-muted-foreground">
-          · {en ? "balance" : "ბალანსი"} {balance}
+          · {locale === "pl" ? "saldo" : en ? "balance" : "ბალანსი"} {balance}
         </span>
       </div>
 
@@ -153,13 +160,19 @@ export function UnlockCard({
             ) : (
               <Lock className="size-4" />
             )}
-            {en ? `Unlock for ${cost} credits` : `გახსნა ${cost} კრედიტით`}
+            {locale === "pl"
+              ? `Odblokuj za ${cost} kredytów`
+              : en
+                ? `Unlock for ${cost} credits`
+                : `გახსნა ${cost} კრედიტით`}
           </Button>
           {failed && (
             <p className="mt-3 text-sm text-[var(--vivida-pink)]">
-              {en
-                ? "Could not unlock, no credits were charged. Please try again."
-                : "გახსნა ვერ მოხერხდა, კრედიტი არ ჩამოგეჭრა. სცადე ხელახლა."}
+              {locale === "pl"
+                ? "Nie udało się odblokować, kredyty nie zostały pobrane. Spróbuj ponownie."
+                : en
+                  ? "Could not unlock, no credits were charged. Please try again."
+                  : "გახსნა ვერ მოხერხდა, კრედიტი არ ჩამოგეჭრა. სცადე ხელახლა."}
             </p>
           )}
         </div>

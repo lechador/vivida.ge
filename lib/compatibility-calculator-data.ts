@@ -1,3 +1,5 @@
+import type { UserLocale } from "@/lib/i18n/locale";
+
 /**
  * Server-side builder for the slim dataset the interactive compatibility
  * calculator ships to the client. The full PAIRS_CONTENT (78 pairs × long
@@ -56,10 +58,8 @@ export type CalculatorData = {
   pairs: Record<string, CalcPair>;
 };
 
-export function buildCalculatorData(
-  locale: "ka" | "en" = "ka",
-): CalculatorData {
-  const en = locale === "en";
+export function buildCalculatorData(locale: UserLocale = "ka"): CalculatorData {
+  const en = locale !== "ka";
   const signs: CalcSign[] = ALL_SLUGS.map((slug) => {
     const meta = signMetaBySlug(slug);
     const c = SIGNS_CONTENT[slug];

@@ -41,9 +41,11 @@ export function SuggestedPersonCard({
         href={`/u/${person.username}`}
         className="flex w-full flex-col items-center"
         aria-label={
-          en
-            ? `${person.displayName}'s profile`
-            : `${person.displayName}-ის პროფილი`
+          locale === "pl"
+            ? `Profil: ${person.displayName}`
+            : en
+              ? `${person.displayName}'s profile`
+              : `${person.displayName}-ის პროფილი`
         }
       >
         <div className="relative">
@@ -64,7 +66,11 @@ export function SuggestedPersonCard({
         </h3>
         <div className="mt-0.5 text-[11px] text-muted-foreground">
           <span className="mr-1">{person.sunSign.symbol}</span>
-          {en ? person.sunSign.labelEn : person.sunSign.labelKa}
+          {locale === "pl"
+            ? person.sunSign.labelPl
+            : en
+              ? person.sunSign.labelEn
+              : person.sunSign.labelKa}
         </div>
       </Link>
 
@@ -75,7 +81,7 @@ export function SuggestedPersonCard({
             {person.compatibility}%
           </span>
           <span className="text-muted-foreground">
-            {en ? "compatible" : "თავსებადი"}
+            {locale === "pl" ? "zgodności" : en ? "compatible" : "თავსებადი"}
           </span>
         </div>
       )}
@@ -90,18 +96,22 @@ export function SuggestedPersonCard({
         {sent ? (
           <>
             <Check className="size-3.5" />
-            {en ? "Sent" : "გაგზავნილი"}
+            {locale === "pl" ? "Wysłano" : en ? "Sent" : "გაგზავნილი"}
           </>
         ) : (
           <>
             <UserPlus className="size-3.5" />
             {isPending
-              ? en
-                ? "Sending…"
-                : "იგზავნება…"
-              : en
-                ? "Add"
-                : "დამატება"}
+              ? locale === "pl"
+                ? "Wysyłanie…"
+                : en
+                  ? "Sending…"
+                  : "იგზავნება…"
+              : locale === "pl"
+                ? "Dodaj"
+                : en
+                  ? "Add"
+                  : "დამატება"}
           </>
         )}
       </Button>

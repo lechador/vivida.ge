@@ -22,3 +22,8 @@ function InternationalLink({
 export function EnglishLink(props: LinkProps) {
   return <InternationalLink {...props} locale="en" />;
 }
+
+/** Keeps Polish content links on the public, Polish-readable URL vocabulary (/pl/...). */
+export function PolishLink(props: LinkProps) {
+  return <InternationalLink {...props} locale="pl" />;
+}

@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { AngelNumberPageEn } from "@/components/seo/angel-numbers-en";
+import { AngelNumberPagePl } from "@/components/seo/angel-numbers-pl";
 
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
@@ -16,6 +17,7 @@ import {
   isAngelSlug,
 } from "@/lib/seo/angel-numbers";
 import { ANGEL_EN_BY_SLUG } from "@/lib/seo/angel-numbers-en";
+import { ANGEL_PL_BY_SLUG } from "@/lib/seo/angel-numbers-pl";
 
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import {
@@ -41,6 +43,29 @@ export async function generateMetadata({
   if (!isAngelSlug(number)) return {};
   const a = ANGEL_BY_SLUG[number];
   const locale = await getRequestLocale();
+
+  if (locale === "pl") {
+    const content = ANGEL_PL_BY_SLUG[number];
+    if (!content) return {};
+    const path = `/angeluri-ricxvebi/${number}`;
+    const title = `${content.title} | Vivida`;
+    const description = `${content.essence} Poznaj symboliczne znaczenie liczby ${number} w miłości, pracy oraz wskazówkę, jak działać, gdy ją widzisz.`;
+    return {
+      title: { absolute: title },
+      description,
+      alternates: localizedAlternates(path, path, "pl"),
+      openGraph: {
+        images: [DEFAULT_OG_IMAGE],
+        type: "article",
+        url: `https://www.vividaastro.com/pl/liczby-anielskie/${number}`,
+        title,
+        description,
+        siteName: "Vivida",
+        locale: "pl_PL",
+      },
+      twitter: { card: "summary_large_image", title, description },
+    };
+  }
 
   if (locale === "en") {
     const content = ANGEL_EN_BY_SLUG[number];
@@ -108,6 +133,12 @@ export default async function AngelNumberPage({
   if (!isAngelSlug(number)) notFound();
   const a = ANGEL_BY_SLUG[number];
   const locale = await getRequestLocale();
+  if (locale === "pl") {
+    const content = ANGEL_PL_BY_SLUG[number];
+    if (!content) notFound();
+    return <AngelNumberPagePl base={a} content={content} />;
+  }
+
   if (locale === "en") {
     const content = ANGEL_EN_BY_SLUG[number];
     if (!content) notFound();
@@ -267,7 +298,6 @@ export default async function AngelNumberPage({
             <ArrowRight className="size-4" />
           </Link>
         </div>
-
       </section>
 
       <SiteFooter />

@@ -37,7 +37,8 @@ export function RelationshipWeeklyCard({
   locale: UserLocale;
 }) {
   const en = locale !== "ka";
-  const intlLocale = locale === "en" ? "en-GB" : "ka-GE";
+  const intlLocale =
+    locale === "pl" ? "pl-PL" : locale === "en" ? "en-GB" : "ka-GE";
   const dayFormatter = new Intl.DateTimeFormat(intlLocale, {
     weekday: "short",
     day: "numeric",
@@ -53,7 +54,11 @@ export function RelationshipWeeklyCard({
         <div>
           <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-[var(--vivida-violet)]">
             <CalendarDays className="size-4" aria-hidden />
-            {en ? "This week's connection" : "ამ კვირის კავშირი"}
+            {locale === "pl"
+              ? "Połączenie w tym tygodniu"
+              : en
+                ? "This week's connection"
+                : "ამ კვირის კავშირი"}
           </div>
           <h2 className="mt-2 text-balance text-2xl font-semibold tracking-tight">
             {weekly.headline}
@@ -64,12 +69,14 @@ export function RelationshipWeeklyCard({
         </div>
         <div className="grid min-w-44 grid-cols-2 gap-2 text-center">
           <Score
-            label={en ? "Harmony" : "ჰარმონია"}
+            label={locale === "pl" ? "Harmonia" : en ? "Harmony" : "ჰარმონია"}
             value={weekly.harmonyScore}
             accent="cyan"
           />
           <Score
-            label={en ? "Challenge" : "გამოწვევა"}
+            label={
+              locale === "pl" ? "Wyzwanie" : en ? "Challenge" : "გამოწვევა"
+            }
             value={weekly.challengeScore}
             accent="pink"
           />
@@ -105,7 +112,11 @@ export function RelationshipWeeklyCard({
               className="size-4 text-[var(--vivida-cyan)]"
               aria-hidden
             />
-            {en ? "Important moments" : "მნიშვნელოვანი მომენტები"}
+            {locale === "pl"
+              ? "Ważne momenty"
+              : en
+                ? "Important moments"
+                : "მნიშვნელოვანი მომენტები"}
           </div>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {weekly.notable.map((item) => (

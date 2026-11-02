@@ -56,7 +56,20 @@ const COPY = {
       "Continue your self-discovery with Vivida's personality assessments and personal chart.",
     ctaLink: "Explore tests",
   },
-} as const;
+  pl: {
+    back: "Wszystkie artykuły",
+    min: "min czytania",
+    contents: "W tym artykule",
+    related: "Przeczytaj także",
+    note: "Ten artykuł ma charakter edukacyjny i służy do autorefleksji. Nie zastępuje profesjonalnej pomocy psychologicznej ani medycznej.",
+    astrologyNote:
+      "Interpretacje astrologiczne służą do autorefleksji. Nie stanowią prognozy naukowej ani podstawy do podejmowania decyzji medycznych, finansowych czy innych istotnych.",
+    cta: "Poznaj siebie lepiej",
+    ctaText:
+      "Kontynuuj samopoznanie dzięki testom osobowości i osobistemu horoskopowi Vivida.",
+    ctaLink: "Wybierz test",
+  },
+};
 
 function metadataAlternates(
   locale: UserLocale,

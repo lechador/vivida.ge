@@ -41,6 +41,23 @@ const QUESTIONS_EN: readonly string[] = [
   "When you look back on today tonight, what do you want to remember?",
 ];
 
+const QUESTIONS_PL: readonly string[] = [
+  "Czego możesz się dzisiaj pozbyć, co już Ci nie służy?",
+  "Co wywołuje dzisiaj Twój uśmiech, choćby ten najmniejszy?",
+  "Komu i za co czujesz dzisiaj szczególną wdzięczność?",
+  "Jaki jeden mały krok przybliży Cię dzisiaj do Twojego celu?",
+  "Kiedy ostatnio czułeś się w pełni sobą?",
+  "Czego się dzisiaj obawiasz i co powiedziałby ten lęk, gdyby przemówił na głos?",
+  "Co musisz dzisiaj usłyszeć – od innych lub od samego siebie?",
+  "Z której ze swoich cech jesteś w tym tygodniu najbardziej dumny?",
+  "Komu możesz dzisiaj rozjaśnić dzień jednym dobrym słowem?",
+  "Kiedy ostatnio zrobiłeś coś po raz pierwszy i czego Cię to nauczyło?",
+  "Co mówi Ci dzisiaj Twoje ciało – czy naprawdę go słuchasz?",
+  "O czym marzyłeś w dzieciństwie, co nadal budzi w Tobie ekscytację?",
+  "Jaka jedna rzecz natychmiast uprościłaby Twój dzisiejszy dzień?",
+  "Gdy wieczorem spojrzysz wstecz na ten dzień, co chciałbyś zapamiętać?",
+];
+
 export const PRO_RITUAL_QUESTION_COUNT = QUESTIONS_KA.length;
 
 /** Day-of-year rotation over the local calendar date (`YYYY-MM-DD`). */
@@ -48,7 +65,12 @@ export function proRitualQuestion(
   dateIso: string,
   locale: UserLocale = "ka",
 ): string {
-  const questions = locale === "ka" ? QUESTIONS_KA : QUESTIONS_EN;
+  const questions =
+    locale === "pl"
+      ? QUESTIONS_PL
+      : locale === "ka"
+        ? QUESTIONS_KA
+        : QUESTIONS_EN;
   const day = new Date(`${dateIso}T00:00:00Z`).getTime();
   const index = Number.isNaN(day)
     ? 0

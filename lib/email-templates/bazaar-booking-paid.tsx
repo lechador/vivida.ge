@@ -29,20 +29,27 @@ export function BookingPaidEmail({
   orderUrl: string;
   locale?: UserLocale;
 }) {
-  const en = locale !== "ka";
+  const pl = locale === "pl";
+  const en = locale === "en";
   const greeting = recipientName
-    ? en
-      ? `Hello, ${recipientName}!`
-      : `სალამი, ${recipientName}!`
-    : en
-      ? "Hello!"
-      : "სალამი!";
+    ? pl
+      ? `Cześć, ${recipientName}!`
+      : en
+        ? `Hello, ${recipientName}!`
+        : `სალამი, ${recipientName}!`
+    : pl
+      ? "Cześć!"
+      : en
+        ? "Hello!"
+        : "სალამი!";
   return (
     <EmailLayout
       preview={
-        en
-          ? `${buyerName} paid ${amountUsdc} USDC for ${serviceTitle}`
-          : `${buyerName}-მ გადაგიხადა ${amountUsdc} USDC (${serviceTitle})`
+        pl
+          ? `${buyerName} opłacił(a) ${amountUsdc} USDC za ${serviceTitle}`
+          : en
+            ? `${buyerName} paid ${amountUsdc} USDC for ${serviceTitle}`
+            : `${buyerName}-მ გადაგიხადა ${amountUsdc} USDC (${serviceTitle})`
       }
       locale={locale}
     >
@@ -57,32 +64,43 @@ export function BookingPaidEmail({
           margin: "0 0 16px",
         }}
       >
-        {en ? "You have a paid order" : "გადახდილი შეკვეთა გაქვს"}
+        {pl
+          ? "Masz opłacone zamówienie"
+          : en
+            ? "You have a paid order"
+            : "გადახდილი შეკვეთა გაქვს"}
       </Heading>
 
       <Text style={paragraphStyle}>{greeting}</Text>
       <Text style={paragraphStyle}>
-        <strong>{buyerName}</strong> {en ? "just paid" : "ახლახან გადაიხადა"}{" "}
-        <strong>{amountUsdc} USDC</strong> {en ? "for" : "—"}{" "}
+        <strong>{buyerName}</strong>{" "}
+        {pl ? "właśnie zapłacił(a)" : en ? "just paid" : "ახლახან გადაიხადა"}{" "}
+        <strong>{amountUsdc} USDC</strong> {pl ? "za" : en ? "for" : "—"}{" "}
         <strong>{serviceTitle}</strong>
-        {en
-          ? ". The payment is verified on Solana."
-          : ". გადახდა Solana-ზე დადასტურებულია."}
+        {pl
+          ? ". Płatność została zweryfikowana na blockchainie Solana."
+          : en
+            ? ". The payment is verified on Solana."
+            : ". გადახდა Solana-ზე დადასტურებულია."}
       </Text>
       <Text style={paragraphStyle}>
-        {en
-          ? "Their question and birth details are waiting in your inbox. Deliver the reading from there, the buyer is notified the moment you do."
-          : "მათი კითხვა და დაბადების მონაცემები შენს შემოსულებში გელოდება. საკითხავი იქიდან მიაწოდე, მყიდველი მაშინვე მიიღებს შეტყობინებას."}
+        {pl
+          ? "Pytanie i dane urodzeniowe czekają w Twojej skrzynce odbiorczej. Dostarcz interpretację bezpośrednio stamtąd — zamawiający zostanie natychmiast powiadomiony."
+          : en
+            ? "Their question and birth details are waiting in your inbox. Deliver the reading from there, the buyer is notified the moment you do."
+            : "მათი კითხვა და დაბადების მონაცემები შენს შემოსულებში გელოდება. საკითხავი იქიდან მიაწოდე, მყიდველი მაშინვე მიიღებს შეტყობინებას."}
       </Text>
 
       <Button href={orderUrl} style={buttonStyle}>
-        {en ? "View order" : "შეკვეთის ნახვა"}
+        {pl ? "Zobacz zamówienie" : en ? "View order" : "შეკვეთის ნახვა"}
       </Button>
 
       <Text style={mutedStyle}>
-        {en
-          ? "Manage these emails anytime from My readings → notifications."
-          : "ამ წერილების მართვა შეგიძლია My readings → შეტყობინებებიდან."}
+        {pl
+          ? "Możesz zarządzać tymi powiadomieniami w dowolnym momencie w Moje odczyty → powiadomienia."
+          : en
+            ? "Manage these emails anytime from My readings → notifications."
+            : "ამ წერილების მართვა შეგიძლია My readings → შეტყობინებებიდან."}
       </Text>
     </EmailLayout>
   );
@@ -92,7 +110,9 @@ export function bookingPaidSubject(
   serviceTitle: string,
   locale: UserLocale = "en",
 ): string {
-  return locale === "en"
-    ? `New paid order: ${serviceTitle} · Vivida`
-    : `ახალი გადახდილი შეკვეთა: ${serviceTitle} · Vivida`;
+  return locale === "pl"
+    ? `Nowe opłacone zamówienie: ${serviceTitle} · Vivida`
+    : locale === "en"
+      ? `New paid order: ${serviceTitle} · Vivida`
+      : `ახალი გადახდილი შეკვეთა: ${serviceTitle} · Vivida`;
 }

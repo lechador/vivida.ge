@@ -10,10 +10,12 @@ import {
   calculateMbti,
   mbtiArchetypeKa,
   mbtiArchetypeEn,
+  mbtiArchetypePl,
   MBTI_ANSWERS_STORAGE_KEY,
   type MbtiResult,
   type MbtiQuestion,
 } from "@/lib/mbti-questions";
+import { localizedHref } from "@/lib/seo/public-paths";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
@@ -29,7 +31,8 @@ export function MbtiGate({
   questions: MbtiQuestion[];
   locale?: UserLocale;
 }) {
-  const en = locale !== "ka";
+  const pl = locale === "pl";
+  const en = locale === "en";
   const [result, setResult] = useState<MbtiResult | null>(null);
   const [noAnswers, setNoAnswers] = useState(false);
 
@@ -53,13 +56,15 @@ export function MbtiGate({
     return (
       <div className="rounded-2xl border border-border bg-card/50 p-8 text-center">
         <p className="text-sm text-muted-foreground">
-          {en
-            ? "No saved answers were found. Please take the test again."
-            : "პასუხები ვერ მოიძებნა. გაიარე ტესტი თავიდან."}
+          {pl
+            ? "Nie znaleziono zapisanych odpowiedzi. Wypełnij test ponownie."
+            : en
+              ? "No saved answers were found. Please take the test again."
+              : "პასუხები ვერ მოიძებნა. გაიარე ტესტი თავიდან."}
         </p>
         <Button asChild variant="mystic" className="mt-4">
-          <Link href="/pirovnebis-testi">
-            {en ? "Start the test" : "ტესტის დაწყება"}
+          <Link href={localizedHref("/pirovnebis-testi", locale)}>
+            {pl ? "Rozpocznij test" : en ? "Start the test" : "ტესტის დაწყება"}
           </Link>
         </Button>
       </div>
@@ -68,14 +73,17 @@ export function MbtiGate({
   if (!result) return null;
 
   const next = encodeURIComponent("/pirovnebis-testi/claim");
+  const archetypeName = pl
+    ? mbtiArchetypePl(result.type)
+    : en
+      ? mbtiArchetypeEn(result.type)
+      : mbtiArchetypeKa(result.type);
 
   return (
     <div>
       <MbtiResultView
         type={result.type}
-        archetypeNameGe={
-          en ? mbtiArchetypeEn(result.type) : mbtiArchetypeKa(result.type)
-        }
+        archetypeNameGe={archetypeName}
         scores={result.scores}
         analysis={null}
         locale={locale}
@@ -87,23 +95,33 @@ export function MbtiGate({
           <Lock className="size-5 text-[var(--vivida-violet)]" />
         </div>
         <h2 className="mt-4 text-lg font-semibold tracking-tight sm:text-xl">
-          {en ? "Your full profile is ready" : "შენი ღრმა ანალიზი მზადაა"}
+          {pl
+            ? "Twój pełny profil jest gotowy"
+            : en
+              ? "Your full profile is ready"
+              : "შენი ღრმა ანალიზი მზადაა"}
         </h2>
         <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-          {en
-            ? "Sign in or create an account to save your result and unlock the complete personality profile."
-            : "შედი ან დარეგისტრირდი, რომ ნახო სრული ფსიქოლოგიურ-ასტროლოგიური ანალიზი, მიიღებ ელფოსტაზეც."}
+          {pl
+            ? "Zaloguj się lub zarejestruj bezpłatnie, aby zobaczyć pełną analizę osobowości. Otrzymasz ją także na e-mail."
+            : en
+              ? "Sign in or create an account to save your result and unlock the complete personality profile."
+              : "შედი ან დარეგისტრირდი, რომ ნახო სრული ფსიქოლოგიურ-ასტროლოგიური ანალიზი, მიიღებ ელფოსტაზეც."}
         </p>
         <div className="mt-5 flex flex-col items-center gap-2 sm:flex-row sm:justify-center">
           <Button asChild variant="mystic" size="lg">
-            <Link href={`/signup?next=${next}`}>
+            <Link href={localizedHref(`/signup?next=${next}`, locale)}>
               <Sparkles className="size-4" />
-              {en ? "Create free account" : "დარეგისტრირდი უფასოდ"}
+              {pl
+                ? "Załóż bezpłatne konto"
+                : en
+                  ? "Create free account"
+                  : "დარეგისტრირდი უფასოდ"}
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg">
-            <Link href={`/login?next=${next}`}>
-              {en ? "Sign in" : "შესვლა"}
+            <Link href={localizedHref(`/login?next=${next}`, locale)}>
+              {pl ? "Zaloguj się" : en ? "Sign in" : "შესვლა"}
             </Link>
           </Button>
         </div>

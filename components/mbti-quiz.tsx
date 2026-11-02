@@ -23,8 +23,8 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 export function MbtiQuiz({
   questions,
   onSubmit,
-  submitLabel = "დასრულება",
-  workingLabel = "ვამუშავებ…",
+  submitLabel,
+  workingLabel,
   locale = "ka",
 }: {
   questions: MbtiQuestion[];
@@ -33,7 +33,12 @@ export function MbtiQuiz({
   workingLabel?: string;
   locale?: UserLocale;
 }) {
+  const pl = locale === "pl";
   const en = locale === "en";
+  const resolvedSubmitLabel =
+    submitLabel ?? (pl ? "Zakończ" : en ? "Finish" : "დასრულება");
+  const resolvedWorkingLabel =
+    workingLabel ?? (pl ? "Przetwarzanie…" : en ? "Processing…" : "ვამუშავებ…");
   const scale = MBTI_LIKERT;
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [index, setIndex] = useState(0);
@@ -92,7 +97,11 @@ export function MbtiQuiz({
       const missing = questions.findIndex((qq) => answers[qq.id] === undefined);
       if (missing >= 0) setIndex(missing);
       setError(
-        en ? "Please answer every question." : "გთხოვ, უპასუხე ყველა კითხვას.",
+        pl
+          ? "Proszę odpowiedzieć na wszystkie pytania."
+          : en
+            ? "Please answer every question."
+            : "გთხოვ, უპასუხე ყველა კითხვას.",
       );
       return;
     }
@@ -112,7 +121,7 @@ export function MbtiQuiz({
           <Sparkles className="size-7 animate-pulse text-[var(--vivida-violet)]" />
         </div>
         <h2 className="mt-5 text-xl font-semibold tracking-tight">
-          {workingLabel}
+          {resolvedWorkingLabel}
         </h2>
         <Loader2 className="mx-auto mt-6 size-5 animate-spin text-muted-foreground" />
       </div>
@@ -147,21 +156,29 @@ export function MbtiQuiz({
           aria-pressed={focus}
           aria-label={
             focus
-              ? en
-                ? "Exit focus mode"
-                : "ფოკუს-რეჟიმის გამორთვა"
-              : en
-                ? "Enter focus mode"
-                : "ფოკუს-რეჟიმის ჩართვა"
+              ? pl
+                ? "Wyjdź z trybu skupienia"
+                : en
+                  ? "Exit focus mode"
+                  : "ფოკუს-რეჟიმის გამორთვა"
+              : pl
+                ? "Włącz tryb skupienia"
+                : en
+                  ? "Enter focus mode"
+                  : "ფოკუს-რეჟიმის ჩართვა"
           }
           title={
             focus
-              ? en
-                ? "Exit focus mode"
-                : "ფოკუს-რეჟიმის გამორთვა"
-              : en
-                ? "Focus mode"
-                : "ფოკუს-რეჟიმი"
+              ? pl
+                ? "Wyjdź z trybu skupienia"
+                : en
+                  ? "Exit focus mode"
+                  : "ფოკუს-რეჟიმის გამორთვა"
+              : pl
+                ? "Tryb skupienia"
+                : en
+                  ? "Focus mode"
+                  : "ფოკუს-რეჟიმი"
           }
           className={cn(
             "absolute -right-2.5 -top-2.5 grid size-8 place-items-center rounded-full border backdrop-blur-xl transition-all hover:scale-105 sm:-right-3 sm:-top-3",
@@ -177,7 +194,8 @@ export function MbtiQuiz({
         <div className="mb-6">
           <div className="mb-2 flex items-center justify-between text-xs font-medium text-muted-foreground">
             <span>
-              {en ? "Question" : "კითხვა"} {index + 1} / {total}
+              {pl ? "Pytanie" : en ? "Question" : "კითხვა"} {index + 1} /{" "}
+              {total}
             </span>
             <span className="tabular-nums">{progressPct}%</span>
           </div>
@@ -192,13 +210,19 @@ export function MbtiQuiz({
         {/* Question */}
         <div key={q.id} className="animate-in fade-in duration-300">
           <p className="min-h-[3.5rem] text-balance text-lg font-medium leading-snug sm:text-xl">
-            {en ? (q.textEn ?? q.textKa) : q.textKa}
+            {pl
+              ? (q.textPl ?? q.textEn ?? q.textKa)
+              : en
+                ? (q.textEn ?? q.textKa)
+                : q.textKa}
           </p>
 
           {/* Likert scale, graduated agree (cyan) ↔ disagree (pink) */}
           <div
             role="radiogroup"
-            aria-label={en ? "Your answer" : "შენი პასუხი"}
+            aria-label={
+              pl ? "Twoja odpowiedź" : en ? "Your answer" : "შენი პასუხი"
+            }
             className="mt-7 flex items-center justify-center gap-2 sm:gap-3"
           >
             {scale.map((opt) => {
@@ -218,14 +242,19 @@ export function MbtiQuiz({
                   : opt.value < 0
                     ? "var(--vivida-pink)"
                     : "var(--muted-foreground)";
+              const optLabel = pl
+                ? opt.labelPl
+                : en
+                  ? opt.labelEn
+                  : opt.labelKa;
               return (
                 <button
                   key={opt.value}
                   type="button"
                   role="radio"
                   aria-checked={selected}
-                  aria-label={en ? opt.labelEn : opt.labelKa}
-                  title={en ? opt.labelEn : opt.labelKa}
+                  aria-label={optLabel}
+                  title={optLabel}
                   onClick={() => pick(opt.value)}
                   className={cn(
                     "grid shrink-0 place-items-center rounded-full border-2 transition-all duration-150 hover:scale-110",
@@ -250,8 +279,10 @@ export function MbtiQuiz({
             })}
           </div>
           <div className="mt-3 flex items-center justify-between px-1 text-xs text-muted-foreground">
-            <span>{en ? "Agree" : "ვეთანხმები"}</span>
-            <span>{en ? "Disagree" : "არ ვეთანხმები"}</span>
+            <span>{pl ? "Zgadzam się" : en ? "Agree" : "ვეთანხმები"}</span>
+            <span>
+              {pl ? "Nie zgadzam się" : en ? "Disagree" : "არ ვეთანხმები"}
+            </span>
           </div>
         </div>
 
@@ -271,7 +302,7 @@ export function MbtiQuiz({
             className="gap-1"
           >
             <ChevronLeft className="size-4" />
-            {en ? "Previous" : "წინა"}
+            {pl ? "Wstecz" : en ? "Previous" : "წინა"}
           </Button>
 
           {isLast ? (
@@ -283,7 +314,7 @@ export function MbtiQuiz({
               disabled={current === undefined}
             >
               <Sparkles className="size-4" />
-              {submitLabel}
+              {resolvedSubmitLabel}
             </Button>
           ) : (
             <Button
@@ -292,7 +323,7 @@ export function MbtiQuiz({
               onClick={() => setIndex((i) => Math.min(total - 1, i + 1))}
               disabled={current === undefined}
             >
-              {en ? "Next" : "შემდეგი"}
+              {pl ? "Dalej" : en ? "Next" : "შემდეგი"}
             </Button>
           )}
         </div>

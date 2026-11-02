@@ -23,45 +23,61 @@ const PATH = "/tavsebadoba";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
 
+  const isPl = locale === "pl";
   const en = locale === "en";
-  const title = en
-    ? "Zodiac Compatibility Calculator, Check Your Match | Vivida"
-    : "ზოდიაქოს თავსებადობა, შეამოწმე შენი წყვილი | Vivida";
-  const description = en
-    ? "Choose two zodiac signs and check your love compatibility instantly, free and without registration. Then explore complete natal-chart compatibility on Vivida."
-    : "გაიგე რამდენად თავსებადი ხართ შენ და შენი სიყვარული ზოდიაქოს ნიშნების მიხედვით, უფასოდ, 10 წამში. შემდეგ ნახე სრული ნატალური თავსებადობა Vivida-ზე.";
+  const title = isPl
+    ? "Kalkulator Dopasowania Znaków Zodiaku – Horoskop Partnerski | Vivida"
+    : en
+      ? "Zodiac Compatibility Calculator, Check Your Match | Vivida"
+      : "ზოდიაქოს თავსებადობა, შეამოწმე შენი წყვილი | Vivida";
+  const description = isPl
+    ? "Wybierz dwa znaki zodiaku i natychmiast sprawdź dopasowanie partnerskie za darmo i bez rejestracji. Odkryj pełną synastrię w serwisie Vivida."
+    : en
+      ? "Choose two zodiac signs and check your love compatibility instantly, free and without registration. Then explore complete natal-chart compatibility on Vivida."
+      : "გაიგე რამდენად თავსებადი ხართ შენ და შენი სიყვარული ზოდიაქოს ნიშნების მიხედვით, უფასოდ, 10 წამში. შემდეგ ნახე სრული ნატალური თავსებადობა Vivida-ზე.";
+  const canonicalUrl = isPl
+    ? "https://www.vividaastro.com/pl/horoskop-partnerski"
+    : `${en ? "https://www.vividaastro.com" : SITE_URL}${PATH}`;
   return {
     title: { absolute: title },
     description,
-    keywords: en
+    keywords: isPl
       ? [
-          "zodiac compatibility",
-          "love compatibility calculator",
-          "astrology compatibility",
-          "zodiac match",
+          "dopasowanie znaków zodiaku",
+          "kalkulator miłości",
+          "horoskop partnerski",
+          "znaki zodiaku miłość",
+          "synastria",
         ]
-      : [
-          "თავსებადობა",
-          "ზოდიაქოს თავსებადობა",
-          "სიყვარულის თავსებადობა",
-          "ნიშნების თავსებადობა",
-          "თავსებადობის ტესტი",
-          "ვის ვუხდები",
-          "tavsebadoba",
-        ],
+      : en
+        ? [
+            "zodiac compatibility",
+            "love compatibility calculator",
+            "astrology compatibility",
+            "zodiac match",
+          ]
+        : [
+            "თავსებადობა",
+            "ზოდიაქოს თავსებადობა",
+            "სიყვარულის თავსებადობა",
+            "ნიშნების თავსებადობა",
+            "თავსებადობის ტესტი",
+            "ვის ვუხდები",
+            "tavsebadoba",
+          ],
     // Keep the ad landing self-canonical on each host. /compatibility is
     // already paired with the separate Georgian hub /zodiac/tavsebadoba.
     alternates: {
-      canonical: `${en ? "https://www.vividaastro.com" : SITE_URL}${PATH}`,
+      canonical: canonicalUrl,
     },
     openGraph: {
       images: [DEFAULT_OG_IMAGE],
       type: "website",
-      url: `${en ? "https://www.vividaastro.com" : SITE_URL}${PATH}`,
+      url: canonicalUrl,
       title,
       description,
       siteName: "Vivida",
-      locale: en ? "en_US" : "ka_GE",
+      locale: isPl ? "pl_PL" : en ? "en_US" : "ka_GE",
     },
     twitter: { card: "summary_large_image", title, description },
   };
@@ -79,11 +95,18 @@ const TRUST_EN = [
   { icon: Sparkles, label: "Instant result" },
 ];
 
+const TRUST_PL = [
+  { icon: Check, label: "Za darmo, bez karty" },
+  { icon: Lock, label: "Bez rejestracji" },
+  { icon: Sparkles, label: "Wynik w 10 sekund" },
+];
+
 export default async function TavsebadobaPage() {
   const locale = await getRequestLocale();
+  const isPl = locale === "pl";
   const en = locale === "en";
   const { signs, pairs } = buildCalculatorData(locale);
-  const trustList = en ? TRUST_EN : TRUST_KA;
+  const trustList = isPl ? TRUST_PL : en ? TRUST_EN : TRUST_KA;
 
   return (
     <main
@@ -114,7 +137,7 @@ export default async function TavsebadobaPage() {
           href="/login"
           className="text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
-          {en ? "Log in" : "შესვლა"}
+          {isPl ? "Zaloguj się" : en ? "Log in" : "შესვლა"}
         </Link>
       </header>
 
@@ -124,20 +147,34 @@ export default async function TavsebadobaPage() {
             className="size-3.5 text-[var(--vivida-pink)]"
             fill="currentColor"
           />
-          {en ? "Zodiac compatibility" : "ზოდიაქოს თავსებადობა"}
+          {isPl
+            ? "Dopasowanie zodiakalne"
+            : en
+              ? "Zodiac compatibility"
+              : "ზოდიაქოს თავსებადობა"}
         </span>
 
         <h1 className="text-balance text-3xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">
-          {en ? "How compatible are " : "რამდენად თავსებადი ხართ "}
+          {isPl
+            ? "Jak bardzo pasujecie "
+            : en
+              ? "How compatible are "
+              : "რამდენად თავსებადი ხართ "}
           <span className="bg-[linear-gradient(120deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan))] bg-clip-text text-transparent">
-            {en ? "you and your person?" : "შენ და შენი სიყვარული?"}
+            {isPl
+              ? "do siebie?"
+              : en
+                ? "you and your person?"
+                : "შენ და შენი სიყვარული?"}
           </span>
         </h1>
 
         <p className="mx-auto mt-5 max-w-xl text-pretty text-base text-muted-foreground sm:text-lg">
-          {en
-            ? "Choose two zodiac signs and discover your compatibility instantly, free."
-            : "აირჩიე ორი ნიშანი და გაიგე თქვენი თავსებადობა მყისიერად, უფასოდ."}
+          {isPl
+            ? "Wybierz dwa znaki zodiaku i poznaj Wasze dopasowanie natychmiast, za darmo."
+            : en
+              ? "Choose two zodiac signs and discover your compatibility instantly, free."
+              : "აირჩიე ორი ნიშანი და გაიგე თქვენი თავსებადობა მყისიერად, უფასოდ."}
         </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">

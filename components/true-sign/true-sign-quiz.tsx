@@ -16,15 +16,17 @@ import { localizedHref } from "@/lib/seo/public-paths";
 import {
   TS_QUESTIONS,
   TS_QUESTIONS_EN,
+  TS_QUESTIONS_PL,
   TS_QUESTION_COUNT,
   TS_ELEMENT_EN,
+  TS_ELEMENT_PL,
   TS_MODALITY_EN,
+  TS_MODALITY_PL,
   scoreTrueSign,
   type TsResult,
 } from "@/lib/true-sign/quiz";
 
 import { signColor } from "@/lib/zodiac";
-
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
@@ -34,8 +36,9 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  * chart cross-sell (your BIRTH sign may differ, go find out for real).
  */
 export function TrueSignQuiz({ locale = "ka" }: { locale?: UserLocale }) {
+  const pl = locale === "pl";
   const en = locale === "en";
-  const questions = en ? TS_QUESTIONS_EN : TS_QUESTIONS;
+  const questions = pl ? TS_QUESTIONS_PL : en ? TS_QUESTIONS_EN : TS_QUESTIONS;
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [index, setIndex] = useState(0);
   const [result, setResult] = useState<TsResult | null>(null);
@@ -68,15 +71,24 @@ export function TrueSignQuiz({ locale = "ka" }: { locale?: UserLocale }) {
   async function share() {
     if (!result) return;
     const url = `${window.location.origin}${localizedHref("/quiz/namdvili-nishani", locale)}`;
-    const text = en
-      ? `Vivida says my personality matches ${result.sign.emoji} ${result.sign.labelEn}! Which sign are you?`
-      : `Vivida-ს ტესტმა თქვა, რომ სინამდვილეში ${result.sign.emoji} ${result.sign.labelKa} ვარ! შენ რომელი ხარ?`;
+    const signName = pl
+      ? (result.sign.labelPl ?? result.sign.labelEn)
+      : en
+        ? result.sign.labelEn
+        : result.sign.labelKa;
+    const text = pl
+      ? `Test Vivida wskazał, że mój charakter najbardziej odpowiada znakowi ${result.sign.emoji} ${signName}! A Ty jakim znakiem jesteś?`
+      : en
+        ? `Vivida says my personality matches ${result.sign.emoji} ${result.sign.labelEn}! Which sign are you?`
+        : `Vivida-ს ტესტმა თქვა, რომ სინამდვილეში ${result.sign.emoji} ${result.sign.labelKa} ვარ! შენ რომელი ხარ?`;
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: en
-            ? "Which zodiac sign matches your personality? · Vivida"
-            : "რომელი ნიშანი ხარ სინამდვილეში? · Vivida",
+          title: pl
+            ? "Jakim znakiem zodiaku naprawdę jesteś? · Vivida"
+            : en
+              ? "Which zodiac sign matches your personality? · Vivida"
+              : "რომელი ნიშანი ხარ სინამდვილეში? · Vivida",
           text,
           url,
         });
@@ -96,8 +108,25 @@ export function TrueSignQuiz({ locale = "ka" }: { locale?: UserLocale }) {
 
   // ── Result ─────────────────────────────────────────────────────────────
   if (result) {
-    const { sign, element, modality, blurbKa, blurbEn } = result;
+    const { sign, element, modality, blurbKa, blurbEn, blurbPl } = result;
     const color = signColor(sign);
+    const signLabel = pl
+      ? (sign.labelPl ?? sign.labelEn)
+      : en
+        ? sign.labelEn
+        : sign.labelKa;
+    const elementLabel = pl
+      ? TS_ELEMENT_PL[element]
+      : en
+        ? TS_ELEMENT_EN[element]
+        : element;
+    const modalityLabel = pl
+      ? TS_MODALITY_PL[modality]
+      : en
+        ? TS_MODALITY_EN[modality]
+        : modality;
+    const blurb = pl ? blurbPl : en ? blurbEn : blurbKa;
+
     return (
       <div className="space-y-5">
         <section
@@ -114,16 +143,18 @@ export function TrueSignQuiz({ locale = "ka" }: { locale?: UserLocale }) {
           />
           <div className="relative">
             <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              {en
-                ? "Your personality’s zodiac match"
-                : "შენი ნიშანი ხასიათის მიხედვით"}
+              {pl
+                ? "Dopasowanie zodiaku do Twojej osobowości"
+                : en
+                  ? "Your personality’s zodiac match"
+                  : "შენი ნიშანი ხასიათის მიხედვით"}
             </div>
             <div className="mt-3 text-7xl leading-none sm:text-8xl">
               {sign.emoji}
             </div>
             <h2 className="mt-3 flex items-center justify-center gap-2 text-3xl font-bold tracking-tight sm:text-4xl">
               <span style={{ color }}>{sign.symbol}</span>
-              {en ? sign.labelEn : sign.labelKa}
+              {signLabel}
             </h2>
             <div
               className="mt-3 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium"
@@ -134,32 +165,35 @@ export function TrueSignQuiz({ locale = "ka" }: { locale?: UserLocale }) {
               }}
             >
               <Sparkles className="size-3.5" />
-              {en ? TS_ELEMENT_EN[element] : element} ·{" "}
-              {en ? TS_MODALITY_EN[modality] : modality}
+              {elementLabel} · {modalityLabel}
             </div>
             <p className="mx-auto mt-5 max-w-md text-pretty text-[15px] leading-relaxed text-foreground/85">
-              {en ? blurbEn : blurbKa}
+              {blurb}
             </p>
           </div>
         </section>
 
         {/* Natal-chart cross-sell, your BIRTH sign may differ */}
         <Link
-          href={en ? "/natal-chart" : "/nataluri-ruka"}
+          href={localizedHref("/nataluri-ruka", locale)}
           className="group flex items-center justify-between gap-3 rounded-2xl border border-[var(--vivida-cyan)]/30 bg-[var(--vivida-cyan)]/8 p-5 ring-1 ring-foreground/5 transition-colors hover:border-[var(--vivida-cyan)]/60 hover:bg-[var(--vivida-cyan)]/14"
         >
           <span className="flex items-center gap-3">
             <Compass className="size-6 shrink-0 text-[var(--vivida-cyan)]" />
             <span className="text-sm">
               <span className="block font-semibold text-foreground">
-                {en
-                  ? "Is your birth sign different?"
-                  : "დაბადების ნიშანი სხვაა?"}
+                {pl
+                  ? "Twój znak urodzenia jest inny?"
+                  : en
+                    ? "Is your birth sign different?"
+                    : "დაბადების ნიშანი სხვაა?"}
               </span>
               <span className="block text-muted-foreground">
-                {en
-                  ? "Find your exact birth sign and explore your natal chart for free."
-                  : "გაიგე შენი დაბადების ზუსტი ნიშანი და ნახე სრული ნატალური რუკა, უფასოდ."}
+                {pl
+                  ? "Poznaj swój dokładny znak urodzenia i odkryj pełny horoskop urodzeniowy za darmo."
+                  : en
+                    ? "Find your exact birth sign and explore your natal chart for free."
+                    : "გაიგე შენი დაბადების ზუსტი ნიშანი და ნახე სრული ნატალური რუკა, უფასოდ."}
               </span>
             </span>
           </span>
@@ -184,12 +218,16 @@ export function TrueSignQuiz({ locale = "ka" }: { locale?: UserLocale }) {
               <Share2 className="size-4" />
             )}
             {copied
-              ? en
-                ? "Copied"
-                : "დაკოპირდა"
-              : en
-                ? "Share result"
-                : "გააზიარე შედეგი"}
+              ? pl
+                ? "Skopiowano"
+                : en
+                  ? "Copied"
+                  : "დაკოპირდა"
+              : pl
+                ? "Udostępnij wynik"
+                : en
+                  ? "Share result"
+                  : "გააზიარე შედეგი"}
           </Button>
           <Button
             type="button"
@@ -198,11 +236,11 @@ export function TrueSignQuiz({ locale = "ka" }: { locale?: UserLocale }) {
             className="gap-1.5"
           >
             <RotateCcw className="size-4" />
-            {en ? "Restart" : "თავიდან"}
+            {pl ? "Od nowa" : en ? "Restart" : "თავიდან"}
           </Button>
           <Button asChild variant="ghost">
             <Link href={localizedHref("/tests", locale)}>
-              {en ? "More tests" : "სხვა ტესტები"}
+              {pl ? "Więcej testów" : en ? "More tests" : "სხვა ტესტები"}
             </Link>
           </Button>
         </div>
@@ -217,7 +255,11 @@ export function TrueSignQuiz({ locale = "ka" }: { locale?: UserLocale }) {
       <div className="mb-6">
         <div className="mb-2 flex items-center justify-between text-xs font-medium text-muted-foreground">
           <span>
-            {en ? "Question" : "კითხვა"} {index + 1} / {TS_QUESTION_COUNT}
+            {pl
+              ? `Pytanie ${index + 1} / ${TS_QUESTION_COUNT}`
+              : en
+                ? `Question ${index + 1} / ${TS_QUESTION_COUNT}`
+                : `კითხვა ${index + 1} / ${TS_QUESTION_COUNT}`}
           </span>
           <span className="tabular-nums">{progress}%</span>
         </div>
@@ -231,11 +273,16 @@ export function TrueSignQuiz({ locale = "ka" }: { locale?: UserLocale }) {
 
       <div key={q.id} className="animate-in fade-in duration-300">
         <h2 className="min-h-[3rem] text-balance text-xl font-semibold leading-snug sm:text-2xl">
-          {en ? q.textEn : q.textKa}
+          {pl ? (q.textPl ?? q.textEn ?? q.textKa) : en ? q.textEn : q.textKa}
         </h2>
         <div className="mt-6 grid gap-2.5">
           {q.options.map((opt, i) => {
             const selected = current === i;
+            const optText = pl
+              ? (opt.textPl ?? opt.textEn ?? opt.textKa)
+              : en
+                ? opt.textEn
+                : opt.textKa;
             return (
               <button
                 key={i}
@@ -256,7 +303,7 @@ export function TrueSignQuiz({ locale = "ka" }: { locale?: UserLocale }) {
                 >
                   {selected && <Check className="size-3 text-white" />}
                 </span>
-                {en ? opt.textEn : opt.textKa}
+                {optText}
               </button>
             );
           })}
@@ -272,7 +319,7 @@ export function TrueSignQuiz({ locale = "ka" }: { locale?: UserLocale }) {
           className="gap-1"
         >
           <ChevronLeft className="size-4" />
-          {en ? "Back" : "წინა"}
+          {pl ? "Wstecz" : en ? "Back" : "წინა"}
         </Button>
       </div>
     </div>

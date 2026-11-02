@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { headers } from "next/headers";
 
+import type { UserLocale } from "@/lib/i18n/locale";
+
 import {
   ALL_ELEMENT_SLUGS,
   ALL_PAIR_SLUGS,
@@ -36,10 +38,14 @@ import {
   DREAM_EN_SLUGS,
   EQ_EN_SLUGS,
   PLANET_EN_SLUGS,
+  upgradePolishDetailSlug,
 } from "@/lib/seo/en-slugs";
 import { ALL_DREAM_SLUGS } from "@/lib/seo/dreams";
 import { ALL_ANGEL_SLUGS } from "@/lib/seo/angel-numbers";
-import { internationalPublicPath } from "@/lib/seo/public-paths";
+import {
+  internationalPublicPath,
+  polishPublicPath,
+} from "@/lib/seo/public-paths";
 import { articleUrl, listPublishedArticleSitemapItems } from "@/lib/articles";
 
 /**
@@ -104,6 +110,12 @@ function alternatesFor(
   }
   languages.en = englishUrl;
   languages["x-default"] = englishUrl;
+
+  const targetForPl = kaPath ?? enPath;
+  const plPath = upgradePolishDetailSlug(polishPublicPath(targetForPl));
+  if (plPath && plPath !== targetForPl) {
+    languages["pl-PL"] = `${ENGLISH_SITE_URL}${plPath === "/" ? "" : plPath}`;
+  }
   return { languages };
 }
 
@@ -126,7 +138,7 @@ function articleAlternates(
       languages.en = articleUrl("en", sibling.slug);
   }
   languages["x-default"] =
-    languages.en ?? articleUrl(current.language as "ka" | "en", current.slug);
+    languages.en ?? articleUrl(current.language as UserLocale, current.slug);
   return { languages };
 }
 
@@ -137,7 +149,7 @@ function articleSitemapEntries(
   return all
     .filter((item) => languages.has(item.language))
     .map((item) => ({
-      url: articleUrl(item.language as "ka" | "en", item.slug),
+      url: articleUrl(item.language as UserLocale, item.slug),
       lastModified: item.updatedAt,
       changeFrequency: "monthly" as const,
       priority: 0.72,
@@ -146,7 +158,7 @@ function articleSitemapEntries(
 }
 
 function articleHubEntry(
-  locale: "ka" | "en",
+  locale: UserLocale,
   all: SitemapArticle[],
 ): MetadataRoute.Sitemap[number] {
   const localeUpdates = all
@@ -334,6 +346,7 @@ function englishSitemap(articleItems: SitemapArticle[]): MetadataRoute.Sitemap {
     samePathEntry("/iq-testi", "monthly", 0.9, ENGLISH_PUBLISHED),
     samePathEntry("/eq-testi", "monthly", 0.9, ENGLISH_PUBLISHED),
     samePathEntry("/big-five", "monthly", 0.9, ENGLISH_PUBLISHED),
+    samePathEntry("/tvit-shepasebis-testi", "monthly", 0.8, ENGLISH_PUBLISHED),
     samePathEntry("/quiz/namdvili-nishani", "monthly", 0.8, ENGLISH_PUBLISHED),
     samePathEntry(
       "/quiz/varskvlavebis-zodiaqo",
@@ -400,11 +413,30 @@ function englishSitemap(articleItems: SitemapArticle[]): MetadataRoute.Sitemap {
     ...articleSitemapEntries(articleItems, new Set(["en"])),
   ];
 
-  return entries.map((entry) => {
+  const normalizedEntries = entries.map((entry) => {
     const parsed = new URL(entry.url);
     parsed.pathname = internationalPublicPath(parsed.pathname);
     return { ...entry, url: parsed.toString().replace(/\/$/, "") };
   });
+
+  const plEntries: MetadataRoute.Sitemap = [];
+  const seenUrls = new Set<string>(normalizedEntries.map((e) => e.url));
+
+  for (const entry of normalizedEntries) {
+    const plUrl = entry.alternates?.languages?.["pl-PL"];
+    if (plUrl && !seenUrls.has(plUrl)) {
+      seenUrls.add(plUrl);
+      plEntries.push({
+        url: plUrl,
+        lastModified: entry.lastModified,
+        changeFrequency: entry.changeFrequency,
+        priority: entry.priority,
+        alternates: entry.alternates,
+      });
+    }
+  }
+
+  return [...normalizedEntries, ...plEntries];
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -915,13 +947,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
    */
   const SAME_PATH_PAIRS = [
     "/horoskopi",
-    // These four render one tree in both languages at the same path. The
-    // English sitemap already named vivida.ge as their Georgian partner, but
-    // this side named nobody, a one-way annotation, which Google discards.
+    // These render one tree in both languages at the same path.
     "/features",
     "/how-it-works",
     "/login",
     "/signup",
+    "/pirovnebis-testi",
+    "/iq-testi",
+    "/eq-testi",
+    "/big-five",
+    "/tvit-shepasebis-testi",
+    "/quiz/namdvili-nishani",
+    "/quiz/varskvlavebis-zodiaqo",
   ] as const;
 
   const pairByKaPath = new Map<string, { ka: string; en: string }>([

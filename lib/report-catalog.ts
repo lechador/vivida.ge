@@ -8,7 +8,7 @@ export const REPORT_PRODUCT_KEYS = [
 ] as const;
 export type ReportProductKey = (typeof REPORT_PRODUCT_KEYS)[number];
 
-export type LocalizedText = { ka: string; en: string };
+export type LocalizedText = { ka: string; en: string; pl?: string };
 export type ReportProduct = {
   key: ReportProductKey;
   credits: number;
@@ -154,7 +154,8 @@ export const REPORT_BUNDLES = {
 export type ReportBundleKey = keyof typeof REPORT_BUNDLES;
 
 export function localized(text: LocalizedText, locale: UserLocale): string {
-  return text[locale];
+  if (locale === "pl" && text.pl) return text.pl;
+  return locale === "ka" ? text.ka : text.en;
 }
 
 export function isReportProductKey(value: unknown): value is ReportProductKey {

@@ -31,24 +31,30 @@ export function MiniBigThree({
   }[] = [
     {
       code: "01 · SOLAR",
-      label: en ? "Sun" : "მზე",
-      role: en ? "Core identity" : "არსი",
+      label: locale === "pl" ? "Słońce" : en ? "Sun" : "მზე",
+      role: locale === "pl" ? "Świadome Ja" : en ? "Core identity" : "არსი",
       glyph: "☉",
       accentColor: "var(--vivida-gold)",
       point: sun,
     },
     {
       code: "02 · LUNAR",
-      label: en ? "Moon" : "მთვარე",
-      role: en ? "Inner world" : "შინაგანი",
+      label: locale === "pl" ? "Księżyc" : en ? "Moon" : "მთვარე",
+      role:
+        locale === "pl" ? "Świat wewnętrzny" : en ? "Inner world" : "შინაგანი",
       glyph: "☽",
       accentColor: "var(--vivida-cyan)",
       point: moon,
     },
     {
       code: "03 · HORIZON",
-      label: en ? "Ascendant" : "ამომავალი",
-      role: en ? "First impression" : "გარეგანი",
+      label: locale === "pl" ? "Ascendent" : en ? "Ascendant" : "ამომავალი",
+      role:
+        locale === "pl"
+          ? "Pierwsze wrażenie"
+          : en
+            ? "First impression"
+            : "გარეგანი",
       glyph: "↑",
       accentColor: "var(--primary)",
       point: asc,
@@ -65,15 +71,21 @@ export function MiniBigThree({
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background/70 px-4 py-2.5 sm:px-5">
         <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
           <span className="inline-block size-1.5 rounded-full bg-primary" />
-          {en
-            ? "PRIMARY NATAL AXIS · BIG THREE"
-            : "ნატალური ღერძი · დიდი სამეული"}
+          {locale === "pl"
+            ? "GŁÓWNA OŚ URODZENIOWA · WIELKA TRÓJKA"
+            : en
+              ? "PRIMARY NATAL AXIS · BIG THREE"
+              : "ნატალური ღერძი · დიდი სამეული"}
         </div>
         <Link
           href="/report"
           className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-primary"
         >
-          {en ? "Full Natal Ephemeris" : "სრული ნატალური რუკა"}
+          {locale === "pl"
+            ? "Pełne efemerydy"
+            : en
+              ? "Full Natal Ephemeris"
+              : "სრული ნატალური რუკა"}
           <ArrowUpRight className="size-3" />
         </Link>
       </div>
@@ -82,7 +94,8 @@ export function MiniBigThree({
         {items.map(({ code, label, role, glyph, accentColor, point }) => {
           const sign = signByIndex(point.signIndex);
           const color = signColor(sign);
-          const signLabel = en ? sign.labelEn : sign.labelKa;
+          const signLabel =
+            locale === "pl" ? sign.labelPl : en ? sign.labelEn : sign.labelKa;
           return (
             <Link
               key={label}

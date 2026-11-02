@@ -66,10 +66,14 @@ const TITLE_EN = "Vivida, Natal Charts, Horoscopes and Zodiac Guides";
 const DESCRIPTION_EN =
   "Personal astrology, daily horoscopes and a free natal chart built from your exact birth moment. Understand what your chart actually says about you.";
 
-/** `lang` attribute per locale, Armenian is `hy`, the ISO 639-1 code. */
-const HTML_LANG = { ka: "ka", en: "en" } as const;
+const TITLE_PL = "Vivida, Horoskopy Urodzeniowe, Tarot i Astrologia AI";
+const DESCRIPTION_PL =
+  "Osobista astrologia, horoskop dzienny, tarot i darmowy horoskop urodzeniowy obliczony na podstawie dokładnego momentu Twoich narodzin.";
 
-const OG_LOCALE = { ka: "ka_GE", en: "en_US" } as const;
+/** `lang` attribute per locale, Armenian is `hy`, the ISO 639-1 code. */
+const HTML_LANG = { ka: "ka", en: "en", pl: "pl" } as const;
+
+const OG_LOCALE = { ka: "ka_GE", en: "en_US", pl: "pl_PL" } as const;
 
 /**
  * Site-wide metadata defaults. Per-page `metadata` exports override these
@@ -82,13 +86,15 @@ const OG_LOCALE = { ka: "ka_GE", en: "en_US" } as const;
  */
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  const en = locale === "en";
-  // Armenian is a path prefix on the international domain, so its origin is
-  // that domain plus /am, a bare ENGLISH_SITE_URL here would resolve every
-  // relative canonical on an Armenian page onto its English twin.
-  const origin = en ? ENGLISH_SITE_URL : SITE_URL;
-  const title = en ? TITLE_EN : TITLE;
-  const description = en ? DESCRIPTION_EN : DESCRIPTION;
+  const isIntl = locale !== "ka";
+  const origin = isIntl ? ENGLISH_SITE_URL : SITE_URL;
+  const title = locale === "pl" ? TITLE_PL : locale === "en" ? TITLE_EN : TITLE;
+  const description =
+    locale === "pl"
+      ? DESCRIPTION_PL
+      : locale === "en"
+        ? DESCRIPTION_EN
+        : DESCRIPTION;
 
   return {
     // Host-aware so relative canonicals and OG/image URLs in child pages

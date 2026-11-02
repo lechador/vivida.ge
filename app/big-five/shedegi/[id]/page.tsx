@@ -17,12 +17,18 @@ import { NextTestWidget } from "@/components/tests/next-test-widget";
 import { UnlockCard } from "@/components/credits/unlock-card";
 import { CREDIT_COST, getBalance, isUnlocked } from "@/lib/credits";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { localizedHref } from "@/lib/seo/public-paths";
 
 export async function generateMetadata() {
   const locale = await getRequestLocale();
-  const en = locale !== "ka";
+  const pl = locale === "pl";
+  const en = locale === "en";
   return {
-    title: en ? "Your Big Five Result" : "შენი Big Five შედეგი",
+    title: pl
+      ? "Twój wynik testu Big Five"
+      : en
+        ? "Your Big Five Result"
+        : "შენი Big Five შედეგი",
     robots: { index: false },
   };
 }
@@ -42,7 +48,8 @@ export default async function SavedBigFiveResultPage({
   const { id } = await params;
   const user = await requireUser();
   const locale = await getRequestLocale();
-  const en = locale !== "ka";
+  const pl = locale === "pl";
+  const en = locale === "en";
 
   const [row] = await db
     .select()
@@ -87,12 +94,18 @@ export default async function SavedBigFiveResultPage({
               cost={CREDIT_COST.bigFiveTest}
               balance={balance}
               title={
-                en ? "Unlock the detailed analysis" : "დეტალური ანალიზის გახსნა"
+                pl
+                  ? "Odblokuj szczegółową analizę"
+                  : en
+                    ? "Unlock the detailed analysis"
+                    : "დეტალური ანალიზის გახსნა"
               }
               blurb={
-                en
-                  ? "Read what your level means for each of the five traits. Pay once and keep the result."
-                  : "ნახე თითოეული თვისების სრული ანალიზი, რას ნიშნავს შენი დონე ხუთივე თვისებაზე. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."
+                pl
+                  ? "Poznaj szczegółowe znaczenie Twojego poziomu dla każdej z pięciu cech. Płacisz raz i zachowujesz wynik na zawsze."
+                  : en
+                    ? "Read what your level means for each of the five traits. Pay once and keep the result."
+                    : "ნახე თითოეული თვისების სრული ანალიზი, რას ნიშნავს შენი დონე ხუთივე თვისებაზე. გადაიხდი ერთხელ, შედეგი სამუდამოდ შენია."
               }
               locale={locale}
             />
@@ -107,9 +120,13 @@ export default async function SavedBigFiveResultPage({
 
         <div className="mt-6 flex justify-center">
           <Button asChild variant="outline">
-            <Link href="/big-five">
+            <Link href={localizedHref("/big-five", locale)}>
               <RotateCcw className="size-4" />
-              {en ? "Retake the test" : "ტესტის თავიდან გავლა"}
+              {pl
+                ? "Rozwiąż test ponownie"
+                : en
+                  ? "Retake the test"
+                  : "ტესტის თავიდან გავლა"}
             </Link>
           </Button>
         </div>

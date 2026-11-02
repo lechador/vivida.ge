@@ -21,6 +21,7 @@ export function StepPlace({
   locale?: UserLocale;
 }) {
   const en = locale === "en";
+  const pl = locale === "pl";
   const [query, setQuery] = useState(value?.displayName ?? "");
   const [results, setResults] = useState<GeocodeResult[]>([]);
   const [open, setOpen] = useState(false);
@@ -95,7 +96,11 @@ export function StepPlace({
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  const headingText = en ? "Where were you born?" : "სად დაიბადე?";
+  const headingText = pl
+    ? "Gdzie się urodziłeś?"
+    : en
+      ? "Where were you born?"
+      : "სად დაიბადე?";
 
   /**
    * Resolve manually entered coordinates into a usable place.
@@ -110,12 +115,16 @@ export function StepPlace({
     if (!checked.ok) {
       setManualError(
         checked.reason === "out_of_range"
-          ? en
-            ? "Latitude must be between -90 and 90, longitude between -180 and 180."
-            : "განედი უნდა იყოს -90-დან 90-მდე, გრძედი -180-დან 180-მდე."
-          : en
-            ? "Enter both coordinates as numbers, for example 41.69 and 44.80."
-            : "შეიყვანე ორივე კოორდინატი რიცხვად, მაგალითად 41.69 და 44.80.",
+          ? pl
+            ? "Szerokość musi być pomiędzy -90 a 90, a długość pomiędzy -180 a 180."
+            : en
+              ? "Latitude must be between -90 and 90, longitude between -180 and 180."
+              : "განედი უნდა იყოს -90-დან 90-მდე, გრძედი -180-დან 180-მდე."
+          : pl
+            ? "Wpisz obie współrzędne jako liczby, na przykład 52.23 i 21.01."
+            : en
+              ? "Enter both coordinates as numbers, for example 41.69 and 44.80."
+              : "შეიყვანე ორივე კოორდინატი რიცხვად, მაგალითად 41.69 და 44.80.",
       );
       return;
     }
@@ -134,7 +143,7 @@ export function StepPlace({
       const label =
         (query.trim() ||
           `${data.latitude.toFixed(2)}, ${data.longitude.toFixed(2)}`) +
-        (en ? " (manual)" : " (ხელით)");
+        (pl ? " (ręcznie)" : en ? " (manual)" : " (ხელით)");
       onChange({
         id: -1,
         name: label,
@@ -149,31 +158,53 @@ export function StepPlace({
       setManualOpen(false);
     } catch {
       setManualError(
-        en
-          ? "Could not resolve that location. Check the coordinates and try again."
-          : "მდებარეობა ვერ დადგინდა. შეამოწმე კოორდინატები და სცადე ხელახლა.",
+        pl
+          ? "Nie udało się ustalić tej lokalizacji. Sprawdź współrzędne i spróbuj ponownie."
+          : en
+            ? "Could not resolve that location. Check the coordinates and try again."
+            : "მდებარეობა ვერ დადგინდა. შეამოწმე კოორდინატები და სცადე ხელახლა.",
       );
     } finally {
       setManualPending(false);
     }
   }
 
-  const descText = en
-    ? "Your birthplace connects your chart to the sky at that exact moment."
-    : "დაბადების ადგილი შენს რუკას იმ მომენტის ცასთან აკავშირებს.";
-  const labelText = en ? "Birth city" : "დაბადების ქალაქი";
-  const placeholderText = en
-    ? "London, New York, Tokyo…"
-    : "თბილისი, ნიუ-იორკი, ტოკიო…";
-  const clearAriaLabel = en ? "Clear" : "წაშლა";
-  const notFoundText = en ? "No place found" : "ვერაფერი მოიძებნა";
-  const notFoundHint = en
-    ? "Try a different spelling, or pick the nearest larger city, it does not change your chart."
-    : "სცადე სხვა დაწერილობა ან აირჩიე უახლოესი დიდი ქალაქი, რუკას ეს არ ცვლის.";
-  const errorText = en
-    ? "Could not reach the search service."
-    : "საძიებო სერვისს ვერ დავუკავშირდით.";
-  const retryText = en ? "Try again" : "სცადე ხელახლა";
+  const descText = pl
+    ? "Miejsce urodzenia łączy Twój kosmogram z niebem w tym dokładnym momencie."
+    : en
+      ? "Your birthplace connects your chart to the sky at that exact moment."
+      : "დაბადების ადგილი შენს რუკას იმ მომენტის ცასთან აკავშირებს.";
+  const labelText = pl
+    ? "Miasto urodzenia"
+    : en
+      ? "Birth city"
+      : "დაბადების ქალაქი";
+  const placeholderText = pl
+    ? "Warszawa, Kraków, Londyn…"
+    : en
+      ? "London, New York, Tokyo…"
+      : "თბილისი, ნიუ-იორკი, ტოკიო…";
+  const clearAriaLabel = pl ? "Wyczyść" : en ? "Clear" : "წაშლა";
+  const notFoundText = pl
+    ? "Nie znaleziono miejsca"
+    : en
+      ? "No place found"
+      : "ვერაფერი მოიძებნა";
+  const notFoundHint = pl
+    ? "Spróbuj innej pisowni lub wybierz najbliższe większe miasto — nie zmieni to Twojego kosmogramu."
+    : en
+      ? "Try a different spelling, or pick the nearest larger city, it does not change your chart."
+      : "სცადე სხვა დაწერილობა ან აირჩიე უახლოესი დიდი ქალაქი, რუკას ეს არ ცვლის.";
+  const errorText = pl
+    ? "Nie udało się połączyć z wyszukiwarką miejsc."
+    : en
+      ? "Could not reach the search service."
+      : "საძიებო სერვისს ვერ დავუკავშირდით.";
+  const retryText = pl
+    ? "Spróbuj ponownie"
+    : en
+      ? "Try again"
+      : "სცადე ხელახლა";
 
   return (
     <div className="space-y-6">

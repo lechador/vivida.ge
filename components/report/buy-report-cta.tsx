@@ -17,6 +17,10 @@ const ERRORS: Record<string, string> = {
   no_chart: "ჯერ შენი რუკა უნდა შეიქმნას. დაასრულე ონბორდინგი.",
   unauthorized: "გთხოვ, შეხვიდე სისტემაში.",
 };
+const ERRORS_PL: Record<string, string> = {
+  no_chart: "Najpierw musisz utworzyć swój kosmogram. Ukończ konfigurację.",
+  unauthorized: "Zaloguj się, aby kontynuować.",
+};
 
 /**
  * Generate the full PDF report, paid with credits. Spends CREDIT_COST.pdfReport
@@ -80,13 +84,15 @@ export function BuyReportCta({
       }
       if (!res.ok || !data.url) {
         setError(
-          en
-            ? data.error === "no_chart"
-              ? "Create your natal chart first."
-              : data.error === "unauthorized"
-                ? "Please sign in first."
-                : "Something went wrong. Please try again."
-            : (ERRORS[data.error] ?? "რაღაც ვერ მოხერხდა. სცადე ხელახლა."),
+          locale === "pl"
+            ? (ERRORS_PL[data.error] ?? "Coś poszło nie tak. Spróbuj ponownie.")
+            : en
+              ? data.error === "no_chart"
+                ? "Create your natal chart first."
+                : data.error === "unauthorized"
+                  ? "Please sign in first."
+                  : "Something went wrong. Please try again."
+              : (ERRORS[data.error] ?? "რაღაც ვერ მოხერხდა. სცადე ხელახლა."),
         );
         setLoading(false);
         return;
@@ -102,9 +108,11 @@ export function BuyReportCta({
       router.push(data.url);
     } catch {
       setError(
-        en
-          ? "Network error. Please try again."
-          : "ქსელის შეცდომა. სცადე ხელახლა.",
+        locale === "pl"
+          ? "Błąd sieci. Spróbuj ponownie."
+          : en
+            ? "Network error. Please try again."
+            : "ქსელის შეცდომა. სცადე ხელახლა.",
       );
       setLoading(false);
     }
@@ -120,25 +128,34 @@ export function BuyReportCta({
         <div className="max-w-xl">
           <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-[var(--vivida-gold)]/30 bg-[var(--vivida-gold)]/10 px-2.5 py-0.5 text-xs font-medium text-[var(--vivida-gold)]">
             <Sparkles className="size-3" />
-            {en ? "Complete report" : "სრული ანგარიში"}
+            {locale === "pl"
+              ? "Kompletny raport"
+              : en
+                ? "Complete report"
+                : "სრული ანგარიში"}
           </div>
           <h3 className="text-xl font-semibold tracking-tight">
-            {en
-              ? "Unlock the deep houses and the full PDF dossier"
-              : "გახსენი ღრმა სახლები და სრული PDF დოსიე"}
+            {locale === "pl"
+              ? "Odblokuj szczegółowe domy i pełne dossier PDF"
+              : en
+                ? "Unlock the deep houses and the full PDF dossier"
+                : "გახსენი ღრმა სახლები და სრული PDF დოსიე"}
           </h3>
           <p className="mt-1.5 text-sm text-foreground/75">
-            {en
-              ? `One unlock for ${cost} credits opens the deep on-page sections (karmic mission, 7th house of love and marriage, 2nd and 8th houses of finance) plus the full downloadable PDF dossier.`
-              : `ერთი განბლოკვა ${cost} კრედიტად გიხსნის ღრმა სექციებს (კარმული მისია, სიყვარულისა და ქორწინების მე-7 სახლი, ფინანსების მე-2 და მე-8 სახლები) და სრულ ჩამოსატვირთ PDF დოსიეს.`}
+            {locale === "pl"
+              ? `Jednorazowe odblokowanie za ${cost} kredytów otwiera głębokie sekcje analizy (misja karmiczna, 7. dom miłości i relacji, 2. i 8. dom finansów) oraz kompletne dossier PDF do pobrania.`
+              : en
+                ? `One unlock for ${cost} credits opens the deep on-page sections (karmic mission, 7th house of love and marriage, 2nd and 8th houses of finance) plus the full downloadable PDF dossier.`
+                : `ერთი განბლოკვა ${cost} კრედიტად გიხსნის ღრმა სექციებს (კარმული მისია, სიყვარულისა და ქორწინების მე-7 სახლი, ფინანსების მე-2 და მე-8 სახლები) და სრულ ჩამოსატვირთ PDF დოსიეს.`}
           </p>
           <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-background/50 px-3 py-1 text-sm">
             <Sparkles className="size-4 text-[var(--vivida-cyan)]" />
             <span className="font-semibold">
-              {cost} {en ? "credits" : "კრედიტი"}
+              {cost} {locale === "pl" ? "kredytów" : en ? "credits" : "კრედიტი"}
             </span>
             <span className="text-muted-foreground">
-              · {en ? "balance" : "ბალანსი"} {balance}
+              · {locale === "pl" ? "saldo" : en ? "balance" : "ბალანსი"}{" "}
+              {balance}
             </span>
           </div>
         </div>
@@ -157,12 +174,15 @@ export function BuyReportCta({
                 ) : (
                   <FileText className="size-4" />
                 )}
-                {en ? "Create" : "შექმნა"}, {cost} {en ? "credits" : "კრედიტი"}
+                {locale === "pl" ? "Utwórz" : en ? "Create" : "შექმნა"}, {cost}{" "}
+                {locale === "pl" ? "kredytów" : en ? "credits" : "კრედიტი"}
               </Button>
               <span className="text-center text-xs text-muted-foreground sm:text-right">
-                {en
-                  ? "One-time payment · permanent access"
-                  : "ერთჯერადი გადახდა · სამუდამო წვდომა"}
+                {locale === "pl"
+                  ? "Płatność jednorazowa · stały dostęp"
+                  : en
+                    ? "One-time payment · permanent access"
+                    : "ერთჯერადი გადახდა · სამუდამო წვდომა"}
               </span>
             </>
           ) : (
