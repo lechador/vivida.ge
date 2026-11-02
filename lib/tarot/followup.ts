@@ -35,6 +35,7 @@ export type FollowupResult =
   | { ok: false; error: "insufficient"; cost: number; balance: number };
 
 function orientationFor(reversed: boolean, locale: UserLocale): string {
+  if (locale === "pl") return reversed ? "odwrócona" : "prosta";
   if (locale === "en") return reversed ? "reversed" : "upright";
   return reversed ? "შებრუნებული" : "პირდაპირი";
 }
@@ -42,6 +43,12 @@ function orientationFor(reversed: boolean, locale: UserLocale): string {
 /** Static answer used when the AI call fails, a paid follow-up never returns empty. */
 function fallbackAnswer(interpretations: string[], locale: UserLocale): string {
   const joined = interpretations.join(" ");
+  if (locale === "pl") {
+    return (
+      `Interpretacja AI jest chwilowo niedostępna. W odpowiedzi na Twoje pytanie dodatkowe ` +
+      `karty wskazują na to: ${joined}`
+    );
+  }
   if (locale === "en") {
     return (
       `The AI interpretation is temporarily unavailable. On your follow-up ` +

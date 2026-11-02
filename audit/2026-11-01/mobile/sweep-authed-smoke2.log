@@ -1,0 +1,14 @@
+
+=== 390x844: 4 routes (concurrency 1) ===
+[1/4] 390 /dashboard tap<24 x2 covered x1 (4s)
+[2/4] 390 /feed HTTP500 (8s)
+[3/4] 390 /discover tap<24 x2 covered x1 (12s)
+[4/4] 390 /people HTTP500 (15s)
+=== 390 done: 4 routes in 15s ===
+[
+  {
+    "width": 390,
+    "height": 844,
+    "count": 4
+  }
+]

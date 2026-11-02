@@ -1,0 +1,19 @@
+
+=== 360x780: 9 routes (concurrency 2) ===
+[1/9] 360 /dashboard tap<24 x3 (4s)
+[2/9] 360 /feed tap<24 x15 covered x4 (4s)
+[3/9] 360 /subscription ok (7s)
+[4/9] 360 /credits ok (7s)
+[5/9] 360 /library covered x1 (11s)
+[6/9] 360 /account ok (11s)
+[7/9] 360 /messages ok (14s)
+[8/9] 360 /people tap<24 x10 covered x3 (14s)
+[9/9] 360 /u/ana-audit tap<24 x3 (17s)
+=== 360 done: 9 routes in 17s ===
+[
+  {
+    "width": 360,
+    "height": 780,
+    "count": 9
+  }
+]

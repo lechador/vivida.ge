@@ -103,10 +103,14 @@ export const PL_PATH_PREFIXES = [
 ] as const;
 
 export const PL_EXACT_PUBLIC_ALIASES = [
+  ["/natal-chart", "/pl/horoskop-urodzeniowy"],
+  ["/en/natal-chart", "/pl/horoskop-urodzeniowy"],
   ["/tavsebadoba", "/pl/horoskop-partnerski"],
   ["/zodiac/tavsebadoba", "/pl/horoskop-partnerski"],
   ["/compatibility", "/pl/horoskop-partnerski"],
   ["/en/compatibility", "/pl/horoskop-partnerski"],
+  ["/horoscope", "/pl/horoskop-dzienny"],
+  ["/en/horoscope", "/pl/horoskop-dzienny"],
   ["/", "/pl"],
   ["/en", "/pl"],
   ["/about", "/pl/about"],

@@ -1,0 +1,42 @@
+
+=== 320x568: 12 routes (concurrency 2) ===
+[1/12] 320 /tavsebadoba tap<24 x1 (55s)
+[2/12] 320 / textx6 tap<24 x14 (55s)
+[3/12] 320 /tests tap<24 x3 (59s)
+[4/12] 320 /zodiac/datit textx13 tap<24 x3 (59s)
+[5/12] 320 /astrologiuri-saxlebi/1 textx1 tap<24 x5 (62s)
+[6/12] 320 /mbti/intj tap<24 x5 (63s)
+[7/12] 320 /astrologiuri-kalendari textx1 tap<24 x2 (64s)
+[8/12] 320 /horoskopi textx5 tap<24 x15 (65s)
+[9/12] 320 /en tap<24 x14 (67s)
+[10/12] 320 /en/compatibility tap<24 x3 (69s)
+[11/12] 320 /zodiac/tavsebadoba textx1 tap<24 x3 (70s)
+[12/12] 320 /articles tap<24 x15 (72s)
+=== 320 done: 12 routes in 72s ===
+
+=== 390x844: 12 routes (concurrency 2) ===
+[1/12] 390 /tavsebadoba tap<24 x2 (3s)
+[2/12] 390 / tap<24 x15 (3s)
+[3/12] 390 /zodiac/datit tap<24 x3 (8s)
+[4/12] 390 /tests tap<24 x3 (8s)
+[5/12] 390 /astrologiuri-saxlebi/1 tap<24 x5 (15s)
+[6/12] 390 /mbti/intj tap<24 x5 (16s)
+[7/12] 390 /astrologiuri-kalendari tap<24 x2 (18s)
+[8/12] 390 /horoskopi tap<24 x15 (18s)
+[9/12] 390 /en tap<24 x14 (20s)
+[10/12] 390 /en/compatibility tap<24 x5 (21s)
+[11/12] 390 /zodiac/tavsebadoba tap<24 x3 (23s)
+[12/12] 390 /articles tap<24 x15 (24s)
+=== 390 done: 12 routes in 24s ===
+[
+  {
+    "width": 320,
+    "height": 568,
+    "count": 12
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "count": 12
+  }
+]

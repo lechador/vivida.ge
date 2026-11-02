@@ -1,0 +1,10 @@
+
+> vivida.ge@0.1.0 lint
+> eslint
+
+
+/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-11-01/mobile/sweep.mjs
+  631:25  warning  'id' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 1 problem (0 errors, 1 warning)
+

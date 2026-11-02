@@ -1,0 +1,57 @@
+[
+  {
+    "url": "/astrologiuri-saxlebi",
+    "pattern": "/astrologiuri-saxlebi",
+    "dynamic": false
+  },
+  {
+    "url": "/privacy",
+    "pattern": "/privacy",
+    "dynamic": false
+  },
+  {
+    "url": "/siyvarulis-horoskopi/aries",
+    "pattern": "/siyvarulis-horoskopi/aries",
+    "dynamic": false
+  },
+  {
+    "url": "/siyvarulis-horoskopi/taurus",
+    "pattern": "/siyvarulis-horoskopi/taurus",
+    "dynamic": false
+  },
+  {
+    "url": "/taro/the-magician",
+    "pattern": "/taro/the-magician",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/aries/dghes",
+    "pattern": "/zodiac/aries/dghes",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/reitingebi",
+    "pattern": "/zodiac/reitingebi",
+    "dynamic": false
+  },
+  {
+    "url": "/sizmris-akhsna",
+    "pattern": "/sizmris-akhsna",
+    "dynamic": false
+  },
+  {
+    "url": "/taro",
+    "pattern": "/taro",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/aries/2026",
+    "pattern": "/zodiac/aries/2026",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/aries",
+    "pattern": "/zodiac/aries",
+    "dynamic": false
+  }
+]

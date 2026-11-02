@@ -1,0 +1,50 @@
+{
+  "scope": "Today simplification, automatic phone-popup removal, AI/history primary navigation",
+  "preserve": [
+    "pricing",
+    "credit costs and gifts",
+    "DAILY_RITUAL_VERSION=2",
+    "existing progress and idempotency",
+    "public routes",
+    "KA/EN locales",
+    "existing phone gift on credits",
+    "unrelated user package changes"
+  ],
+  "unit_and_source_regressions": [
+    "primary mobile links go to dashboard/taro/ask/library",
+    "More is an actual accessible drawer trigger",
+    "Ask badge appears on actual AI entry",
+    "interpersonal messages remain accessible with unread indicator",
+    "summary and focus precede promotions",
+    "long details remain expandable and readable",
+    "dashboard never mounts PhoneGiftPopup",
+    "ritual does not complete on mount without a focus choice"
+  ],
+  "browser_matrix": [
+    "free KA mobile",
+    "free KA desktop",
+    "PRO KA mobile",
+    "completed ritual KA mobile",
+    "free EN mobile",
+    "free EN desktop"
+  ],
+  "browser_actions": [
+    "open and close forecast details",
+    "open More with pointer",
+    "close drawer with Escape and restore focus",
+    "verify keyboard access",
+    "check report/tests/messages/account links in More",
+    "check no horizontal overflow"
+  ],
+  "safe_verification": "Mock props in a temporary local preview; no production accounts, notifications, purchases, credit spends, or DB writes. Delete preview before committing. Authenticated production user UI cannot be claimed checked without a real session.",
+  "release_gates": [
+    "independent code-review pass",
+    "npm run check",
+    "full npx vitest run",
+    "npm run build",
+    "no preview/debug files in commit",
+    "user package hashes preserved",
+    "push correct main commit",
+    "read back exact Vercel deployment commit"
+  ]
+}

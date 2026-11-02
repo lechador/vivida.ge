@@ -45,6 +45,7 @@ export type NavItem = {
   href: string;
   label: string;
   labelEn: string;
+  labelPl: string;
   Icon: LucideIcon;
   /** Hue used for the active glow + hover icon tint. Roughly the brand axis. */
   hue: string;
@@ -55,6 +56,7 @@ export type NavItem = {
    */
   tabLabel?: string;
   tabLabelEn?: string;
+  tabLabelPl?: string;
 };
 
 /**
@@ -73,7 +75,7 @@ const NAV_FEATURE_GATE: Partial<Record<NavActiveKey, SocialFeature>> = {
  * 404 (no /readings route exists there, rewrites are English-host-only).
  */
 const NAV_LOCALE_GATE: Partial<Record<NavActiveKey, readonly UserLocale[]>> = {
-  readings: ["en"],
+  readings: ["en", "pl"],
 };
 
 function navVisible(item: NavItem): boolean {
@@ -86,6 +88,7 @@ function navVisible(item: NavItem): boolean {
  * Resolve the visible label for the current interface language.
  */
 export function navLabel(item: NavItem, locale: UserLocale = "ka"): string {
+  if (locale === "pl") return item.labelPl;
   if (locale === "en") return item.labelEn;
   return item.label;
 }
@@ -98,6 +101,7 @@ export function mobileTabLabel(
   item: NavItem,
   locale: UserLocale = "ka",
 ): string {
+  if (locale === "pl") return item.tabLabelPl ?? item.labelPl;
   if (locale === "en") return item.tabLabelEn ?? item.labelEn;
   return item.tabLabel ?? item.label;
 }
@@ -108,6 +112,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/dashboard",
     label: "დღეს",
     labelEn: "Today",
+    labelPl: "Dzisiaj",
     Icon: Sun,
     hue: "oklch(0.82 0.16 80)",
   },
@@ -116,6 +121,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/taro",
     label: "ტარო",
     labelEn: "Tarot",
+    labelPl: "Tarot",
     Icon: Wand2,
     hue: "oklch(0.78 0.18 305)",
   },
@@ -124,6 +130,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/ask",
     label: "ჰკითხე",
     labelEn: "Ask",
+    labelPl: "Zapytaj",
     Icon: Stars,
     hue: "oklch(0.80 0.16 230)",
   },
@@ -132,6 +139,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/library",
     label: "ბიბლიოთეკა",
     labelEn: "Library",
+    labelPl: "Biblioteka",
     Icon: BookOpen,
     hue: "oklch(0.80 0.15 190)",
   },
@@ -140,6 +148,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/report",
     label: "ჩემი რუკა",
     labelEn: "My chart",
+    labelPl: "Mój kosmogram",
     Icon: Compass,
     hue: "oklch(0.78 0.18 305)",
   },
@@ -148,6 +157,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/sky",
     label: "ცა ახლა",
     labelEn: "Sky now",
+    labelPl: "Niebo teraz",
     Icon: Orbit,
     hue: "oklch(0.80 0.15 200)",
   },
@@ -156,6 +166,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/reports",
     label: "რეპორტები",
     labelEn: "Reports",
+    labelPl: "Raporty",
     Icon: ScrollText,
     hue: "oklch(0.80 0.16 55)",
   },
@@ -164,6 +175,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/timing",
     label: "როდის",
     labelEn: "Timing",
+    labelPl: "Najlepsze dni",
     Icon: CalendarClock,
     hue: "oklch(0.82 0.14 90)",
   },
@@ -172,6 +184,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/feed",
     label: "ფიდი",
     labelEn: "Feed",
+    labelPl: "Aktualności",
     Icon: Sparkles,
     hue: "oklch(0.78 0.18 320)",
   },
@@ -180,6 +193,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/tests",
     label: "ტესტები",
     labelEn: "Tests",
+    labelPl: "Testy",
     Icon: Brain,
     hue: "oklch(0.78 0.16 300)",
   },
@@ -188,6 +202,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/readings",
     label: "რიდინგები",
     labelEn: "Readings",
+    labelPl: "Czytania",
     Icon: Store,
     hue: "oklch(0.75 0.18 340)",
   },
@@ -196,6 +211,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/messages",
     label: "წერილები",
     labelEn: "Messages",
+    labelPl: "Wiadomości",
     Icon: MessageCircle,
     hue: "oklch(0.78 0.18 200)",
   },
@@ -204,6 +220,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/discover",
     label: "აღმოაჩინე",
     labelEn: "Discover",
+    labelPl: "Odkrywaj",
     Icon: Telescope,
     hue: "oklch(0.78 0.15 195)",
   },
@@ -212,6 +229,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/synastry",
     label: "თავსებადობა",
     labelEn: "Compatibility",
+    labelPl: "Zgodność",
     Icon: Heart,
     hue: "oklch(0.72 0.22 350)",
   },
@@ -220,6 +238,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/people",
     label: "ხალხი",
     labelEn: "People",
+    labelPl: "Społeczność",
     Icon: UserPlus,
     hue: "oklch(0.75 0.16 160)",
   },
@@ -228,6 +247,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     href: "/friends",
     label: "მეგობრები",
     labelEn: "Friends",
+    labelPl: "Znajomi",
     Icon: Users,
     hue: "oklch(0.72 0.22 0)",
   },
@@ -282,7 +302,12 @@ function mobileTab(key: NavActiveKey): NavItem {
   const item = ALL_NAV_ITEMS.find((entry) => entry.key === key);
   if (!item) throw new Error(`unknown mobile tab ${key}`);
   if (key === "library") {
-    return { ...item, tabLabel: "ჩემი ისტორია", tabLabelEn: "My history" };
+    return {
+      ...item,
+      tabLabel: "ჩემი ისტორია",
+      tabLabelEn: "My history",
+      tabLabelPl: "Moja historia",
+    };
   }
   return { ...item };
 }

@@ -1,0 +1,1373 @@
+diff --git a/app/dashboard/page.tsx b/app/dashboard/page.tsx
+index 395deb9..c117d2f 100644
+--- a/app/dashboard/page.tsx
++++ b/app/dashboard/page.tsx
+@@ -21,7 +21,6 @@ import { RestrictedNotice } from "@/components/safety/restricted-notice";
+ import { DashboardTestPromo } from "@/components/dashboard/test-promo-widget";
+ import { DashboardArticleRecommendations } from "@/components/dashboard/article-recommendations";
+ import { DashboardBillingNudge } from "@/components/dashboard/billing-nudge";
+-import { PhoneGiftPopup } from "@/components/phone-gift/phone-gift-popup";
+ import { TESTS } from "@/lib/tests-catalog";
+ import {
+   listPublishedArticlePreviews,
+@@ -31,8 +30,6 @@ import { normalizeUserLocale } from "@/lib/i18n/user-locale";
+ import { getRequestLocale } from "@/lib/i18n/request-locale";
+ import { getBalance } from "@/lib/credits";
+ import { shouldShowPurchasePromotion } from "@/lib/billing-config";
+-import { phoneGiftPopupEligible } from "@/lib/phone-gift-pure";
+-import { isPremiumUser } from "@/lib/premium";
+ import type { Metadata } from "next";
+ 
+ export async function generateMetadata(): Promise<Metadata> {
+@@ -71,7 +68,6 @@ export default async function DashboardPage() {
+     [eqResult],
+     [bigFiveResult],
+     balance,
+-    isPremium,
+   ] = await Promise.all([
+     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
+     db
+@@ -79,8 +75,6 @@ export default async function DashboardPage() {
+         locale: users.interfaceLanguage,
+         countryCode: users.residenceCountryCode,
+         isPremium: users.isPremium,
+-        phoneVerifiedAt: users.phoneVerifiedAt,
+-        phoneGiftPopupDismissedAt: users.phoneGiftPopupDismissedAt,
+       })
+       .from(users)
+       .where(eq(users.id, user.id))
+@@ -106,7 +100,6 @@ export default async function DashboardPage() {
+       .where(eq(bigFiveResults.userId, user.id))
+       .limit(1),
+     getBalance(user.id),
+-    isPremiumUser(user.id),
+   ]);
+   const locale = await getRequestLocale(normalizeUserLocale(userRow?.locale));
+   const en = locale !== "ka";
+@@ -168,16 +161,6 @@ export default async function DashboardPage() {
+   );
+   const suggestedTest = pool[seedValue % pool.length];
+   const suggestedArticles = pickDailyArticles(publishedArticles, seedValue);
+-  // Phone-gift campaign is Georgian-numbers only (verify a +995 number →
+-  // credits), so the popup never shows on the English host.
+-  const showPhoneGiftPopup =
+-    !en &&
+-    phoneGiftPopupEligible({
+-      hasVerifiedPhone: Boolean(userRow?.phoneVerifiedAt),
+-      isPremium,
+-      restricted,
+-      popupDismissed: Boolean(userRow?.phoneGiftPopupDismissedAt),
+-    });
+ 
+   return (
+     <main
+@@ -196,8 +179,6 @@ export default async function DashboardPage() {
+ 
+       <AppHeader authed active="today" />
+ 
+-      {showPhoneGiftPopup && <PhoneGiftPopup locale={locale} />}
+-
+       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
+         {restricted && <RestrictedNotice locale={locale} />}
+         <h1 className="mb-5 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
+@@ -207,12 +188,13 @@ export default async function DashboardPage() {
+           </span>
+         </h1>
+ 
+-        <div className="mb-8">
++        <DailyDashboard userId={user.id} locale={locale} />
++
++        {/* Tarot + AI stay one tap away, below the delivered daily value. */}
++        <div className="mt-8">
+           <PopularTools locale={locale} placement="dashboard_top" />
+         </div>
+ 
+-        <DailyDashboard userId={user.id} locale={locale} />
+-
+         {/* Soft prompt to enable daily push — hides itself once enabled,
+             unsupported, or dismissed. */}
+         <PushOptIn variant="banner" locale={locale} />
+diff --git a/components/dashboard/daily-card.tsx b/components/dashboard/daily-card.tsx
+index 3215919..fc695b6 100644
+--- a/components/dashboard/daily-card.tsx
++++ b/components/dashboard/daily-card.tsx
+@@ -1,6 +1,6 @@
+ "use client";
+ 
+-import { useEffect, useRef } from "react";
++import { useEffect, useRef, type ReactNode } from "react";
+ import { Sparkles } from "lucide-react";
+ 
+ import type { DailyHoroscope } from "@/db/schema";
+@@ -54,18 +54,34 @@ export function DailyCard({
+   horoscope,
+   transits = [],
+   onRead,
++  children,
+   locale = "ka",
+ }: {
+   horoscope: DailyHoroscope;
+   /** Today's strongest transit aspects + their library interpretations. */
+   transits?: TransitBreakdownItem[];
+   onRead?: () => void;
++  /** Primary daily action stays next to the summary, before optional details. */
++  children?: ReactNode;
+   locale?: UserLocale;
+ }) {
+   const en = locale !== "ka";
+   const readSentinelRef = useRef<HTMLParagraphElement>(null);
+   const readTrackedRef = useRef(false);
+ 
++  // Longer body paragraphs (library duplicates already filtered) — rendered
++  // inside the expandable details block so the headline + summary stay the
++  // first thing on screen.
++  const detailParagraphs = horoscope.body
++    .split(/\n{2,}/)
++    .filter(Boolean)
++    // Library-composed bodies reuse the same texts the transit
++    // breakdown below shows verbatim — drop those paragraphs here so
++    // nothing reads twice. Surfaces without the breakdown (email,
++    // mobile) keep the full body.
++    .filter((para) => !transits.some((t) => t.body.trim() === para.trim()));
++  const hasDetails = detailParagraphs.length > 0 || transits.length > 0;
++
+   useEffect(() => {
+     readTrackedRef.current = false;
+     trackEvent(ANALYTICS_EVENT.dailyHoroscopeViewed, {
+@@ -153,79 +169,80 @@ export function DailyCard({
+         </div>
+       )}
+ 
+-      <p className="relative mt-5 text-base leading-relaxed text-foreground/90">
++      <p
++        ref={readSentinelRef}
++        className="relative mt-5 text-base leading-relaxed text-foreground/90"
++      >
+         {horoscope.summary}
+       </p>
+ 
+-      <div className="relative mt-5 space-y-4 text-sm leading-relaxed text-foreground/85">
+-        {horoscope.body
+-          .split(/\n{2,}/)
+-          .filter(Boolean)
+-          // Library-composed bodies reuse the same texts the transit
+-          // breakdown below shows verbatim — drop those paragraphs here so
+-          // nothing reads twice. Surfaces without the breakdown (email,
+-          // mobile) keep the full body.
+-          .filter(
+-            (para) => !transits.some((t) => t.body.trim() === para.trim()),
+-          )
+-          .map((para, i) => (
+-            <p key={i}>{para}</p>
+-          ))}
+-      </div>
+-
+-      {transits.length > 0 && (
+-        <section className="relative mt-6 border-t border-border/40 pt-5">
+-          <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+-            {en ? "Today's transits" : "დღის ტრანზიტები"}
+-          </h3>
+-          <ul className="mt-3 space-y-3">
+-            {transits.map((t, i) => {
+-              const tone = ASPECT_TONE[t.kind] ?? "var(--vivida-violet)";
+-              const transitBody = BODIES[t.transit];
+-              const natalBody = BODIES[t.natal];
+-              return (
+-                <li
+-                  key={i}
+-                  className="rounded-xl border border-border/50 bg-background/30 p-3.5"
+-                >
+-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+-                    <span
+-                      className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-medium"
+-                      style={{
+-                        color: tone,
+-                        borderColor: `color-mix(in oklch, ${tone} 40%, transparent)`,
+-                        backgroundColor: `color-mix(in oklch, ${tone} 10%, transparent)`,
+-                      }}
+-                    >
+-                      {transitBody?.symbol}{" "}
+-                      {(en ? transitBody?.labelEn : transitBody?.labelKa) ??
+-                        t.transit}
+-                      <span aria-hidden>{ASPECT_GLYPH[t.kind] ?? "·"}</span>
+-                      {natalBody?.symbol}{" "}
+-                      {(en ? natalBody?.labelEn : natalBody?.labelKa) ??
+-                        t.natal}
+-                    </span>
+-                    <span className="text-muted-foreground">
+-                      {(en ? ASPECT_EN : ASPECT_KA)[t.kind] ?? t.kind}
+-                    </span>
+-                  </div>
+-                  <p className="mt-2 text-sm font-medium text-foreground/95">
+-                    {t.title}
+-                  </p>
+-                  <p className="mt-1 text-sm leading-relaxed text-foreground/80">
+-                    {t.body}
+-                  </p>
+-                </li>
+-              );
+-            })}
+-          </ul>
+-        </section>
++      {children != null && <div className="relative mt-4">{children}</div>}
++
++      {hasDetails && (
++        <details className="relative mt-5 rounded-xl border border-border/50 bg-background/30">
++          <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-foreground/90 transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden">
++            {en ? "Details and transits" : "დეტალები და ტრანზიტები"}
++          </summary>
++          <div className="space-y-4 px-4 pb-4 text-sm leading-relaxed text-foreground/85">
++            {detailParagraphs.map((para, i) => (
++              <p key={i}>{para}</p>
++            ))}
++            {transits.length > 0 && (
++              <section className="border-t border-border/40 pt-4">
++                <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
++                  {en ? "Today's transits" : "დღის ტრანზიტები"}
++                </h3>
++                <ul className="mt-3 space-y-3">
++                  {transits.map((t, i) => {
++                    const tone = ASPECT_TONE[t.kind] ?? "var(--vivida-violet)";
++                    const transitBody = BODIES[t.transit];
++                    const natalBody = BODIES[t.natal];
++                    return (
++                      <li
++                        key={i}
++                        className="rounded-xl border border-border/50 bg-background/30 p-3.5"
++                      >
++                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
++                          <span
++                            className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-medium"
++                            style={{
++                              color: tone,
++                              borderColor: `color-mix(in oklch, ${tone} 40%, transparent)`,
++                              backgroundColor: `color-mix(in oklch, ${tone} 10%, transparent)`,
++                            }}
++                          >
++                            {transitBody?.symbol}{" "}
++                            {(en
++                              ? transitBody?.labelEn
++                              : transitBody?.labelKa) ?? t.transit}
++                            <span aria-hidden>
++                              {ASPECT_GLYPH[t.kind] ?? "·"}
++                            </span>
++                            {natalBody?.symbol}{" "}
++                            {(en ? natalBody?.labelEn : natalBody?.labelKa) ??
++                              t.natal}
++                          </span>
++                          <span className="text-muted-foreground">
++                            {(en ? ASPECT_EN : ASPECT_KA)[t.kind] ?? t.kind}
++                          </span>
++                        </div>
++                        <p className="mt-2 text-sm font-medium text-foreground/95">
++                          {t.title}
++                        </p>
++                        <p className="mt-1 text-sm leading-relaxed text-foreground/80">
++                          {t.body}
++                        </p>
++                      </li>
++                    );
++                  })}
++                </ul>
++              </section>
++            )}
++          </div>
++        </details>
+       )}
+ 
+-      <p
+-        ref={readSentinelRef}
+-        className="relative mt-6 border-t border-border/40 pt-4 text-xs text-muted-foreground"
+-      >
++      <p className="relative mt-6 border-t border-border/40 pt-4 text-xs text-muted-foreground">
+         {en
+           ? "A new reading will be waiting tomorrow."
+           : "ხვალ ახალი წინასწარმეტყველება გელოდება."}
+diff --git a/components/dashboard/daily-dashboard.tsx b/components/dashboard/daily-dashboard.tsx
+index 37c7919..f4fa562 100644
+--- a/components/dashboard/daily-dashboard.tsx
++++ b/components/dashboard/daily-dashboard.tsx
+@@ -222,17 +222,6 @@ function DashboardExtrasSection({
+ 
+   return (
+     <>
+-      {!loading && extras.daily ? (
+-        <ProDailyBrief
+-          userId={userId}
+-          dateIso={extras.daily.date}
+-          transits={extras.transitBreakdown}
+-          isPremium={isPremium}
+-          locale={locale}
+-        />
+-      ) : loading ? (
+-        <CardSkeleton className="min-h-[180px]" />
+-      ) : null}
+       {(!loading && extras.daily) || dailySlot || moonSlot ? (
+         <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
+           {!loading && extras.daily ? (
+@@ -256,6 +245,20 @@ function DashboardExtrasSection({
+         </div>
+       ) : null}
+ 
++      {/* PRO layer sits below the delivered free insight — premium answers
++          stay fully unlocked, free viewers get the score tease + CTA. */}
++      {!loading && extras.daily ? (
++        <ProDailyBrief
++          userId={userId}
++          dateIso={extras.daily.date}
++          transits={extras.transitBreakdown}
++          isPremium={isPremium}
++          locale={locale}
++        />
++      ) : loading ? (
++        <CardSkeleton className="min-h-[180px]" />
++      ) : null}
++
+       {!weeklyUnlocked ? (
+         <WeeklyForecastLocked
+           cost={CREDIT_COST.weeklyForecast}
+diff --git a/components/dashboard/daily-ritual.tsx b/components/dashboard/daily-ritual.tsx
+index 4ab3a57..e7b29f7 100644
+--- a/components/dashboard/daily-ritual.tsx
++++ b/components/dashboard/daily-ritual.tsx
+@@ -104,14 +104,16 @@ export function DailyRitual({
+   const progressPercent = completed ? 100 : completedSteps * 50;
+ 
+   return (
+-    <div className="space-y-3">
+-      <DailyCard
+-        horoscope={horoscope}
+-        transits={transits}
+-        onRead={onRead}
+-        locale={locale}
+-      />
+-      <section className="rounded-2xl border border-[var(--vivida-violet)]/35 bg-card/65 p-4 backdrop-blur-xl sm:p-5">
++    <DailyCard
++      horoscope={horoscope}
++      transits={transits}
++      onRead={onRead}
++      locale={locale}
++    >
++      <section
++        data-daily-ritual={completed ? "complete" : "pending"}
++        className="rounded-2xl border border-[var(--vivida-violet)]/35 bg-card/65 p-4 backdrop-blur-xl sm:p-5"
++      >
+         <div className="flex flex-wrap items-center justify-between gap-3">
+           <div className="flex items-center gap-2">
+             <Flame className="size-5 text-[var(--vivida-pink)]" />
+@@ -204,6 +206,6 @@ export function DailyRitual({
+           )}
+         </div>
+       </section>
+-    </div>
++    </DailyCard>
+   );
+ }
+diff --git a/components/nav/app-header.tsx b/components/nav/app-header.tsx
+index ce841ad..965707b 100644
+--- a/components/nav/app-header.tsx
++++ b/components/nav/app-header.tsx
+@@ -102,6 +102,8 @@ export async function AppHeader({
+           <MobileNav
+             active={active as NavActiveKey | undefined}
+             locale={locale}
++            unreadMessages={unreadMessages}
++            pendingAskNudges={pendingAskNudges}
+           />
+         )}
+ 
+diff --git a/components/nav/desktop-sidebar.tsx b/components/nav/desktop-sidebar.tsx
+index 240a8c2..f8a28f5 100644
+--- a/components/nav/desktop-sidebar.tsx
++++ b/components/nav/desktop-sidebar.tsx
+@@ -1,5 +1,4 @@
+ import Link from "next/link";
+-import { MessageCircle } from "lucide-react";
+ 
+ import { VividaMark } from "@/components/brand/vivida-mark";
+ import { cn } from "@/lib/utils";
+@@ -31,17 +30,9 @@ export function DesktopSidebar({
+   pendingAskNudges?: number;
+   locale?: UserLocale;
+ }) {
+-  const items: NavItem[] = [
+-    ...NAV_ITEMS,
+-    {
+-      key: "messages",
+-      href: "/messages",
+-      label: "ჩატი",
+-      labelEn: "Chat",
+-      Icon: MessageCircle,
+-      hue: "oklch(0.78 0.18 200)",
+-    },
+-  ];
++  // NAV_ITEMS already leads with Today/Tarot/Ask/History and carries every
++  // other destination (My chart, messages, tests, reports…) as secondary.
++  const items: NavItem[] = NAV_ITEMS;
+ 
+   // Labels are always visible — no hover reveal.
+   const reveal = "";
+diff --git a/components/nav/mobile-nav.tsx b/components/nav/mobile-nav.tsx
+index f2abac6..863f0b2 100644
+--- a/components/nav/mobile-nav.tsx
++++ b/components/nav/mobile-nav.tsx
+@@ -4,11 +4,13 @@ import { useState } from "react";
+ import Link from "next/link";
+ import * as DialogPrimitive from "@radix-ui/react-dialog";
+ import { motion, AnimatePresence } from "framer-motion";
+-import { Menu, X } from "lucide-react";
++import { Ellipsis, Menu, X } from "lucide-react";
+ 
+ import { cn } from "@/lib/utils";
+ import { VividaMark } from "@/components/brand/vivida-mark";
+ import { InstallAppButton } from "@/components/pwa/install-button";
++import { AskTabBadge } from "./ask-tab-badge";
++import { MessagesTabBadge } from "./messages-tab-badge";
+ import { NavItemLink } from "./nav-item-link";
+ import { NAV_ITEMS, navLabel, type NavActiveKey } from "./nav-items";
+ import type { UserLocale } from "@/lib/i18n/user-locale";
+@@ -16,26 +18,65 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
+ /**
+  * Mobile-only slide-in nav drawer. The desktop NavLinks is `hidden lg:flex`,
+  * so phones/tablets need a hamburger entry point. Renders nothing above lg.
++ *
++ * The `tab` variant renders a bottom-tab-bar-styled "More" trigger instead
++ * of the header hamburger, so the fifth tab opens this same drawer — no
++ * dead links, no parallel menu to drift.
+  */
+ export function MobileNav({
+   active,
+   locale = "ka",
++  variant = "menu",
++  unreadMessages = 0,
++  pendingAskNudges = 0,
+ }: {
+   active?: NavActiveKey;
+   locale?: UserLocale;
++  variant?: "menu" | "tab";
++  unreadMessages?: number;
++  /** Unopened proactive astrologer nudges — dot on the ask row. */
++  pendingAskNudges?: number;
+ }) {
+   const [open, setOpen] = useState(false);
++  const moreLabel = locale !== "ka" ? "More" : "მეტი";
+ 
+   return (
+     <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
+       <DialogPrimitive.Trigger asChild>
+-        <button
+-          type="button"
+-          aria-label={locale !== "ka" ? "Menu" : "მენიუ"}
+-          className="grid size-11 shrink-0 place-items-center rounded-full text-foreground/85 transition-colors hover:bg-card/60 hover:text-foreground lg:hidden"
+-        >
+-          <Menu className="size-5" />
+-        </button>
++        {variant === "tab" ? (
++          <button
++            type="button"
++            aria-label={moreLabel}
++            aria-expanded={open}
++            className={cn(
++              "group flex w-full flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 text-[10px] font-medium transition-colors",
++              open
++                ? "text-foreground"
++                : "text-muted-foreground hover:text-foreground",
++            )}
++          >
++            <span
++              className={cn(
++                "relative grid size-9 place-items-center rounded-xl transition-all",
++                open
++                  ? "bg-[var(--vivida-violet)]/25 ring-1 ring-[var(--vivida-violet)]/60 shadow-[0_0_18px_-4px_oklch(0.65_0.24_305/0.6)]"
++                  : "group-active:scale-95",
++              )}
++              style={open ? { color: "oklch(0.78 0.18 305)" } : undefined}
++            >
++              <Ellipsis className="size-5" />
++            </span>
++            <span cla
+
+... [OUTPUT TRUNCATED - 2,673 chars omitted out of 52,601 total] ...
+
+em.key === "ask" && (
++                            <AskTabBadge
++                              pending={pendingAskNudges}
++                              locale={locale}
++                            />
++                          )}
++                        </span>
+                         <span className="relative z-10">
+                           {navLabel(item, locale)}
+                         </span>
+@@ -156,7 +207,19 @@ export function MobileNav({
+                     );
+                   })}
+                 </nav>
+-                <div className="mt-auto border-t border-border/60 pt-4">
++                <div className="mt-auto space-y-3 border-t border-border/60 pt-4">
++                  <NavItemLink
++                    href="/account"
++                    itemKey="account"
++                    surface="mobile_nav"
++                    locale={locale}
++                    onNavigate={() => setOpen(false)}
++                    className="block text-sm text-muted-foreground transition-colors hover:text-foreground"
++                  >
++                    {locale === "en"
++                      ? "Account & settings →"
++                      : "ანგარიში და პარამეტრები →"}
++                  </NavItemLink>
+                   <InstallAppButton
+                     locale={locale}
+                     surface="mobile_nav"
+diff --git a/components/nav/mobile-tab-bar.tsx b/components/nav/mobile-tab-bar.tsx
+index 5489d4c..a970271 100644
+--- a/components/nav/mobile-tab-bar.tsx
++++ b/components/nav/mobile-tab-bar.tsx
+@@ -1,16 +1,19 @@
+ import { cn } from "@/lib/utils";
+ import { AskTabBadge } from "./ask-tab-badge";
+-import { MessagesTabBadge } from "./messages-tab-badge";
++import { MobileNav } from "./mobile-nav";
+ import { NavItemLink } from "./nav-item-link";
+-import { MOBILE_TAB_ITEMS, type NavActiveKey } from "./nav-items";
+-import { navLabel } from "./nav-items";
++import {
++  MOBILE_TAB_ITEMS,
++  mobileTabLabel,
++  type NavActiveKey,
++} from "./nav-items";
+ import type { UserLocale } from "@/lib/i18n/user-locale";
+ 
+ /**
+- * iOS/Android-style fixed bottom tab bar. Mirrors the desktop NavLinks
+- * destinations so authed users on phones get one-tap access to every
+- * primary destination without opening the hamburger drawer. Hidden on
+- * lg+ where the inline header nav already covers it.
++ * iOS/Android-style fixed bottom tab bar. Four primary destinations
++ * (Today / Tarot / Ask / My history) plus a More entry point that opens
++ * the full nav drawer — every other route stays one tap behind More.
++ * Hidden on lg+ where the desktop sidebar already covers it.
+  *
+  * Respects safe-area insets so it sits above the iOS home indicator
+  * instead of being clipped under it.
+@@ -70,21 +73,24 @@ export function MobileTabBar({
+                   style={isActive ? { color: item.hue } : undefined}
+                 >
+                   <item.Icon className="size-5" />
+-                  {item.key === "messages" && (
+-                    <MessagesTabBadge
+-                      initial={unreadMessages}
+-                      locale={locale}
+-                    />
+-                  )}
+                   {item.key === "ask" && (
+                     <AskTabBadge pending={pendingAskNudges} locale={locale} />
+                   )}
+                 </span>
+-                <span className="truncate">{navLabel(item, locale)}</span>
++                <span className="truncate">{mobileTabLabel(item, locale)}</span>
+               </NavItemLink>
+             </li>
+           );
+         })}
++        <li className="flex-1">
++          <MobileNav
++            variant="tab"
++            active={active}
++            locale={locale}
++            unreadMessages={unreadMessages}
++            pendingAskNudges={pendingAskNudges}
++          />
++        </li>
+       </ul>
+     </nav>
+   );
+diff --git a/components/nav/nav-items.ts b/components/nav/nav-items.ts
+index 0a4888e..ebba35e 100644
+--- a/components/nav/nav-items.ts
++++ b/components/nav/nav-items.ts
+@@ -46,6 +46,13 @@ export type NavItem = {
+   Icon: LucideIcon;
+   /** Hue used for the active glow + hover icon tint. Roughly the brand axis. */
+   hue: string;
++  /**
++   * Optional bottom-tab-bar-only label override. The /library destination
++   * reads as "My history" in the tab bar while drawer/sidebar keep the
++   * canonical library name.
++   */
++  tabLabel?: string;
++  tabLabelEn?: string;
+ };
+ 
+ /**
+@@ -72,6 +79,18 @@ export function navLabel(item: NavItem, locale: UserLocale = "ka"): string {
+   return item.label;
+ }
+ 
++/**
++ * Bottom-tab-bar label: honors the per-item tab override (history naming
++ * for /library) and falls back to the canonical label.
++ */
++export function mobileTabLabel(
++  item: NavItem,
++  locale: UserLocale = "ka",
++): string {
++  if (locale === "en") return item.tabLabelEn ?? item.labelEn;
++  return item.tabLabel ?? item.label;
++}
++
+ const ALL_NAV_ITEMS: NavItem[] = [
+   {
+     key: "today",
+@@ -82,29 +101,13 @@ const ALL_NAV_ITEMS: NavItem[] = [
+     hue: "oklch(0.82 0.16 80)",
+   },
+   {
+-    key: "sky",
+-    href: "/sky",
+-    label: "ცა ახლა",
+-    labelEn: "Sky now",
+-    Icon: Orbit,
+-    hue: "oklch(0.80 0.15 200)",
+-  },
+-  {
+-    key: "report",
+-    href: "/report",
+-    label: "ჩემი რუკა",
+-    labelEn: "My chart",
+-    Icon: Compass,
++    key: "tarot",
++    href: "/taro",
++    label: "ტარო",
++    labelEn: "Tarot",
++    Icon: Wand2,
+     hue: "oklch(0.78 0.18 305)",
+   },
+-  {
+-    key: "reports",
+-    href: "/reports",
+-    label: "რეპორტები",
+-    labelEn: "Reports",
+-    Icon: ScrollText,
+-    hue: "oklch(0.80 0.16 55)",
+-  },
+   {
+     key: "ask",
+     href: "/ask",
+@@ -122,13 +125,29 @@ const ALL_NAV_ITEMS: NavItem[] = [
+     hue: "oklch(0.80 0.15 190)",
+   },
+   {
+-    key: "tarot",
+-    href: "/taro",
+-    label: "ტარო",
+-    labelEn: "Tarot",
+-    Icon: Wand2,
++    key: "report",
++    href: "/report",
++    label: "ჩემი რუკა",
++    labelEn: "My chart",
++    Icon: Compass,
+     hue: "oklch(0.78 0.18 305)",
+   },
++  {
++    key: "sky",
++    href: "/sky",
++    label: "ცა ახლა",
++    labelEn: "Sky now",
++    Icon: Orbit,
++    hue: "oklch(0.80 0.15 200)",
++  },
++  {
++    key: "reports",
++    href: "/reports",
++    label: "რეპორტები",
++    labelEn: "Reports",
++    Icon: ScrollText,
++    hue: "oklch(0.80 0.16 55)",
++  },
+   {
+     key: "timing",
+     href: "/timing",
+@@ -153,6 +172,14 @@ const ALL_NAV_ITEMS: NavItem[] = [
+     Icon: Brain,
+     hue: "oklch(0.78 0.16 300)",
+   },
++  {
++    key: "messages",
++    href: "/messages",
++    label: "წერილები",
++    labelEn: "Messages",
++    Icon: MessageCircle,
++    hue: "oklch(0.78 0.18 200)",
++  },
+   {
+     key: "discover",
+     href: "/discover",
+@@ -188,52 +215,28 @@ const ALL_NAV_ITEMS: NavItem[] = [
+ ];
+ 
+ /**
+- * The mobile bottom tab bar shows a curated 5-item subset of the nav:
+- * today / chart / tarot / tests / chat.
++ * The mobile bottom tab bar shows four link destinations —
++ * Today / Tarot / Ask / My history — plus a More entry point that opens
++ * the full nav drawer (rendered by MobileTabBar, not a link here).
++ * Tab entries reuse the canonical item (href/icon/hue/labels) so the two
++ * surfaces cannot drift; /library carries its tab-only history naming.
+  */
+ export const NAV_ITEMS: NavItem[] = ALL_NAV_ITEMS.filter(navVisible);
+ 
++function mobileTab(key: NavActiveKey): NavItem {
++  const item = ALL_NAV_ITEMS.find((entry) => entry.key === key);
++  if (!item) throw new Error(`unknown mobile tab ${key}`);
++  if (key === "library") {
++    return { ...item, tabLabel: "ჩემი ისტორია", tabLabelEn: "My history" };
++  }
++  return { ...item };
++}
++
+ const ALL_MOBILE_TAB_ITEMS: NavItem[] = [
+-  {
+-    key: "today",
+-    href: "/dashboard",
+-    label: "დღეს",
+-    labelEn: "Today",
+-    Icon: Sun,
+-    hue: "oklch(0.82 0.16 80)",
+-  },
+-  {
+-    key: "report",
+-    href: "/report",
+-    label: "ჩემი რუკა",
+-    labelEn: "My chart",
+-    Icon: Compass,
+-    hue: "oklch(0.78 0.18 305)",
+-  },
+-  {
+-    key: "tarot",
+-    href: "/taro",
+-    label: "ტარო",
+-    labelEn: "Tarot",
+-    Icon: Wand2,
+-    hue: "oklch(0.78 0.18 305)",
+-  },
+-  {
+-    key: "tests",
+-    href: "/tests",
+-    label: "ტესტები",
+-    labelEn: "Tests",
+-    Icon: Brain,
+-    hue: "oklch(0.78 0.16 300)",
+-  },
+-  {
+-    key: "messages",
+-    href: "/messages",
+-    label: "ჩატი",
+-    labelEn: "Chat",
+-    Icon: MessageCircle,
+-    hue: "oklch(0.78 0.18 200)",
+-  },
++  mobileTab("today"),
++  mobileTab("tarot"),
++  mobileTab("ask"),
++  mobileTab("library"),
+ ];
+ 
+ /** Visible mobile tab bar — same flag filtering as the desktop nav. */
+diff --git a/components/phone-gift/phone-gift-popup.tsx b/components/phone-gift/phone-gift-popup.tsx
+deleted file mode 100644
+index 4b6365b..0000000
+--- a/components/phone-gift/phone-gift-popup.tsx
++++ /dev/null
+@@ -1,87 +0,0 @@
+-"use client";
+-
+-import { useRef, useState } from "react";
+-import { useRouter } from "next/navigation";
+-import { Gift } from "lucide-react";
+-
+-import {
+-  Dialog,
+-  DialogContent,
+-  DialogDescription,
+-  DialogHeader,
+-  DialogTitle,
+-} from "@/components/ui/dialog";
+-import { PhoneGiftForm } from "@/components/phone-gift/phone-gift-form";
+-import { dismissPhoneGiftPopup } from "@/actions/phone";
+-import { ANALYTICS_EVENT, trackEvent } from "@/lib/analytics";
+-import type { UserLocale } from "@/lib/i18n/user-locale";
+-
+-/**
+- * One-time dashboard gift popup. The dashboard renders this only while the
+- * viewer is eligible (no verified phone, not PRO, not dismissed) — any close
+- * path either records the dismissal so the popup never returns, or (after a
+- * successful claim) refreshes so the dashboard drops the stale state. The
+- * offer itself stays claimable from the credits page.
+- */
+-export function PhoneGiftPopup({ locale }: { locale: UserLocale }) {
+-  const en = locale !== "ka";
+-  const router = useRouter();
+-  const [open, setOpen] = useState(true);
+-  const claimedRef = useRef(false);
+-  const closedRef = useRef(false);
+-
+-  function handleOpenChange(next: boolean) {
+-    if (next) {
+-      setOpen(true);
+-      return;
+-    }
+-    setOpen(false);
+-    if (closedRef.current) return;
+-    closedRef.current = true;
+-    if (claimedRef.current) {
+-      // The number is verified now — a refresh removes this popup from the
+-      // dashboard and updates the balance.
+-      router.refresh();
+-      return;
+-    }
+-    trackEvent(ANALYTICS_EVENT.phoneGiftDismissed, {
+-      surface: "dashboard_popup",
+-    });
+-    void dismissPhoneGiftPopup();
+-  }
+-
+-  return (
+-    <Dialog open={open} onOpenChange={handleOpenChange}>
+-      <DialogContent className="max-w-md">
+-        <DialogHeader>
+-          <DialogTitle className="flex items-center gap-2">
+-            <Gift className="size-5 shrink-0 text-[var(--vivida-cyan)]" />
+-            {en
+-              ? "Verify your number and get 20 credits"
+-              : "დაადასტურე ნომერი და მიიღე 20 კრედიტი"}
+-          </DialogTitle>
+-          <DialogDescription>
+-            {en
+-              ? "Add your mobile number and verify it with an SMS code. Verification gives you 10 credits; opting in to promotional SMS makes it 20."
+-              : "შეიყვანე მობილურის ნომერი და დაადასტურე SMS კოდით. ნომრის დადასტურება გაძლევს 10 კრედიტს, მარკეტინგულ SMS-ებზე თანხმობა კი სულ 20 კრედიტს."}
+-          </DialogDescription>
+-        </DialogHeader>
+-
+-        <PhoneGiftForm
+-          locale={locale}
+-          surface="dashboard_popup"
+-          onClaimed={() => {
+-            claimedRef.current = true;
+-          }}
+-          onDone={() => handleOpenChange(false)}
+-        />
+-
+-        <p className="text-xs text-muted-foreground">
+-          {en
+-            ? "You can also claim this offer later from the Credits page."
+-            : "ეს შეთავაზება კრედიტების გვერდზე ყოველთვის ხელმისაწვდომია."}
+-        </p>
+-      </DialogContent>
+-    </Dialog>
+-  );
+-}
+diff --git a/components/pwa/install-nudge.tsx b/components/pwa/install-nudge.tsx
+index b5da010..41c09c4 100644
+--- a/components/pwa/install-nudge.tsx
++++ b/components/pwa/install-nudge.tsx
+@@ -5,6 +5,8 @@ import { X } from "lucide-react";
+ 
+ import { InstallAppButton } from "./install-button";
+ import { browserTrackingConsent } from "@/lib/tracking-consent";
++import { ANALYTICS_EVENT } from "@/lib/analytics";
++import { canPromptAfterDailyValue } from "@/lib/daily-ritual";
+ import type { UserLocale } from "@/lib/i18n/locale";
+ 
+ const SNOOZE_KEY = "vivida_pwa_nudge_after";
+@@ -18,10 +20,21 @@ export function InstallNudge({ locale }: { locale: UserLocale }) {
+     const standalone = () =>
+       window.matchMedia("(display-mode: standalone)").matches ||
+       Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
+-    const onValue = () => {
++    const onValue = (event: Event) => {
+       if (standalone() || !window.matchMedia("(max-width: 767px)").matches)
+         return;
+       if (browserTrackingConsent() === null) return;
++      const pendingRitual = Boolean(
++        document.querySelector('[data-daily-ritual="pending"]'),
++      );
++      const action = (event as CustomEvent<{ action?: string }>).detail?.action;
++      if (
++        !canPromptAfterDailyValue(
++          pendingRitual,
++          action === ANALYTICS_EVENT.dailyRitualCompleted,
++        )
++      )
++        return;
+       try {
+         if (Number(localStorage.getItem(SNOOZE_KEY) ?? 0) > Date.now()) return;
+       } catch {
+diff --git a/lib/analytics.ts b/lib/analytics.ts
+index c4aadeb..32fe9f4 100644
+--- a/lib/analytics.ts
++++ b/lib/analytics.ts
+@@ -195,7 +195,9 @@ export function trackEvent(
+ ): boolean {
+   if (typeof window === "undefined") return false;
+   if (VALUE_ACTION_EVENTS.has(name)) {
+-    window.dispatchEvent(new Event("vivida:pwa-value-action"));
++    window.dispatchEvent(
++      new CustomEvent("vivida:pwa-value-action", { detail: { action: name } }),
++    );
+   }
+   if (!browserTrackingAllowed()) return false;
+   const gtag = (
+diff --git a/lib/daily-ritual.ts b/lib/daily-ritual.ts
+index a5566a5..ac00954 100644
+--- a/lib/daily-ritual.ts
++++ b/lib/daily-ritual.ts
+@@ -1,5 +1,13 @@
+ export type DailyRitualState = { horoscopeRead: boolean; focus: string | null };
+ 
++/** Keep value-triggered prompts from covering an unfinished daily action. */
++export function canPromptAfterDailyValue(
++  pendingRitual: boolean,
++  completedDailyAction: boolean,
++): boolean {
++  return !pendingRitual || completedDailyAction;
++}
++
+ const EMPTY: DailyRitualState = { horoscopeRead: false, focus: null };
+ const PREFIX = "vivida_daily_ritual_v2";
+ 
+@@ -7,22 +15,34 @@ function key(userId: string, date: string): string {
+   return `${PREFIX}:${encodeURIComponent(userId)}:${date}`;
+ }
+ 
+-export function readDailyRitual(userId: string, date: string): DailyRitualState {
++export function readDailyRitual(
++  userId: string,
++  date: string,
++): DailyRitualState {
+   if (typeof window === "undefined") return { ...EMPTY };
+   try {
+-    const value = JSON.parse(localStorage.getItem(key(userId, date)) ?? "null") as unknown;
++    const value = JSON.parse(
++      localStorage.getItem(key(userId, date)) ?? "null",
++    ) as unknown;
+     if (!value || typeof value !== "object") return { ...EMPTY };
+     const record = value as Record<string, unknown>;
+     return {
+       horoscopeRead: record.horoscopeRead === true,
+-      focus: typeof record.focus === "string" && record.focus.length <= 80 ? record.focus : null,
++      focus:
++        typeof record.focus === "string" && record.focus.length <= 80
++          ? record.focus
++          : null,
+     };
+   } catch {
+     return { ...EMPTY };
+   }
+ }
+ 
+-export function saveDailyRitual(userId: string, date: string, state: DailyRitualState): void {
++export function saveDailyRitual(
++  userId: string,
++  date: string,
++  state: DailyRitualState,
++): void {
+   if (typeof window === "undefined") return;
+   try {
+     localStorage.setItem(key(userId, date), JSON.stringify(state));
+diff --git a/tests/analytics.test.ts b/tests/analytics.test.ts
+index 16063f2..aa38ab0 100644
+--- a/tests/analytics.test.ts
++++ b/tests/analytics.test.ts
+@@ -120,6 +120,18 @@ describe("trackEvent", () => {
+     expect(hits).toEqual([]);
+   });
+ 
++  it("identifies only the completed action in the local PWA signal even without analytics consent", () => {
++    const dispatch = vi.fn((event: Event) => Boolean(event));
++    (globalThis as { dispatchEvent: (event: Event) => boolean }).dispatchEvent =
++      dispatch;
++    (globalThis as { document: { cookie: string } }).document.cookie =
++      "vivida_tracking_consent=denied";
++    trackEvent(ANALYTICS_EVENT.dailyHoroscopeRead, { date: "2026-10-04" });
++    const event = dispatch.mock.calls[0]?.[0] as unknown as CustomEvent;
++    expect(event.type).toBe("vivida:pwa-value-action");
++    expect(event.detail).toEqual({ action: "daily_horoscope_read" });
++  });
++
+   it("never sends GA4 events from a token route despite existing consent and gtag", () => {
+     const hits = installGtag();
+     (globalThis as { location: { pathname: string } }).location.pathname =
+diff --git a/tests/pwa-daily-value.test.ts b/tests/pwa-daily-value.test.ts
+new file mode 100644
+index 0000000..afbb6c3
+--- /dev/null
++++ b/tests/pwa-daily-value.test.ts
+@@ -0,0 +1,30 @@
++import { describe, expect, it } from "vitest";
++import * as ritual from "@/lib/daily-ritual";
++
++const policy = (
++  ritual as typeof ritual & {
++    canPromptAfterDailyValue?: (
++      pendingRitual: boolean,
++      completedAction: boolean,
++    ) => boolean;
++  }
++).canPromptAfterDailyValue;
++
++describe("value prompts around the daily ritual", () => {
++  it("does not cover a pending focus choice just because the summary was read", () => {
++    expect(policy).toBeTypeOf("function");
++    expect(policy?.(true, false)).toBe(false);
++  });
++  it("allows an install suggestion after confirmed daily completion", () => {
++    expect(policy).toBeTypeOf("function");
++    expect(policy?.(true, true)).toBe(true);
++  });
++  it("keeps value-triggered prompts unchanged on other surfaces", () => {
++    expect(policy).toBeTypeOf("function");
++    expect(policy?.(false, false)).toBe(true);
++  });
++  it("does not suppress a suggestion once today's ritual is already complete", () => {
++    expect(policy).toBeTypeOf("function");
++    expect(policy?.(false, true)).toBe(true);
++  });
++});
+diff --git a/tests/today-daily-card.test.ts b/tests/today-daily-card.test.ts
+new file mode 100644
+index 0000000..36f6fa5
+--- /dev/null
++++ b/tests/today-daily-card.test.ts
+@@ -0,0 +1,77 @@
++import { describe, expect, it, vi } from "vitest";
++import { renderToStaticMarkup } from "react-dom/server";
++import { createElement } from "react";
++
++import { DailyCard } from "@/components/dashboard/daily-card";
++import type { DailyHoroscope } from "@/db/schema";
++import type { TransitBreakdownItem } from "@/lib/transit-library";
++
++const horoscope = {
++  userId: "user-1",
++  date: "2026-10-04",
++  headline: "მშვიდი, მაგრამ გადამწყვეტი დღე",
++  summary: "მოკლე შეჯამება დღის მთავარი ხაზით.",
++  body: "პირველი გრძელი აბზაცი დეტალებით.\n\nმეორე გრძელი აბზაცი ტრანზიტების ახსნით.",
++  themes: ["სიმშვიდე", "გამბედაობა"],
++  transits: null,
++  model: "test",
++  language: "ka",
++  createdAt: new Date("2026-10-04T00:00:00Z"),
++} as unknown as DailyHoroscope;
++
++const transits: TransitBreakdownItem[] = [
++  {
++    transit: "moon",
++    natal: "sun",
++    kind: "trine",
++    title: "მთვარე ტრინი მზე",
++    body: "ტრანზიტის გრძელი ახსნა.",
++  } as TransitBreakdownItem,
++];
++
++function render(locale: "ka" | "en" = "ka") {
++  const onRead = vi.fn();
++  const html = renderToStaticMarkup(
++    createElement(DailyCard, { horoscope, transits, onRead, locale }),
++  );
++  return { html, onRead };
++}
++
++describe("DailyCard first-value hierarchy", () => {
++  it("shows headline and summary without requiring expansion", () => {
++    const { html } = render();
++    expect(html).toContain(horoscope.headline);
++    expect(html).toContain(horoscope.summary);
++    // Summary must render outside the expandable details block.
++    const detailsAt = html.indexOf("<details");
++    const summaryAt = html.indexOf(horoscope.summary);
++    expect(detailsAt).toBeGreaterThan(-1);
++    expect(summaryAt).toBeGreaterThan(-1);
++    expect(summaryAt).toBeLessThan(detailsAt);
++  });
++
++  it("keeps the longer body and transit explanations inside an accessible details section", () => {
++    const { html } = render();
++    expect(html).toContain("<details");
++    expect(html).toContain("<summary");
++    const detailsBlock = html.slice(html.indexOf("<details"));
++    expect(detailsBlock).toContain("პირველი გრძელი აბზაცი");
++    expect(detailsBlock).toContain("მეორე გრძელი აბზაცი");
++    expect(detailsBlock).toContain("ტრანზიტის გრძელი ახსნა");
++  });
++
++  it("does not report the card as read just because it rendered", () => {
++    const { onRead } = render();
++    expect(onRead).not.toHaveBeenCalled();
++  });
++
++  it("keeps the English copy working in the collapsed layout", () => {
++    const onRead = vi.fn();
++    const html = renderToStaticMarkup(
++      createElement(DailyCard, { horoscope, transits, onRead, locale: "en" }),
++    );
++    expect(html).toContain(horoscope.headline);
++    expect(html).toContain("<details");
++    expect(onRead).not.toHaveBeenCalled();
++  });
++});
+diff --git a/tests/today-dashboard-order.test.ts b/tests/today-dashboard-order.test.ts
+new file mode 100644
+index 0000000..0524bb1
+--- /dev/null
++++ b/tests/today-dashboard-order.test.ts
+@@ -0,0 +1,58 @@
++import { readFileSync } from "node:fs";
++import { fileURLToPath } from "node:url";
++import { describe, expect, it } from "vitest";
++
++const root = fileURLToPath(new URL("../", import.meta.url));
++const page = readFileSync(`${root}app/dashboard/page.tsx`, "utf8");
++const extras = readFileSync(
++  `${root}components/dashboard/daily-dashboard.tsx`,
++  "utf8",
++);
++
++describe("dashboard free-value-first ordering", () => {
++  it("renders the delivered daily insight before promotional tools", () => {
++    expect(page).toContain("<DailyDashboard");
++    expect(page).toContain("<PopularTools");
++    expect(page.indexOf("<DailyDashboard")).toBeLessThan(
++      page.indexOf("<PopularTools"),
++    );
++  });
++
++  it("keeps tarot and AI one tap away below the daily insight", () => {
++    const tools = readFileSync(
++      `${root}components/nav/popular-tools.tsx`,
++      "utf8",
++    );
++    expect(tools).toContain('"/taro"');
++    expect(tools).toContain('"/ask"');
++    expect(page).toContain("<PopularTools");
++  });
++
++  it("keeps purchase prompts below the delivered free value", () => {
++    expect(page.indexOf("<DailyDashboard")).toBeLessThan(
++      page.indexOf("<DashboardBillingNudge"),
++    );
++  });
++
++  it("shows the free daily ritual before the PRO teaser in the extras wave", () => {
++    expect(extras).toContain("<DailyRitual");
++    expect(extras).toContain("<ProDailyBrief");
++    expect(extras.indexOf("<DailyRitual")).toBeLessThan(
++      extras.indexOf("<ProDailyBrief"),
++    );
++  });
++
++  it("keeps the weekly forecast and its lock below the daily ritual", () => {
++    expect(extras.indexOf("<DailyRitual")).toBeLessThan(
++      extras.indexOf("<WeeklyForecastLocked"),
++    );
++  });
++});
++
++describe("dashboard phone-gift popup removal", () => {
++  it("does not mount or query the automatic popup from the dashboard", () => {
++    expect(page).not.toContain("PhoneGiftPopup");
++    expect(page).not.toContain("phoneGiftPopupEligible");
++    expect(page).not.toContain("phoneGiftPopupDismissedAt");
++  });
++});
+diff --git a/tests/today-nav.test.ts b/tests/today-nav.test.ts
+new file mode 100644
+index 0000000..24388e6
+--- /dev/null
++++ b/tests/today-nav.test.ts
+@@ -0,0 +1,110 @@
++import { describe, expect, it, vi } from "vitest";
++import { renderToStaticMarkup } from "react-dom/server";
++import { createElement } from "react";
++
++vi.mock("next/link", () => ({
++  default: ({
++    href,
++    children,
++    ...rest
++  }: {
++    href: string;
++    children: React.ReactNode;
++  }) => createElement("a", { href, ...rest }, children),
++}));
++
++import {
++  MOBILE_TAB_ITEMS,
++  NAV_ITEMS,
++  mobileTabLabel,
++  navLabel,
++  type NavItem,
++} from "@/components/nav/nav-items";
++import { MobileTabBar } from "@/components/nav/mobile-tab-bar";
++
++function byKey(key: string): NavItem {
++  const item = [...MOBILE_TAB_ITEMS, ...NAV_ITEMS].find((i) => i.key === key);
++  if (!item) throw new Error(`missing nav item ${key}`);
++  return item;
++}
++
++describe("mobile bottom navigation destinations", () => {
++  it("is exactly Today / Tarot / Ask / My history, in order", () => {
++    expect(MOBILE_TAB_ITEMS.map((i) => i.key)).toEqual([
++      "today",
++      "tarot",
++      "ask",
++      "library",
++    ]);
++    expect(MOBILE_TAB_ITEMS.map((i) => i.href)).toEqual([
++      "/dashboard",
++      "/taro",
++      "/ask",
++      "/library",
++    ]);
++  });
++
++  it("labels every tab in both KA and EN, with history named as history", () => {
++    const labels = (locale: "ka" | "en") =>
++      MOBILE_TAB_ITEMS.map((i) => mobileTabLabel(i, locale));
++    expect(labels("ka")).toEqual(["დღეს", "ტარო", "ჰკითხე", "ჩემი ისტორია"]);
++    expect(labels("en")).toEqual(["Today", "Tarot", "Ask", "My history"]);
++  });
++});
++
++describe("shared nav keeps every destination reachable", () => {
++  it("orders desktop/drawer with Today, Tarot, Ask, History first", () => {
++    const keys = NAV_ITEMS.map((i) => i.key);
++    expect(keys.slice(0, 4)).toEqual(["today", "tarot", "ask", "library"]);
++  });
++
++  it("keeps My chart, tests, reports and interpersonal messages in the menu", () => {
++    const keys = NAV_ITEMS.map((i) => i.key);
++    for (const key of ["report", "tests", "reports", "messages"]) {
++      expect(keys).toContain(key);
++    }
++  });
++
++  it("names interpersonal messages distinctly from the AI ask entry", () => {
++    const messages = byKey("messages");
++    const ask = byKey("ask");
++    expect(navLabel(messages, "ka")).toBe("წერილები");
++    expect(navLabel(messages, "en")).toBe("Messages");
++    expect(navLabel(messages, "ka")).not.toBe(navLabel(ask, "ka"));
++    expect(navLabel(messages, "en")).not.toBe(navLabel(ask, "en"));
++  });
++});
++
++describe("MobileTabBar runtime output", () => {
++  it("links the four real destinations and opens the drawer from More (KA)", () => {
++    const html = renderToStaticMarkup(
++      createElement(MobileTabBar, {
++        active: "today",
++        unreadMessages: 0,
++        pendingAskNudges: 0,
++        locale: "ka",
++      }),
++    );
++    for (const href of ["/dashboard", "/taro", "/ask", "/library"]) {
++      expect(html).toContain(`href="${href}"`);
++    }
++    expect(html).not.toContain('href="#"');
++    expect(html).not.toContain('href="/more"');
++    expect(html).toContain("მეტი");
++    expect(html).toContain("ჩემი ისტორია");
++  });
++
++  it("renders EN labels and the ask nudge badge on the real /ask tab", () => {
++    const html = renderToStaticMarkup(
++      createElement(MobileTabBar, {
++        active: "ask",
++        unreadMessages: 0,
++        pendingAskNudges: 2,
++        locale: "en",
++      }),
++    );
++    expect(html).toContain("My history");
++    expect(html).toContain("More");
++    expect(html).toContain("New message from your astrologer");
++  });
++});
+diff --git a/tests/today-ritual-layout.test.ts b/tests/today-ritual-layout.test.ts
+new file mode 100644
+index 0000000..821aff4
+--- /dev/null
++++ b/tests/today-ritual-layout.test.ts
+@@ -0,0 +1,66 @@
++import { createElement } from "react";
++import { renderToStaticMarkup } from "react-dom/server";
++import { describe, expect, it, vi } from "vitest";
++
++const actions = vi.hoisted(() => ({ completeDailyRitual: vi.fn() }));
++vi.mock("@/actions/daily-ritual", () => actions);
++vi.mock("next/link", () => ({
++  default: ({ href, children }: { href: string; children: React.ReactNode }) =>
++    createElement("a", { href }, children),
++}));
++
++import { DailyRitual } from "@/components/dashboard/daily-ritual";
++import type { DailyHoroscope } from "@/db/schema";
++
++const horoscope: DailyHoroscope = {
++  userId: "test-reader",
++  date: "2026-10-04",
++  headline: "ერთი მთავარი აზრი",
++  summary: "დღის მოკლე შეჯამება.",
++  body: "დეტალური განმარტება დამატებითი კონტექსტით.",
++  themes: ["სიმშვიდე", "გამბედაობა", "ურთიერთობები"],
++  transits: null,
++  model: "test-fixture",
++  language: "ka",
++  createdAt: new Date("2026-10-04T00:00:00Z"),
++};
++
++function render(completed = false) {
++  return renderToStaticMarkup(
++    createElement(DailyRitual, {
++      userId: "test-reader",
++      horoscope,
++      transits: [],
++      initialProgress: {
++        current: completed ? 7 : 0,
++        longest: completed ? 7 : 0,
++        todayComplete: completed,
++        next: completed
++          ? { days: 30, daysLeft: 23, credits: 2 }
++          : { days: 7, daysLeft: 7, credits: 1 },
++      },
++      locale: "ka",
++    }),
++  );
++}
++
++describe("daily ritual action placement", () => {
++  it("places the actual focus choices immediately after the summary, before optional forecast details", () => {
++    const html = render();
++    const summaryAt = html.indexOf(horoscope.summary);
++    const focusAt = html.indexOf("დღის პატარა რიტუალი");
++    const detailsAt = html.indexOf("<details");
++    expect(summaryAt).toBeGreaterThan(-1);
++    expect(detailsAt).toBeGreaterThan(-1);
++    expect(focusAt).toBeGreaterThan(summaryAt);
++    expect(focusAt).toBeLessThan(detailsAt);
++  });
++
++  it("keeps completed progress and reminder access without issuing another completion", () => {
++    const html = render(true);
++    expect(html).toContain("დღის რიტუალი დასრულებულია");
++    expect(html).toContain("7 დღიანი სერია");
++    expect(html).toContain('href="/account#reminders"');
++    expect(actions.completeDailyRitual).not.toHaveBeenCalled();
++  });
++});

@@ -14,7 +14,7 @@ import { PartnerCard } from "@/components/synastry/partner-card";
 import { CREDIT_COST } from "@/lib/credits-config";
 import { isPremiumUser } from "@/lib/premium";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
-import type { UserLocale } from "@/lib/i18n/user-locale";
+import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -25,9 +25,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function SynastryPage() {
-  const locale = await getRequestLocale();
-  const en = locale !== "ka";
   const user = await requireUser();
+  const locale = await getUserLocale(user.id);
+  const en = locale !== "ka";
   const [partners, used] = await Promise.all([
     listRelationshipsForViewer(user.id),
     partnerCreationsThisMonth(user.id),

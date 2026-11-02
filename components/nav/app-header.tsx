@@ -16,7 +16,22 @@ import { ObservatoryDrawer } from "./observatory-drawer";
 import { SearchBar } from "./search-bar";
 import { UserMenu } from "./user-menu";
 import { CreditBalanceMenu } from "@/components/credits/credit-balance-menu";
+import { AppLanguageSwitcher } from "@/components/i18n/international-language-switcher";
+import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { getUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
+import { localizedHref } from "@/lib/seo/public-paths";
+import { signByIndex } from "@/lib/zodiac";
+
+const PHASE_LABEL_PL: Record<string, string> = {
+  new_moon: "Nów",
+  waxing_crescent: "Przybywający sierp",
+  first_quarter: "Pierwsza kwadra",
+  waxing_gibbous: "Przybywający garb",
+  full_moon: "Pełnia",
+  waning_gibbous: "Ubywający garb",
+  last_quarter: "Trzecia kwadra",
+  waning_crescent: "Ubywający sierp",
+};
 
 const PRIMARY_WORKSPACE_KEYS: NavActiveKey[] = [
   "today",
@@ -88,7 +103,11 @@ export async function AppHeader({
       residenceCountryCode = data.residenceCountryCode;
     }
   }
+  if (!userInfo) {
+    locale = await getRequestLocale();
+  }
 
+  const pl = locale === "pl";
   const en = locale !== "ka";
 
   const allItems = navItems(locale);
@@ -101,16 +120,21 @@ export async function AppHeader({
     : undefined;
   const activeSectionLabel =
     active === "account"
-      ? en
-        ? "Account & Settings"
-        : "ანგარიში და პარამეტრები"
+      ? pl
+        ? "Konto i ustawienia"
+        : en
+          ? "Account & Settings"
+          : "ანგარიში და პარამეტრები"
       : activeNavItem
         ? navLabel(activeNavItem, locale)
-        : en
-          ? "Observatory"
-          : "ობსერვატორია";
+        : pl
+          ? "Obserwatorium"
+          : en
+            ? "Observatory"
+            : "ობსერვატორია";
 
   const moonSnapshot = computeMoonPhase(new Date());
+  const moonSign = moonSnapshot ? signByIndex(moonSnapshot.signIndex) : null;
   const illumPct = moonSnapshot
     ? Math.round(moonSnapshot.illumination * 100)
     : 50;
@@ -131,7 +155,7 @@ export async function AppHeader({
               />
             )}
             <Link
-              href={userInfo ? "/dashboard" : "/"}
+              href={userInfo ? "/dashboard" : pl ? "/pl" : "/"}
               className="inline-flex shrink-0 items-center gap-2.5 whitespace-nowrap"
             >
               <VividaMark size={28} id="app-header" className="shrink-0" />
@@ -143,7 +167,13 @@ export async function AppHeader({
 
           {/* Zone 2: 5 Concise Single-Line Workspace / Public Links */}
           <nav
-            aria-label={en ? "Primary navigation" : "მთავარი ნავიგაცია"}
+            aria-label={
+              pl
+                ? "Główna nawigacja"
+                : en
+                  ? "Primary navigation"
+                  : "მთავარი ნავიგაცია"
+            }
             className="hidden items-center gap-7 text-sm font-medium text-muted-foreground lg:flex"
           >
             {userInfo ? (
@@ -152,7 +182,7 @@ export async function AppHeader({
                 return (
                   <Link
                     key={item.key}
-                    href={item.href}
+                    href={localizedHref(item.href, locale)}
                     className={`shrink-0 whitespace-nowrap transition-colors duration-150 hover:text-foreground ${
                       isActive
                         ? "text-foreground underline decoration-primary decoration-1 underline-offset-8"
@@ -166,34 +196,38 @@ export async function AppHeader({
             ) : (
               <>
                 <Link
-                  href={en ? "/daily-horoscope" : "/horoskopi"}
+                  href={localizedHref("/horoskopi", locale)}
                   className="shrink-0 whitespace-nowrap transition-colors hover:text-foreground"
                 >
-                  {en ? "Horoscope" : "ჰოროსკოპი"}
+                  {pl ? "Horoskop" : en ? "Horoscope" : "ჰოროსკოპი"}
                 </Link>
                 <Link
-                  href={en ? "/natal-chart" : "/nataluri-ruka"}
+                  href={localizedHref("/nataluri-ruka", locale)}
                   className="shrink-0 whitespace-nowrap transition-colors hover:text-foreground"
                 >
-                  {en ? "Birth Chart" : "ნატალური რუკა"}
+                  {pl
+                    ? "Horoskop urodzeniowy"
+                    : en
+                      ? "Birth Chart"
+                      : "ნატალური რუკა"}
                 </Link>
                 <Link
-                  href={en ? "/compatibility" : "/zodiac/tavsebadoba"}
+                  href={localizedHref("/zodiac/tavsebadoba", locale)}
                   className="shrink-0 whitespace-nowrap transition-colors hover:text-foreground"
                 >
-                  {en ? "Compatibility" : "თავსებადობა"}
+                  {pl ? "Zgodność" : en ? "Compatibility" : "თავსებადობა"}
                 </Link>
                 <Link
-                  href={en ? "/tarot" : "/taro"}
+                  href={localizedHref("/taro", locale)}
                   className="shrink-0 whitespace-nowrap transition-colors hover:text-foreground"
                 >
                   {en ? "Tarot" : "ტარო"}
                 </Link>
                 <Link
-                  href="/tests"
+                  href={localizedHref("/tests", locale)}
                   className="shrink-0 whitespace-nowrap transition-colors hover:text-foreground"
                 >
-                  {en ? "Tests" : "ტესტები"}
+                  {pl ? "Testy" : en ? "Tests" : "ტესტები"}
                 </Link>
               </>
             )}
@@ -201,6 +235,7 @@ export async function AppHeader({
 
           {/* Zone 3: Account Controls or Primary Sign-in Action */}
           <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
+            <AppLanguageSwitcher locale={locale} authed={Boolean(userInfo)} />
             {userInfo ? (
               <>
                 <MobileSearch locale={locale} />
@@ -235,7 +270,9 @@ export async function AppHeader({
                 size="sm"
                 className="shrink-0 whitespace-nowrap"
               >
-                <Link href="/login">{en ? "Sign in" : "შესვლა"}</Link>
+                <Link href="/login">
+                  {pl ? "Zaloguj się" : en ? "Sign in" : "შესვლა"}
+                </Link>
               </Button>
             )}
           </div>
@@ -248,7 +285,7 @@ export async function AppHeader({
             <div className="flex min-w-0 items-center gap-3 text-xs text-muted-foreground">
               <div className="flex items-center gap-2 truncate">
                 <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
-                  {en ? "Observatory" : "ობსერვატორია"}
+                  {pl ? "Obserwatorium" : en ? "Observatory" : "ობსერვატორია"}
                 </span>
                 <span aria-hidden>/</span>
                 <span className="truncate font-medium text-foreground">
@@ -258,7 +295,7 @@ export async function AppHeader({
 
               {moonSnapshot && (
                 <Link
-                  href={en ? "/moon-calendar" : "/mtvaris-kalendari"}
+                  href={localizedHref("/mtvaris-kalendari", locale)}
                   className="hidden items-center gap-2 border-l border-border pl-3 font-mono text-[11px] tabular-nums text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
                 >
                   <LunarPhaseDisc
@@ -266,14 +303,21 @@ export async function AppHeader({
                     size={16}
                   />
                   <span>
-                    {en
-                      ? PHASE_LABEL_EN[moonSnapshot.phaseKey]
-                      : moonSnapshot.phaseLabelKa}
+                    {pl
+                      ? (PHASE_LABEL_PL[moonSnapshot.phaseKey] ??
+                        PHASE_LABEL_EN[moonSnapshot.phaseKey])
+                      : en
+                        ? PHASE_LABEL_EN[moonSnapshot.phaseKey]
+                        : moonSnapshot.phaseLabelKa}
                   </span>
                   <span aria-hidden>·</span>
                   <span className="text-[var(--vivida-gold)]">
                     {moonSnapshot.signSymbol}{" "}
-                    {en ? moonSnapshot.signEn : moonSnapshot.signKa}
+                    {pl
+                      ? (moonSign?.labelPl ?? moonSnapshot.signEn)
+                      : en
+                        ? moonSnapshot.signEn
+                        : moonSnapshot.signKa}
                   </span>
                   <span aria-hidden>·</span>
                   <span>{illumPct}%</span>

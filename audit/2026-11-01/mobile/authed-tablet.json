@@ -1,0 +1,62 @@
+[
+  {
+    "url": "/dashboard",
+    "pattern": "/dashboard",
+    "dynamic": false
+  },
+  {
+    "url": "/feed",
+    "pattern": "/feed",
+    "dynamic": false
+  },
+  {
+    "url": "/friends",
+    "pattern": "/friends",
+    "dynamic": false
+  },
+  {
+    "url": "/report",
+    "pattern": "/report",
+    "dynamic": false
+  },
+  {
+    "url": "/account",
+    "pattern": "/account",
+    "dynamic": false
+  },
+  {
+    "url": "/messages?with=22222222-2222-4222-8222-222222222222",
+    "pattern": "/messages",
+    "dynamic": false
+  },
+  {
+    "url": "/u/luka-audit",
+    "pattern": "/u/luka-audit",
+    "dynamic": false
+  },
+  {
+    "url": "/synastry/new",
+    "pattern": "/synastry/new",
+    "dynamic": false
+  },
+  {
+    "url": "/library",
+    "pattern": "/library",
+    "dynamic": false
+  },
+  {
+    "url": "/ask",
+    "pattern": "/ask",
+    "dynamic": false
+  },
+  {
+    "url": "/people",
+    "pattern": "/people",
+    "dynamic": false
+  },
+  {
+    "url": "/subscription",
+    "pattern": "/subscription",
+    "dynamic": false
+  }
+]

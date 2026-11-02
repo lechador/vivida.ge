@@ -1,0 +1,22 @@
+[
+  {
+    "url": "/dashboard",
+    "pattern": "/dashboard",
+    "dynamic": false
+  },
+  {
+    "url": "/feed",
+    "pattern": "/feed",
+    "dynamic": false
+  },
+  {
+    "url": "/discover",
+    "pattern": "/discover",
+    "dynamic": false
+  },
+  {
+    "url": "/people",
+    "pattern": "/people",
+    "dynamic": false
+  }
+]

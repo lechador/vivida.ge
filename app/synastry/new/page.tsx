@@ -10,6 +10,7 @@ import { partnerCreationsThisMonth } from "@/lib/partners-core";
 import { PARTNER_CAP_PER_MONTH } from "@/lib/partners-config";
 import { PartnerForm } from "@/components/synastry/partner-form";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { getUserLocale } from "@/lib/i18n/user-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -25,9 +26,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function NewPartnerPage() {
-  const locale = await getRequestLocale();
-  const en = locale !== "ka";
   const user = await requireUser();
+  const locale = await getUserLocale(user.id);
+  const en = locale !== "ka";
   // Server-side cap check, keeps unauthorised users from bypassing the
   // client-side disabled CTA.
   const used = await partnerCreationsThisMonth(user.id);

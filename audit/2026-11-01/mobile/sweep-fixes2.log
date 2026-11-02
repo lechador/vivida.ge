@@ -1,0 +1,22 @@
+
+=== 320x568: 12 routes (concurrency 2) ===
+[1/12] 320 /tavsebadoba tap<24 x1 (3s)
+[2/12] 320 / textx6 tap<24 x14 (3s)
+[3/12] 320 /tests tap<24 x3 (6s)
+[4/12] 320 /zodiac/datit tap<24 x3 (6s)
+[5/12] 320 /astrologiuri-saxlebi/1 textx1 tap<24 x5 (9s)
+[6/12] 320 /mbti/intj tap<24 x5 (10s)
+[7/12] 320 /astrologiuri-kalendari tap<24 x2 (12s)
+[8/12] 320 /horoskopi tap<24 x15 (13s)
+[9/12] 320 /en tap<24 x14 (15s)
+[10/12] 320 /en/compatibility tap<24 x3 (15s)
+[11/12] 320 /zodiac/tavsebadoba textx1 tap<24 x3 (17s)
+[12/12] 320 /articles tap<24 x15 (18s)
+=== 320 done: 12 routes in 18s ===
+[
+  {
+    "width": 320,
+    "height": 568,
+    "count": 12
+  }
+]

@@ -1,0 +1,777 @@
+[
+  {
+    "url": "/",
+    "pattern": "/",
+    "dynamic": false
+  },
+  {
+    "url": "/account",
+    "pattern": "/account",
+    "dynamic": false
+  },
+  {
+    "url": "/akhali-mtvare",
+    "pattern": "/akhali-mtvare",
+    "dynamic": false
+  },
+  {
+    "url": "/akhali-mtvare/2026-11-09",
+    "pattern": "/akhali-mtvare/[date]",
+    "dynamic": true
+  },
+  {
+    "url": "/akhali-mtvare/2026-12-09",
+    "pattern": "/akhali-mtvare/[date]",
+    "dynamic": true
+  },
+  {
+    "url": "/angeluri-ricxvebi",
+    "pattern": "/angeluri-ricxvebi",
+    "dynamic": false
+  },
+  {
+    "url": "/angeluri-ricxvebi/000",
+    "pattern": "/angeluri-ricxvebi/[number]",
+    "dynamic": true
+  },
+  {
+    "url": "/angeluri-ricxvebi/111",
+    "pattern": "/angeluri-ricxvebi/[number]",
+    "dynamic": true
+  },
+  {
+    "url": "/articles",
+    "pattern": "/articles",
+    "dynamic": false
+  },
+  {
+    "url": "/articles/mze-mtvare-ascedenti-natalur-rukashi",
+    "pattern": "/articles/[slug]",
+    "dynamic": true
+  },
+  {
+    "url": "/articles/piradi-sivrce-urtiertobashi",
+    "pattern": "/articles/[slug]",
+    "dynamic": true
+  },
+  {
+    "url": "/ask",
+    "pattern": "/ask",
+    "dynamic": false
+  },
+  {
+    "url": "/astrologiuri-kalendari",
+    "pattern": "/astrologiuri-kalendari",
+    "dynamic": false
+  },
+  {
+    "url": "/astrologiuri-kalendari/2026-11-01",
+    "pattern": "/astrologiuri-kalendari/[date]",
+    "dynamic": true
+  },
+  {
+    "url": "/astrologiuri-kalendari/2026-11-02",
+    "pattern": "/astrologiuri-kalendari/[date]",
+    "dynamic": true
+  },
+  {
+    "url": "/astrologiuri-saxlebi",
+    "pattern": "/astrologiuri-saxlebi",
+    "dynamic": false
+  },
+  {
+    "url": "/astrologiuri-saxlebi/1",
+    "pattern": "/astrologiuri-saxlebi/[number]",
+    "dynamic": true
+  },
+  {
+    "url": "/astrologiuri-saxlebi/2",
+    "pattern": "/astrologiuri-saxlebi/[number]",
+    "dynamic": true
+  },
+  {
+    "url": "/big-five",
+    "pattern": "/big-five",
+    "dynamic": false
+  },
+  {
+    "url": "/big-five/shedegi",
+    "pattern": "/big-five/shedegi",
+    "dynamic": false
+  },
+  {
+    "url": "/big-five/shedegi/sample",
+    "pattern": "/big-five/shedegi/[id]",
+    "dynamic": true
+  },
+  {
+    "url": "/chinuri-horoskopi",
+    "pattern": "/chinuri-horoskopi",
+    "dynamic": false
+  },
+  {
+    "url": "/chinuri-horoskopi/dragon",
+    "pattern": "/chinuri-horoskopi/[animal]",
+    "dynamic": true
+  },
+  {
+    "url": "/chinuri-horoskopi/ox",
+    "pattern": "/chinuri-horoskopi/[animal]",
+    "dynamic": true
+  },
+  {
+    "url": "/chinuri-horoskopi/rat",
+    "pattern": "/chinuri-horoskopi/[animal]",
+    "dynamic": true
+  },
+  {
+    "url": "/credits",
+    "pattern": "/credits",
+    "dynamic": false
+  },
+  {
+    "url": "/dabnelebebi",
+    "pattern": "/dabnelebebi",
+    "dynamic": false
+  },
+  {
+    "url": "/dabnelebebi/2026-08-12-mzis-sruli-dabneleba",
+    "pattern": "/dabnelebebi/[slug]",
+    "dynamic": true
+  },
+  {
+    "url": "/dabnelebebi/2026-08-28-mtvaris-nawilobrivi-dabneleba",
+    "pattern": "/dabnelebebi/[slug]",
+    "dynamic": true
+  },
+  {
+    "url": "/dashboard",
+    "pattern": "/dashboard",
+    "dynamic": false
+  },
+  {
+    "url": "/discover",
+    "pattern": "/discover",
+    "dynamic": false
+  },
+  {
+    "url": "/emociuri-inteleqti",
+    "pattern": "/emociuri-inteleqti",
+    "dynamic": false
+  },
+  {
+    "url": "/emociuri-inteleqti/ra-aris-emociuri-inteleqti",
+    "pattern": "/emociuri-inteleqti/[slug]",
+    "dynamic": true
+  },
+  {
+    "url": "/emociuri-inteleqti/rogor-avimaghlo-empathia",
+    "pattern": "/emociuri-inteleqti/[slug]",
+    "dynamic": true
+  },
+  {
+    "url": "/en",
+    "pattern": "/en",
+    "dynamic": false
+  },
+  {
+    "url": "/en/about",
+    "pattern": "/en/about",
+    "dynamic": false
+  },
+  {
+    "url": "/en/compatibility",
+    "pattern": "/en/compatibility",
+    "dynamic": false
+  },
+  {
+    "url": "/en/horoscope",
+    "pattern": "/en/horoscope",
+    "dynamic": false
+  },
+  {
+    "url": "/en/natal-chart",
+    "pattern": "/en/natal-chart",
+    "dynamic": false
+  },
+  {
+    "url": "/en/privacy",
+    "pattern": "/en/privacy",
+    "dynamic": false
+  },
+  {
+    "url": "/en/readings",
+    "pattern": "/en/readings",
+    "dynamic": false
+  },
+  {
+    "url": "/en/terms",
+    "pattern": "/en/terms",
+    "dynamic": false
+  },
+  {
+    "url": "/en/tests",
+    "pattern": "/en/tests",
+    "dynamic": false
+  },
+  {
+    "url": "/en/zodiac",
+    "pattern": "/en/zodiac",
+    "dynamic": false
+  },
+  {
+    "url": "/eq-testi",
+    "pattern": "/eq-testi",
+    "dynamic": false
+  },
+  {
+    "url": "/eq-testi/shedegi",
+    "pattern": "/eq-testi/shedegi",
+    "dynamic": false
+  },
+  {
+    "url": "/eq-testi/shedegi/sample",
+    "pattern": "/eq-testi/shedegi/[id]",
+    "dynamic": true
+  },
+  {
+    "url": "/features",
+    "pattern": "/features",
+    "dynamic": false
+  },
+  {
+    "url": "/feed",
+    "pattern": "/feed",
+    "dynamic": false
+  },
+  {
+    "url": "/feed/sample",
+    "pattern": "/feed/[postId]",
+    "dynamic": true
+  },
+  {
+    "url": "/finansuri-horoskopi",
+    "pattern": "/finansuri-horoskopi",
+    "dynamic": false
+  },
+  {
+    "url": "/finansuri-horoskopi/aries",
+    "pattern": "/finansuri-horoskopi/[sign]",
+    "dynamic": true
+  },
+  {
+    "url": "/finansuri-horoskopi/taurus",
+    "pattern": "/finansuri-horoskopi/[sign]",
+    "dynamic": true
+  },
+  {
+    "url": "/forgot-password",
+    "pattern": "/forgot-password",
+    "dynamic": false
+  },
+  {
+    "url": "/friends",
+    "pattern": "/friends",
+    "dynamic": false
+  },
+  {
+    "url": "/frtxili-dgheebi",
+    "pattern": "/frtxili-dgheebi",
+    "dynamic": false
+  },
+  {
+    "url": "/horoskopi",
+    "pattern": "/horoskopi",
+    "dynamic": false
+  },
+  {
+    "url": "/horoskopi/kvireuli",
+    "pattern": "/horoskopi/kvireuli",
+    "dynamic": false
+  },
+  {
+    "url": "/horoskopi/tviuri",
+    "pattern": "/horoskopi/tviuri",
+    "dynamic": false
+  },
+  {
+    "url": "/how-it-works",
+    "pattern": "/how-it-works",
+    "dynamic": false
+  },
+  {
+    "url": "/ighbliani-dgheebi",
+    "pattern": "/ighbliani-dgheebi",
+    "dynamic": false
+  },
+  {
+    "url": "/iq-testi",
+    "pattern": "/iq-testi",
+    "dynamic": false
+  },
+  {
+    "url": "/iq-testi/shedegi",
+    "pattern": "/iq-testi/shedegi",
+    "dynamic": false
+  },
+  {
+    "url": "/iq-testi/shedegi/sample",
+    "pattern": "/iq-testi/shedegi/[id]",
+    "dynamic": true
+  },
+  {
+    "url": "/karieris-horoskopi",
+    "pattern": "/karieris-horoskopi",
+    "dynamic": false
+  },
+  {
+    "url": "/karieris-horoskopi/aries",
+    "pattern": "/karieris-horoskopi/[sign]",
+    "dynamic": true
+  },
+  {
+    "url": "/karieris-horoskopi/taurus",
+    "pattern": "/karieris-horoskopi/[sign]",
+    "dynamic": true
+  },
+  {
+    "url": "/library",
+    "pattern": "/library",
+    "dynamic": false
+  },
+  {
+    "url": "/library/sample",
+    "pattern": "/library/[id]",
+    "dynamic": true
+  },
+  {
+    "url": "/login",
+    "pattern": "/login",
+    "dynamic": false
+  },
+  {
+    "url": "/mbti",
+    "pattern": "/mbti",
+    "dynamic": false
+  },
+  {
+    "url": "/mbti/intj",
+    "pattern": "/mbti/[type]",
+    "dynamic": true
+  },
+  {
+    "url": "/mbti/isfj",
+    "pattern": "/mbti/[type]",
+    "dynamic": true
+  },
+  {
+    "url": "/mbti/istj",
+    "pattern": "/mbti/[type]",
+    "dynamic": true
+  },
+  {
+    "url": "/merkuri-retrogradi",
+    "pattern": "/merkuri-retrogradi",
+    "dynamic": false
+  },
+  {
+    "url": "/messages",
+    "pattern": "/messages",
+    "dynamic": false
+  },
+  {
+    "url": "/mijachvulobis-testi",
+    "pattern": "/mijachvulobis-testi",
+    "dynamic": false
+  },
+  {
+    "url": "/mkitxaoba",
+    "pattern": "/mkitxaoba",
+    "dynamic": false
+  },
+  {
+    "url": "/mtvaris-kalendari",
+    "pattern": "/mtvaris-kalendari",
+    "dynamic": false
+  },
+  {
+    "url": "/nataluri-ruka",
+    "pattern": "/nataluri-ruka",
+    "dynamic": false
+  },
+  {
+    "url": "/numerologia",
+    "pattern": "/numerologia",
+    "dynamic": false
+  },
+  {
+    "url": "/numerologia/1",
+    "pattern": "/numerologia/[number]",
+    "dynamic": true
+  },
+  {
+    "url": "/numerologia/2",
+    "pattern": "/numerologia/[number]",
+    "dynamic": true
+  },
+  {
+    "url": "/numerologia/7",
+    "pattern": "/numerologia/[number]",
+    "dynamic": true
+  },
+  {
+    "url": "/onboarding",
+    "pattern": "/onboarding",
+    "dynamic": false
+  },
+  {
+    "url": "/onboarding/result",
+    "pattern": "/onboarding/result",
+    "dynamic": false
+  },
+  {
+    "url": "/people",
+    "pattern": "/people",
+    "dynamic": false
+  },
+  {
+    "url": "/piradi-horoskopi",
+    "pattern": "/piradi-horoskopi",
+    "dynamic": false
+  },
+  {
+    "url": "/piradi-ruka",
+    "pattern": "/piradi-ruka",
+    "dynamic": false
+  },
+  {
+    "url": "/piradi-ruka/rogor-shevadginot",
+    "pattern": "/piradi-ruka/rogor-shevadginot",
+    "dynamic": false
+  },
+  {
+    "url": "/pirovnebis-testi",
+    "pattern": "/pirovnebis-testi",
+    "dynamic": false
+  },
+  {
+    "url": "/pirovnebis-testi/claim",
+    "pattern": "/pirovnebis-testi/claim",
+    "dynamic": false
+  },
+  {
+    "url": "/planetebi",
+    "pattern": "/planetebi",
+    "dynamic": false
+  },
+  {
+    "url": "/planetebi/mtvare",
+    "pattern": "/planetebi/[planet]",
+    "dynamic": true
+  },
+  {
+    "url": "/planetebi/mze",
+    "pattern": "/planetebi/[planet]",
+    "dynamic": true
+  },
+  {
+    "url": "/post-login",
+    "pattern": "/post-login",
+    "dynamic": false
+  },
+  {
+    "url": "/privacy",
+    "pattern": "/privacy",
+    "dynamic": false
+  },
+  {
+    "url": "/quiz/namdvili-nishani",
+    "pattern": "/quiz/namdvili-nishani",
+    "dynamic": false
+  },
+  {
+    "url": "/quiz/varskvlavebis-zodiaqo",
+    "pattern": "/quiz/varskvlavebis-zodiaqo",
+    "dynamic": false
+  },
+  {
+    "url": "/r/sample",
+    "pattern": "/r/[id]",
+    "dynamic": true
+  },
+  {
+    "url": "/relationship/invite/sample",
+    "pattern": "/relationship/invite/[token]",
+    "dynamic": true
+  },
+  {
+    "url": "/report",
+    "pattern": "/report",
+    "dynamic": false
+  },
+  {
+    "url": "/reports",
+    "pattern": "/reports",
+    "dynamic": false
+  },
+  {
+    "url": "/reports/sample",
+    "pattern": "/reports/[id]",
+    "dynamic": true
+  },
+  {
+    "url": "/reset-password",
+    "pattern": "/reset-password",
+    "dynamic": false
+  },
+  {
+    "url": "/savse-mtvare",
+    "pattern": "/savse-mtvare",
+    "dynamic": false
+  },
+  {
+    "url": "/savse-mtvare/2026-11-24",
+    "pattern": "/savse-mtvare/[date]",
+    "dynamic": true
+  },
+  {
+    "url": "/savse-mtvare/2026-12-24",
+    "pattern": "/savse-mtvare/[date]",
+    "dynamic": true
+  },
+  {
+    "url": "/signup",
+    "pattern": "/signup",
+    "dynamic": false
+  },
+  {
+    "url": "/siyvarulis-horoskopi",
+    "pattern": "/siyvarulis-horoskopi",
+    "dynamic": false
+  },
+  {
+    "url": "/siyvarulis-horoskopi/aries",
+    "pattern": "/siyvarulis-horoskopi/[sign]",
+    "dynamic": true
+  },
+  {
+    "url": "/siyvarulis-horoskopi/taurus",
+    "pattern": "/siyvarulis-horoskopi/[sign]",
+    "dynamic": true
+  },
+  {
+    "url": "/sizmris-akhsna",
+    "pattern": "/sizmris-akhsna",
+    "dynamic": false
+  },
+  {
+    "url": "/sizmris-akhsna/gveli",
+    "pattern": "/sizmris-akhsna/[symbol]",
+    "dynamic": true
+  },
+  {
+    "url": "/sizmris-akhsna/wyali",
+    "pattern": "/sizmris-akhsna/[symbol]",
+    "dynamic": true
+  },
+  {
+    "url": "/sky",
+    "pattern": "/sky",
+    "dynamic": false
+  },
+  {
+    "url": "/subscription",
+    "pattern": "/subscription",
+    "dynamic": false
+  },
+  {
+    "url": "/synastry",
+    "pattern": "/synastry",
+    "dynamic": false
+  },
+  {
+    "url": "/synastry/new",
+    "pattern": "/synastry/new",
+    "dynamic": false
+  },
+  {
+    "url": "/synastry/sample",
+    "pattern": "/synastry/[id]",
+    "dynamic": true
+  },
+  {
+    "url": "/taro",
+    "pattern": "/taro",
+    "dynamic": false
+  },
+  {
+    "url": "/taro/the-fool",
+    "pattern": "/taro/[card]",
+    "dynamic": true
+  },
+  {
+    "url": "/taro/the-magician",
+    "pattern": "/taro/[card]",
+    "dynamic": true
+  },
+  {
+    "url": "/tavsebadoba",
+    "pattern": "/tavsebadoba",
+    "dynamic": false
+  },
+  {
+    "url": "/terms",
+    "pattern": "/terms",
+    "dynamic": false
+  },
+  {
+    "url": "/test-results/sample",
+    "pattern": "/test-results/[id]",
+    "dynamic": true
+  },
+  {
+    "url": "/tests",
+    "pattern": "/tests",
+    "dynamic": false
+  },
+  {
+    "url": "/timing",
+    "pattern": "/timing",
+    "dynamic": false
+  },
+  {
+    "url": "/tvit-shepasebis-testi",
+    "pattern": "/tvit-shepasebis-testi",
+    "dynamic": false
+  },
+  {
+    "url": "/u/vivida",
+    "pattern": "/u/[username]",
+    "dynamic": true
+  },
+  {
+    "url": "/uk",
+    "pattern": "/uk",
+    "dynamic": false
+  },
+  {
+    "url": "/unsubscribe",
+    "pattern": "/unsubscribe",
+    "dynamic": false
+  },
+  {
+    "url": "/verify-email",
+    "pattern": "/verify-email",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac",
+    "pattern": "/zodiac",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/amomavali",
+    "pattern": "/zodiac/amomavali",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/amomavali/aries",
+    "pattern": "/zodiac/amomavali/[sign]",
+    "dynamic": true
+  },
+  {
+    "url": "/zodiac/amomavali/taurus",
+    "pattern": "/zodiac/amomavali/[sign]",
+    "dynamic": true
+  },
+  {
+    "url": "/zodiac/aries",
+    "pattern": "/zodiac/[sign]",
+    "dynamic": true
+  },
+  {
+    "url": "/zodiac/aries/2026",
+    "pattern": "/zodiac/[sign]/[slug]",
+    "dynamic": true
+  },
+  {
+    "url": "/zodiac/aries/dghes",
+    "pattern": "/zodiac/[sign]/[slug]",
+    "dynamic": true
+  },
+  {
+    "url": "/zodiac/datit",
+    "pattern": "/zodiac/datit",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/elementebi",
+    "pattern": "/zodiac/elementebi",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/elementebi/earth",
+    "pattern": "/zodiac/elementebi/[element]",
+    "dynamic": true
+  },
+  {
+    "url": "/zodiac/elementebi/fire",
+    "pattern": "/zodiac/elementebi/[element]",
+    "dynamic": true
+  },
+  {
+    "url": "/zodiac/gemini",
+    "pattern": "/zodiac/[sign]",
+    "dynamic": true
+  },
+  {
+    "url": "/zodiac/gzamkvlevi",
+    "pattern": "/zodiac/gzamkvlevi",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/mtvare",
+    "pattern": "/zodiac/mtvare",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/mtvare/aries",
+    "pattern": "/zodiac/mtvare/[sign]",
+    "dynamic": true
+  },
+  {
+    "url": "/zodiac/mtvare/taurus",
+    "pattern": "/zodiac/mtvare/[sign]",
+    "dynamic": true
+  },
+  {
+    "url": "/zodiac/reitingebi",
+    "pattern": "/zodiac/reitingebi",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/reitingebi/romantiuli",
+    "pattern": "/zodiac/reitingebi/[topic]",
+    "dynamic": true
+  },
+  {
+    "url": "/zodiac/reitingebi/tavsebadi",
+    "pattern": "/zodiac/reitingebi/[topic]",
+    "dynamic": true
+  },
+  {
+    "url": "/zodiac/tavsebadoba",
+    "pattern": "/zodiac/tavsebadoba",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/tavsebadoba/aries-aries",
+    "pattern": "/zodiac/tavsebadoba/[pair]",
+    "dynamic": true
+  },
+  {
+    "url": "/zodiac/tavsebadoba/aries-gemini",
+    "pattern": "/zodiac/tavsebadoba/[pair]",
+    "dynamic": true
+  }
+]

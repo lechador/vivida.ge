@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Languages } from "lucide-react";
 
 import { updateInterfaceLanguage } from "@/actions/interface-language";
+import { setLanguageCookie } from "@/components/i18n/international-language-switcher";
 import { cn } from "@/lib/utils";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
@@ -13,19 +14,25 @@ const OPTIONS: Array<{
   label: string;
   nativeLabel: string;
 }> = [
-  { value: "ka", label: "Georgian", nativeLabel: "ქართული" },
   { value: "en", label: "English", nativeLabel: "English" },
+  { value: "pl", label: "Polish", nativeLabel: "Polski" },
 ];
 
 export function LanguageCard({ initial }: { initial: UserLocale }) {
   const router = useRouter();
-  const [locale, setLocale] = useState(initial);
+  const [locale, setLocale] = useState<UserLocale>(
+    initial === "pl" ? "pl" : "en",
+  );
   const [isPending, startTransition] = useTransition();
-  const en = locale === "en";
+  const pl = locale === "pl";
+  const en = locale !== "ka";
 
   function select(next: UserLocale) {
     if (next === locale || isPending) return;
     setLocale(next);
+    if (next === "en" || next === "pl") {
+      setLanguageCookie(next);
+    }
     startTransition(async () => {
       try {
         await updateInterfaceLanguage(next);
@@ -36,11 +43,13 @@ export function LanguageCard({ initial }: { initial: UserLocale }) {
     });
   }
 
-  const title = en ? "Language" : "ენა";
-  const description = en
-    ? "Choose the language used across your account and authenticated navigation."
-    : "აირჩიე ანგარიშისა და ავტორიზებული ნავიგაციის ენა.";
-  const updatingText = en ? "Updating…" : "ახლდება…";
+  const title = pl ? "Język" : en ? "Language" : "ენა";
+  const description = pl
+    ? "Wybierz język używany na Twoim koncie i w nawigacji po zalogowaniu."
+    : en
+      ? "Choose the language used across your account and authenticated navigation."
+      : "აირჩიე ანგარიშისა და ავტორიზებული ნავიგაციის ენა.";
+  const updatingText = pl ? "Aktualizowanie…" : en ? "Updating…" : "ახლდება…";
 
   return (
     <section

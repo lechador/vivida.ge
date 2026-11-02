@@ -1,0 +1,52 @@
+{
+  "captured_at": "2026-10-04T06:57:46.740Z",
+  "ka_accounts": 2006,
+  "registered_mau": 831,
+  "registered_wau": 280,
+  "registered_active_28d": 795,
+  "ritual_users_28d": 39,
+  "ritual_adoption_pct": 4.91,
+  "ritual_completions_28d": 55,
+  "ritual_repeat_2plus_users": 8,
+  "ritual_repeat_7plus_users": 0,
+  "one_day_active_users": 512,
+  "one_day_active_pct": 61.61,
+  "eightplus_day_users": 32,
+  "eightplus_day_pct": 3.85,
+  "completed_last7_average_dau": 62.14,
+  "completed_last7_day_dates": [
+    "2026-09-27",
+    "2026-09-28",
+    "2026-09-29",
+    "2026-09-30",
+    "2026-10-01",
+    "2026-10-02",
+    "2026-10-03"
+  ],
+  "completed_last7_avg_dau_to_mau_pct": 7.48,
+  "push_subscribed_active_users": 41,
+  "push_among_mau_pct": 4.93,
+  "cohort_totals": {
+    "signups": 1016,
+    "profiles_now": 607,
+    "eligible_d1": 967,
+    "returned_d1": 52,
+    "eligible_week1": 802,
+    "returned_week1": 118,
+    "ritual_week1": 14
+  },
+  "cohort_d1_return_pct": 5.38,
+  "cohort_week1_any_return_pct": 14.71,
+  "credit_free_to_spent_ratio": 4.222,
+  "tarot_plus_followup_credit_share_pct": 64.47,
+  "limits": [
+    "Includes operator/test accounts if their locale is ka; no PII fetched or manual account exclusion.",
+    "Activity rows indicate an authenticated visit, not a value action or session count.",
+    "date_local is the user profile timezone; dashboard-style Tbilisi cutoffs are used.",
+    "Generated/saved content is not proof of reading.",
+    "Cumulative return 24h-8d is not exact-day D7 retention.",
+    "DAU/MAU here uses last 7 completed day average divided by rolling 30d MAU; not today partial DAU.",
+    "Cohort sample is last 42 days with per-window matured denominators.",
+    "Credit issuance/spend is wallet accounting, not cash revenue or model compute cost."
+  ]
+}

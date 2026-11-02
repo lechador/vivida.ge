@@ -1,0 +1,35 @@
+
+=== 320x568: 25 routes (concurrency 2) ===
+[1/25] 320 / under+20 textx15 tap<24 x15 zoom x2 (3s)
+[2/25] 320 /horoskopi textx6 tap<24 x15 (4s)
+[3/25] 320 /zodiac/aries textx1 tap<24 x4 (6s)
+[4/25] 320 /taro textx1 tap<24 x2 zoom x1 (7s)
+[5/25] 320 /nataluri-ruka textx1 tap<24 x12 (10s)
+[6/25] 320 /mbti/intj textx2 tap<24 x5 (13s)
+[7/25] 320 /chinuri-horoskopi/dragon textx1 tap<24 x3 (16s)
+[8/25] 320 /en tap<24 x14 (18s)
+[9/25] 320 /login tap<24 x2 (20s)
+[10/25] 320 /signup tap<24 x1 (22s)
+[11/25] 320 /tests textx9 tap<24 x3 (25s)
+[12/25] 320 /piradi-ruka textx1 tap<24 x9 (29s)
+[13/25] 320 /savse-mtvare textx1 tap<24 x2 (33s)
+[14/25] 320 /en/readings tap<24 x3 zoom x1 (35s)
+[15/25] 320 /mtvaris-kalendari textx1 tap<24 x3 (41s)
+[16/25] 320 /numerologia textx1 tap<24 x6 zoom x1 (64s)
+[17/25] 320 /astrologiuri-kalendari textx2 tap<24 x2 (64s)
+[18/25] 320 /sizmris-akhsna/gveli textx1 tap<24 x4 (68s)
+[19/25] 320 /tavsebadoba textx12 tap<24 x2 zoom x2 (71s)
+[20/25] 320 /astrologiuri-saxlebi/1 textx2 tap<24 x5 (71s)
+[21/25] 320 /big-five tap<24 x2 (120s)
+[22/25] 320 /horoskopi/tviuri textx1 tap<24 x4 (121s)
+[23/25] 320 /zodiac/tavsebadoba/aries-gemini textx1 tap<24 x3 (125s)
+[24/25] 320 /articles textx1 tap<24 x15 (126s)
+[25/25] 320 /mkitxaoba textx1 tap<24 x3 (129s)
+=== 320 done: 25 routes in 129s ===
+[
+  {
+    "width": 320,
+    "height": 568,
+    "count": 25
+  }
+]

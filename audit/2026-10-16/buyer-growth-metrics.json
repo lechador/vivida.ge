@@ -1,0 +1,30 @@
+{
+  "snapshotAtTbilisi": "2026-10-16 16:45:23",
+  "transactionReadOnly": "on",
+  "kaSegment": {
+    "total_all_locales": 2320,
+    "total_ka": 2301,
+    "total_en": 12,
+    "total_am": 7,
+    "dau_yesterday_ka": 53,
+    "wau_7d_ka": 265,
+    "mau_28d_ka": 840,
+    "mau_1_day": 545,
+    "mau_2_3_days": 211,
+    "mau_4_7_days": 56,
+    "mau_8_plus_days": 28
+  },
+  "credit28d": {
+    "free_issued_all_28d": 33364,
+    "free_issued_organic_28d": 22364,
+    "admin_grant_28d": 11000,
+    "monthly_bonus_28d": 9720,
+    "signup_bonus_28d": 11040,
+    "purchased_credits_28d": 330,
+    "spent_credits_28d": 6242,
+    "spent_tarot_total_28d": 3800,
+    "ratioIncludingAdminGrant": 5.35,
+    "ratioOrganicFreeToSpend": 3.58,
+    "tarotShareOfSpend28dPct": 60.9
+  }
+}

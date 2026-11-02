@@ -1,6 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { englishSiteHref } from "@/lib/seo/locales";
+import {
+  englishSiteHref,
+  resolveInternationalLanguageSwitchHrefs,
+} from "@/lib/seo/locales";
+import {
+  MOBILE_TAB_ITEMS,
+  mobileTabLabel,
+  NAV_ITEMS,
+  navLabel,
+} from "@/components/nav/nav-items";
 
 const request = { host: "www.vivida.ge", localeHeader: null as string | null };
 
@@ -114,5 +123,65 @@ describe("englishSiteHref", () => {
       "https://www.vividaastro.com/zodiac",
     );
     expect(englishSiteHref("/", false)).toBe("https://www.vividaastro.com");
+  });
+});
+
+describe("resolveInternationalLanguageSwitchHrefs", () => {
+  it("maps English and Polish counterpart URLs across core hubs and detail slugs", () => {
+    expect(resolveInternationalLanguageSwitchHrefs("/", "/", true)).toEqual({
+      enHref: "/",
+      plHref: "/pl",
+    });
+    expect(resolveInternationalLanguageSwitchHrefs("/pl", "/", true)).toEqual({
+      enHref: "/",
+      plHref: "/pl",
+    });
+    expect(
+      resolveInternationalLanguageSwitchHrefs(
+        "/natal-chart",
+        "/nataluri-ruka",
+        true,
+      ),
+    ).toEqual({
+      enHref: "/natal-chart",
+      plHref: "/pl/horoskop-urodzeniowy",
+    });
+    expect(
+      resolveInternationalLanguageSwitchHrefs(
+        "/pl/horoskop-urodzeniowy",
+        "/nataluri-ruka",
+        true,
+      ),
+    ).toEqual({
+      enHref: "/natal-chart",
+      plHref: "/pl/horoskop-urodzeniowy",
+    });
+    expect(
+      resolveInternationalLanguageSwitchHrefs(
+        "/dream-meanings/snake",
+        "/",
+        true,
+      ),
+    ).toEqual({
+      enHref: "/dream-meanings/snake",
+      plHref: "/pl/sennik/waz",
+    });
+    expect(
+      resolveInternationalLanguageSwitchHrefs("/pl/sennik/waz", "/", true),
+    ).toEqual({
+      enHref: "/dream-meanings/snake",
+      plHref: "/pl/sennik/waz",
+    });
+  });
+});
+
+describe("authenticated navigation labels for Polish", () => {
+  it("resolves Polish labels in navLabel and mobileTabLabel", () => {
+    const today = NAV_ITEMS.find((i) => i.key === "today")!;
+    const report = NAV_ITEMS.find((i) => i.key === "report")!;
+    const historyTab = MOBILE_TAB_ITEMS.find((i) => i.key === "library")!;
+    expect(navLabel(today, "pl")).toBe("Dzisiaj");
+    expect(navLabel(report, "pl")).toBe("Mój kosmogram");
+    expect(mobileTabLabel(historyTab, "pl")).toBe("Moja historia");
   });
 });

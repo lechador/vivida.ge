@@ -5,14 +5,10 @@ import { VividaMark } from "@/components/brand/vivida-mark";
 import { LunarPhaseDisc } from "@/components/brand/celestial-icons";
 import { computeMoonPhase } from "@/lib/moon-phase";
 import { ObservatoryDrawer } from "@/components/nav/observatory-drawer";
-import {
-  MarketingEnglishLink,
-  MarketingHeaderNav,
-} from "./marketing-header-client";
+import { MarketingHeaderNav } from "./marketing-header-client";
 
 export function MarketingHeader({
   active,
-  englishPath,
 }: {
   active?: string;
   englishPath?: string;
@@ -59,7 +55,7 @@ export function MarketingHeader({
         <div className="mx-auto flex h-9 w-full max-w-7xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6">
           <div className="flex min-w-0 flex-1 items-center gap-2 font-mono text-[11px] tabular-nums text-muted-foreground sm:gap-3">
             {/* Decorative coordinates: first thing to go on a phone, so the
-                moon phase + language + drawer trigger keep one line. */}
+                moon phase + drawer trigger keep one line. */}
             <span className="hidden uppercase tracking-[0.16em] text-primary sm:inline">
               41°43′N · 44°47′E
             </span>
@@ -88,7 +84,6 @@ export function MarketingHeader({
           </div>
 
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-            <MarketingEnglishLink englishPath={englishPath} />
             <ObservatoryDrawer authed={false} locale="ka" />
           </div>
         </div>

@@ -22,13 +22,20 @@ export function ObservatoryAuthedSection({
   pendingAskNudges?: number;
   onNavigate: () => void;
 }) {
+  const pl = locale === "pl";
   const en = locale !== "ka";
   const items = navItems(locale);
 
   return (
     <div className="mb-6">
       <div className="mb-2.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
-        <span>{en ? "01 · Personal Workspace" : "01 · პირადი სივრცე"}</span>
+        <span>
+          {pl
+            ? "01 · Osobista przestrzeń"
+            : en
+              ? "01 · Personal Workspace"
+              : "01 · პირადი სივრცე"}
+        </span>
         <span>{items.length}</span>
       </div>
       <div className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-background/70">

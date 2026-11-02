@@ -48,6 +48,7 @@ export function UserMenu({
   locale?: UserLocale;
 }) {
   const [isPending, startTransition] = useTransition();
+  const pl = locale === "pl";
   const en = locale !== "ka";
   const featuredPro = featuredPremiumPlanForCountry(countryCode);
   const proMonths = featuredPro.intervalCount ?? 1;
@@ -63,7 +64,7 @@ export function UserMenu({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label={en ? "User menu" : "მენიუ"}
+          aria-label={pl ? "Menu użytkownika" : en ? "User menu" : "მენიუ"}
           className="relative grid size-10 shrink-0 place-items-center rounded-md border border-border bg-card text-foreground/85 transition-colors hover:border-primary/60 hover:bg-secondary"
         >
           <Image
@@ -76,7 +77,10 @@ export function UserMenu({
           />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64 rounded-md border-border bg-card p-2">
+      <DropdownMenuContent
+        align="end"
+        className="w-64 rounded-md border-border bg-card p-2"
+      >
         <div className="flex items-center gap-3 px-2 py-2">
           <Image
             src={image || DEFAULT_AVATAR}
@@ -88,7 +92,7 @@ export function UserMenu({
           />
           <div className="min-w-0 flex-1">
             <div className="truncate text-sm font-semibold text-foreground">
-              {name ?? (en ? "You" : "შენ")}
+              {name ?? (pl ? "Ty" : en ? "You" : "შენ")}
             </div>
             {email && (
               <div className="truncate text-xs text-muted-foreground">
@@ -104,14 +108,18 @@ export function UserMenu({
           <DropdownMenuItem asChild>
             <Link href={`/u/${username}`} className="cursor-pointer">
               <User className="size-4 text-muted-foreground" />
-              {en ? "Public profile" : "საჯარო პროფილი"}
+              {pl
+                ? "Profil publiczny"
+                : en
+                  ? "Public profile"
+                  : "საჯარო პროფილი"}
             </Link>
           </DropdownMenuItem>
         )}
         <DropdownMenuItem asChild>
           <Link href="/credits" className="cursor-pointer">
             <Sparkles className="size-4 text-primary" />
-            {en ? "Credits" : "კრედიტები"}
+            {pl ? "Kredyty" : en ? "Credits" : "კრედიტები"}
             {typeof balance === "number" && (
               <span className="ml-auto font-mono text-xs font-medium tabular-nums text-primary">
                 {balance}
@@ -122,7 +130,7 @@ export function UserMenu({
         <DropdownMenuItem asChild>
           <Link href="/library" className="cursor-pointer">
             <BookOpen className="size-4 text-muted-foreground" />
-            {en ? "My library" : "ჩემი ბიბლიოთეკა"}
+            {pl ? "Moja biblioteka" : en ? "My library" : "ჩემი ბიბლიოთეკა"}
           </Link>
         </DropdownMenuItem>
         {showProEntry && (
@@ -130,16 +138,22 @@ export function UserMenu({
             <Link href="/subscription" className="cursor-pointer">
               <Crown className="size-4 text-primary" />
               {isPremium
-                ? en
-                  ? "Manage PRO"
-                  : "PRO-ს მართვა"
-                : proMonths > 1
-                  ? en
-                    ? `${proMonths} months of PRO`
-                    : `${proMonths} თვე PRO`
+                ? pl
+                  ? "Zarządzaj PRO"
                   : en
-                    ? "Get PRO"
-                    : "გახდი PRO"}
+                    ? "Manage PRO"
+                    : "PRO-ს მართვა"
+                : proMonths > 1
+                  ? pl
+                    ? `${proMonths} mies. PRO`
+                    : en
+                      ? `${proMonths} months of PRO`
+                      : `${proMonths} თვე PRO`
+                  : pl
+                    ? "Kup PRO"
+                    : en
+                      ? "Get PRO"
+                      : "გახდი PRO"}
               {!isPremium && (
                 <span className="ml-auto font-mono text-xs font-medium tabular-nums text-primary">
                   {formatBillingAmount(
@@ -155,7 +169,7 @@ export function UserMenu({
         <DropdownMenuItem asChild>
           <Link href="/account" className="cursor-pointer">
             <Settings className="size-4 text-muted-foreground" />
-            {en ? "Account" : "ანგარიში"}
+            {pl ? "Konto" : en ? "Account" : "ანგარიში"}
           </Link>
         </DropdownMenuItem>
 
@@ -171,12 +185,16 @@ export function UserMenu({
         >
           <LogOut className="size-4" />
           {isPending
-            ? en
-              ? "Signing out…"
-              : "გასვლა…"
-            : en
-              ? "Sign out"
-              : "გასვლა"}
+            ? pl
+              ? "Wylogowywanie…"
+              : en
+                ? "Signing out…"
+                : "გასვლა…"
+            : pl
+              ? "Wyloguj się"
+              : en
+                ? "Sign out"
+                : "გასვლა"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

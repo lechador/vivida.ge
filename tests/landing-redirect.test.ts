@@ -40,12 +40,15 @@ describe("signedInLandingTarget", () => {
     expect(target({ englishHost: true })).toBe(APP_HOME);
   });
 
-  it("redirects the Armenian landing only on the international host", () => {
+  it("redirects the Armenian and Polish landings only on the international host", () => {
     expect(target({ pathname: "/am", englishHost: true })).toBe(APP_HOME);
     expect(target({ pathname: "/am/", englishHost: true })).toBe(APP_HOME);
+    expect(target({ pathname: "/pl", englishHost: true })).toBe(APP_HOME);
+    expect(target({ pathname: "/pl/", englishHost: true })).toBe(APP_HOME);
     // On vivida.ge /am is 308'd to the international domain first, so that the
     // reader keeps a non-Georgian interface.
     expect(target({ pathname: "/am", englishHost: false })).toBeNull();
+    expect(target({ pathname: "/pl", englishHost: false })).toBeNull();
   });
 
   it("never touches anything but the landing pages", () => {

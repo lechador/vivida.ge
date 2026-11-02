@@ -1,0 +1,47 @@
+[
+  {
+    "url": "/onboarding",
+    "pattern": "/onboarding",
+    "dynamic": false
+  },
+  {
+    "url": "/onboarding/result",
+    "pattern": "/onboarding/result",
+    "dynamic": false
+  },
+  {
+    "url": "/dashboard",
+    "pattern": "/dashboard",
+    "dynamic": false
+  },
+  {
+    "url": "/post-login",
+    "pattern": "/post-login",
+    "dynamic": false
+  },
+  {
+    "url": "/feed",
+    "pattern": "/feed",
+    "dynamic": false
+  },
+  {
+    "url": "/account",
+    "pattern": "/account",
+    "dynamic": false
+  },
+  {
+    "url": "/credits",
+    "pattern": "/credits",
+    "dynamic": false
+  },
+  {
+    "url": "/subscription",
+    "pattern": "/subscription",
+    "dynamic": false
+  },
+  {
+    "url": "/piradi-ruka",
+    "pattern": "/piradi-ruka",
+    "dynamic": false
+  }
+]

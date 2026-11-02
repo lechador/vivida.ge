@@ -1,0 +1,783 @@
+[
+  {
+    "case": {
+      "name": "ka-free-mobile",
+      "locale": "ka",
+      "state": "free",
+      "width": 390,
+      "height": 844,
+      "mobile": true
+    },
+    "dom": {
+      "url": "http://127.0.0.1:3113/today-p0-preview?locale=ka&state=free",
+      "title": "Local Today P0 component preview · Vivida",
+      "text": "მთავარ კონტენტზე გადასვლა\nvivida\nლოკალური preview · სატესტო მონაცემები\nსალამი, მკითხველო\nდღევანდელი დღე · კვირა, 4 ოქტომბერი\nდაუთმე დრო იმას, რაც შენთვის მნიშვნელოვანია\nსიმშვიდე\nგამბედაობა\nურთიერთობები\n\nმშვიდი დასაწყისი დაგეხმარება დაინახო, რას სჭირდება შენი ყურადღება. ყველაფრის ერთად მოგვარების ნაცვლად, აირჩიე ერთი მცირე მოქმედება.\n\nდეტალები და ტრანზიტები\n\nხვალ ახალი წინასწარმეტყველება გელოდება.\n\nდღის პატარა რიტუალი\n\n0 დღიანი სერია\n\n7 დღეში +1\n\nაირჩიე დღევანდელი ფოკუსი\n\nსიმშვიდე\nგამბედაობა\nურთიერთობები\nდღევანდელი მთვარე\nბოლო მეოთხედი · ♋ კირჩხიბი\nდრო მშვიდი ტემპისთვის\n39% განათებული\n23.2 დღე\n\nდაიტოვე დრო ერთი საქმის დასასრულებლად, სანამ შემდეგზე გადახვალ.\n\nგააგრძელე კითხვა\n›\nშენი PRO დღე\n\nკვირა, 4 ოქტომბერი\n\n6/10\n\nწონასწორული დღე · არც წინაღობა ჩანს, არც საჩუქარი — რიტმს შენ ქმნი.\n\nდღის ტრანზიტები\n\nმთვარე\n△\nმზე\n· ტრინი\n\nსივრცე მშვიდი საუბრისთვის\n\nეს თემა გამოიყენე რეფლექსიისთვის, არა წინასწარმეტყველებად. რას შეცვლიდა ცოტა მეტი მოთმინება დღევანდელ საუბარში?\n\nPRO რიტუალი\n\nშენი სხეული რას გეუბნება დღეს — უსმენ მას?\n\nგანბლოკე PRO-ით\nდღეს\nტარო\nჰკითხე\nჩემი ისტორია\nმეტი",
+      "width": 390,
+      "scrollWidth": 390,
+      "headings": [
+        "სალამი, მკითხველო",
+        "დაუთმე დრო იმას, რაც შენთვის მნიშვნელოვანია",
+        "",
+        "დღის პატარა რიტუალი",
+        "დრო მშვიდი ტემპისთვის",
+        "შენი PRO დღე",
+        "დღის ტრანზიტები",
+        "PRO რიტუალი"
+      ],
+      "mobileLinks": [
+        {
+          "href": "/dashboard",
+          "text": "დღეს"
+        },
+        {
+          "href": "/taro",
+          "text": "ტარო"
+        },
+        {
+          "href": "/ask",
+          "text": "ჰკითხე"
+        },
+        {
+          "href": "/library",
+          "text": "ჩემი ისტორია"
+        }
+      ],
+      "mobileButtons": [
+        {
+          "label": "მეტი",
+          "text": "მეტი"
+        }
+      ],
+      "dialogs": 0,
+      "details": [
+        {
+          "open": false,
+          "label": "დეტალები და ტრანზიტები"
+        },
+        {
+          "open": false,
+          "label": "გააგრძელე კითხვა\n›"
+        }
+      ],
+      "focusButtons": [
+        {
+          "text": "სიმშვიდე",
+          "disabled": false,
+          "top": 801,
+          "bottom": 831
+        },
+        {
+          "text": "გამბედაობა",
+          "disabled": false,
+          "top": 801,
+          "bottom": 831
+        }
+      ]
+    },
+    "interactions": {
+      "detailsClicked": true,
+      "detailsOpened": true,
+      "detailsText": "დეტალები და ტრანზიტები\n\nახალი ვალდებულების აღებამდე ცოტა დრო დაუთმე საკუთარ თავს. მკაფიო საზღვარი დაგიტოვებს დროს იმისთვის, რაც უკვე მნიშვნელოვანია.\n\nმოკლე საუბარი შეიძლება დაგეხმაროს, უკეთ გაიგო სხვა ადამიანის საჭიროება. ჯერ მოუსმინე, შემდეგ გადაწყვიტე, რისი თქმა გინდა.\n\nდღის ტრანზიტები\n☽ მთვარე\n△\n☉ მზე\nტრინი\n\nსივრცე მშვიდი საუბრისთვის\n\nეს თემა გამოიყენე რეფლექსიისთვის, არა წინასწარმეტყველებად. რას შეცვლიდა ცოტა მეტი მოთმინება დღევანდელ საუბარში?",
+      "detailsClosed": true,
+      "moreClicked": true,
+      "drawerOpened": true,
+      "drawerLinks": [
+        {
+          "href": "/dashboard",
+          "text": "vivida"
+        },
+        {
+          "href": "/dashboard",
+          "text": "დღეს"
+        },
+        {
+          "href": "/taro",
+          "text": "ტარო"
+        },
+        {
+          "href": "/ask",
+          "text": "ჰკითხე"
+        },
+        {
+          "href": "/library",
+          "text": "ბიბლიოთეკა"
+        },
+        {
+          "href": "/report",
+          "text": "ჩემი რუკა"
+        },
+        {
+          "href": "/sky",
+          "text": "ცა ახლა"
+        },
+        {
+          "href": "/reports",
+          "text": "რეპორტები"
+        },
+        {
+          "href": "/timing",
+          "text": "როდის"
+        },
+        {
+          "href": "/feed",
+          "text": "ფიდი"
+        },
+        {
+          "href": "/tests",
+          "text": "ტესტები"
+        },
+        {
+          "href": "/messages",
+          "text": "3\nწერილები"
+        },
+        {
+          "href": "/synastry",
+          "text": "თავსებადობა"
+        },
+        {
+          "href": "/friends",
+          "text": "მეგობრები"
+        }
+      ],
+      "drawerScreenshot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser/ka-free-mobile-more.png",
+      "tabFocusInDialog": false,
+      "escapeClosed": false,
+      "focusReturnedToMore": false
+    },
+    "errors": [],
+    "failures": [
+      "drawer interaction failed: tabFocusInDialog",
+      "drawer interaction failed: escapeClosed",
+      "drawer interaction failed: focusReturnedToMore",
+      "More missing /account",
+      "focus action is not visible in the first usable viewport"
+    ],
+    "topShot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser/ka-free-mobile-top.png",
+    "fullShot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser/ka-free-mobile-full.png"
+  },
+  {
+    "case": {
+      "name": "ka-free-desktop",
+      "locale": "ka",
+      "state": "free",
+      "width": 1440,
+      "height": 1000,
+      "mobile": false
+    },
+    "dom": {
+      "url": "http://127.0.0.1:3113/today-p0-preview?locale=ka&state=free",
+      "title": "Local Today P0 component preview · Vivida",
+      "text": "მთავარ კონტენტზე გადასვლა\nvivida\nდღეს\nტარო\nჰკითხე\nბიბლიოთეკა\nჩემი რუკა\nცა ახლა\nრეპორტები\nროდის\nფიდი\nტესტები\n3\nწერილები\nთავსებადობა\nმეგობრები\nანგარიში & პარამეტრები →\nლოკალური preview · სატესტო მონაცემები\nსალამი, მკითხველო\nდღევანდელი დღე · კვირა, 4 ოქტომბერი\nდაუთმე დრო იმას, რაც შენთვის მნიშვნელოვანია\nსიმშვიდე\nგამბედაობა\nურთიერთობები\n\nმშვიდი დასაწყისი დაგეხმარება დაინახო, რას სჭირდება შენი ყურადღება. ყველაფრის ერთად მოგვარების ნაცვლად, აირჩიე ერთი მცირე მოქმედება.\n\nდეტალები და ტრანზიტები\n\nხვალ ახალი წინასწარმეტყველება გელოდება.\n\nდღის პატარა რიტუალი\n\n0 დღიანი სერია\n\n7 დღეში +1\n\nაირჩიე დღევანდელი ფოკუსი\n\nსიმშვიდე\nგამბედაობა\nურთიერთობები\nდღევანდელი მთვარე\nბოლო მეოთხედი · ♋ კირჩხიბი\nდრო მშვიდი ტემპისთვის\n39% განათებული\n23.2 დღე\n\nდაიტოვე დრო ერთი საქმის დასასრულებლად, სანამ შემდეგზე გადახვალ.\n\nგააგრძელე კითხვა\n›\nშენი PRO დღე\n\nკვირა, 4 ოქტომბერი\n\n6/10\n\nწონასწორული დღე · არც წინაღობა ჩანს, არც საჩუქარი — რიტმს შენ ქმნი.\n\nდღის ტრანზიტები\n\nმთვარე\n△\nმზე\n· ტრინი\n\nსივრცე მშვიდი საუბრისთვის\n\nეს თემა გამოიყენე რეფლექსიისთვის, არა წინასწარმეტყველებად. რას შეცვლიდა ცოტა მეტი მოთმინება დღევანდელ საუბარში?\n\nPRO რიტუალი\n\nშენი სხეული რას გეუბნება დღეს — უსმენ მას?\n\nგანბლოკე PRO-ით",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "headings": [
+        "სალამი, მკითხველო",
+        "დაუთმე დრო იმას, რაც შენთვის მნიშვნელოვანია",
+        "",
+        "დღის პატარა რიტუალი",
+        "დრო მშვიდი ტემპისთვის",
+        "შენი PRO დღე",
+        "დღის ტრანზიტები",
+        "PRO რიტუალი"
+      ],
+      "mobileLinks": [
+        {
+          "href": "/dashboard",
+          "text": "დღეს"
+        },
+        {
+          "href": "/taro",
+          "text": "ტარო"
+        },
+        {
+          "href": "/ask",
+          "text": "ჰკითხე"
+        },
+        {
+          "href": "/library",
+          "text": "ჩემი ისტორია"
+        }
+      ],
+      "mobileButtons": [
+        {
+          "label": "მეტი",
+          "text": "მეტი"
+        }
+      ],
+      "dialogs": 0,
+      "details": [
+        {
+          "open": false,
+          "label": "დეტალები და ტრანზიტები"
+        },
+        {
+          "open": false,
+          "label": "გააგრძელე კითხვა\n›"
+        }
+      ],
+      "focusButtons": [
+        {
+          "text": "სიმშვიდე",
+          "disabled": false,
+          "top": 783.78125,
+          "bottom": 817.265625
+        },
+        {
+          "text": "გამბედაობა",
+          "disabled": false,
+          "top": 783.78125,
+          "bottom": 817.265625
+        }
+      ]
+    },
+    "interactions": {
+      "detailsClicked": true,
+      "detailsOpened": true,
+      "detailsText": "დეტალები და ტრანზიტები\n\nახალი ვალდებულების აღებამდე ცოტა დრო დაუთმე საკუთარ თავს. მკაფიო საზღვარი დაგიტოვებს დროს იმისთვის, რაც უკვე მნიშვნელოვანია.\n\nმოკლე საუბარი შეიძლება დაგეხმაროს, უკეთ გაიგო სხვა ადამიანის საჭიროება. ჯერ მოუსმინე, შემდეგ გადაწყვიტე, რისი თქმა გინდა.\n\nდღის ტრანზიტები\n☽ მთვარე\n△\n☉ მზე\nტრინი\n\nსივრცე მშვიდი საუბრისთვის\n\nეს თემა გამოიყენე რეფლექსიისთვის, არა წინასწარმეტყველებად. რას შეცვლიდა ცოტა მეტი მოთმინება დღევანდელ საუბარში?",
+      "detailsClosed": true
+    },
+    "errors": [],
+    "failures": [],
+    "topShot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser/ka-free-desktop-top.png",
+    "fullShot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser/ka-free-desktop-full.png"
+  },
+  {
+    "case": {
+      "name": "ka-pro-mobile",
+      "locale": "ka",
+      "state": "pro",
+      "width": 390,
+      "height": 844,
+      "mobile": true
+    },
+    "dom": {
+      "url": "http://127.0.0.1:3113/today-p0-preview?locale=ka&state=pro",
+      "title": "Local Today P0 component preview · Vivida",
+      "text": "მთავარ კონტენტზე გადასვლა\n\nVivida ყოველთვის ხელთ გქონდეს\n\nდაამატე ვებ აპი მთავარ ეკრანზე, რომ სწრაფად გახსნა.\n\nდაამატე მთავარ ეკრანზე\nvivida\nლოკალური preview · სატესტო მონაცემები\nსალამი, მკითხველო\nდღევანდელი დღე · კვირა, 4 ოქტომბერი\nდაუთმე დრო იმას, რაც შენთვის მნიშვნელოვანია\nსიმშვიდე\nგამბედაობა\nურთიერთობები\n\nმშვიდი დასაწყისი დაგეხმარება დაინახო, რას სჭირდება შენი ყურადღება. ყველაფრის ერთად მოგვარების ნაცვლად, აირჩიე ერთი მცირე მოქმედება.\n\nდეტალები და ტრანზიტები\n\nხვალ ახალი წინასწარმეტყველება გელოდება.\n\nდღის პატარა რიტუალი\n\n0 დღიანი სერია\n\n7 დღეში +1\n\nაირჩიე დღევანდელი ფოკუსი\n\nსიმშვიდე\nგამბედაობა\nურთიერთობები\nდღევანდელი მთვარე\nბოლო მეოთხედი · ♋ კირჩხიბი\nდრო მშვიდი ტემპისთვის\n39% განათებული\n23.2 დღე\n\nდაიტოვე დრო ერთი საქმის დასასრულებლად, სანამ შემდეგზე გადახვალ.\n\nგააგრძელე კითხვა\n›\nშენი PRO დღე\n\nკვირა, 4 ოქტომბერი\n\n6/10\n\nწონასწორული დღე · არც წინაღობა ჩანს, არც საჩუქარი — რიტმს შენ ქმნი.\n\nდღის ტრანზიტები\n\nმთვარე\n△\nმზე\n· ტრინი\n\nსივრცე მშვიდი საუბრისთვის\n\nეს თემა გამოიყენე რეფლექსიისთვის, არა წინასწარმეტყველებად. რას შეცვლიდა ცოტა მეტი მოთმინება დღევანდელ საუბარში?\n\nPRO რიტუალი\n\nშენი სხეული რას გეუბნება დღეს — უსმენ მას?\n\nპასუხი მხოლოდ ამ ბრაუზერში ინახება.\nშენახვა\nდღეს\nტარო\nჰკითხე\nჩემი ისტორია\nმეტი",
+      "width": 390,
+      "scrollWidth": 390,
+      "headings": [
+        "სალამი, მკითხველო",
+        "დაუთმე დრო იმას, რაც შენთვის მნიშვნელოვანია",
+        "",
+        "დღის პატარა რიტუალი",
+        "დრო მშვიდი ტემპისთვის",
+        "შენი PRO დღე",
+        "დღის ტრანზიტები",
+        "PRO რიტუალი"
+      ],
+      "mobileLinks": [
+        {
+          "href": "/dashboard",
+          "text": "დღეს"
+        },
+        {
+          "href": "/taro",
+          "text": "ტარო"
+        },
+        {
+          "href": "/ask",
+          "text": "ჰკითხე"
+        },
+        {
+          "href": "/library",
+          "text": "ჩემი ისტორია"
+        }
+      ],
+      "mobileButtons": [
+        {
+          "label": "მეტი",
+          "text": "მეტი"
+        }
+      ],
+      "dialogs": 0,
+      "details": [
+        {
+          "open": false,
+          "label": "დეტალები და ტრანზიტები"
+        },
+        {
+          "open": false,
+          "label": "გააგრძელე კითხვა\n›"
+        }
+      ],
+      "focusButtons": [
+        {
+          "text": "სიმშვიდე",
+          "disabled": false,
+          "top": 801,
+          "bottom": 831
+        },
+        {
+          "text": "გამბედაობა",
+          "disabled": false,
+          "top": 801,
+          "bottom": 831
+        }
+      ]
+    },
+    "interactions": {
+      "detailsClicked": true,
+      "detailsOpened": true,
+      "detailsText": "დეტალები და ტრანზიტები\n\nახალი ვალდებულების აღებამდე ცოტა დრო დაუთმე საკუთარ თავს. მკაფიო საზღვარი დაგიტოვებს დროს იმისთვის, რაც უკვე მნიშვნელოვანია.\n\nმოკლე საუბარი შეიძლება დაგეხმაროს, უკეთ გაიგო სხვა ადამიანის საჭიროება. ჯერ მოუსმინე, შემდეგ გადაწყვიტე, რისი თქმა გინდა.\n\nდღის ტრანზიტები\n☽ მთვარე\n△\n☉ მზე\nტრინი\n\nსივრცე მშვიდი საუბრისთვის\n\nეს თემა გამოიყენე რეფლექსიისთვის, არა წინასწარმეტყველებად. რას შეცვლიდა ცოტა მეტი მოთმინება დღევანდელ საუბარში?",
+      "detailsClosed": true,
+      "moreClicked": true,
+      "drawerOpened": true,
+      "drawerLinks": [
+        {
+          "href": "/dashboard",
+          "text": "vivida"
+        },
+        {
+          "href": "/dashboard",
+          "text": "დღეს"
+        },
+        {
+          "href": "/taro",
+          "text": "ტარო"
+        },
+        {
+          "href": "/ask",
+          "text": "ჰკითხე"
+        },
+        {
+          "href": "/library",
+          "text": "ბიბლიოთეკა"
+        },
+        {
+          "href": "/report",
+          "text": "ჩემი რუკა"
+        },
+        {
+          "href": "/sky",
+          "text": "ცა ახლა"
+        },
+        {
+          "href": "/reports",
+          "text": "რეპორტები"
+        },
+        {
+          "href": "/timing",
+          "text": "როდის"
+        },
+        {
+          "href": "/feed",
+          "text": "ფიდი"
+        },
+        {
+          "href": "/tests",
+          "text": "ტესტები"
+        },
+        {
+          "href": "/messages",
+          "text": "3\nწერილები"
+        },
+        {
+          "href": "/synastry",
+          "text": "თავსებადობა"
+        },
+        {
+          "href": "/friends",
+          "text": "მეგობრები"
+        }
+      ],
+      "drawerScreenshot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser/ka-pro-mobile-more.png",
+      "tabFocusInDialog": false,
+      "escapeClosed": false,
+      "focusReturnedToMore": false
+    },
+    "errors": [],
+    "failures": [
+      "drawer interaction failed: tabFocusInDialog",
+      "drawer interaction failed: escapeClosed",
+      "drawer interaction failed: focusReturnedToMore",
+      "More missing /account",
+      "focus action is not visible in the first usable viewport"
+    ],
+    "topShot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser/ka-pro-mobile-top.png",
+    "fullShot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser/ka-pro-mobile-full.png"
+  },
+  {
+    "case": {
+      "name": "ka-complete-mobile",
+      "locale": "ka",
+      "state": "complete",
+      "width": 390,
+      "height": 844,
+      "mobile": true
+    },
+    "dom": {
+      "url": "http://127.0.0.1:3113/today-p0-preview?locale=ka&state=complete",
+      "title": "Local Today P0 component preview · Vivida",
+      "text": "მთავარ კონტენტზე გადასვლა\n\nVivida ყოველთვის ხელთ გქონდეს\n\nდაამატე ვებ აპი მთავარ ეკრანზე, რომ სწრაფად გახსნა.\n\nდაამატე მთავარ ეკრანზე\nvivida\nლოკალური preview · სატესტო მონაცემები\nსალამი, მკითხველო\nდღევანდელი დღე · კვირა, 4 ოქტომბერი\nდაუთმე დრო იმას, რაც შენთვის მნიშვნელოვანია\nსიმშვიდე\nგამბედაობა\nურთიერთობები\n\nმშვიდი დასაწყისი დაგეხმარება დაინახო, რას სჭირდება შენი ყურადღება. ყველაფრის ერთად მოგვარების ნაცვლად, აირჩიე ერთი მცირე მოქმედება.\n\nდეტალები და ტრანზიტები\n\nხვალ ახალი წინასწარმეტყველება გელოდება.\n\nდღის პატარა რიტუალი\n\n7 დღიანი სერია\n\n23 დღეში +2\n\nდღის რიტუალი დასრულებულია\n\nსერიის გასაგრძელებლად ხვალ დაბრუნდი\n\nაირჩიე შეხსენებები →\nდღევანდელი მთვარე\nბოლო მეოთხედი · ♋ კირჩხიბი\nდრო მშვიდი ტემპისთვის\n39% განათებული\n23.2 დღე\n\nდაიტოვე დრო ერთი საქმის დასასრულებლად, სანამ შემდეგზე გადახვალ.\n\nგააგრძელე კითხვა\n›\nშენი PRO დღე\n\nკვირა, 4 ოქტომბერი\n\n6/10\n\nწონასწორული დღე · არც წინაღობა ჩანს, არც საჩუქარი — რიტმს შენ ქმნი.\n\nდღის ტრანზიტები\n\nმთვარე\n△\nმზე\n· ტრინი\n\nსივრცე მშვიდი საუბრისთვის\n\nეს თემა გამოიყენე რეფლექსიისთვის, არა წინასწარმეტყველებად. რას შეცვლიდა ცოტა მეტი მოთმინება დღევანდელ საუბარში?\n\nPRO რიტუალი\n\nშენი სხეული რას გეუბნება დღეს — უსმენ მას?\n\nგანბლოკე PRO-ით\nდღეს\nტარო\nჰკითხე\nჩემი ისტორია\nმეტი",
+      "width": 390,
+      "scrollWidth": 390,
+      "headings": [
+        "სალამი, მკითხველო",
+        "დაუთმე დრო იმას, რაც შენთვის მნიშვნელოვანია",
+        "",
+        "დღის პატარა რიტუალი",
+        "დრო მშვიდი ტემპისთვის",
+        "შენი PRO დღე",
+        "დღის ტრანზიტები",
+        "PRO რიტუალი"
+      ],
+      "mobileLinks": [
+        {
+          "href": "/dashboard",
+          "text": "დღეს"
+        },
+        {
+          "href": "/taro",
+          "text": "ტარო"
+        },
+        {
+          "href": "/ask",
+          "text": "ჰკითხე"
+        },
+        {
+          "href": "/library",
+          "text": "ჩემი ისტორია"
+        }
+      ],
+      "mobileButtons": [
+        {
+          "label": "მეტი",
+          "text": "მეტი"
+        }
+      ],
+      "dialogs": 0,
+      "details": [
+        {
+          "open": false,
+          "label": "დეტალები და ტრანზიტები"
+        },
+        {
+          "open": false,
+          "label": "გააგრძელე კითხვა\n›"
+        }
+      ],
+      "focusButtons": []
+    },
+    "interactions": {
+      "detailsClicked": true,
+      "detailsOpened": true,
+      "detailsText": "დეტალები და ტრანზიტები\n\nახალი ვალდებულების აღებამდე ცოტა დრო დაუთმე საკუთარ თავს. მკაფიო საზღვარი დაგიტოვებს დროს იმისთვის, რაც უკვე მნიშვნელოვანია.\n\nმოკლე საუბარი შეიძლება დაგეხმაროს, უკეთ გაიგო სხვა ადამიანის საჭიროება. ჯერ მოუსმინე, შემდეგ გადაწყვიტე, რისი თქმა გინდა.\n\nდღის ტრანზიტები\n☽ მთვარე\n△\n☉ მზე\nტრინი\n\nსივრცე მშვიდი საუბრისთვის\n\nეს თემა გამოიყენე რეფლექსიისთვის, არა წინასწარმეტყველებად. რას შეცვლიდა ცოტა მეტი მოთმინება დღევანდელ საუბარში?",
+      "detailsClosed": true,
+      "moreClicked": true,
+      "drawerOpened": true,
+      "drawerLinks": [
+        {
+          "href": "/dashboard",
+          "text": "vivida"
+        },
+        {
+          "href": "/dashboard",
+          "text": "დღეს"
+        },
+        {
+          "href": "/taro",
+          "text": "ტარო"
+        },
+        {
+          "href": "/ask",
+          "text": "ჰკითხე"
+        },
+        {
+          "href": "/library",
+          "text": "ბიბლიოთეკა"
+        },
+        {
+          "href": "/report",
+          "text": "ჩემი რუკა"
+        },
+        {
+          "href": "/sky",
+          "text": "ცა ახლა"
+        },
+        {
+          "href": "/reports",
+          "text": "რეპორტები"
+        },
+        {
+          "href": "/timing",
+          "text": "როდის"
+        },
+        {
+          "href": "/feed",
+          "text": "ფიდი"
+        },
+        {
+          "href": "/tests",
+          "text": "ტესტები"
+        },
+        {
+          "href": "/messages",
+          "text": "3\nწერილები"
+        },
+        {
+          "href": "/synastry",
+          "text": "თავსებადობა"
+        },
+        {
+          "href": "/friends",
+          "text": "მეგობრები"
+        }
+      ],
+      "drawerScreenshot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser/ka-complete-mobile-more.png",
+      "tabFocusInDialog": false,
+      "escapeClosed": false,
+      "focusReturnedToMore": false
+    },
+    "errors": [],
+    "failures": [
+      "drawer interaction failed: tabFocusInDialog",
+      "drawer interaction failed: escapeClosed",
+      "drawer interaction failed: focusReturnedToMore",
+      "More missing /account"
+    ],
+    "topShot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser/ka-complete-mobile-top.png",
+    "fullShot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser/ka-complete-mobile-full.png"
+  },
+  {
+    "case": {
+      "name": "en-free-mobile",
+      "locale": "en",
+      "state": "free",
+      "width": 390,
+      "height": 844,
+      "mobile": true
+    },
+    "dom": {
+      "url": "http://127.0.0.1:3113/today-p0-preview?locale=en&state=free",
+      "title": "Local Today P0 component preview · Vivida",
+      "text": "მთავარ კონტენტზე გადასვლა\n\nVivida ყოველთვის ხელთ გქონდეს\n\nდაამატე ვებ აპი მთავარ ეკრანზე, რომ სწრაფად გახსნა.\n\nდაამატე მთავარ ეკრანზე\nvivida\nLocal preview · test data\nHello, reader\nTODAY · OCTOBER 4, 2026\nMake room for what matters\nCalm\nCourage\nRelationships\n\nA quieter start can help you notice what deserves your attention. Choose one small action instead of trying to solve everything at once.\n\nDetails and transits\n\nA new reading will be waiting tomorrow.\n\nToday's small ritual\n\n0 day streak\n\n+1 in 7 days\n\nChoose today's focus\n\nCalm\nCourage\nRelationships\nTODAY'S MOON\nLast Quarter · ♋ Cancer\nA moment to slow down\n39% illuminated\n23.2 days\n\nGive yourself room to finish one thing before moving to the next.\n\nContinue reading\n›\nYOUR PRO DAY\n\nOctober 4\n\n6/10\n\nA balanced day · No clear obstacle, no clear gift — you set the rhythm.\n\nTODAY'S TRANSITS\n\nMoon\n△\nSun\n· trine\n\nSpace for a thoughtful conversation\n\nUse this theme as a reflection prompt, not a prediction. What could a little more patience change in a conversation today?\n\nPRO RITUAL\n\nWhat is your body telling you today — are you listening?\n\nUnlock with PRO\nToday\nTarot\nAsk\nMy history\nMore",
+      "width": 390,
+      "scrollWidth": 390,
+      "headings": [
+        "Hello, reader",
+        "Make room for what matters",
+        "",
+        "Today's small ritual",
+        "A moment to slow down",
+        "YOUR PRO DAY",
+        "TODAY'S TRANSITS",
+        "PRO RITUAL"
+      ],
+      "mobileLinks": [
+        {
+          "href": "/dashboard",
+          "text": "Today"
+        },
+        {
+          "href": "/taro",
+          "text": "Tarot"
+        },
+        {
+          "href": "/ask",
+          "text": "Ask"
+        },
+        {
+          "href": "/library",
+          "text": "My history"
+        }
+      ],
+      "mobileButtons": [
+        {
+          "label": "More",
+          "text": "More"
+        }
+      ],
+      "dialogs": 0,
+      "details": [
+        {
+          "open": false,
+          "label": "Details and transits"
+        },
+        {
+          "open": false,
+          "label": "Continue reading\n›"
+        }
+      ],
+      "focusButtons": [
+        {
+          "text": "Calm",
+          "disabled": false,
+          "top": 698.5,
+          "bottom": 728.5
+        },
+        {
+          "text": "Courage",
+          "disabled": false,
+          "top": 698.5,
+          "bottom": 728.5
+        }
+      ]
+    },
+    "interactions": {
+      "detailsClicked": true,
+      "detailsOpened": true,
+      "detailsText": "Details and transits\n\nPause before you take on another commitment. A clear boundary can create time for the things you already care about.\n\nA short conversation can help you understand what someone else needs. Listen first, then choose what you want to say.\n\nTODAY'S TRANSITS\n☽ Moon\n△\n☉ Sun\ntrine\n\nSpace for a thoughtful conversation\n\nUse this theme as a reflection prompt, not a prediction. What could a little more patience change in a conversation today?",
+      "detailsClosed": true,
+      "moreClicked": true,
+      "drawerOpened": true,
+      "drawerLinks": [
+        {
+          "href": "/dashboard",
+          "text": "vivida"
+        },
+        {
+          "href": "/dashboard",
+          "text": "Today"
+        },
+        {
+          "href": "/taro",
+          "text": "Tarot"
+        },
+        {
+          "href": "/ask",
+          "text": "Ask"
+        },
+        {
+          "href": "/library",
+          "text": "Library"
+        },
+        {
+          "href": "/report",
+          "text": "My chart"
+        },
+        {
+          "href": "/sky",
+          "text": "Sky now"
+        },
+        {
+          "href": "/reports",
+          "text": "Reports"
+        },
+        {
+          "href": "/timing",
+          "text": "Timing"
+        },
+        {
+          "href": "/feed",
+          "text": "Feed"
+        },
+        {
+          "href": "/tests",
+          "text": "Tests"
+        },
+        {
+          "href": "/messages",
+          "text": "3\nMessages"
+        },
+        {
+          "href": "/synastry",
+          "text": "Compatibility"
+        },
+        {
+          "href": "/friends",
+          "text": "Friends"
+        }
+      ],
+      "drawerScreenshot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser/en-free-mobile-more.png",
+      "tabFocusInDialog": false,
+      "escapeClosed": false,
+      "focusReturnedToMore": false
+    },
+    "errors": [],
+    "failures": [
+      "drawer interaction failed: tabFocusInDialog",
+      "drawer interaction failed: escapeClosed",
+      "drawer interaction failed: focusReturnedToMore",
+      "More missing /account"
+    ],
+    "topShot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser/en-free-mobile-top.png",
+    "fullShot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser/en-free-mobile-full.png"
+  },
+  {
+    "case": {
+      "name": "en-free-desktop",
+      "locale": "en",
+      "state": "free",
+      "width": 1440,
+      "height": 1000,
+      "mobile": false
+    },
+    "dom": {
+      "url": "http://127.0.0.1:3113/today-p0-preview?locale=en&state=free",
+      "title": "Local Today P0 component preview · Vivida",
+      "text": "მთავარ კონტენტზე გადასვლა\nvivida\nToday\nTarot\nAsk\nLibrary\nMy chart\nSky now\nReports\nTiming\nFeed\nTests\n3\nMessages\nCompatibility\nFriends\nAccount & settings →\nLocal preview · test data\nHello, reader\nTODAY · OCTOBER 4, 2026\nMake room for what matters\nCalm\nCourage\nRelationships\n\nA quieter start can help you notice what deserves your attention. Choose one small action instead of trying to solve everything at once.\n\nDetails and transits\n\nA new reading will be waiting tomorrow.\n\nToday's small ritual\n\n0 day streak\n\n+1 in 7 days\n\nChoose today's focus\n\nCalm\nCourage\nRelationships\nTODAY'S MOON\nLast Quarter · ♋ Cancer\nA moment to slow down\n39% illuminated\n23.2 days\n\nGive yourself room to finish one thing before moving to the next.\n\nContinue reading\n›\nYOUR PRO DAY\n\nOctober 4\n\n6/10\n\nA balanced day · No clear obstacle, no clear gift — you set the rhythm.\n\nTODAY'S TRANSITS\n\nMoon\n△\nSun\n· trine\n\nSpace for a thoughtful conversation\n\nUse this theme as a reflection prompt, not a prediction. What could a little more patience change in a conversation today?\n\nPRO RITUAL\n\nWhat is your body telling you today — are you listening?\n\nUnlock with PRO",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "headings": [
+        "Hello, reader",
+        "Make room for what matters",
+        "",
+        "Today's small ritual",
+        "A moment to slow down",
+        "YOUR PRO DAY",
+        "TODAY'S TRANSITS",
+        "PRO RITUAL"
+      ],
+      "mobileLinks": [
+        {
+          "href": "/dashboard",
+          "text": "Today"
+        },
+        {
+          "href": "/taro",
+          "text": "Tarot"
+        },
+        {
+          "href": "/ask",
+          "text": "Ask"
+        },
+        {
+          "href": "/library",
+          "text": "My history"
+        }
+      ],
+      "mobileButtons": [
+        {
+          "label": "More",
+          "text": "More"
+        }
+      ],
+      "dialogs": 0,
+      "details": [
+        {
+          "open": false,
+          "label": "Details and transits"
+        },
+        {
+          "open": false,
+          "label": "Continue reading\n›"
+        }
+      ],
+      "focusButtons": [
+        {
+          "text": "Calm",
+          "disabled": false,
+          "top": 741.59375,
+          "bottom": 775.078125
+        },
+        {
+          "text": "Courage",
+          "disabled": false,
+          "top": 741.59375,
+          "bottom": 775.078125
+        }
+      ]
+    },
+    "interactions": {
+      "detailsClicked": true,
+      "detailsOpened": true,
+      "detailsText": "Details and transits\n\nPause before you take on another commitment. A clear boundary can create time for the things you already care about.\n\nA short conversation can help you understand what someone else needs. Listen first, then choose what you want to say.\n\nTODAY'S TRANSITS\n☽ Moon\n△\n☉ Sun\ntrine\n\nSpace for a thoughtful conversation\n\nUse this theme as a reflection prompt, not a prediction. What could a little more patience change in a conversation today?",
+      "detailsClosed": true
+    },
+    "errors": [],
+    "failures": [],
+    "topShot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser/en-free-desktop-top.png",
+    "fullShot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser/en-free-desktop-full.png"
+  }
+]

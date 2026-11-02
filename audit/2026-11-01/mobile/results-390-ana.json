@@ -1,0 +1,2369 @@
+[
+  {
+    "url": "/account",
+    "pattern": "/account",
+    "width": 390,
+    "status": 200,
+    "finalUrl": "/account",
+    "title": "ანგარიში · Vivida",
+    "lang": "ka",
+    "screenshot": "shots/account__390-ana.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "scrollHeight": 5458,
+      "scrollX": 0,
+      "bodyPaddingBottom": "76px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [],
+    "mediumTapTargets": [
+      {
+        "selector": "div.mb-6.scroll-mt-24:nth-of-type(7) > section.rounded-2xl.border > div.mt-5.rounded-xl:nth-of-type(3) > div.flex.items-start > button.relative.mt-0\\.5",
+        "tag": "BUTTON",
+        "w": 44,
+        "h": 24,
+        "size": 24,
+        "label": ""
+      },
+      {
+        "selector": "div.mb-6:nth-of-type(11) > div.rounded-2xl.border > div.space-y-4:nth-of-type(1) > div.flex.items-start:nth-of-type(4) > button.relative.mt-0\\.5",
+        "tag": "BUTTON",
+        "w": 44,
+        "h": 24,
+        "size": 24,
+        "label": "აღმოჩენადობა"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 183,
+        "h": 28,
+        "size": 28,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 107,
+        "h": 32,
+        "size": 32,
+        "label": "Vivida"
+      },
+      {
+        "selector": "dl.grid.grid-cols-1 > div:nth-of-type(5) > div.flex.flex-col > div.flex.w-full:nth-of-type(2) > button.inline-flex.items-center:nth-of-type(1)",
+        "tag": "BUTTON",
+        "w": 147,
+        "h": 34,
+        "size": 34,
+        "label": "♀ მდედრობითი"
+      },
+      {
+        "selector": "dl.grid.grid-cols-1 > div:nth-of-type(5) > div.flex.flex-col > div.flex.w-full:nth-of-type(2) > button.inline-flex.items-center:nth-of-type(2)",
+        "tag": "BUTTON",
+        "w": 130,
+        "h": 34,
+        "size": 34,
+        "label": "♂ მამრობითი"
+      },
+      {
+        "selector": "section.rounded-2xl.border > div.space-y-3:nth-of-type(1) > div.rounded-xl.border:nth-of-type(1) > div.mt-3.flex:nth-of-type(2) > button.inline-flex.h-9:nth-of-type(1)",
+        "tag": "BUTTON",
+        "w": 76,
+        "h": 36,
+        "size": 36,
+        "label": "Push"
+      },
+      {
+        "selector": "section.rounded-2xl.border > div.space-y-3:nth-of-type(1) > div.rounded-xl.border:nth-of-type(1) > div.mt-3.flex:nth-of-type(2) > button.inline-flex.h-9:nth-of-type(2)",
+        "tag": "BUTTON",
+        "w": 112,
+        "h": 36,
+        "size": 36,
+        "label": "ელფოსტა"
+      },
+      {
+        "selector": "section.rounded-2xl.border > div.space-y-3:nth-of-type(1) > div.rounded-xl.border:nth-of-type(1) > div.mt-3.flex:nth-of-type(3) > select.h-9.w-full",
+        "tag": "SELECT",
+        "w": 274,
+        "h": 36,
+        "size": 36,
+        "label": "კვირაში ერთხელ ყოველდღე, როცა აქტუალურია"
+      },
+      {
+        "selector": "section.rounded-2xl.border > div.space-y-3:nth-of-type(1) > div.rounded-xl.border:nth-of-type(2) > div.mt-3.flex:nth-of-type(2) > button.inline-flex.h-9:nth-of-type(1)",
+        "tag": "BUTTON",
+        "w": 76,
+        "h": 36,
+        "size": 36,
+        "label": "Push"
+      },
+      {
+        "selector": "section.rounded-2xl.border > div.space-y-3:nth-of-type(1) > div.rounded-xl.border:nth-of-type(2) > div.mt-3.flex:nth-of-type(2) > button.inline-flex.h-9:nth-of-type(2)",
+        "tag": "BUTTON",
+        "w": 112,
+        "h": 36,
+        "size": 36,
+        "label": "ელფოსტა"
+      },
+      {
+        "selector": "section.rounded-2xl.border > div.space-y-3:nth-of-type(1) > div.rounded-xl.border:nth-of-type(3) > div.mt-3.flex:nth-of-type(2) > button.inline-flex.h-9:nth-of-type(1)",
+        "tag": "BUTTON",
+        "w": 98,
+        "h": 36,
+        "size": 36,
+        "label": "Push"
+      },
+      {
+        "selector": "section.rounded-2xl.border > div.space-y-3:nth-of-type(1) > div.rounded-xl.border:nth-of-type(3) > div.mt-3.flex:nth-of-type(2) > button.inline-flex.h-9:nth-of-type(2)",
+        "tag": "BUTTON",
+        "w": 112,
+        "h": 36,
+        "size": 36,
+        "label": "ელფოსტა"
+      },
+      {
+        "selector": "section.relative.z-10 > div.mb-6:nth-of-type(9) > section.rounded-2xl.border > div.mt-4.flex:nth-of-type(2) > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 239,
+        "h": 36,
+        "size": 36,
+        "label": "საცხოვრებელი ადგილის შენახვა"
+      },
+      {
+        "selector": "div.mb-6:nth-of-type(11) > div.rounded-2xl.border > div.mt-5.flex:nth-of-type(2) > div.flex.items-center:nth-of-type(2) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 150,
+        "h": 36,
+        "size": 36,
+        "label": "ნახე პროფილი"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > div.flex.items-center > span.font-mono.text-\\[10px\\]:nth-of-type(1)",
+        "fontSize": 10,
+        "text": "ობსერვატორია"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(4) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჩემი ისტორია"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 256,
+        "h": 42,
+        "top": -80,
+        "bottom": -38,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > nav.fixed.inset-x-0",
+        "w": 390,
+        "h": 74,
+        "top": 770,
+        "bottom": 844,
+        "zIndex": "40",
+        "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 40,
+        "h": 40,
+        "top": 716,
+        "bottom": 756,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": {
+      "height": 74,
+      "top": 770,
+      "bodyPaddingBottom": 76,
+      "sufficient": true
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/credits",
+    "pattern": "/credits",
+    "width": 390,
+    "status": 200,
+    "finalUrl": "/credits",
+    "title": "კრედიტები · Vivida",
+    "lang": "ka",
+    "screenshot": "shots/credits__390-ana.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "scrollHeight": 2546,
+      "scrollX": 0,
+      "bodyPaddingBottom": "76px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 183,
+        "h": 28,
+        "size": 28,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 107,
+        "h": 32,
+        "size": 32,
+        "label": "Vivida"
+      },
+      {
+        "selector": "section.scroll-mt-20.rounded-3xl > nav.mt-4.grid > a.rounded-lg.px-2:nth-of-type(1)",
+        "tag": "A",
+        "w": 102,
+        "h": 32,
+        "size": 32,
+        "label": "ყველა"
+      },
+      {
+        "selector": "section.scroll-mt-20.rounded-3xl > nav.mt-4.grid > a.rounded-lg.px-2:nth-of-type(2)",
+        "tag": "A",
+        "w": 102,
+        "h": 32,
+        "size": 32,
+        "label": "მიღებული"
+      },
+      {
+        "selector": "section.scroll-mt-20.rounded-3xl > nav.mt-4.grid > a.rounded-lg.px-2:nth-of-type(3)",
+        "tag": "A",
+        "w": 102,
+        "h": 32,
+        "size": 32,
+        "label": "დახარჯული"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(1) > button.grid.size-10",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-10",
+        "tag": "A",
+        "w": 69,
+        "h": 40,
+        "size": 40,
+        "label": "PRO გამოწერის გახსნა"
+      },
+      {
+        "selector": "#radix-_R_1tbclritslb_",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "შეტყობინებები"
+      },
+      {
+        "selector": "#radix-_R_2dbclritslb_",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "section.relative.z-10 > div.mt-4:nth-of-type(6) > div.rounded-3xl.border > div.mt-5.flex:nth-of-type(2) > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 126,
+        "h": 40,
+        "size": 40,
+        "label": "კოპირება"
+      },
+      {
+        "selector": "section.relative.z-10 > div.mt-4:nth-of-type(6) > div.rounded-3xl.border > div.mt-4.flex:nth-of-type(3) > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 132,
+        "h": 40,
+        "size": 40,
+        "label": "გაზიარება"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "კონფიდენციალურობა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "tag": "A",
+        "w": 256,
+        "h": 42,
+        "size": 42,
+        "label": "მთავარ კონტენტზე გადასვლა"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > div.flex.items-center > span.font-mono.text-\\[10px\\]:nth-of-type(1)",
+        "fontSize": 10,
+        "text": "ობსერვატორია"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(4) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჩემი ისტორია"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 256,
+        "h": 42,
+        "top": -80,
+        "bottom": -38,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > nav.fixed.inset-x-0",
+        "w": 390,
+        "h": 74,
+        "top": 770,
+        "bottom": 844,
+        "zIndex": "40",
+        "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 40,
+        "h": 40,
+        "top": 716,
+        "bottom": 756,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": {
+      "height": 74,
+      "top": 770,
+      "bodyPaddingBottom": 76,
+      "sufficient": true
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/dashboard",
+    "pattern": "/dashboard",
+    "width": 390,
+    "status": 200,
+    "finalUrl": "/dashboard",
+    "title": "დღეს · Vivida",
+    "lang": "ka",
+    "screenshot": "shots/dashboard__390-ana.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "scrollHeight": 2439,
+      "scrollX": 0,
+      "bodyPaddingBottom": "76px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "div.space-y-8:nth-of-type(1) > section:nth-of-type(1) > div.relative.overflow-hidden > div.flex.flex-wrap:nth-of-type(1) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 165,
+        "h": 15,
+        "size": 15,
+        "label": "სრული ნატალური რუკა"
+      },
+      {
+        "selector": "section.relative.z-10 > div.space-y-8:nth-of-type(1) > section:nth-of-type(3) > div.mb-2.flex:nth-of-type(1) > a.text-xs.text-muted-foreground",
+        "tag": "A",
+        "w": 55,
+        "h": 16,
+        "size": 16,
+        "label": "ყველა →"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-8 > header.mb-3.flex > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 105,
+        "h": 16,
+        "size": 16,
+        "label": "ყველა სტატია"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 183,
+        "h": 28,
+        "size": 28,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 107,
+        "h": 32,
+        "size": 32,
+        "label": "Vivida"
+      },
+      {
+        "selector": "section.relative.z-10 > div.space-y-8:nth-of-type(1) > section:nth-of-type(1) > header.mb-3.flex > a.font-mono.text-xs",
+        "tag": "A",
+        "w": 159,
+        "h": 32,
+        "size": 32,
+        "label": "სრული ნატალური რუკა →"
+      },
+      {
+        "selector": "section:nth-of-type(3) > div.relative:nth-of-type(2) > div.-mx-4.flex:nth-of-type(3) > article.group.relative > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 150,
+        "h": 32,
+        "size": 32,
+        "label": "დამატება"
+      },
+      {
+        "selector": "section.relative.z-10 > header.mb-8.overflow-hidden > div.flex.flex-col:nth-of-type(2) > div.flex.flex-wrap:nth-of-type(2) > a.inline-flex.h-9:nth-of-type(1)",
+        "tag": "A",
+        "w": 130,
+        "h": 36,
+        "size": 36,
+        "label": "ჩემი რუკა →"
+      },
+      {
+        "selector": "section.relative.z-10 > header.mb-8.overflow-hidden > div.flex.flex-col:nth-of-type(2) > div.flex.flex-wrap:nth-of-type(2) > a.inline-flex.h-9:nth-of-type(2)",
+        "tag": "A",
+        "w": 122,
+        "h": 36,
+        "size": 36,
+        "label": "თავსებადობა"
+      },
+      {
+        "selector": "section.relative.z-10 > header.mb-8.overflow-hidden > div.flex.flex-col:nth-of-type(2) > div.flex.flex-wrap:nth-of-type(2) > a.inline-flex.h-9:nth-of-type(3)",
+        "tag": "A",
+        "w": 64,
+        "h": 36,
+        "size": 36,
+        "label": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(1) > button.grid.size-10",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-10",
+        "tag": "A",
+        "w": 69,
+        "h": 40,
+        "size": 40,
+        "label": "PRO გამოწერის გახსნა"
+      },
+      {
+        "selector": "#radix-_R_7lklritslb_",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "შეტყობინებები"
+      },
+      {
+        "selector": "#radix-_R_9lklritslb_",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "კონფიდენციალურობა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "tag": "A",
+        "w": 256,
+        "h": 42,
+        "size": 42,
+        "label": "მთავარ კონტენტზე გადასვლა"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > div.flex.items-center > span.font-mono.text-\\[10px\\]:nth-of-type(1)",
+        "fontSize": 10,
+        "text": "ობსერვატორია"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative > span.truncate:nth-of-type(3)",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(4) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჩემი ისტორია"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 256,
+        "h": 42,
+        "top": -80,
+        "bottom": -38,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > nav.fixed.inset-x-0",
+        "w": 390,
+        "h": 74,
+        "top": 770,
+        "bottom": 844,
+        "zIndex": "40",
+        "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 40,
+        "h": 40,
+        "top": 716,
+        "bottom": 756,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [
+      {
+        "control": "div.space-y-8:nth-of-type(1) > section:nth-of-type(1) > div.relative.overflow-hidden > div.grid.gap-3:nth-of-type(2) > a.group.relative:nth-of-type(3)",
+        "controlLabel": "03 · HORIZON · ამომავალი გარეგანი ↑ კირჩხიბი 19° 4",
+        "coveredBy": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > nav.fixed.inset-x-0"
+      }
+    ],
+    "tabBar": {
+      "height": 74,
+      "top": 770,
+      "bodyPaddingBottom": 76,
+      "sufficient": true
+    },
+    "consoleErrors": [
+      "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` wh"
+    ],
+    "pageErrors": []
+  },
+  {
+    "url": "/feed",
+    "pattern": "/feed",
+    "width": 390,
+    "status": 200,
+    "finalUrl": "/feed",
+    "title": "ფიდი · Vivida",
+    "lang": "ka",
+    "screenshot": "shots/feed__390-ana.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "scrollHeight": 2728,
+      "scrollX": 0,
+      "bodyPaddingBottom": "76px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "section.relative.z-10 > div.mb-6:nth-of-type(3) > section > div.mb-2.flex:nth-of-type(1) > a.text-xs.text-muted-foreground",
+        "tag": "A",
+        "w": 55,
+        "h": 16,
+        "size": 16,
+        "label": "ყველა →"
+      },
+      {
+        "selector": "article.rounded-2xl.border > div.mt-3.flex:nth-of-type(1) > button.tabular-nums.transition-colors",
+        "tag": "BUTTON",
+        "w": 80,
+        "h": 16,
+        "size": 16,
+        "label": "2 კომენტარი"
+      },
+      {
+        "selector": "article.rounded-2xl.border > div.mt-3.flex:nth-of-type(1) > button.tabular-nums.transition-colors",
+        "tag": "BUTTON",
+        "w": 80,
+        "h": 16,
+        "size": 16,
+        "label": "1 კომენტარი"
+      },
+      {
+        "selector": "article.rounded-2xl.border > div.mt-3.flex:nth-of-type(1) > button.tabular-nums.transition-colors",
+        "tag": "BUTTON",
+        "w": 80,
+        "h": 16,
+        "size": 16,
+        "label": "1 კომენტარი"
+      },
+      {
+        "selector": "article.rounded-2xl.border > header.flex.items-start > div.min-w-0.flex-1 > div.mt-0\\.5.flex:nth-of-type(2) > a.truncate",
+        "tag": "A",
+        "w": 62,
+        "h": 17,
+        "size": 17,
+        "label": "@luka-audit"
+      },
+      {
+        "selector": "article.rounded-2xl.border > header.flex.items-start > div.min-w-0.flex-1 > div.mt-0\\.5.flex:nth-of-type(2) > a.truncate",
+        "tag": "A",
+        "w": 80,
+        "h": 17,
+        "size": 17,
+        "label": "@mariam-audit"
+      },
+      {
+        "selector": "article.rounded-2xl.border > header.flex.items-start > div.min-w-0.flex-1 > div.mt-0\\.5.flex:nth-of-type(2) > a.truncate",
+        "tag": "A",
+        "w": 71,
+        "h": 17,
+        "size": 17,
+        "label": "@tamar-audit"
+      },
+      {
+        "selector": "article.rounded-2xl.border > header.flex.items-start > div.min-w-0.flex-1 > div.mt-0\\.5.flex:nth-of-type(2) > a.truncate",
+        "tag": "A",
+        "w": 70,
+        "h": 17,
+        "size": 17,
+        "label": "@giorgi-audit"
+      },
+      {
+        "selector": "article.rounded-2xl.border > header.flex.items-start > div.min-w-0.flex-1 > div.mt-0\\.5.flex:nth-of-type(2) > a.truncate",
+        "tag": "A",
+        "w": 59,
+        "h": 17,
+        "size": 17,
+        "label": "@ana-audit"
+      },
+      {
+        "selector": "article.rounded-2xl.border > header.flex.items-start > div.min-w-0.flex-1 > div.mt-0\\.5.flex:nth-of-type(2) > a.truncate",
+        "tag": "A",
+        "w": 65,
+        "h": 17,
+        "size": 17,
+        "label": "@sofia-audit"
+      },
+      {
+        "selector": "article.rounded-2xl.border > header.flex.items-start > div.min-w-0.flex-1 > div.flex.items-center:nth-of-type(1) > a.truncate.text-\\[15px\\]",
+        "tag": "A",
+        "w": 170,
+        "h": 23,
+        "size": 23,
+        "label": "ლუკა მეგობრიშვილი"
+      },
+      {
+        "selector": "article.rounded-2xl.border > header.flex.items-start > div.min-w-0.flex-1 > div.flex.items-center:nth-of-type(1) > a.truncate.text-\\[15px\\]",
+        "tag": "A",
+        "w": 115,
+        "h": 23,
+        "size": 23,
+        "label": "მარიამ ჩხეიძე"
+      },
+      {
+        "selector": "article.rounded-2xl.border > header.flex.items-start > div.min-w-0.flex-1 > div.flex.items-center:nth-of-type(1) > a.truncate.text-\\[15px\\]",
+        "tag": "A",
+        "w": 152,
+        "h": 23,
+        "size": 23,
+        "label": "თამარ გელაშვილი"
+      },
+      {
+        "selector": "article.rounded-2xl.border > header.flex.items-start > div.min-w-0.flex-1 > div.flex.items-center:nth-of-type(1) > a.truncate.text-\\[15px\\]",
+        "tag": "A",
+        "w": 181,
+        "h": 23,
+        "size": 23,
+        "label": "გიორგი მაღალაშვილი"
+      },
+      {
+        "selector": "article.rounded-2xl.border > header.flex.items-start > div.min-w-0.flex-1 > div.flex.items-center:nth-of-type(1) > a.truncate.text-\\[15px\\]",
+        "tag": "A",
+        "w": 122,
+        "h": 23,
+        "size": 23,
+        "label": "ანა კალანდაძე"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > div.mb-4.flex:nth-of-type(5) > button.rounded-full.border:nth-of-type(1)",
+        "tag": "BUTTON",
+        "w": 67,
+        "h": 26,
+        "size": 26,
+        "label": "ყველა"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > div.mb-4.flex:nth-of-type(5) > button.rounded-full.border:nth-of-type(2)",
+        "tag": "BUTTON",
+        "w": 104,
+        "h": 26,
+        "size": 26,
+        "label": "ჩემი ნიშნით"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 183,
+        "h": 28,
+        "size": 28,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 107,
+        "h": 32,
+        "size": 32,
+        "label": "Vivida"
+      },
+      {
+        "selector": "section > div.relative:nth-of-type(2) > div.-mx-4.flex:nth-of-type(3) > article.group.relative > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 150,
+        "h": 32,
+        "size": 32,
+        "label": "დამატება"
+      },
+      {
+        "selector": "#radix-_R_cjd4lritslb_",
+        "tag": "BUTTON",
+        "w": 32,
+        "h": 32,
+        "size": 32,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "#radix-_R_cld4lritslb_",
+        "tag": "BUTTON",
+        "w": 32,
+        "h": 32,
+        "size": 32,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "#radix-_R_cnd4lritslb_",
+        "tag": "BUTTON",
+        "w": 32,
+        "h": 32,
+        "size": 32,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "#radix-_R_cpd4lritslb_",
+        "tag": "BUTTON",
+        "w": 32,
+        "h": 32,
+        "size": 32,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "#radix-_R_crd4lritslb_",
+        "tag": "BUTTON",
+        "w": 32,
+        "h": 32,
+        "size": 32,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "#radix-_R_ctd4lritslb_",
+        "tag": "BUTTON",
+        "w": 32,
+        "h": 32,
+        "size": 32,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "article.rounded-2xl.border > div.mt-2.grid:nth-of-type(2) > div.relative > button.flex.w-full",
+        "tag": "BUTTON",
+        "w": 108,
+        "h": 36,
+        "size": 36,
+        "label": "მომწონს"
+      },
+      {
+        "selector": "article.rounded-2xl.border > div.mt-2.grid:nth-of-type(2) > button.flex.w-full:nth-of-type(1)",
+        "tag": "BUTTON",
+        "w": 108,
+        "h": 36,
+        "size": 36,
+        "label": "კომენტარი"
+      },
+      {
+        "selector": "article.rounded-2xl.border > div.mt-2.grid:nth-of-type(2) > button.flex.w-full:nth-of-type(2)",
+        "tag": "BUTTON",
+        "w": 108,
+        "h": 36,
+        "size": 36,
+        "label": "გაზიარება"
+      },
+      {
+        "selector": "article.rounded-2xl.border > div.mt-2.grid:nth-of-type(2) > div.relative > button.flex.w-full",
+        "tag": "BUTTON",
+        "w": 108,
+        "h": 36,
+        "size": 36,
+        "label": "ლაიქი"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > div.flex.items-center > span.font-mono.text-\\[10px\\]:nth-of-type(1)",
+        "fontSize": 10,
+        "text": "ობსერვატორია"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(4) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჩემი ისტორია"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 256,
+        "h": 42,
+        "top": -80,
+        "bottom": -38,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > nav.fixed.inset-x-0",
+        "w": 390,
+        "h": 74,
+        "top": 770,
+        "bottom": 844,
+        "zIndex": "40",
+        "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 40,
+        "h": 40,
+        "top": 716,
+        "bottom": 756,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": {
+      "height": 74,
+      "top": 770,
+      "bodyPaddingBottom": 76,
+      "sufficient": true
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/library",
+    "pattern": "/library",
+    "width": 390,
+    "status": 200,
+    "finalUrl": "/library",
+    "title": "ჩემი ბიბლიოთეკა · Vivida",
+    "lang": "ka",
+    "screenshot": "shots/library__390-ana.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "scrollHeight": 1027,
+      "scrollX": 0,
+      "bodyPaddingBottom": "76px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > div.mt-6.rounded-xl:nth-of-type(1) > nav.mt-3.flex > a.shrink-0.rounded-md:nth-of-type(6)",
+        "tag": "A",
+        "beyond": 530,
+        "width": 136,
+        "left": 784,
+        "right": 920,
+        "fixed": false,
+        "inScroller": true,
+        "text": "PDF რეპორტი · 0"
+      },
+      {
+        "selector": "section.relative.z-10 > div.mt-6.rounded-xl:nth-of-type(1) > nav.mt-3.flex > a.shrink-0.rounded-md:nth-of-type(6) > span.font-mono.tabular-nums",
+        "tag": "SPAN",
+        "beyond": 517,
+        "width": 22,
+        "left": 886,
+        "right": 907,
+        "fixed": false,
+        "inScroller": true,
+        "text": "· 0"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > div.mt-6.rounded-xl:nth-of-type(1) > nav.mt-3.flex > a.shrink-0.rounded-md:nth-of-type(5)",
+        "tag": "A",
+        "beyond": 388,
+        "width": 140,
+        "left": 638,
+        "right": 778,
+        "fixed": false,
+        "inScroller": true,
+        "text": "კონსულტაცია · 0"
+      },
+      {
+        "selector": "section.relative.z-10 > div.mt-6.rounded-xl:nth-of-type(1) > nav.mt-3.flex > a.shrink-0.rounded-md:nth-of-type(5) > span.font-mono.tabular-nums",
+        "tag": "SPAN",
+        "beyond": 375,
+        "width": 22,
+        "left": 744,
+        "right": 765,
+        "fixed": false,
+        "inScroller": true,
+        "text": "· 0"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > div.mt-6.rounded-xl:nth-of-type(1) > nav.mt-3.flex > a.shrink-0.rounded-md:nth-of-type(4)",
+        "tag": "A",
+        "beyond": 242,
+        "width": 135,
+        "left": 497,
+        "right": 632,
+        "fixed": false,
+        "inScroller": true,
+        "text": "ტარო კითხვა · 0"
+      },
+      {
+        "selector": "section.relative.z-10 > div.mt-6.rounded-xl:nth-of-type(1) > nav.mt-3.flex > a.shrink-0.rounded-md:nth-of-type(4) > span.font-mono.tabular-nums",
+        "tag": "SPAN",
+        "beyond": 229,
+        "width": 22,
+        "left": 598,
+        "right": 619,
+        "fixed": false,
+        "inScroller": true,
+        "text": "· 0"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > div.mt-6.rounded-xl:nth-of-type(1) > nav.mt-3.flex > a.shrink-0.rounded-md:nth-of-type(3)",
+        "tag": "A",
+        "beyond": 101,
+        "width": 178,
+        "left": 313,
+        "right": 491,
+        "fixed": false,
+        "inScroller": true,
+        "text": "7-დღიანი პროგნოზი · 0"
+      },
+      {
+        "selector": "section.relative.z-10 > div.mt-6.rounded-xl:nth-of-type(1) > nav.mt-3.flex > a.shrink-0.rounded-md:nth-of-type(3) > span.font-mono.tabular-nums",
+        "tag": "SPAN",
+        "beyond": 88,
+        "width": 22,
+        "left": 457,
+        "right": 478,
+        "fixed": false,
+        "inScroller": true,
+        "text": "· 0"
+      }
+    ],
+    "clippedText": [],
+    "smallTapTargets": [],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 183,
+        "h": 28,
+        "size": 28,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > div.mt-6.rounded-xl:nth-of-type(1) > nav.mt-3.flex > a.shrink-0.rounded-md:nth-of-type(1)",
+        "tag": "A",
+        "w": 92,
+        "h": 30,
+        "size": 30,
+        "label": "ყველა · 0"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > div.mt-6.rounded-xl:nth-of-type(1) > nav.mt-3.flex > a.shrink-0.rounded-md:nth-of-type(2)",
+        "tag": "A",
+        "w": 180,
+        "h": 30,
+        "size": 30,
+        "label": "დღიური ჰოროსკოპი · 0"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > div.mt-6.rounded-xl:nth-of-type(1) > nav.mt-3.flex > a.shrink-0.rounded-md:nth-of-type(3)",
+        "tag": "A",
+        "w": 178,
+        "h": 30,
+        "size": 30,
+        "label": "7-დღიანი პროგნოზი · 0"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > div.mt-6.rounded-xl:nth-of-type(1) > nav.mt-3.flex > a.shrink-0.rounded-md:nth-of-type(4)",
+        "tag": "A",
+        "w": 135,
+        "h": 30,
+        "size": 30,
+        "label": "ტარო კითხვა · 0"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > div.mt-6.rounded-xl:nth-of-type(1) > nav.mt-3.flex > a.shrink-0.rounded-md:nth-of-type(5)",
+        "tag": "A",
+        "w": 140,
+        "h": 30,
+        "size": 30,
+        "label": "კონსულტაცია · 0"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > div.mt-6.rounded-xl:nth-of-type(1) > nav.mt-3.flex > a.shrink-0.rounded-md:nth-of-type(6)",
+        "tag": "A",
+        "w": 136,
+        "h": 30,
+        "size": 30,
+        "label": "PDF რეპორტი · 0"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 107,
+        "h": 32,
+        "size": 32,
+        "label": "Vivida"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > header.flex.flex-col > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 358,
+        "h": 34,
+        "size": 34,
+        "label": "რჩეულები 0"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(1) > button.grid.size-10",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-10",
+        "tag": "A",
+        "w": 69,
+        "h": 40,
+        "size": 40,
+        "label": "PRO გამოწერის გახსნა"
+      },
+      {
+        "selector": "#radix-_R_7lklritslb_",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "შეტყობინებები"
+      },
+      {
+        "selector": "#radix-_R_9lklritslb_",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "section.relative.z-10 > div.mt-6.rounded-xl:nth-of-type(1) > form.flex.gap-2 > label.flex.min-w-0 > input.h-10.min-w-0",
+        "tag": "INPUT",
+        "w": 197,
+        "h": 40,
+        "size": 40,
+        "label": "მოძებნე ბიბლიოთეკაში…"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > div.mt-6.rounded-xl:nth-of-type(1) > form.flex.gap-2 > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 73,
+        "h": 40,
+        "size": 40,
+        "label": "ძიება"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > div.flex.items-center > span.font-mono.text-\\[10px\\]:nth-of-type(1)",
+        "fontSize": 10,
+        "text": "ობსერვატორია"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(4) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჩემი ისტორია"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 256,
+        "h": 42,
+        "top": -80,
+        "bottom": -38,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > nav.fixed.inset-x-0",
+        "w": 390,
+        "h": 74,
+        "top": 770,
+        "bottom": 844,
+        "zIndex": "40",
+        "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 40,
+        "h": 40,
+        "top": 716,
+        "bottom": 756,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > div.mt-6.rounded-xl:nth-of-type(1) > nav.mt-3.flex",
+        "clientWidth": 332,
+        "scrollWidth": 891,
+        "rectWidth": 332,
+        "overflowsViewport": false
+      }
+    ],
+    "coveredControls": [],
+    "tabBar": {
+      "height": 74,
+      "top": 770,
+      "bodyPaddingBottom": 76,
+      "sufficient": true
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/messages",
+    "pattern": "/messages",
+    "width": 390,
+    "status": 200,
+    "finalUrl": "/messages",
+    "title": "ჩატი · Vivida",
+    "lang": "ka",
+    "screenshot": "shots/messages__390-ana.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 183,
+        "h": 28,
+        "size": 28,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 107,
+        "h": 32,
+        "size": 32,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(1) > button.grid.size-10",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-10",
+        "tag": "A",
+        "w": 69,
+        "h": 40,
+        "size": 40,
+        "label": "PRO გამოწერის გახსნა"
+      },
+      {
+        "selector": "#radix-_R_faslritslb_",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "შეტყობინებები"
+      },
+      {
+        "selector": "#radix-_R_jaslritslb_",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "კონფიდენციალურობა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "tag": "A",
+        "w": 256,
+        "h": 42,
+        "size": 42,
+        "label": "მთავარ კონტენტზე გადასვლა"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > div.flex.items-center > span.font-mono.text-\\[10px\\]:nth-of-type(1)",
+        "fontSize": 10,
+        "text": "ობსერვატორია"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(4) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჩემი ისტორია"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 256,
+        "h": 42,
+        "top": -80,
+        "bottom": -38,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > nav.fixed.inset-x-0",
+        "w": 390,
+        "h": 74,
+        "top": 770,
+        "bottom": 844,
+        "zIndex": "40",
+        "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 40,
+        "h": 40,
+        "top": 716,
+        "bottom": 756,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": {
+      "height": 74,
+      "top": 770,
+      "bodyPaddingBottom": 0,
+      "sufficient": false
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/people",
+    "pattern": "/people",
+    "width": 390,
+    "status": 200,
+    "finalUrl": "/people",
+    "title": "ხალხი · Vivida",
+    "lang": "ka",
+    "screenshot": "shots/people__390-ana.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "scrollHeight": 1345,
+      "scrollX": 0,
+      "bodyPaddingBottom": "76px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(1) > div.flex.items-center > div.min-w-0.flex-1:nth-of-type(1) > div.flex.items-center:nth-of-type(1) > a.truncate.text-\\[15px\\]",
+        "tag": "A",
+        "w": 51,
+        "h": 23,
+        "size": 23,
+        "label": "ელენე ნოზაძე"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(2) > div.flex.items-center > div.min-w-0.flex-1:nth-of-type(1) > div.flex.items-center:nth-of-type(1) > a.truncate.text-\\[15px\\]",
+        "tag": "A",
+        "w": 51,
+        "h": 23,
+        "size": 23,
+        "label": "სოფია ლომიძე"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(3) > div.flex.items-center > div.min-w-0.flex-1:nth-of-type(1) > div.flex.items-center:nth-of-type(1) > a.truncate.text-\\[15px\\]",
+        "tag": "A",
+        "w": 112,
+        "h": 23,
+        "size": 23,
+        "label": "ნინო ტესტაძე"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(4) > div.flex.items-center > div.min-w-0.flex-1:nth-of-type(1) > div.flex.items-center:nth-of-type(1) > a.truncate.text-\\[15px\\]",
+        "tag": "A",
+        "w": 51,
+        "h": 23,
+        "size": 23,
+        "label": "მარიამ ჩხეიძე"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(5) > div.flex.items-center > div.min-w-0.flex-1:nth-of-type(1) > div.flex.items-center:nth-of-type(1) > a.truncate.text-\\[15px\\]",
+        "tag": "A",
+        "w": 51,
+        "h": 23,
+        "size": 23,
+        "label": "ნიკოლოზ ქავთარაძე"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(6) > div.flex.items-center > div.min-w-0.flex-1:nth-of-type(1) > div.flex.items-center:nth-of-type(1) > a.truncate.text-\\[15px\\]",
+        "tag": "A",
+        "w": 51,
+        "h": 23,
+        "size": 23,
+        "label": "დავით ჯაფარიძე"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(7) > div.flex.items-center > div.min-w-0.flex-1:nth-of-type(1) > div.flex.items-center:nth-of-type(1) > a.truncate.text-\\[15px\\]",
+        "tag": "A",
+        "w": 51,
+        "h": 23,
+        "size": 23,
+        "label": "გიორგი მაღალაშვილი"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(8) > div.flex.items-center > div.min-w-0.flex-1:nth-of-type(1) > div.flex.items-center:nth-of-type(1) > a.truncate.text-\\[15px\\]",
+        "tag": "A",
+        "w": 51,
+        "h": 23,
+        "size": 23,
+        "label": "თამარ გელაშვილი"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(9) > div.flex.items-center > div.min-w-0.flex-1:nth-of-type(1) > div.flex.items-center:nth-of-type(1) > a.truncate.text-\\[15px\\]",
+        "tag": "A",
+        "w": 51,
+        "h": 23,
+        "size": 23,
+        "label": "ლუკა მეგობრიშვილი"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(10) > div.flex.items-center > div.min-w-0.flex-1:nth-of-type(1) > div.flex.items-center:nth-of-type(1) > a.truncate.text-\\[15px\\]",
+        "tag": "A",
+        "w": 51,
+        "h": 23,
+        "size": 23,
+        "label": "საბა ბერიძე"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 183,
+        "h": 28,
+        "size": 28,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 107,
+        "h": 32,
+        "size": 32,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(1) > button.grid.size-10",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-10",
+        "tag": "A",
+        "w": 69,
+        "h": 40,
+        "size": 40,
+        "label": "PRO გამოწერის გახსნა"
+      },
+      {
+        "selector": "#radix-_R_faslritslb_",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "შეტყობინებები"
+      },
+      {
+        "selector": "#radix-_R_jaslritslb_",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(1) > div.flex.items-center > div.shrink-0:nth-of-type(2) > div.flex.flex-col > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 209,
+        "h": 40,
+        "size": 40,
+        "label": "მეგობრობის თხოვნა"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(2) > div.flex.items-center > div.shrink-0:nth-of-type(2) > div.flex.flex-col > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 209,
+        "h": 40,
+        "size": 40,
+        "label": "მეგობრობის თხოვნა"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(3) > div.flex.items-center > div.shrink-0:nth-of-type(2) > div.flex.flex-col > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 130,
+        "h": 40,
+        "size": 40,
+        "label": "მეგობარი"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(4) > div.flex.items-center > div.shrink-0:nth-of-type(2) > div.flex.flex-col > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 209,
+        "h": 40,
+        "size": 40,
+        "label": "მეგობრობის თხოვნა"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(5) > div.flex.items-center > div.shrink-0:nth-of-type(2) > div.flex.flex-col > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 209,
+        "h": 40,
+        "size": 40,
+        "label": "მეგობრობის თხოვნა"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(6) > div.flex.items-center > div.shrink-0:nth-of-type(2) > div.flex.flex-col > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 209,
+        "h": 40,
+        "size": 40,
+        "label": "მეგობრობის თხოვნა"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(7) > div.flex.items-center > div.shrink-0:nth-of-type(2) > div.flex.flex-col > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 209,
+        "h": 40,
+        "size": 40,
+        "label": "მეგობრობის თხოვნა"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(8) > div.flex.items-center > div.shrink-0:nth-of-type(2) > div.flex.flex-col > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 209,
+        "h": 40,
+        "size": 40,
+        "label": "მეგობრობის თხოვნა"
+      },
+      {
+        "selector": "li.rounded-2xl.border:nth-of-type(9) > div.flex.items-center > div.shrink-0:nth-of-type(2) > div.flex.flex-col > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 209,
+        "h": 40,
+        "size": 40,
+        "label": "მეგობრობის თხოვნა"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > div.flex.items-center > span.font-mono.text-\\[10px\\]:nth-of-type(1)",
+        "fontSize": 10,
+        "text": "ობსერვატორია"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(4) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჩემი ისტორია"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 256,
+        "h": 42,
+        "top": -80,
+        "bottom": -38,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > nav.fixed.inset-x-0",
+        "w": 390,
+        "h": 74,
+        "top": 770,
+        "bottom": 844,
+        "zIndex": "40",
+        "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 40,
+        "h": 40,
+        "top": 716,
+        "bottom": 756,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [
+      {
+        "control": "section.relative.z-10 > ul.space-y-2 > li.rounded-2xl.border:nth-of-type(6) > div.flex.items-center > a.shrink-0",
+        "controlLabel": "დავით ჯაფარიძე-ის პროფილი",
+        "coveredBy": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > nav.fixed.inset-x-0"
+      },
+      {
+        "control": "li.rounded-2xl.border:nth-of-type(6) > div.flex.items-center > div.shrink-0:nth-of-type(2) > div.flex.flex-col > button.inline-flex.items-center",
+        "controlLabel": "მეგობრობის თხოვნა",
+        "coveredBy": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > nav.fixed.inset-x-0"
+      }
+    ],
+    "tabBar": {
+      "height": 74,
+      "top": 770,
+      "bodyPaddingBottom": 76,
+      "sufficient": true
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/subscription",
+    "pattern": "/subscription",
+    "width": 390,
+    "status": 200,
+    "finalUrl": "/subscription",
+    "title": "PRO გამოწერა · Vivida",
+    "lang": "ka",
+    "screenshot": "shots/subscription__390-ana.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "scrollHeight": 920,
+      "scrollX": 0,
+      "bodyPaddingBottom": "76px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 183,
+        "h": 28,
+        "size": 28,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 107,
+        "h": 32,
+        "size": 32,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(1) > button.grid.size-10",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-10",
+        "tag": "A",
+        "w": 69,
+        "h": 40,
+        "size": 40,
+        "label": "PRO გამოწერის გახსნა"
+      },
+      {
+        "selector": "#radix-_R_1tbclritslb_",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "შეტყობინებები"
+      },
+      {
+        "selector": "#radix-_R_2dbclritslb_",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "კონფიდენციალურობა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "tag": "A",
+        "w": 256,
+        "h": 42,
+        "size": 42,
+        "label": "მთავარ კონტენტზე გადასვლა"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > div.flex.items-center > span.font-mono.text-\\[10px\\]:nth-of-type(1)",
+        "fontSize": 10,
+        "text": "ობსერვატორია"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(4) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჩემი ისტორია"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 256,
+        "h": 42,
+        "top": -80,
+        "bottom": -38,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > nav.fixed.inset-x-0",
+        "w": 390,
+        "h": 74,
+        "top": 770,
+        "bottom": 844,
+        "zIndex": "40",
+        "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 40,
+        "h": 40,
+        "top": 716,
+        "bottom": 756,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": {
+      "height": 74,
+      "top": 770,
+      "bodyPaddingBottom": 76,
+      "sufficient": true
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/u/ana-audit",
+    "pattern": "/u/ana-audit",
+    "width": 390,
+    "status": 200,
+    "finalUrl": "/u/ana-audit",
+    "title": "ანა კალანდაძე · Vivida",
+    "lang": "ka",
+    "screenshot": "shots/u_ana_audit__390-ana.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "scrollHeight": 1303,
+      "scrollX": 0,
+      "bodyPaddingBottom": "76px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "article.rounded-2xl.border > div.mt-3.flex:nth-of-type(1) > button.tabular-nums.transition-colors",
+        "tag": "BUTTON",
+        "w": 80,
+        "h": 16,
+        "size": 16,
+        "label": "1 კომენტარი"
+      },
+      {
+        "selector": "article.rounded-2xl.border > header.flex.items-start > div.min-w-0.flex-1 > div.mt-0\\.5.flex:nth-of-type(2) > a.truncate",
+        "tag": "A",
+        "w": 59,
+        "h": 17,
+        "size": 17,
+        "label": "@ana-audit"
+      },
+      {
+        "selector": "article.rounded-2xl.border > header.flex.items-start > div.min-w-0.flex-1 > div.flex.items-center:nth-of-type(1) > a.truncate.text-\\[15px\\]",
+        "tag": "A",
+        "w": 122,
+        "h": 23,
+        "size": 23,
+        "label": "ანა კალანდაძე"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 183,
+        "h": 28,
+        "size": 28,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 107,
+        "h": 32,
+        "size": 32,
+        "label": "Vivida"
+      },
+      {
+        "selector": "#radix-_R_pqepbn5ritslb_",
+        "tag": "BUTTON",
+        "w": 32,
+        "h": 32,
+        "size": 32,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "article.relative.overflow-hidden > div.relative.grid:nth-of-type(2) > div.relative.mx-auto:nth-of-type(1) > div.mt-3:nth-of-type(2) > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 260,
+        "h": 36,
+        "size": 36,
+        "label": "AI ავატარი"
+      },
+      {
+        "selector": "div.relative.grid:nth-of-type(2) > div.min-w-0:nth-of-type(2) > div.flex.flex-col:nth-of-type(1) > div.flex.flex-wrap:nth-of-type(2) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 142,
+        "h": 36,
+        "size": 36,
+        "label": "რედაქტირება"
+      },
+      {
+        "selector": "article.rounded-2xl.border > div.mt-2.grid:nth-of-type(2) > div.relative > button.flex.w-full",
+        "tag": "BUTTON",
+        "w": 108,
+        "h": 36,
+        "size": 36,
+        "label": "ლაიქი"
+      },
+      {
+        "selector": "article.rounded-2xl.border > div.mt-2.grid:nth-of-type(2) > button.flex.w-full:nth-of-type(1)",
+        "tag": "BUTTON",
+        "w": 108,
+        "h": 36,
+        "size": 36,
+        "label": "კომენტარი"
+      },
+      {
+        "selector": "article.rounded-2xl.border > div.mt-2.grid:nth-of-type(2) > button.flex.w-full:nth-of-type(2)",
+        "tag": "BUTTON",
+        "w": 108,
+        "h": 36,
+        "size": 36,
+        "label": "გაზიარება"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(1) > button.grid.size-10",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-10",
+        "tag": "A",
+        "w": 69,
+        "h": 40,
+        "size": 40,
+        "label": "PRO გამოწერის გახსნა"
+      },
+      {
+        "selector": "#radix-_R_um9bn5ritslb_",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "შეტყობინებები"
+      },
+      {
+        "selector": "#radix-_R_16m9bn5ritslb_",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "მენიუ"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "tag": "BUTTON",
+        "w": 40,
+        "h": 40,
+        "size": 40,
+        "label": "კონფიდენციალურობა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "tag": "A",
+        "w": 256,
+        "h": 42,
+        "size": 42,
+        "label": "მთავარ კონტენტზე გადასვლა"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > div.flex.items-center > span.font-mono.text-\\[10px\\]:nth-of-type(1)",
+        "fontSize": 10,
+        "text": "ობსერვატორია"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(1) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "დღეს"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(2) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(3) > a.group.relative > span.truncate:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ჰკითხე"
+      },
+      {
+        "selector": "main.relative.isolate > nav.fixed.inset-x-0 > ul.mx-auto.flex > li.flex-1:nth-of-type(4) > a.group.relative",
+        "fontSize": 10,
+        "text": "ჩემი ისტორია"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 256,
+        "h": 42,
+        "top": -80,
+        "bottom": -38,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > nav.fixed.inset-x-0",
+        "w": 390,
+        "h": 74,
+        "top": 770,
+        "bottom": 844,
+        "zIndex": "40",
+        "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 40,
+        "h": 40,
+        "top": 716,
+        "bottom": 756,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": {
+      "height": 74,
+      "top": 770,
+      "bodyPaddingBottom": 76,
+      "sufficient": true
+    },
+    "consoleErrors": [],
+    "pageErrors": []
+  }
+]

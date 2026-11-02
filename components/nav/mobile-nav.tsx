@@ -32,7 +32,8 @@ export function MobileNav({
   pendingAskNudges?: number;
 }) {
   const [open, setOpen] = useState(false);
-  const moreLabel = locale !== "ka" ? "More" : "მეტი";
+  const pl = locale === "pl";
+  const moreLabel = pl ? "Więcej" : locale !== "ka" ? "More" : "მეტი";
 
   function closeDrawer() {
     startTransition(() => {
@@ -178,9 +179,11 @@ export function MobileNav({
                   onNavigate={closeDrawer}
                   className="block text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  {locale === "en"
-                    ? "Account & settings →"
-                    : "ანგარიში და პარამეტრები →"}
+                  {pl
+                    ? "Konto i ustawienia →"
+                    : locale === "en"
+                      ? "Account & settings →"
+                      : "ანგარიში და პარამეტრები →"}
                 </NavItemLink>
                 <InstallAppButton
                   locale={locale}

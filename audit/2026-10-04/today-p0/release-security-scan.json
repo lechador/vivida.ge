@@ -1,0 +1,27 @@
+{
+  "files": [
+    "app/dashboard/page.tsx",
+    "components/dashboard/daily-card.tsx",
+    "components/dashboard/daily-dashboard.tsx",
+    "components/dashboard/daily-ritual.tsx",
+    "components/nav/app-header.tsx",
+    "components/nav/desktop-sidebar.tsx",
+    "components/nav/mobile-nav.tsx",
+    "components/nav/mobile-tab-bar.tsx",
+    "components/nav/nav-items.ts",
+    "components/phone-gift/phone-gift-popup.tsx",
+    "components/pwa/install-nudge.tsx",
+    "lib/analytics.ts",
+    "lib/daily-ritual.ts",
+    "tests/analytics.test.ts",
+    "tests/pwa-daily-value.test.ts",
+    "tests/today-daily-card.test.ts",
+    "tests/today-dashboard-order.test.ts",
+    "tests/today-nav.test.ts",
+    "tests/today-ritual-layout.test.ts"
+  ],
+  "file_count": 19,
+  "added_line_security_findings": {},
+  "preview_included": false,
+  "pricing_credit_auth_schema_files_changed": false
+}

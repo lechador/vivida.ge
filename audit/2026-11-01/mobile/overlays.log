@@ -1,0 +1,21 @@
+consent-320: docOverflow=0 overlays=2 escaping=0
+drawer-320: docOverflow=0 overlays=5 escaping=1
+   vivida-drawer-right fixed inset-y-0 right-0 z-50 flex w-[min 294x568 [26,320] escape: DIV:01 · პირადი სივრცე1401დღეს02ტარო03ჰკითხე04ბიბლიოთე:300 | DIV:01დღეს02ტარო03ჰკითხე04ბიბლიოთეკა05ჩემი რუკა06ცა ახ:300 | A:12თავსებადობა:299 | DIV:12თავსებადობა:220 | SPAN:12:75 | SPAN::107
+mobilemenu-320: docOverflow=0 overlays=5 escaping=1
+   vivida-drawer-left fixed inset-y-0 left-0 z-50 flex w-[min(2 272x568 [0,272] escape: A:ტესტები:251 | SPAN::59 | svg::56 | path::49 | path::52 | path::54
+chat-320: docOverflow=? overlays=0 escaping=0 ERROR TimeoutError: locator.click: Timeout 10000ms exceeded.
+Call log:
+  - waiting for
+notifications-320: docOverflow=0 overlays=4 escaping=0
+chartzoom-320: docOverflow=0 overlays=5 escaping=0
+onboarding-320: docOverflow=0 overlays=2 escaping=0
+consent-390: docOverflow=0 overlays=2 escaping=0
+drawer-390: docOverflow=0 overlays=5 escaping=1
+   vivida-drawer-right fixed inset-y-0 right-0 z-50 flex w-[min 359x844 [31,390] escape: DIV:02 · ასტრონომიული ალმანახი801დღის ჰოროსკოპი02ნატალ:370 | DIV:01დღის ჰოროსკოპი02ნატალური რუკა03ტაროს 3-კარტიანი :370 | A:03ტაროს 3-კარტიანი გაშლა:369 | DIV:03ტაროს 3-კარტიანი გაშლა:281 | SPAN:ტაროს 3-კარტიანი გაშლა:281 | A:04მთვარის კალენდარი:369
+mobilemenu-390: docOverflow=0 overlays=5 escaping=0
+chat-390: docOverflow=? overlays=0 escaping=0 ERROR TimeoutError: locator.click: Timeout 10000ms exceeded.
+Call log:
+  - waiting for
+notifications-390: docOverflow=0 overlays=4 escaping=0
+chartzoom-390: docOverflow=0 overlays=5 escaping=0
+onboarding-390: docOverflow=0 overlays=2 escaping=0

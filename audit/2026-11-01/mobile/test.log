@@ -1,0 +1,334 @@
+
+> vivida.ge@0.1.0 test
+> vitest run
+
+(node:51391) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+ RUN  v4.1.12 /Users/giviendeladze/Projects/vivida/vivida.ge
+
+stderr | tests/subscription-checkout.test.ts > POST /api/subscription/checkout > prices an Armenian resident from the Georgian fallback, not a dropped AMD market
+[experiments] outcome recording failed: Error: DATABASE_URL is not set
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/db/index.ts:11:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiments.ts:3:1
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at recordExperimentOutcomesBestEffort (/Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiment-outcomes.ts:15:50)
+
+stderr | tests/credits-checkout.test.ts > POST /api/credits/checkout > uses the server-owned pack values for Stripe Checkout
+[experiments] outcome recording failed: Error: DATABASE_URL is not set
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/db/index.ts:11:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiments.ts:3:1
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at recordExperimentOutcomesBestEffort (/Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiment-outcomes.ts:15:50)
+
+stderr | tests/subscription-checkout.test.ts > POST /api/subscription/checkout > serves Stripe checkout on the English domain too (Stripe is primary, crypto is the alternative)
+[experiments] outcome recording failed: Error: DATABASE_URL is not set
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/db/index.ts:11:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiments.ts:3:1
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at recordExperimentOutcomesBestEffort (/Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiment-outcomes.ts:15:50)
+
+stderr | tests/subscription-checkout.test.ts > POST /api/subscription/checkout > keeps Stripe on the English domain until the crypto rail is configured
+[experiments] outcome recording failed: Error: DATABASE_URL is not set
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/db/index.ts:11:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiments.ts:3:1
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at recordExperimentOutcomesBestEffort (/Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiment-outcomes.ts:15:50)
+
+stderr | tests/credits-checkout.test.ts > POST /api/credits/checkout > keeps a safe product context through checkout
+[experiments] outcome recording failed: Error: DATABASE_URL is not set
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/db/index.ts:11:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiments.ts:3:1
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at recordExperimentOutcomesBestEffort (/Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiment-outcomes.ts:15:50)
+
+ ✓ tests/subscription-checkout.test.ts (4 tests) 476ms
+     ✓ prices an Armenian resident from the Georgian fallback, not a dropped AMD market  473ms
+stderr | tests/credits-checkout.test.ts > POST /api/credits/checkout > serves Stripe checkout on the English domain too (Stripe is primary, crypto is the alternative)
+[experiments] outcome recording failed: Error: DATABASE_URL is not set
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/db/index.ts:11:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiments.ts:3:1
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at recordExperimentOutcomesBestEffort (/Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiment-outcomes.ts:15:50)
+
+stderr | tests/credits-checkout.test.ts > POST /api/credits/checkout > keeps Stripe on the English domain until the crypto rail is configured
+[experiments] outcome recording failed: Error: DATABASE_URL is not set
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/db/index.ts:11:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiments.ts:3:1
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at recordExperimentOutcomesBestEffort (/Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiment-outcomes.ts:15:50)
+
+stderr | tests/credits-checkout.test.ts > POST /api/credits/checkout > uses the UK credit catalogue for UK residents
+[experiments] outcome recording failed: Error: DATABASE_URL is not set
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/db/index.ts:11:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiments.ts:3:1
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at recordExperimentOutcomesBestEffort (/Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiment-outcomes.ts:15:50)
+
+stderr | tests/credits-checkout.test.ts > POST /api/credits/checkout > prices an Armenian resident from the Georgian fallback, not a dropped AMD market
+[experiments] outcome recording failed: Error: DATABASE_URL is not set
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/db/index.ts:11:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiments.ts:3:1
+    at async VitestModuleEvaluator._runInlinedModule (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at async VitestModuleRunner.directRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1281:59)
+    at async VitestModuleRunner.cachedRequest (file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/vitest/node_modules/vite/dist/node/module-runner.js:1188:73)
+    at recordExperimentOutcomesBestEffort (/Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiment-outcomes.ts:15:50)
+
+ ✓ tests/credits-checkout.test.ts (9 tests) 484ms
+     ✓ uses the server-owned pack values for Stripe Checkout  469ms
+ ✓ tests/bazaar-verify.test.ts (8 tests) 628ms
+     ✓ a clean null result is not_found (retryable), not unavailable  622ms
+ ✓ tests/moon-events-regression.test.ts (1 test) 767ms
+     ✓ keeps the existing dates and phase samples for a fixed horizon  766ms
+ ✓ tests/moon-event-detail.test.ts (11 tests) 911ms
+     ✓ keeps the upcoming discovery list narrow  614ms
+stderr | tests/crypto-pay.test.ts > fetchConfirmedTransaction outcome mapping > a JSON-RPC error body is unavailable with its code, never paid, never permanent
+[crypto/verify] rpc error body: {"code":-32015,"message":"unsupported version"}
+
+ ✓ tests/crypto-pay.test.ts (18 tests) 1002ms
+     ✓ asks for a version-tolerant getTransaction (255)  998ms
+ ✓ tests/relationship-weekly.test.ts (3 tests) 196ms
+ ✓ tests/sitemap-horizon.test.ts (2 tests) 985ms
+     ✓ does not generate or submit distant-future lunar detail pages  762ms
+ ✓ tests/ask-memory.test.ts (7 tests) 49ms
+ ✓ tests/email-layout-locale.test.ts (3 tests) 49ms
+ ✓ tests/ask-personalization.test.ts (13 tests) 42ms
+ ✓ tests/email-daily-blast.test.ts (9 tests) 72ms
+ ✓ tests/avatar-gen.test.ts (1 test) 27ms
+ ✓ tests/sms.test.ts (2 tests) 29ms
+ ✓ tests/report-email.test.ts (8 tests) 36ms
+ ✓ tests/report-status-recovery.test.ts (3 tests) 16ms
+ ✓ tests/verified-badge.test.ts (5 tests) 51ms
+ ✓ tests/ask-synastry.test.ts (11 tests) 44ms
+ ✓ tests/astrology-calendar-en.test.ts (3 tests) 1576ms
+     ✓ provides English sign names for generated Mercury periods  1525ms
+ ✓ tests/bazaar-emails.test.ts (3 tests) 30ms
+ ✓ tests/pro-day-score.test.ts (10 tests) 4ms
+ ✓ tests/checkout-success-refresh.test.ts (2 tests) 55ms
+stderr | tests/birthday.test.ts > birthday email & gift credits > gifts credits and renders the gift P.S. for free users
+[birthday] AI copy failed, using fallback: OPENROUTER_API_KEY missing
+
+ ✓ tests/iq-scoring.test.ts (12 tests) 18ms
+stderr | tests/birthday.test.ts > birthday email & gift credits > does NOT gift credits or mention the credit gift for PRO users
+[birthday] AI copy failed, using fallback: OPENROUTER_API_KEY missing
+
+stderr | tests/birthday.test.ts > birthday email & gift credits > also blocks gifting if isPremiumUser resolves true even when row flag was false
+[birthday] AI copy failed, using fallback: OPENROUTER_API_KEY missing
+
+ ✓ tests/birthday.test.ts (4 tests) 59ms
+ ✓ tests/today-daily-card.test.ts (4 tests) 19ms
+ ✓ tests/tarot-openrouter-prompt.test.ts (3 tests) 24ms
+ ✓ tests/credit-progress.test.ts (2 tests) 14ms
+ ✓ tests/reminder-config.test.ts (3 tests) 16ms
+ ✓ tests/email-verify-link.test.ts (2 tests) 8ms
+ ✓ tests/countries.test.ts (2 tests) 14ms
+ ✓ tests/billing-config.test.ts (48 tests) 35ms
+ ✓ tests/crypto-checkout-route.test.ts (7 tests) 15ms
+ ✓ tests/crypto-config.test.ts (5 tests) 14ms
+ ✓ tests/messages-poll.test.ts (5 tests) 9ms
+ ✓ tests/crypto-fiat-route.test.ts (8 tests) 12ms
+ ✓ tests/zodiac-sign-en.test.ts (1 test) 3ms
+stderr | tests/stripe-webhook.test.ts > POST /api/stripe/webhook > rejects payloads that fail signature verification
+[stripe/webhook] signature verification failed: invalid signature
+
+ ✓ tests/verified-badge-email-send.test.ts (2 tests) 21ms
+stderr | tests/report-email-send.test.ts > sendReportPdfEmail > still sends a link-only email when the PDF bytes are unreachable
+[email] report PDF fetch failed, sending link only: R2 down
+
+stderr | tests/report-email-send.test.ts > sendReportPdfEmail > skips an attachment that exceeds the size ceiling
+[email] report report-1 PDF too large to attach (22020096 bytes), sending link only
+
+stderr | tests/report-email-send.test.ts > sendReportPdfEmail > reports a Resend failure and logs it as failed
+[email] report PDF send failed: { message: 'invalid recipient', name: 'validation_error' }
+
+ ✓ tests/report-email-send.test.ts (6 tests) 37ms
+stderr | tests/stripe-webhook.test.ts > POST /api/stripe/webhook > grants purchased credits using the Stripe session as idempotency key
+[experiments] outcome recording failed: TypeError: __vite_ssr_import_1__.db.select is not a function
+    at getExistingExperimentAssignment (/Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiments.ts:49:6)
+    at recordExperimentEvent (/Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiments.ts:69:13)
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiments.ts:110:11
+    at Array.map (<anonymous>)
+    at recordExistingExperimentOutcomes (/Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiments.ts:108:33)
+    at recordExperimentOutcomesBestEffort (/Users/giviendeladze/Projects/vivida/vivida.ge/lib/experiment-outcomes.ts:16:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at Module.POST (/Users/giviendeladze/Projects/vivida/vivida.ge/app/api/stripe/webhook/route.ts:81:11)
+    at /Users/giviendeladze/Projects/vivida/vivida.ge/tests/stripe-webhook.test.ts:65:22
+    at async file:///Users/giviendeladze/Projects/vivida/vivida.ge/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ tests/stripe-webhook.test.ts (4 tests) 54ms
+ ✓ tests/ask-nudges.test.ts (11 tests) 3ms
+ ✓ tests/tarot-minor.test.ts (8 tests) 15ms
+ ✓ tests/paywall-offer.test.ts (9 tests) 16ms
+ ✓ tests/signup-credit-experiment.test.ts (4 tests) 8ms
+ ✓ tests/seo-english-gsc.test.ts (2 tests) 13ms
+ ✓ tests/today-nav.test.ts (9 tests) 22ms
+ ✓ tests/iq-content-en.test.ts (9 tests) 8ms
+ ✓ tests/today-ritual-layout.test.ts (2 tests) 9ms
+ ✓ tests/international-public-paths.test.ts (14 tests) 6ms
+ ✓ tests/angel-eq-en.test.ts (4 tests) 6ms
+ ✓ tests/tarot-followup-request.test.ts (5 tests) 13ms
+ ✓ tests/tarot-reading-request.test.ts (3 tests) 10ms
+ ✓ tests/zodiac-placement-en.test.ts (2 tests) 6ms
+ ✓ tests/zodiac-pair-en.test.ts (1 test) 10ms
+ ✓ tests/signup-abuse.test.ts (8 tests) 13ms
+stderr | tests/tarot-followup.test.ts > performFollowup > stores a degraded fallback when the AI call fails
+[tarot] AI follow-up failed, using fallback: upstream down
+
+ ✓ tests/tarot-followup.test.ts (5 tests) 7ms
+stderr | tests/purchase-idempotency.test.ts > grantPurchaseCredits > does not credit the same Stripe Checkout session twice
+[credits.campaignConversion] failed for user-1 : __vite_ssr_import_1__.db.select is not a function
+
+ ✓ tests/purchase-idempotency.test.ts (1 test) 23ms
+ ✓ tests/cancel-retention-offer.test.ts (10 tests) 5ms
+ ✓ tests/phone.test.ts (8 tests) 5ms
+ ✓ tests/tarot-teaser.test.ts (5 tests) 4ms
+ ✓ tests/dreams-numerology-en.test.ts (4 tests) 12ms
+ ✓ tests/admin-safety.test.ts (5 tests) 15ms
+ ✓ tests/yearly-horoscope-en.test.ts (1 test) 3ms
+ ✓ tests/moon-calendar-date.test.ts (2 tests) 4ms
+ ✓ tests/sensitive-navigation.test.ts (5 tests) 5ms
+ ✓ tests/moon-events-cache.test.ts (1 test) 5ms
+ ✓ tests/tarot-deck-en.test.ts (3 tests) 6ms
+ ✓ tests/tarot-history-request.test.ts (3 tests) 5ms
+ ✓ tests/en-slugs.test.ts (10 tests) 11ms
+ ✓ tests/email-verify-link-action.test.ts (2 tests) 7ms
+ ✓ tests/zodiac-discovery-en.test.ts (3 tests) 5ms
+ ✓ tests/tarot-detail.test.ts (5 tests) 5ms
+ ✓ tests/cron-topology.test.ts (7 tests) 5ms
+ ✓ tests/tarot-reading-spread.test.ts (5 tests) 9ms
+ ✓ tests/request-locale.test.ts (9 tests) 3ms
+ ✓ tests/phone-auth-login.test.ts (3 tests) 11ms
+ ✓ tests/report-content-en.test.ts (2 tests) 4ms
+ ✓ tests/attachment-scoring.test.ts (14 tests) 4ms
+ ✓ tests/auth-core-signup-gate.test.ts (6 tests) 8ms
+ ✓ tests/thematic-horoscope-en.test.ts (1 test) 11ms
+ ✓ tests/synastry-en.test.ts (5 tests) 4ms
+ ✓ tests/credits-unlock.test.ts (4 tests) 22ms
+ ✓ tests/duplicate-account-match.test.ts (9 tests) 7ms
+ ✓ tests/credit-economy.test.ts (4 tests) 4ms
+ ✓ tests/security-headers.test.ts (7 tests) 3ms
+ ✓ tests/auth-core-email-verification.test.ts (3 tests) 4ms
+ ✓ tests/push-daily-cap.test.ts (4 tests) 7ms
+stderr | tests/phone-en-gating.test.ts > phone stack on the Georgian host > does not reject sends for region (fails later on dev SMS config)
+[phone] send rate-limit check failed: __vite_ssr_import_2__.db.insert is not a function
+
+ ✓ tests/phone-en-gating.test.ts (6 tests) 5ms
+ ✓ tests/growth-metrics.test.ts (5 tests) 4ms
+ ✓ tests/growth-relationships.test.ts (3 tests) 3ms
+ ✓ tests/analytics.test.ts (11 tests) 5ms
+ ✓ tests/email-health-canaries.test.ts (5 tests) 3ms
+stderr | tests/tarot-reading-degraded.test.ts > performReading AI degradation > marks the reading degraded when the AI call fails
+[tarot] AI reading failed, using fallback: upstream down
+
+ ✓ tests/oauth-email-gate.test.ts (7 tests) 7ms
+ ✓ tests/tarot-reading-degraded.test.ts (2 tests) 4ms
+ ✓ tests/suggest-username.test.ts (4 tests) 3ms
+ ✓ tests/seo-legacy-redirects.test.ts (3 tests) 3ms
+ ✓ tests/seo-locales.test.ts (6 tests) 3ms
+ ✓ tests/library-actions.test.ts (7 tests) 9ms
+ ✓ tests/zodiac-elements-en.test.ts (1 test) 3ms
+ ✓ tests/winback-sequence.test.ts (27 tests) 6ms
+ ✓ tests/tarot-spreads.test.ts (4 tests) 9ms
+ ✓ tests/rosenberg-scoring.test.ts (8 tests) 5ms
+ ✓ tests/safe-return-path.test.ts (3 tests) 2ms
+ ✓ tests/astrology-guides-en.test.ts (4 tests) 5ms
+ ✓ tests/tarot-reading-idempotency.test.ts (1 test) 5ms
+ ✓ tests/push-prompt.test.ts (9 tests) 3ms
+ ✓ tests/block-visibility.test.ts (2 tests) 2ms
+ ✓ tests/sentry-privacy.test.ts (3 tests) 3ms
+ ✓ tests/compatibility-calculator-en.test.ts (1 test) 3ms
+ ✓ tests/manual-coordinates.test.ts (10 tests) 3ms
+ ✓ tests/streak.test.ts (2 tests) 3ms
+ ✓ tests/phone-gift.test.ts (10 tests) 2ms
+ ✓ tests/email-send-budget.test.ts (11 tests) 3ms
+ ✓ tests/landing-redirect.test.ts (8 tests) 2ms
+ ✓ tests/today-dashboard-order.test.ts (6 tests) 2ms
+ ✓ tests/chart-chat-starters.test.ts (2 tests) 3ms
+ ✓ tests/daily-headline.test.ts (5 tests) 3ms
+ ✓ tests/sentry-config.test.ts (2 tests) 2ms
+ ✓ tests/tarot-followup-suggestions.test.ts (2 tests) 2ms
+ ✓ tests/bazaar-pure.test.ts (10 tests) 4ms
+ ✓ tests/report-store.test.ts (4 tests) 7ms
+ ✓ tests/pro-anchor.test.ts (8 tests) 2ms
+ ✓ tests/moon-phase-en.test.ts (1 test) 4ms
+ ✓ tests/vercel-analytics-privacy.test.ts (2 tests) 5ms
+ ✓ tests/pending-natal-profile.test.ts (4 tests) 10ms
+ ✓ tests/tarot-request-attempt.test.ts (3 tests) 2ms
+ ✓ tests/email-expiry.test.ts (12 tests) 3ms
+ ✓ tests/ka-date.test.ts (5 tests) 2ms
+ ✓ tests/weekly-teaser.test.ts (3 tests) 5ms
+ ✓ tests/profile-duplicate-guard.test.ts (3 tests) 5ms
+ ✓ tests/tarot-pending-question.test.ts (4 tests) 3ms
+ ✓ tests/analytics-debug.test.ts (4 tests) 4ms
+ ✓ tests/pwa-daily-value.test.ts (4 tests) 3ms
+ ✓ tests/monthly-bonus-eligibility.test.ts (5 tests) 2ms
+ ✓ tests/report-store-availability.test.ts (2 tests) 2ms
+ ✓ tests/apple-web-auth.test.ts (1 test) 2ms
+ ✓ tests/blocked-notification-push.test.ts (1 test) 2ms
+ ↓ tests/credits-postgres.integration.test.ts (3 tests | 3 skipped)
+ ↓ tests/photos-promote.integration.test.ts (5 tests | 5 skipped)
+ ✓ tests/premium-reports.test.ts (22 tests) 8076ms
+     ✓ produces all four English reports without other-script copy  1567ms
+     ✓ renders every English report as a valid PDF  2818ms
+     ✓ fills the annual report with substantial copy in ka  935ms
+     ✓ keeps the annual/ka copy in its own script  679ms
+     ✓ fills the annual report with substantial copy in en  681ms
+     ✓ keeps the annual/en copy in its own script  688ms
+
+ Test Files  137 passed | 2 skipped (139)
+      Tests  779 passed | 8 skipped (787)
+   Start at  15:41:26
+   Duration  8.57s (transform 5.75s, setup 0ms, import 20.55s, tests 16.55s, environment 9ms)
+

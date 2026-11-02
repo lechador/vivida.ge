@@ -58,7 +58,7 @@ export async function POST(req: Request) {
   }
 
   const locale =
-    body.locale === "en" || body.locale === "ka"
+    body.locale === "en" || body.locale === "pl" || body.locale === "ka"
       ? normalizeUserLocale(body.locale)
       : await getRequestLocale();
 

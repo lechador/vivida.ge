@@ -1,0 +1,1411 @@
+!!! CONTRIBUTOR TIER — TRAINS ON YOUR DATA !!!
+
+This is Meta's contributor tier. Selecting it permits Meta to use your
+prompts and completions to train future Meta models.
+
+See current pricing and rate limits for the Meta Model API here:
+  https://dev.meta.ai/docs/pricing-rate-limits/
+
+It lowers the barrier to entry for prototyping, testing integrations, and
+scaling experiments where training on your data is acceptable. Do NOT use it
+for confidential, proprietary, personal, or otherwise sensitive data. For the
+same model with no training on your data, select the standard variant
+(without the -contributor suffix).
+
+Confirm only if training on your prompts and completions is acceptable.
+Use this model for this invocation? [y/N] {"type": "system", "subtype": "init", "model": "meta/muse-spark-1.3-contributor", "session_id": "20261004_105501_a5cf2e", "timestamp": 1791096901348}
+{"type": "tool_use", "name": "read_file", "input": {"limit": 100, "offset": 1, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge/AGENTS.md"}, "timestamp": 1791096908852}
+{"type": "tool_use", "name": "read_file", "input": {"limit": 200, "offset": 1, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge/docs/product-growth-priorities.md"}, "timestamp": 1791096908852}
+{"type": "tool_use", "name": "read_file", "input": {"limit": 200, "offset": 1, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge/docs/analytics-events.md"}, "timestamp": 1791096908852}
+{"type": "tool_use", "name": "search_files", "input": {"limit": 50, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge", "pattern": "daily-ritual|streak|dashboard", "target": "files"}, "timestamp": 1791096908852}
+{"type": "tool_result", "name": "read_file", "output": "{\"content\": \"1|<!-- BEGIN:nextjs-agent-rules -->\\n2|\\n3|# This is NOT the Next.js you know\\n4|\\n5|This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.\\n6|\\n7|This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.\\n8|\\n9|<!-- END:nextjs-agent-rules -->\", \"total_lines\": 9, \"file_size\": 678, \"truncated\": false, \"is_binary\": false, \"is_image\": false, \"not_found\": false}", "duration_ms": 56, "is_error": false, "timestamp": 1791096908958}
+{"type": "tool_result", "name": "read_file", "output": "{\"content\": \"1|# Vivida retention and monetization plan\\n2|\\n3|Last updated: 26 August 2026\\n4|\\n5|This is the implementation order for improving activation, retention, and\\n6|customer spend. It combines the repository and live-product audit with\\n7|aggregate production baselines. The order is intentional: measure the full\\n8|value and payment loop first, create a repeat-use habit second, and expand paid\\n9|inventory only after those foundations are measurable.\\n10|\\n11|## Measured baseline\\n12|\\n13|- 981 registered users; 564 MAU, 202 WAU, and 21 DAU at extraction.\\n14|- DAU / MAU is 3.7%.\\n15|- 73.7% of the measured signup cohort completed a birth profile, while 31.8%\\n16|  returned during days 1–7.\\n17|- 48.2% of MAU were active on one day only; 8.2% were active on 8+ days.\\n18|- 15,044 free credits were issued in the trailing 30 days versus 3,331 spent,\\n19|  a 4.52× supply-to-spend ratio. Purchased issuance was 140 credits across\\n20|  four users; the active-wallet median was 20 credits.\\n21|- Tarot and natal PDF reports generated 79.5% of credit consumption.\\n22|- Two users have made lifetime credit purchases and one PRO subscription was\\n23|  active at extraction. Those counts can overlap and are not summed as unique\\n24|  payers.\\n25|- Early AI chart chat and tarot usage correlate with stronger later retention,\\n26|  but both samples are small and should guide experiments rather than forecasts.\\n27|\\n28|## Priority order\\n29|\\n30|| Priority                    | Initiative                                         | Why now                                                                                                                                                                              | Success signal                                                                                 |\\n31|| --------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |\\n32|| P0 — shipped 2026-08-22     | Full value and paywall measurement                 | We can see some value actions, but not the complete exposure → selection → shortfall → checkout → unlock journey.                                                                    | Reliable value, paywall, D1/D7/D30, and payer-conversion baselines.                            |\\n33|| P0 — shipped                | Preserve calculator data through signup/onboarding | The public calculator already collects the exact birth inputs onboarding asks for again.                                                                                             | Higher calculator-to-profile completion and shorter onboarding time.                           |\\n34|| P0 — shipped 2026-08-22     | First onboarding “aha” result                      | New users now see their personalized Big Three immediately, then receive tracked, prefilled AI question recommendations.                                                             | Higher first-value completion, recommendation click-through, and D1 return.                    |\\n35|| P0 — shipped 2026-08-22     | Credits vs PRO comparison                          | Public natal promos, natal and first-free-tarot result states, and the Credits hub now explain one-time credits versus monthly unlimited PRO before a balance shortfall.             | Higher monetization-choice click-through and payer conversion before users reach zero credits. |\\n36|| P0 — implemented 2026-08-22 | Signup-credit cohort test                          | Future signups are assigned 50/50 to 20 credits immediately or 10 immediately plus 5 after a 24-hour return; legacy balances remain untouched.                                       | Variant-level D1/D7 retention, seven-day credit use, and 30-day payer conversion.              |\\n37|| P1 — shipped 2026-08-26     | Daily “Today” ritual                               | Daily reading, chosen focus, server-truth streak, and lifetime milestones now create a compact reason to return.                                                                     | Higher DAU/MAU, active days per MAU, and D7 retention.                                         |\\n38|| P1 — shipped 2026-08-26     | Contextual paywalls and credit-economy experiments | Shortfalls now name the deficit, compare credits with PRO, recommend the smallest sufficient pack, and return to content after verified checkout. Repeatable free earning is capped. | Higher paywall-to-checkout and 30-day payer conversion without lower retention.                |\\n39|| P1 — shipped 2026-09-05     | Reading history and journal                        | Tarot, forecasts, and AI insight do not accumulate into durable personal value.                                                     ...", "duration_ms": 56, "is_error": false, "timestamp": 1791096908960}
+{"type": "tool_result", "name": "read_file", "output": "{\"content\": \"1|# Analytics event contract (W04)\\n2|\\n3|Contract version: `v: 1` (`EVENT_CONTRACT_VERSION` in `lib/analytics.ts`).\\n4|Every product event carries `platform` (`web`), `feature`, `surface`,\\n5|`locale`, `v`. Never send user IDs, emails, names, birth data, city names,\\n6|free-text questions, or content bodies. GA4 campaign-reserved params are\\n7|stripped automatically (`stripCampaignParams`).\\n8|\\n9|## Value actions → `value_action` mirror\\n10|\\n11|These prove received value and feed the \\\"valuable sessions\\\" metric:\\n12|\\n13|| event                                                  | feature       | surface(s)                     |\\n14|| ------------------------------------------------------ | ------------- | ------------------------------ |\\n15|| `compatibility_check_completed`                        | compatibility | calculator                     |\\n16|| `natal_chart_computed`                                 | natal         | calculator / onboarding result |\\n17|| `public_horoscope_read` / `daily_horoscope_read`       | horoscope     | public / dashboard             |\\n18|| `daily_ritual_completed`                               | daily         | dashboard                      |\\n19|| `tarot_reading_completed` / `tarot_followup_completed` | tarot         | tarot_reader                   |\\n20|| `ai_answer_completed`                                  | ai_chat       | chart_chat                     |\\n21|| `library_item_opened`                                  | library       | library_detail                 |\\n22|| `report_opened`                                        | report        | report_page                    |\\n23|| `relationship_insight_opened`                          | relationship  | synastry_detail (wired W12)    |\\n24|| `timing_window_opened`                                 | timing        | timing_page (wired W12)        |\\n25|| `test_completed`                                       | tests         | test surface                   |\\n26|\\n27|## Funnel / diagnostic events\\n28|\\n29|### Web app installation\\n30|\\n31|`pwa_install_cta_viewed`, `pwa_install_cta_clicked`, `pwa_install_prompt_shown`,\\n32|`pwa_install_prompt_accepted`, `pwa_install_prompt_dismissed`, and\\n33|`pwa_appinstalled` describe the browser installation path. `pwa_standalone_opened`\\n34|counts launches and `pwa_standalone_first_open` fires once per browser storage\\n35|after the installed web app opens. They carry the shared event contract and are\\n36|consent-gated. The first-open count includes earlier installs that open after\\n37|instrumentation starts, and does not reveal whether the shortcut remains on a\\n38|device. A consented first-party `/api/pwa/open` call also records a random\\n39|browser-storage profile ID in `pwa_installation`, with first and latest open\\n40|dates; the admin PWA page displays both sources separately.\\n41|\\n42|| event                                                               | when                                                                                             | key params                        |\\n43|| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------- |\\n44|| `onboarding_started/step_viewed/step_completed/submitted/abandoned` | wizard lifecycle; abandoned = unmount without submit + last `step_name`                          | `flow`, `step_name`               |\\n45|| `search_opened/result_selected/no_result`                           | authed header people-search; no query text, `no_result` once per distinct query                  | `result_type: people`             |\\n46|| `nav_item_selected`                                                 | sidebar / drawer / tab-bar taps                                                                  | `item` (nav key)                  |\\n47|| `library_item_favorited`                                            | favorite toggle succeeds                                                                         | `outcome: favorited/unfavorited`  |\\n48|| `library_note_saved`                                                | non-empty private note saved                                                                     | `outcome: saved`                  |\\n49|| `report_downloaded`                                                 | PDF download click                                                                               | `report_type: natal`              |\\n50|| `checkout_failed`                                                   | credit top-up could not start (no URL / HTTP / network)                                          | `reason: no_url/http_NNN/network` |\\n51|| `checkout_cancel_return`                                            | Stripe `?status=canceled` return                                                                 | `outcome: canceled_at_stripe`     |\\n52|| `checko...", "duration_ms": 56, "is_error": false, "timestamp": 1791096908961}
+{"type": "tool_result", "name": "search_files", "output": "{\"total_count\": 0}", "duration_ms": 104, "is_error": false, "timestamp": 1791096908962}
+{"type": "tool_use", "name": "search_files", "input": {"limit": 60, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge/app", "pattern": "dashboard", "target": "files"}, "timestamp": 1791096915649}
+{"type": "tool_use", "name": "search_files", "input": {"limit": 60, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge", "pattern": "ritual", "target": "files"}, "timestamp": 1791096915650}
+{"type": "tool_use", "name": "search_files", "input": {"limit": 60, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge", "pattern": "streak", "target": "files"}, "timestamp": 1791096915650}
+{"type": "tool_result", "name": "search_files", "output": "{\"total_count\": 0}", "duration_ms": 44, "is_error": false, "timestamp": 1791096915709}
+{"type": "tool_result", "name": "search_files", "output": "{\"total_count\": 0}", "duration_ms": 42, "is_error": false, "timestamp": 1791096915710}
+{"type": "tool_result", "name": "search_files", "output": "{\"total_count\": 0}", "duration_ms": 59, "is_error": false, "timestamp": 1791096915710}
+{"type": "tool_use", "name": "terminal", "input": {"command": "pwd; ls; ls app 2>&1 | head -50; ls docs 2>&1 | head -50", "workdir": "/Users/giviendeladze/Projects/vivida/vivida.ge"}, "timestamp": 1791096919609}
+{"type": "tool_result", "name": "terminal", "output": "{\"output\": \"/Users/giviendeladze/Projects/vivida/vivida.ge\\nAGENTS.md\\nCLAUDE.md\\nREADME.md\\nactions\\napp\\naudit\\nauth.config.ts\\nauth.ts\\ncomponents\\ncomponents.json\\ndb\\ndocs\\ndrizzle\\ndrizzle.config.ts\\ne2e\\neslint.config.mjs\\ninstrumentation-client.ts\\ninstrumentation.ts\\nlib\\nnext-env.d.ts\\nnext.config.ts\\nnode_modules\\npackage-lock.json\\npackage.json\\nplaywright.config.ts\\npostcss.config.mjs\\nproxy.ts\\npublic\\nq-tmp.mjs\\nscripts\\nsentry.edge.config.ts\\nsentry.server.config.ts\\ntest-results\\ntests\\ntsconfig.json\\ntsconfig.tsbuildinfo\\ntypes\\nvercel.json\\nvitest.config.mts\\n_fonts\\naccount\\nakhali-mtvare\\nangeluri-ricxvebi\\napi\\napple-icon.png\\narticles\\nask\\nastrologiuri-kalendari\\nastrologiuri-saxlebi\\nbig-five\\nchinuri-horoskopi\\ncredits\\ndabnelebebi\\ndashboard\\ndiscover\\nemociuri-inteleqti\\nen\\neq-testi\\nfavicon.ico\\nfeatures\\nfeed\\nfinansuri-horoskopi\\nforgot-password\\nfriends\\nfrtxili-dgheebi\\nglobal-error.tsx\\nglobals.css\\nhoroskopi\\nhow-it-works\\nicon.svg\\nighbliani-dgheebi\\niq-testi\\nkarieris-horoskopi\\nlayout.tsx\\nlibrary\\nlogin\\nmanifest.ts\\nmbti\\nmerkuri-retrogradi\\nmessages\\nmijachvulobis-testi\\nmkitxaoba\\nmtvaris-kalendari\\nnataluri-ruka\\nnot-found.tsx\\nnumerologia\\nonboarding\\nopengraph-image.tsx\\npage.tsx\\nanalytics-events.md\\nproduct-growth-priorities.md\\nproduction-monitoring.md\\npwa-install-plan-ka.md\\nsafety-followups.md\\nseo\\nsocial-share-credits.md\", \"exit_code\": 0, \"error\": null}", "duration_ms": 63, "is_error": false, "timestamp": 1791096919672}
+{"type": "tool_use", "name": "terminal", "input": {"command": "ls app/dashboard/; echo ---; ls actions/ | head -60; echo ---; ls components/ | head -80; echo ---; ls lib/ | head -100", "workdir": "/Users/giviendeladze/Projects/vivida/vivida.ge"}, "timestamp": 1791096922170}
+{"type": "tool_result", "name": "terminal", "output": "{\"output\": \"page.tsx\\n---\\naccount.ts\\nauth.ts\\nchart.ts\\nchinese-zodiac.ts\\ndaily-ritual.ts\\ndaily.ts\\ndashboard.ts\\nemail-preferences.ts\\nfeed.ts\\nfriendship.ts\\ninterface-language.ts\\nlibrary.ts\\nmessages.ts\\nmoderation.ts\\nmoon-phase.ts\\nnotifications.ts\\npartners.ts\\npeople.ts\\nphone.ts\\nprofile.ts\\nrelationships.ts\\nreminders.ts\\nresidence.ts\\nsign-horoscope.ts\\nsign-ranking.ts\\nsms-marketing.ts\\nsubmit-mbti.ts\\nweekly-forecast.ts\\n---\\naccount\\nanalytics\\narticles\\nask\\nastro\\nattachment\\nauth\\nbig-five\\nbilling\\nbrand\\ncalculator\\nchat\\ncredits\\ndashboard\\ndiscover\\nen\\neq\\nfb-pixel.tsx\\nfeed\\nfriends\\ni18n\\ninvite\\niq\\nlanding\\nlibrary\\nmarketing\\nmarketing-cta.tsx\\nmarketing-header.tsx\\nmbti\\nmbti-quiz.tsx\\nnav\\nonboarding\\npaywall\\npdf\\npeople\\nphone-gift\\nprivacy\\nprofile\\npush\\npwa\\nquizzes\\nref-capture.tsx\\nreport\\nrosenberg\\nsafety\\nsearch\\nseo\\nsite-footer.tsx\\nsky\\nsmart-header.tsx\\nsubscription\\nsynastry\\nsystem\\ntarot\\ntests\\ntrue-sign\\nui\\nvercel-observability.tsx\\n---\\naccount-constants.ts\\naccount-core.ts\\nactivity.ts\\nadmin-auth.ts\\nadmin-safety.ts\\nanalytics\\nanalytics-debug.ts\\nanalytics.ts\\napi\\narticle-engagement.ts\\narticles.ts\\nask-memory-pure.ts\\nask-memory.ts\\nask-nudges-pure.ts\\nask-nudges.ts\\naspect-library.ts\\naspects.ts\\nastrology-api.ts\\nastrology-local.ts\\nastrology.ts\\nattachment\\nauth-core.ts\\nauth-error.ts\\nauth-helpers.ts\\navatar-gen.ts\\navatar.ts\\navatars.ts\\nbig-five\\nbilling-config.ts\\nbirthday.ts\\nblock-core.ts\\nblock-visibility.ts\\nblock.ts\\nchart-chat-starters.ts\\nchart-chat.ts\\ncheckout-tracking.ts\\ncompatibility-calculator-data.ts\\ncompatibility-score.ts\\ncountries.ts\\ncredit-economy-metrics.ts\\ncredit-economy.ts\\ncredit-progress.ts\\ncredits-config.ts\\ncredits-monthly.ts\\ncredits-unlock-core.ts\\ncredits.ts\\ncron\\ndaily-headline.ts\\ndaily-ritual-core.ts\\ndaily-ritual.ts\\ndiscover.ts\\nduplicate-account-match.ts\\nduplicate-account.ts\\nelements.ts\\nemail-campaigns.ts\\nemail-marketing.ts\\nemail-templates\\nemail.ts\\neq\\nexperiment-assignment.ts\\nexperiment-catalog.ts\\nexperiment-outcomes.ts\\nexperiments.ts\\nfb-pixel.ts\\nfeed-config.ts\\nfeed-core.ts\\nfeed-write-core.ts\\nfriend-synastry.ts\\nfriendship-core.ts\\nfriendship.ts\\ngeneration-lock.ts\\ngeocoding.ts\\ngeorgian.ts\\ngrowth-metrics.ts\\nheader-cache.ts\\nhoroscope-leads.ts\\nhouse-library.ts\\nhouses.ts\\ni18n\\ninterpretation-library.ts\\ninterpretations.ts\\niq\\nlanding-redirect.ts\\nlegal-entity.ts\\nlibrary.ts\\nmarketing-attribution.ts\\nmbti-characters.ts\\nmbti-content-en.ts\\nmbti-library.ts\\nmbti-questions-db.ts\\nmbti-questions.ts\\nmbti-submit-core.ts\\nmbti-synthesis.ts\\nmentions-parse.ts\\nmentions.ts\\nmessages-core.ts\\nmessages.ts\\nmeta-conversions.ts\\nmoon-calendar-date.ts\\nmoon-phase-en.ts\", \"exit_code\": 0, \"error\": null}", "duration_ms": 69, "is_error": false, "timestamp": 1791096922241}
+{"type": "tool_use", "name": "read_file", "input": {"limit": 300, "offset": 1, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge/app/dashboard/page.tsx"}, "timestamp": 1791096929249}
+{"type": "tool_use", "name": "read_file", "input": {"limit": 200, "offset": 1, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge/actions/dashboard.ts"}, "timestamp": 1791096929249}
+{"type": "tool_use", "name": "read_file", "input": {"limit": 200, "offset": 1, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge/actions/daily-ritual.ts"}, "timestamp": 1791096929250}
+{"type": "tool_result", "name": "read_file", "output": "{\"content\": \"1|import { eq } from \\\"drizzle-orm\\\";\\n2|\\n3|import { db } from \\\"@/db\\\";\\n4|import {\\n5|  bigFiveResults,\\n6|  eqResults,\\n7|  iqResults,\\n8|  mbtiTestResults,\\n9|  profiles,\\n10|  users,\\n11|} from \\\"@/db/schema\\\";\\n12|import { requireUser } from \\\"@/lib/auth-helpers\\\";\\n13|import { isAccountRestricted } from \\\"@/lib/restriction\\\";\\n14|import { Starfield } from \\\"@/components/landing/starfield\\\";\\n15|import { AppHeader } from \\\"@/components/nav/app-header\\\";\\n16|import { PopularTools } from \\\"@/components/nav/popular-tools\\\";\\n17|import { AstroLockedMain } from \\\"@/components/astro/astro-locked-main\\\";\\n18|import { DailyDashboard } from \\\"@/components/dashboard/daily-dashboard\\\";\\n19|import { PushOptIn } from \\\"@/components/push/push-opt-in\\\";\\n20|import { RestrictedNotice } from \\\"@/components/safety/restricted-notice\\\";\\n21|import { DashboardTestPromo } from \\\"@/components/dashboard/test-promo-widget\\\";\\n22|import { DashboardArticleRecommendations } from \\\"@/components/dashboard/article-recommendations\\\";\\n23|import { DashboardBillingNudge } from \\\"@/components/dashboard/billing-nudge\\\";\\n24|import { PhoneGiftPopup } from \\\"@/components/phone-gift/phone-gift-popup\\\";\\n25|import { TESTS } from \\\"@/lib/tests-catalog\\\";\\n26|import {\\n27|  listPublishedArticlePreviews,\\n28|  type ArticlePreview,\\n29|} from \\\"@/lib/articles\\\";\\n30|import { normalizeUserLocale } from \\\"@/lib/i18n/user-locale\\\";\\n31|import { getRequestLocale } from \\\"@/lib/i18n/request-locale\\\";\\n32|import { getBalance } from \\\"@/lib/credits\\\";\\n33|import { shouldShowPurchasePromotion } from \\\"@/lib/billing-config\\\";\\n34|import { phoneGiftPopupEligible } from \\\"@/lib/phone-gift-pure\\\";\\n35|import { isPremiumUser } from \\\"@/lib/premium\\\";\\n36|import type { Metadata } from \\\"next\\\";\\n37|\\n38|export async function generateMetadata(): Promise<Metadata> {\\n39|  const locale = await getRequestLocale();\\n40|  return { title: locale !== \\\"ka\\\" ? \\\"Today\\\" : \\\"დღეს\\\" };\\n41|}\\n42|\\n43|function pickDailyArticles(\\n44|  articles: ArticlePreview[],\\n45|  seed: number,\\n46|  limit = 3,\\n47|): ArticlePreview[] {\\n48|  const shuffled = [...articles];\\n49|  let state = seed || 1;\\n50|\\n51|  for (let index = shuffled.length - 1; index > 0; index -= 1) {\\n52|    state = (Math.imul(state, 1_664_525) + 1_013_904_223) >>> 0;\\n53|    const swapIndex = state % (index + 1);\\n54|    [shuffled[index], shuffled[swapIndex]] = [\\n55|      shuffled[swapIndex],\\n56|      shuffled[index],\\n57|    ];\\n58|  }\\n59|\\n60|  return shuffled.slice(0, limit);\\n61|}\\n62|\\n63|export default async function DashboardPage() {\\n64|  const user = await requireUser();\\n65|\\n66|  const [\\n67|    [profile],\\n68|    [userRow],\\n69|    [mbtiResult],\\n70|    [iqResult],\\n71|    [eqResult],\\n72|    [bigFiveResult],\\n73|    balance,\\n74|    isPremium,\\n75|  ] = await Promise.all([\\n76|    db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),\\n77|    db\\n78|      .select({\\n79|        locale: users.interfaceLanguage,\\n80|        countryCode: users.residenceCountryCode,\\n81|        isPremium: users.isPremium,\\n82|        phoneVerifiedAt: users.phoneVerifiedAt,\\n83|        phoneGiftPopupDismissedAt: users.phoneGiftPopupDismissedAt,\\n84|      })\\n85|      .from(users)\\n86|      .where(eq(users.id, user.id))\\n87|      .limit(1),\\n88|    db\\n89|      .select({ id: mbtiTestResults.id })\\n90|      .from(mbtiTestResults)\\n91|      .where(eq(mbtiTestResults.userId, user.id))\\n92|      .limit(1),\\n93|    db\\n94|      .select({ id: iqResults.id })\\n95|      .from(iqResults)\\n96|      .where(eq(iqResults.userId, user.id))\\n97|      .limit(1),\\n98|    db\\n99|      .select({ id: eqResults.id })\\n100|      .from(eqResults)\\n101|      .where(eq(eqResults.userId, user.id))\\n102|      .limit(1),\\n103|    db\\n104|      .select({ id: bigFiveResults.id })\\n105|      .from(bigFiveResults)\\n106|      .where(eq(bigFiveResults.userId, user.id))\\n107|      .limit(1),\\n108|    getBalance(user.id),\\n109|    isPremiumUser(user.id),\\n110|  ]);\\n111|  const locale = await getRequestLocale(normalizeUserLocale(userRow?.locale));\\n112|  const en = locale !== \\\"ka\\\";\\n113|\\n114|  if (!profile?.dateOfBirth) {\\n115|    return (\\n116|      <AstroLockedMain\\n117|        active=\\\"today\\\"\\n118|        title={\\n119|          en\\n120|            ? \\\"Your daily horoscope needs a natal chart\\\"\\n121|            : \\\"დღიური ჰოროსკოპი ნატალურ რუკას საჭიროებს\\\"\\n122|        }\\n123|        description={\\n124|          en\\n125|            ? \\\"Add your birth details to receive a personalized horoscope and sky overview every day.\\\"\\n126|            : \\\"შეავსე დაბადების მონაცემები და ყოველ დღე მიიღებ პერსონალურ ჰოროსკოპსა და ცის მიმოხილვას.\\\"\\n127|        }\\n128|        next=\\\"/dashboard\\\"\\n129|        locale={locale}\\n130|      />\\n131|    );\\n132|  }\\n133|\\n134|  const [restricted, publishedArticles] = await Promise.all([\\n135|    isAccountRestricted(user.id),\\n136|    listPublishedArticlePreviews(locale),\\n137|  ]);\\n1...", "duration_ms": 15, "is_error": false, "timestamp": 1791096929264}
+{"type": "tool_result", "name": "read_file", "output": "{\"content\": \"1|\\\"use server\\\";\\n2|\\n3|import { eq } from \\\"drizzle-orm\\\";\\n4|\\n5|import { db } from \\\"@/db\\\";\\n6|import { profiles } from \\\"@/db/schema\\\";\\n7|import { ensureChartFor } from \\\"@/actions/chart\\\";\\n8|import { ensureDailyFor } from \\\"@/actions/daily\\\";\\n9|import { ensureMoonPhase, type MoonPhaseRow } from \\\"@/actions/moon-phase\\\";\\n10|import { ensureWeeklyForecast } from \\\"@/actions/weekly-forecast\\\";\\n11|import { getBalance, isUnlocked } from \\\"@/lib/credits\\\";\\n12|import { isPremiumUser } from \\\"@/lib/premium\\\";\\n13|import { getDashboardSuggestions } from \\\"@/lib/suggestions\\\";\\n14|import {\\n15|  overlayTransitAspects,\\n16|  type TransitBreakdownItem,\\n17|} from \\\"@/lib/transit-library\\\";\\n18|import { SOCIAL_FEATURES } from \\\"@/lib/social-flags\\\";\\n19|import type {\\n20|  Chart,\\n21|  DailyHoroscope,\\n22|  WeeklyForecast,\\n23|  WeeklyForecastDay,\\n24|} from \\\"@/db/schema\\\";\\n25|import type { DiscoverCard } from \\\"@/lib/discover\\\";\\n26|import type { UserLocale } from \\\"@/lib/i18n/user-locale\\\";\\n27|import { getDailyRitualProgress } from \\\"@/lib/daily-ritual-core\\\";\\n28|import { stripWeeklyTeaser } from \\\"@/lib/weekly-teaser\\\";\\n29|import type { StreakProgress } from \\\"@/lib/streak-credits\\\";\\n30|\\n31|/**\\n32| * The dashboard loads in two waves so the page never blocks on AI latency:\\n33| *\\n34| *   1. `loadDashboardCore` — chart positions + suggestions. All local\\n35| *      compute + DB reads, no AI, so it returns in ~1s. The chart's AI\\n36| *      narrative is upgraded in the background (aiUpgrade: \\\"defer\\\").\\n37| *   2. `loadDashboardExtras` — the AI-generated daily horoscope, weekly\\n38| *      forecast, and moon reading, fetched in parallel and streamed into\\n39| *      their own cards behind skeletons.\\n40| *\\n41| * This is what makes the post-signup experience feel instant: previously a\\n42| * single bundle awaited the cold ~30s chart interpretation before anything\\n43| * rendered.\\n44| */\\n45|\\n46|export type DashboardCore =\\n47|  | { kind: \\\"no-chart\\\" }\\n48|  | {\\n49|      kind: \\\"ok\\\";\\n50|      chart: Chart;\\n51|      timezone: string;\\n52|      canDaily: boolean;\\n53|      /** The 7-day forecast is a one-time credit unlock. */\\n54|      weeklyUnlocked: boolean;\\n55|      /** Credit balance — used by the locked-forecast unlock CTA. */\\n56|      balance: number;\\n57|      /** PRO entitlement — gates the PRO daily brief layer. */\\n58|      isPremium: boolean;\\n59|      ritualProgress: StreakProgress;\\n60|      suggestions: DiscoverCard[];\\n61|    };\\n62|\\n63|export async function loadDashboardCore(\\n64|  userId: string,\\n65|): Promise<DashboardCore> {\\n66|  // Fast path: returns the static chart immediately, AI narrative lands in\\n67|  // the background. Positions + big-three render with zero AI latency.\\n68|  const chart = await ensureChartFor(userId, { aiUpgrade: \\\"defer\\\" });\\n69|  if (!chart) return { kind: \\\"no-chart\\\" };\\n70|\\n71|  // Skip the \\\"suggested people\\\" query entirely when the rail is flagged off\\n72|  // — no point ranking strangers we won't show. Render is also guarded.\\n73|  const [\\n74|    profileRow,\\n75|    suggestions,\\n76|    weeklyUnlocked,\\n77|    balance,\\n78|    ritualProgress,\\n79|    isPremium,\\n80|  ] = await Promise.all([\\n81|    db\\n82|      .select({ timezone: profiles.timezone })\\n83|      .from(profiles)\\n84|      .where(eq(profiles.userId, userId))\\n85|      .limit(1),\\n86|    SOCIAL_FEATURES.suggestedPeopleRail\\n87|      ? getDashboardSuggestions(userId, 20).catch(() => [] as DiscoverCard[])\\n88|      : Promise.resolve([] as DiscoverCard[]),\\n89|    isUnlocked(userId, \\\"weekly\\\", \\\"spend_weekly\\\"),\\n90|    getBalance(userId),\\n91|    getDailyRitualProgress(userId),\\n92|    isPremiumUser(userId),\\n93|  ]);\\n94|\\n95|  return {\\n96|    kind: \\\"ok\\\",\\n97|    chart,\\n98|    timezone: profileRow[0]?.timezone ?? \\\"UTC\\\",\\n99|    canDaily: true,\\n100|    weeklyUnlocked,\\n101|    balance,\\n102|    isPremium,\\n103|    ritualProgress,\\n104|    suggestions,\\n105|  };\\n106|}\\n107|\\n108|export type DashboardExtras = {\\n109|  daily: DailyHoroscope | null;\\n110|  /** Today's strongest transit aspects with their library interpretations —\\n111|   *  the \\\"დღის ტრანზიტები\\\" breakdown under the daily reading. */\\n112|  transitBreakdown: TransitBreakdownItem[];\\n113|  moonPhase: MoonPhaseRow | null;\\n114|  weeklyForecast: WeeklyForecast | null;\\n115|  /**\\n116|   * Locked-week teaser: real days with scores + dates, but the narrative\\n117|   * (headline, reasons, advice, drivers) stripped for every day after the\\n118|   * first. The locked card shows day 1 fully and blurs the rest.\\n119|   */\\n120|  weeklyTeaser: WeeklyForecastDay[] | null;\\n121|};\\n122|\\n123|/**\\n124| * The AI-heavy cards, fetched in parallel. Each failure degrades to null so\\n125| * one slow/failed generator never blocks the others. Called after the core\\n126| * has already painted, so its latency is hidden behind per-card skeletons.\\n127| */\\n128|export async function loadDashboardExtras(\\n129|  us...", "duration_ms": 14, "is_error": false, "timestamp": 1791096929265}
+{"type": "tool_result", "name": "read_file", "output": "{\"content\": \"1|\\\"use server\\\";\\n2|\\n3|import { requireUser } from \\\"@/lib/auth-helpers\\\";\\n4|import { completeDailyRitualFor } from \\\"@/lib/daily-ritual-core\\\";\\n5|\\n6|export async function completeDailyRitual() {\\n7|  const user = await requireUser();\\n8|  return completeDailyRitualFor(user.id);\\n9|}\", \"total_lines\": 9, \"file_size\": 258, \"truncated\": false, \"is_binary\": false, \"is_image\": false, \"not_found\": false}", "duration_ms": 10, "is_error": false, "timestamp": 1791096929267}
+{"type": "tool_use", "name": "read_file", "input": {"limit": 250, "offset": 1, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/daily-ritual-core.ts"}, "timestamp": 1791096933413}
+{"type": "tool_use", "name": "read_file", "input": {"limit": 250, "offset": 1, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/daily-ritual.ts"}, "timestamp": 1791096933413}
+{"type": "tool_result", "name": "read_file", "output": "{\"content\": \"1|import { and, eq, isNotNull, sql } from \\\"drizzle-orm\\\";\\n2|\\n3|import { db } from \\\"@/db\\\";\\n4|import { profiles, userActivityDays } from \\\"@/db/schema\\\";\\n5|import { formatLocalDate } from \\\"@/lib/activity\\\";\\n6|import { calculateStreak } from \\\"@/lib/streak\\\";\\n7|import { awardRitualMilestone, toStreakProgress, type StreakProgress } from \\\"@/lib/streak-credits\\\";\\n8|\\n9|export const DAILY_RITUAL_VERSION = 2;\\n10|\\n11|async function ritualContext(userId: string) {\\n12|  const [profile] = await db\\n13|    .select({ timezone: profiles.timezone })\\n14|    .from(profiles)\\n15|    .where(eq(profiles.userId, userId))\\n16|    .limit(1);\\n17|  const timezone = profile?.timezone ?? \\\"UTC\\\";\\n18|  return { timezone, today: formatLocalDate(new Date(), timezone) };\\n19|}\\n20|\\n21|export async function getDailyRitualProgress(userId: string): Promise<StreakProgress> {\\n22|  const { today } = await ritualContext(userId);\\n23|  const rows = await db\\n24|    .select({ date: userActivityDays.dateLocal })\\n25|    .from(userActivityDays)\\n26|    .where(\\n27|      and(\\n28|        eq(userActivityDays.userId, userId),\\n29|        eq(userActivityDays.ritualVersion, DAILY_RITUAL_VERSION),\\n30|        isNotNull(userActivityDays.ritualCompletedAt),\\n31|      ),\\n32|    );\\n33|  return toStreakProgress(calculateStreak(rows.map((row) => row.date), today));\\n34|}\\n35|\\n36|export async function completeDailyRitualFor(userId: string): Promise<{\\n37|  ok: true;\\n38|  firstCompletion: boolean;\\n39|  awardedCredits: number;\\n40|  progress: StreakProgress;\\n41|}> {\\n42|  const { today } = await ritualContext(userId);\\n43|  const completedAt = new Date();\\n44|\\n45|  const result = await db.execute<{ first_completion: boolean }>(sql`\\n46|    INSERT INTO user_activity_day (user_id, date_local, ritual_completed_at, ritual_version)\\n47|    VALUES (${userId}, ${today}, ${completedAt}, ${DAILY_RITUAL_VERSION})\\n48|    ON CONFLICT (user_id, date_local) DO UPDATE\\n49|    SET ritual_completed_at = EXCLUDED.ritual_completed_at,\\n50|        ritual_version = EXCLUDED.ritual_version\\n51|    WHERE user_activity_day.ritual_version IS DISTINCT FROM ${DAILY_RITUAL_VERSION}\\n52|       OR user_activity_day.ritual_completed_at IS NULL\\n53|    RETURNING true AS first_completion\\n54|  `);\\n55|  const firstCompletion = result.rows.length > 0;\\n56|  const progress = await getDailyRitualProgress(userId);\\n57|  // Also run on an idempotent retry, repairing a transient reward failure.\\n58|  const awardedCredits = await awardRitualMilestone(userId, progress.current);\\n59|  return { ok: true, firstCompletion, awardedCredits, progress };\\n60|}\", \"total_lines\": 60, \"file_size\": 2386, \"truncated\": false, \"is_binary\": false, \"is_image\": false, \"not_found\": false}", "duration_ms": 3, "is_error": false, "timestamp": 1791096933418}
+{"type": "tool_result", "name": "read_file", "output": "{\"content\": \"1|export type DailyRitualState = { horoscopeRead: boolean; focus: string | null };\\n2|\\n3|const EMPTY: DailyRitualState = { horoscopeRead: false, focus: null };\\n4|const PREFIX = \\\"vivida_daily_ritual_v2\\\";\\n5|\\n6|function key(userId: string, date: string): string {\\n7|  return `${PREFIX}:${encodeURIComponent(userId)}:${date}`;\\n8|}\\n9|\\n10|export function readDailyRitual(userId: string, date: string): DailyRitualState {\\n11|  if (typeof window === \\\"undefined\\\") return { ...EMPTY };\\n12|  try {\\n13|    const value = JSON.parse(localStorage.getItem(key(userId, date)) ?? \\\"null\\\") as unknown;\\n14|    if (!value || typeof value !== \\\"object\\\") return { ...EMPTY };\\n15|    const record = value as Record<string, unknown>;\\n16|    return {\\n17|      horoscopeRead: record.horoscopeRead === true,\\n18|      focus: typeof record.focus === \\\"string\\\" && record.focus.length <= 80 ? record.focus : null,\\n19|    };\\n20|  } catch {\\n21|    return { ...EMPTY };\\n22|  }\\n23|}\\n24|\\n25|export function saveDailyRitual(userId: string, date: string, state: DailyRitualState): void {\\n26|  if (typeof window === \\\"undefined\\\") return;\\n27|  try {\\n28|    localStorage.setItem(key(userId, date), JSON.stringify(state));\\n29|  } catch {\\n30|    // Private browsing/storage quotas must never block completion.\\n31|  }\\n32|}\", \"total_lines\": 32, \"file_size\": 1186, \"truncated\": false, \"is_binary\": false, \"is_image\": false, \"not_found\": false}", "duration_ms": 3, "is_error": false, "timestamp": 1791096933435}
+{"type": "tool_use", "name": "terminal", "input": {"command": "ls components/dashboard/; echo ---; ls lib/ | grep -i -E \"streak|reminder|push|notif|library|mood|check\"; echo ---; ls actions/ | grep -i -E \"remind|push|libr|notif\"; echo ---; cat docs/pwa-install-plan-ka.md | head -80", "workdir": "/Users/giviendeladze/Projects/vivida/vivida.ge"}, "timestamp": 1791096933436}
+{"type": "tool_result", "name": "terminal", "output": "{\"output\": \"article-recommendations.tsx\\naspect-cards.tsx\\nbig-three-card.tsx\\nbilling-nudge.tsx\\nchart-section.tsx\\nchart-wheel.tsx\\ncosmic-loader.tsx\\ndaily-card.tsx\\ndaily-dashboard.tsx\\ndaily-ritual.tsx\\nelements-card.tsx\\nhoroscope-loading.tsx\\nhouse-cards.tsx\\nmini-big-three.tsx\\nmoon-phase-card.tsx\\nplanet-cards.tsx\\nplanet-list.tsx\\npro-daily-brief.tsx\\nsign-badge.tsx\\nsign-out-button.tsx\\nsuggested-people-rail.tsx\\nsuggested-person-card.tsx\\ntest-promo-widget.tsx\\nweekly-forecast-card.tsx\\nweekly-forecast-locked.tsx\\n---\\naspect-library.ts\\ncheckout-tracking.ts\\nhouse-library.ts\\ninterpretation-library.ts\\nlibrary.ts\\nmbti-library.ts\\nmoon-phase-library.ts\\nnatal-library-en.ts\\nnotification-push.ts\\nnotifications.ts\\npersonal-reminders.ts\\npush.ts\\nrelationship-notifications.ts\\nreminder-config.ts\\nreminder-delivery.ts\\nreminder-funnel.ts\\nreminder-settings.ts\\nstreak-credits.ts\\nstreak.ts\\nsynastry-library.ts\\ntransit-library.ts\\n---\\nlibrary.ts\\nnotifications.ts\\nreminders.ts\\n---\\n# Vivida-ს ვებ აპის დაყენების გეგმა\\n\\nგანახლდა: 2026-09-23. ეს გეგმა ეხება `vivida.ge`-ის ბრაუზერიდან მთავარ ეკრანზე დაყენებას (PWA). Flutter-ის მობილური აპი არ არის გაშვებული; Android-ის მაღაზიის ვერსია unpublished არის და ახლო მომავალში მისი დაბრუნება არ იგეგმება.\\n\\n## შესრულების სტატუსი\\n\\nდამატებულია ფუტერისა და ავტორიზებული მომხმარებლის მობილური მენიუს ინსტალაციის მოქმედება, Android-ის სისტემური prompt და ხელით დაყენების ინსტრუქცია, ღირებული მოქმედების შემდეგ კონტექსტური შეთავაზება 30-დღიანი გადადებით, გაუმჭვირვალე PNG/`maskable` ხატულები, მომსახურე სკრიპტის რეგისტრაცია და offline შეტყობინება, GA4 მოვლენები, პირველი მხარის აღრიცხვის ცხრილი/მიგრაცია და `vivida-admin`-ის PWA გვერდი. ორივე მონაცემთა წყარო ითვლის მხოლოდ ანალიტიკაზე თანხმობის მქონე მომხმარებლებს. გამოქვეყნებამდე საჭიროა მიგრაცია `0085` და GA4 გასაღებები მხოლოდ სურვილის შემთხვევაში, თუ ინსტალაციის გზის დამატებითი ანალიზი გვინდა.\\n\\n## რა გვაქვს დღეს\\n\\n- `app/manifest.ts` აცხადებს `standalone` რეჟიმს და უკვე იყენებს 192/512 PNG და `maskable` ხატულებს. `app/apple-icon.png`-იც გაუმჭვირვალეა; მოწყობილობაზე საბოლოო ხილვადობა დასამოწმებელია.\\n- `public/sw.js` push შეტყობინებებთან ერთად გვერდის offline შეტყობინებასაც აბრუნებს; სრული offline ფუნქციონალი ცალკე სამუშაოა.\\n- დაყენების ღილაკი ფუტერსა და მობილურ მენიუშია. Footer-იდან App Store/Play Store-ის „მალე“ ნიშნები ამოღებულია.\\n- `lib/analytics.ts`-ში PWA მოვლენები დამატებულია. `vivida-admin`-ის PWA გვერდი პირველი მხარის ბაზის რაოდენობასა და სურვილის შემთხვევაში GA4-ის ინსტალაციის გზას ცალ-ცალკე აჩვენებს; ორივე თანხმობაზეა დამოკიდებული.\\n\\n## 1. ინსტალაციის შეთავაზება\\n\\n1. Footer-ის ახალი ვებ აპის ტექსტს დაემატოს „დაამატე Vivida მთავარ ეკრანზე“ მოქმედება; იგივე მოქმედება მობილურ მენიუში განთავსდეს. ტექსტში ნათლად ეწეროს, რომ ეს ვებ აპია.\\n2. Android-ის მხარდაჭერილ ბრაუზერში `beforeinstallprompt` მოვლენა შეინახოს კლიენტმა და ღილაკზე დაჭერისას გამოიძახოს ბრაუზერის ინსტალაციის დიალოგი. თუ მოვლენა არ მოვიდა, ღილაკმა მხოლოდ შესაბამისი ბრაუზერის მენიუს ინსტრუქცია აჩვენოს. უარყოფის შემდეგ იმავე სესიაში აღარ შეაწუხოს მომხმარებელი.\\n3. iPhone/iPad-ზე, სადაც პროგრამული prompt არ არის ხელმისაწვდომი, ღილაკმა აჩვენოს მოკლე, ვიზუალური Safari → Share → Add to Home Screen ინსტრუქცია. უკვე standalone რეჟიმში გახსნილ აპში ინსტალაციის შეთავაზება დაიმალოს.\\n4. ერთი კონტექსტური შეთავაზება გამოჩნდეს მხოლოდ მას შემდეგ, რაც მომხმარებელმა ღირებული მოქმედება შეასრულა (მაგალითად, პირველი რუკის დათვალიერება ან ტაროს პასუხი). უარყოფისას დაიმახსოვროს გადადება და აღარ აჩვენოს ხშირად.\\n5. გადაამოწმოს Android Chrome, iOS Safari, desktop Chrome/Edge და unsupported ბრაუზერები: ღილაკი ყოველთვის სწორ მოქმედებას უნდა ასრულებდეს და არ უნდა ჰპირდებოდეს მაღაზიის აპს.\\n\\n## 2. ხატულის გასწორება\\n\\n1. არსებული Vivida-ს ვარსკვლავისგან შეიქმნას სრულფონიანი, გაუმჭვირვალე 192×192 და 512×512 PNG, ასევე ცალკე `maskable` ვარიანტები. ფონი უნდა ავსებდეს მთელ კვადრატს; ლოგოს მნიშვნელოვანი ნაწილი ნიღბის უსაფრთხო არეში დარჩეს.\\n2. `app/manifest.ts`-ში ჩაიწეროს ეს ფაილები შესაბამისი `purpose` მნიშვნელობებით. `app/apple-icon.png` განახლდეს გაუმჭვირვალე 180×180 ვერსიად. Favicon-იც იგივე ბრენდს უნდა შეესაბამებოდეს.\\n3. ახალი ხატულა შემოწმდეს Android-ის სხვადასხვა ფორმის ნიღბით და iPhone-ის მთავარ ეკრანზე, ღია და მუქ ფონზე. ძველი დაინსტალირებული ვერსია შეიძლება ქეშში დარჩეს; შემოწმება ახალ დაყენებაზეც უნდა ჩატარდეს.\\n\\n## 3. სტატისტიკა ადმინ პანელში\\n\\n1. გაიწეროს მოვლენები: `pwa_install_cta_viewed`, `pwa_install_cta_clicked`, `pwa_install_prompt_shown`, `pwa_install_prompt_accepted`, `pwa_install_prompt_dismissed`, `pwa_appinstalled`, `pwa_standalone_opened`. პარამეტრები იყოს მხოლოდ პლატფორმა, ბრაუზერი, ენა და ჩვენების ადგილი; პირადი მონაცემები GA4-ში არ გაიგზავნოს.\\n2. სწრაფი ხედისთვის GA4 Data API-დან `eventName`/`eventCount` გამოიყენოს `vivida-admin`-ის Audience ან ცალკე PWA გვერდმა: შეთავაზების ნახვა → დაჭერა → მიღება → standalone გახსნა, დროის დიაპაზონით და პლატფორმით. ეს რიცხვები მხოლოდ თანხმობის მქონე მომხმარებლებს მოიცავს.\\n3. პირველი მხარის endpoint და ც...", "duration_ms": 71, "is_error": false, "timestamp": 1791096933514}
+{"type": "tool_use", "name": "read_file", "input": {"limit": 250, "offset": 1, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge/components/dashboard/daily-dashboard.tsx"}, "timestamp": 1791096941127}
+{"type": "tool_use", "name": "read_file", "input": {"limit": 250, "offset": 1, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge/components/dashboard/daily-ritual.tsx"}, "timestamp": 1791096941128}
+{"type": "tool_use", "name": "read_file", "input": {"limit": 200, "offset": 1, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge/components/dashboard/daily-card.tsx"}, "timestamp": 1791096941129}
+{"type": "tool_result", "name": "read_file", "output": "{\"content\": \"1|\\\"use client\\\";\\n2|\\n3|import { useEffect, useState } from \\\"react\\\";\\n4|import { useRouter } from \\\"next/navigation\\\";\\n5|import Link from \\\"next/link\\\";\\n6|import { ArrowRight } from \\\"lucide-react\\\";\\n7|\\n8|import {\\n9|  loadDashboardCore,\\n10|  loadDashboardExtras,\\n11|  type DashboardCore,\\n12|  type DashboardExtras,\\n13|} from \\\"@/actions/dashboard\\\";\\n14|import { Button } from \\\"@/components/ui/button\\\";\\n15|import { CosmicLoader } from \\\"@/components/dashboard/cosmic-loader\\\";\\n16|import { SOCIAL_FEATURES } from \\\"@/lib/social-flags\\\";\\n17|\\n18|import { HoroscopeLoading } from \\\"./horoscope-loading\\\";\\n19|import { MiniBigThree } from \\\"./mini-big-three\\\";\\n20|import { MoonPhaseCard } from \\\"./moon-phase-card\\\";\\n21|import { SuggestedPeopleRail } from \\\"./suggested-people-rail\\\";\\n22|import { CREDIT_COST } from \\\"@/lib/credits-config\\\";\\n23|import { WeeklyForecastCard } from \\\"./weekly-forecast-card\\\";\\n24|import { WeeklyForecastLocked } from \\\"./weekly-forecast-locked\\\";\\n25|import type { UserLocale } from \\\"@/lib/i18n/user-locale\\\";\\n26|import { DailyRitual } from \\\"./daily-ritual\\\";\\n27|import { ProDailyBrief } from \\\"./pro-daily-brief\\\";\\n28|\\n29|/**\\n30| * Dashboard content loaded after first paint via server actions. The page\\n31| * shell ships immediately; this loads in two waves so the user never waits\\n32| * on AI latency:\\n33| *   - core (chart positions + suggestions) renders as soon as it's ready\\n34| *   - the AI cards (daily / weekly / moon) stream in behind skeletons\\n35| */\\n36|export function DailyDashboard({\\n37|  userId,\\n38|  locale = \\\"ka\\\",\\n39|}: {\\n40|  userId: string;\\n41|  locale?: UserLocale;\\n42|}) {\\n43|  const en = locale !== \\\"ka\\\";\\n44|  const router = useRouter();\\n45|  const [core, setCore] = useState<DashboardCore | null>(null);\\n46|  const [error, setError] = useState<string | null>(null);\\n47|\\n48|  useEffect(() => {\\n49|    let cancelled = false;\\n50|    loadDashboardCore(userId)\\n51|      .then((c) => {\\n52|        if (!cancelled) setCore(c);\\n53|      })\\n54|      .catch((err) => {\\n55|        if (!cancelled) setError((err as Error).message);\\n56|      });\\n57|    return () => {\\n58|      cancelled = true;\\n59|    };\\n60|  }, [userId]);\\n61|\\n62|  useEffect(() => {\\n63|    if (core?.kind === \\\"no-chart\\\") {\\n64|      router.replace(\\\"/onboarding\\\");\\n65|    }\\n66|  }, [core, router]);\\n67|\\n68|  if (error) {\\n69|    return (\\n70|      <div className=\\\"space-y-6\\\">\\n71|        <div className=\\\"rounded-2xl border border-border/60 bg-card/40 p-6 text-center text-sm text-muted-foreground\\\">\\n72|          {en\\n73|            ? \\\"Could not load. Please refresh the page.\\\"\\n74|            : \\\"ვერ ჩაიტვირთა — გთხოვ, გადატვირთო გვერდი.\\\"}\\n75|        </div>\\n76|      </div>\\n77|    );\\n78|  }\\n79|\\n80|  if (!core || core.kind === \\\"no-chart\\\") {\\n81|    return (\\n82|      <div className=\\\"space-y-6\\\">\\n83|        <div className=\\\"flex min-h-[240px] items-center justify-center\\\">\\n84|          <CosmicLoader embedded progressive locale={locale} />\\n85|        </div>\\n86|      </div>\\n87|    );\\n88|  }\\n89|\\n90|  const {\\n91|    chart,\\n92|    canDaily,\\n93|    weeklyUnlocked,\\n94|    balance,\\n95|    isPremium,\\n96|    suggestions,\\n97|    ritualProgress,\\n98|  } = core;\\n99|\\n100|  return (\\n101|    <div className=\\\"space-y-8\\\">\\n102|      {/* AI cards stream in here behind skeletons so the page never blocks\\n103|          on generation latency. */}\\n104|      <DashboardExtrasSection\\n105|        userId={userId}\\n106|        canDaily={canDaily}\\n107|        weeklyUnlocked={weeklyUnlocked}\\n108|        balance={balance}\\n109|        isPremium={isPremium}\\n110|        locale={locale}\\n111|        ritualProgress={ritualProgress}\\n112|      />\\n113|\\n114|      <section>\\n115|        <header className=\\\"mb-3 flex items-baseline justify-between\\\">\\n116|          <h2 className=\\\"text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground\\\">\\n117|            {en ? \\\"Your big three\\\" : \\\"შენი დიდი სამეული\\\"}\\n118|          </h2>\\n119|          <Link\\n120|            href=\\\"/report\\\"\\n121|            className=\\\"text-xs text-muted-foreground transition-colors hover:text-foreground\\\"\\n122|          >\\n123|            {en ? \\\"Full chart →\\\" : \\\"სრული რუკა →\\\"}\\n124|          </Link>\\n125|        </header>\\n126|        <MiniBigThree chart={chart.data} locale={locale} />\\n127|      </section>\\n128|\\n129|      <section className=\\\"rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/10 to-transparent p-6 backdrop-blur-xl\\\">\\n130|        <div className=\\\"flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between\\\">\\n131|          <div>\\n132|            <h3 className=\\\"text-lg font-semibold tracking-tight\\\">\\n133|              {en ? \\\"Your complete natal chart\\\" : \\\"შენი სრული ნატალური რუკა\\\"}\\n134|            </h3>\\n135|            <p className=\\\"mt-1 max-w-md text-sm text-muted-foreground\\\">\\n136|            ...", "duration_ms": 16, "is_error": false, "timestamp": 1791096941146}
+{"type": "tool_result", "name": "read_file", "output": "{\"content\": \"1|\\\"use client\\\";\\n2|\\n3|import { useCallback, useEffect, useMemo, useRef, useState } from \\\"react\\\";\\n4|import Link from \\\"next/link\\\";\\n5|import { Check, Flame, Gift, Loader2 } from \\\"lucide-react\\\";\\n6|\\n7|import { completeDailyRitual } from \\\"@/actions/daily-ritual\\\";\\n8|import { DailyCard } from \\\"@/components/dashboard/daily-card\\\";\\n9|import type { DailyHoroscope } from \\\"@/db/schema\\\";\\n10|import {\\n11|  readDailyRitual,\\n12|  saveDailyRitual,\\n13|  type DailyRitualState,\\n14|} from \\\"@/lib/daily-ritual\\\";\\n15|import { ANALYTICS_EVENT, trackEvent } from \\\"@/lib/analytics\\\";\\n16|import type { UserLocale } from \\\"@/lib/i18n/user-locale\\\";\\n17|import type { StreakProgress } from \\\"@/lib/streak-credits\\\";\\n18|import type { TransitBreakdownItem } from \\\"@/lib/transit-library\\\";\\n19|\\n20|const FALLBACK_FOCUS: Record<UserLocale, string[]> = {\\n21|  ka: [\\\"სიმშვიდე\\\", \\\"გამბედაობა\\\", \\\"ურთიერთობები\\\"],\\n22|  en: [\\\"Calm\\\", \\\"Courage\\\", \\\"Relationships\\\"],\\n23|};\\n24|\\n25|export function DailyRitual({\\n26|  userId,\\n27|  horoscope,\\n28|  transits,\\n29|  initialProgress,\\n30|  locale,\\n31|}: {\\n32|  userId: string;\\n33|  horoscope: DailyHoroscope;\\n34|  transits: TransitBreakdownItem[];\\n35|  initialProgress: StreakProgress;\\n36|  locale: UserLocale;\\n37|}) {\\n38|  const en = locale === \\\"en\\\";\\n39|  const [state, setState] = useState<DailyRitualState>({\\n40|    horoscopeRead: false,\\n41|    focus: null,\\n42|  });\\n43|  const [progress, setProgress] = useState(initialProgress);\\n44|  const [pending, setPending] = useState(false);\\n45|  const [earned, setEarned] = useState(0);\\n46|  const requested = useRef(initialProgress.todayComplete);\\n47|  const focuses = useMemo(() => {\\n48|    const themes = horoscope.themes\\n49|      .map((theme) => theme.trim())\\n50|      .filter(Boolean)\\n51|      .slice(0, 3);\\n52|    return themes.length >= 2 ? themes : FALLBACK_FOCUS[locale];\\n53|  }, [horoscope.themes, locale]);\\n54|\\n55|  useEffect(() => {\\n56|    const timer = window.setTimeout(() => {\\n57|      setState(readDailyRitual(userId, horoscope.date));\\n58|      setProgress(initialProgress);\\n59|      requested.current = initialProgress.todayComplete;\\n60|    }, 0);\\n61|    return () => window.clearTimeout(timer);\\n62|  }, [horoscope.date, initialProgress, userId]);\\n63|\\n64|  const updateState = useCallback(\\n65|    (next: DailyRitualState) => {\\n66|      setState(next);\\n67|      saveDailyRitual(userId, horoscope.date, next);\\n68|    },\\n69|    [horoscope.date, userId],\\n70|  );\\n71|\\n72|  const onRead = useCallback(() => {\\n73|    setState((current) => {\\n74|      if (current.horoscopeRead) return current;\\n75|      const next = { ...current, horoscopeRead: true };\\n76|      saveDailyRitual(userId, horoscope.date, next);\\n77|      return next;\\n78|    });\\n79|  }, [horoscope.date, userId]);\\n80|\\n81|  useEffect(() => {\\n82|    if (!state.horoscopeRead || !state.focus || requested.current) return;\\n83|    requested.current = true;\\n84|    setPending(true);\\n85|    void completeDailyRitual()\\n86|      .then((result) => {\\n87|        setProgress(result.progress);\\n88|        setEarned(result.awardedCredits);\\n89|        trackEvent(ANALYTICS_EVENT.dailyRitualCompleted, {\\n90|          streak: result.progress.current,\\n91|          milestone_credits: result.awardedCredits,\\n92|        });\\n93|      })\\n94|      .catch(() => {\\n95|        requested.current = false;\\n96|      })\\n97|      .finally(() => setPending(false));\\n98|  }, [state.focus, state.horoscopeRead]);\\n99|\\n100|  const completed = progress.todayComplete;\\n101|  const completedSteps =\\n102|    Number(state.horoscopeRead || completed) +\\n103|    Number(Boolean(state.focus) || completed);\\n104|  const progressPercent = completed ? 100 : completedSteps * 50;\\n105|\\n106|  return (\\n107|    <div className=\\\"space-y-3\\\">\\n108|      <DailyCard\\n109|        horoscope={horoscope}\\n110|        transits={transits}\\n111|        onRead={onRead}\\n112|        locale={locale}\\n113|      />\\n114|      <section className=\\\"rounded-2xl border border-[var(--vivida-violet)]/35 bg-card/65 p-4 backdrop-blur-xl sm:p-5\\\">\\n115|        <div className=\\\"flex flex-wrap items-center justify-between gap-3\\\">\\n116|          <div className=\\\"flex items-center gap-2\\\">\\n117|            <Flame className=\\\"size-5 text-[var(--vivida-pink)]\\\" />\\n118|            <div>\\n119|              <h3 className=\\\"text-sm font-semibold\\\">\\n120|                {en ? \\\"Today's small ritual\\\" : \\\"დღის პატარა რიტუალი\\\"}\\n121|              </h3>\\n122|              <p className=\\\"text-xs text-muted-foreground\\\">\\n123|                {progress.current} {en ? \\\"day streak\\\" : \\\"დღიანი სერია\\\"}\\n124|              </p>\\n125|            </div>\\n126|          </div>\\n127|          {progress.next ? (\\n128|            <span className=\\\"inline-flex items-center gap-1 rounded-full border border-border bg-background/50 px-2.5 py-1 text-xs text-muted-foreground\\\">\\n129|              <Gift className=\\\"size-3.5...", "duration_ms": 17, "is_error": false, "timestamp": 1791096941148}
+{"type": "tool_result", "name": "read_file", "output": "{\"content\": \"1|\\\"use client\\\";\\n2|\\n3|import { useEffect, useRef } from \\\"react\\\";\\n4|import { Sparkles } from \\\"lucide-react\\\";\\n5|\\n6|import type { DailyHoroscope } from \\\"@/db/schema\\\";\\n7|import type { TransitBreakdownItem } from \\\"@/lib/transit-library\\\";\\n8|import { kaLongDate } from \\\"@/lib/i18n/ka-date\\\";\\n9|import { BODIES } from \\\"@/lib/zodiac\\\";\\n10|import {\\n11|  ANALYTICS_EVENT,\\n12|  trackEvent,\\n13|  trackFirstResultViewed,\\n14|} from \\\"@/lib/analytics\\\";\\n15|import type { UserLocale } from \\\"@/lib/i18n/user-locale\\\";\\n16|\\n17|const ASPECT_GLYPH: Record<string, string> = {\\n18|  conjunction: \\\"☌\\\",\\n19|  sextile: \\\"⚹\\\",\\n20|  square: \\\"□\\\",\\n21|  trine: \\\"△\\\",\\n22|  opposition: \\\"☍\\\",\\n23|};\\n24|\\n25|const ASPECT_KA: Record<string, string> = {\\n26|  conjunction: \\\"შეერთება\\\",\\n27|  sextile: \\\"სექსტილი\\\",\\n28|  square: \\\"კვადრატი\\\",\\n29|  trine: \\\"ტრინი\\\",\\n30|  opposition: \\\"ოპოზიცია\\\",\\n31|};\\n32|const ASPECT_EN: Record<string, string> = {\\n33|  conjunction: \\\"conjunction\\\",\\n34|  sextile: \\\"sextile\\\",\\n35|  square: \\\"square\\\",\\n36|  trine: \\\"trine\\\",\\n37|  opposition: \\\"opposition\\\",\\n38|};\\n39|\\n40|/** Harmonic aspects get the cyan accent, tense ones pink, neutral violet. */\\n41|const ASPECT_TONE: Record<string, string> = {\\n42|  conjunction: \\\"var(--vivida-violet)\\\",\\n43|  sextile: \\\"var(--vivida-cyan)\\\",\\n44|  trine: \\\"var(--vivida-cyan)\\\",\\n45|  square: \\\"var(--vivida-pink)\\\",\\n46|  opposition: \\\"var(--vivida-pink)\\\",\\n47|};\\n48|\\n49|/**\\n50| * Daily horoscope hero card. Shown above the chart wheel so it's\\n51| * the first thing returning users see — the engagement loop.\\n52| */\\n53|export function DailyCard({\\n54|  horoscope,\\n55|  transits = [],\\n56|  onRead,\\n57|  locale = \\\"ka\\\",\\n58|}: {\\n59|  horoscope: DailyHoroscope;\\n60|  /** Today's strongest transit aspects + their library interpretations. */\\n61|  transits?: TransitBreakdownItem[];\\n62|  onRead?: () => void;\\n63|  locale?: UserLocale;\\n64|}) {\\n65|  const en = locale !== \\\"ka\\\";\\n66|  const readSentinelRef = useRef<HTMLParagraphElement>(null);\\n67|  const readTrackedRef = useRef(false);\\n68|\\n69|  useEffect(() => {\\n70|    readTrackedRef.current = false;\\n71|    trackEvent(ANALYTICS_EVENT.dailyHoroscopeViewed, {\\n72|      date: horoscope.date,\\n73|      has_transits: transits.length > 0 ? 1 : 0,\\n74|    });\\n75|    trackFirstResultViewed({\\n76|      product: \\\"daily_horoscope\\\",\\n77|      surface: \\\"dashboard\\\",\\n78|    });\\n79|\\n80|    const sentinel = readSentinelRef.current;\\n81|    if (!sentinel || typeof IntersectionObserver === \\\"undefined\\\") return;\\n82|    const observer = new IntersectionObserver(\\n83|      (entries) => {\\n84|        if (\\n85|          !entries.some((entry) => entry.isIntersecting) ||\\n86|          readTrackedRef.current\\n87|        )\\n88|          return;\\n89|        readTrackedRef.current = true;\\n90|        trackEvent(ANALYTICS_EVENT.dailyHoroscopeRead, {\\n91|          date: horoscope.date,\\n92|          has_transits: transits.length > 0 ? 1 : 0,\\n93|        });\\n94|        onRead?.();\\n95|        observer.disconnect();\\n96|      },\\n97|      { threshold: 0.6 },\\n98|    );\\n99|    observer.observe(sentinel);\\n100|    return () => observer.disconnect();\\n101|  }, [horoscope.date, onRead, transits.length]);\\n102|\\n103|  // `horoscope.date` is already the user's local date, so it is rendered\\n104|  // verbatim — no timezone shift, and no dependence on the browser shipping\\n105|  // Georgian locale data.\\n106|  const date = en\\n107|    ? new Intl.DateTimeFormat(\\\"en\\\", {\\n108|        day: \\\"numeric\\\",\\n109|        month: \\\"long\\\",\\n110|        year: \\\"numeric\\\",\\n111|        timeZone: \\\"UTC\\\",\\n112|      }).format(new Date(`${horoscope.date}T00:00:00Z`))\\n113|    : kaLongDate(horoscope.date);\\n114|\\n115|  return (\\n116|    <article className=\\\"relative overflow-hidden rounded-2xl border border-[var(--vivida-violet)]/40 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-[var(--vivida-cyan)]/10 p-7 backdrop-blur-xl sm:p-9\\\">\\n117|      <div\\n118|        aria-hidden\\n119|        className=\\\"absolute -right-20 -top-20 size-72 rounded-full bg-[conic-gradient(from_0deg,var(--vivida-violet),var(--vivida-pink),var(--vivida-cyan),var(--vivida-violet))] opacity-25 blur-3xl\\\"\\n120|      />\\n121|      <div\\n122|        aria-hidden\\n123|        className=\\\"absolute -bottom-10 -left-10 size-44 rounded-full bg-[radial-gradient(circle,var(--vivida-cyan)_0%,transparent_70%)] opacity-25 blur-2xl\\\"\\n124|      />\\n125|\\n126|      <header className=\\\"relative flex items-center justify-between gap-4\\\">\\n127|        <div>\\n128|          <div className=\\\"text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground\\\">\\n129|            {en ? \\\"Today\\\" : \\\"დღევანდელი დღე\\\"} · {date}\\n130|          </div>\\n131|          <h2 className=\\\"mt-1 text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-3xl\\\">\\n132|            <span className=\\\"bg-[linear-gradient(120deg,var(--vivida-violet),var(-...", "duration_ms": 16, "is_error": false, "timestamp": 1791096941150}
+{"type": "tool_use", "name": "read_file", "input": {"limit": 150, "offset": 1, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/streak-credits.ts"}, "timestamp": 1791096955125}
+{"type": "tool_use", "name": "read_file", "input": {"limit": 120, "offset": 1, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/streak.ts"}, "timestamp": 1791096955126}
+{"type": "tool_use", "name": "read_file", "input": {"limit": 120, "offset": 1, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge/components/dashboard/pro-daily-brief.tsx"}, "timestamp": 1791096955126}
+{"type": "tool_result", "name": "read_file", "output": "{\"content\": \"1|import { nextRitualMilestone, ritualMilestoneAt } from \\\"@/lib/credit-economy\\\";\\n2|import { grantCreditsOnce } from \\\"@/lib/credits\\\";\\n3|import type { StreakInfo } from \\\"@/lib/streak\\\";\\n4|\\n5|export type StreakProgress = StreakInfo & {\\n6|  next: { days: number; daysLeft: number; credits: number } | null;\\n7|};\\n8|\\n9|export function toStreakProgress(streak: StreakInfo): StreakProgress {\\n10|  const next = nextRitualMilestone(streak.current);\\n11|  return {\\n12|    ...streak,\\n13|    next: next\\n14|      ? { days: next.days, daysLeft: Math.max(0, next.days - streak.current), credits: next.credits }\\n15|      : null,\\n16|  };\\n17|}\\n18|\\n19|export async function awardRitualMilestone(userId: string, streak: number): Promise<number> {\\n20|  const milestone = ritualMilestoneAt(streak);\\n21|  if (!milestone) return 0;\\n22|  const granted = await grantCreditsOnce(\\n23|    userId,\\n24|    milestone.credits,\\n25|    \\\"streak_bonus\\\",\\n26|    `ritual-milestone:${milestone.days}`,\\n27|  );\\n28|  return granted ? milestone.credits : 0;\\n29|}\", \"total_lines\": 29, \"file_size\": 939, \"truncated\": false, \"is_binary\": false, \"is_image\": false, \"not_found\": false}", "duration_ms": 9, "is_error": false, "timestamp": 1791096955134}
+{"type": "tool_result", "name": "read_file", "output": "{\"content\": \"1|export type StreakInfo = {\\n2|  current: number;\\n3|  longest: number;\\n4|  todayComplete: boolean;\\n5|};\\n6|\\n7|export function shiftDate(date: string, delta: number): string {\\n8|  const [year, month, day] = date.split(\\\"-\\\").map(Number);\\n9|  return new Date(Date.UTC(year, month - 1, day) + delta * 86_400_000)\\n10|    .toISOString()\\n11|    .slice(0, 10);\\n12|}\\n13|\\n14|export function calculateStreak(\\n15|  completedDates: Iterable<string>,\\n16|  today: string,\\n17|): StreakInfo {\\n18|  const days = new Set(completedDates);\\n19|  const todayComplete = days.has(today);\\n20|  const start = todayComplete ? today : shiftDate(today, -1);\\n21|\\n22|  let current = 0;\\n23|  for (let cursor = start; days.has(cursor); cursor = shiftDate(cursor, -1)) current += 1;\\n24|\\n25|  let longest = 0;\\n26|  let run = 0;\\n27|  let previous: string | null = null;\\n28|  for (const day of [...days].sort()) {\\n29|    run = previous !== null && shiftDate(previous, 1) === day ? run + 1 : 1;\\n30|    longest = Math.max(longest, run);\\n31|    previous = day;\\n32|  }\\n33|  return { current, longest, todayComplete };\\n34|}\", \"total_lines\": 34, \"file_size\": 986, \"truncated\": false, \"is_binary\": false, \"is_image\": false, \"not_found\": false}", "duration_ms": 8, "is_error": false, "timestamp": 1791096955135}
+{"type": "tool_result", "name": "read_file", "output": "{\"content\": \"1|\\\"use client\\\";\\n2|\\n3|import { useEffect, useState } from \\\"react\\\";\\n4|import Link from \\\"next/link\\\";\\n5|import { Check, Crown, Lock, Sparkles } from \\\"lucide-react\\\";\\n6|\\n7|import { Button } from \\\"@/components/ui/button\\\";\\n8|import { dayScoreBand, proDayScore } from \\\"@/lib/pro-day-score\\\";\\n9|import {\\n10|  proRitualQuestion,\\n11|  readProRitualAnswer,\\n12|  saveProRitualAnswer,\\n13|} from \\\"@/lib/pro-ritual-questions\\\";\\n14|import type { TransitBreakdownItem } from \\\"@/lib/transit-library\\\";\\n15|import { BODIES } from \\\"@/lib/zodiac\\\";\\n16|import { ANALYTICS_EVENT, trackEvent } from \\\"@/lib/analytics\\\";\\n17|import { kaLongDate } from \\\"@/lib/i18n/ka-date\\\";\\n18|import type { UserLocale } from \\\"@/lib/i18n/user-locale\\\";\\n19|\\n20|const ASPECT_GLYPH: Record<string, string> = {\\n21|  conjunction: \\\"☌\\\",\\n22|  sextile: \\\"⚹\\\",\\n23|  square: \\\"□\\\",\\n24|  trine: \\\"△\\\",\\n25|  opposition: \\\"☍\\\",\\n26|};\\n27|\\n28|const ASPECT_KA: Record<string, string> = {\\n29|  conjunction: \\\"შეერთება\\\",\\n30|  sextile: \\\"სექსტილი\\\",\\n31|  square: \\\"კვადრატი\\\",\\n32|  trine: \\\"ტრინი\\\",\\n33|  opposition: \\\"ოპოზიცია\\\",\\n34|};\\n35|const ASPECT_EN: Record<string, string> = {\\n36|  conjunction: \\\"conjunction\\\",\\n37|  sextile: \\\"sextile\\\",\\n38|  square: \\\"square\\\",\\n39|  trine: \\\"trine\\\",\\n40|  opposition: \\\"opposition\\\",\\n41|};\\n42|\\n43|/** Harmonic aspects get the cyan accent, tense ones pink, neutral violet. */\\n44|const ASPECT_TONE: Record<string, string> = {\\n45|  conjunction: \\\"var(--vivida-violet)\\\",\\n46|  sextile: \\\"var(--vivida-cyan)\\\",\\n47|  trine: \\\"var(--vivida-cyan)\\\",\\n48|  square: \\\"var(--vivida-pink)\\\",\\n49|  opposition: \\\"var(--vivida-pink)\\\",\\n50|};\\n51|\\n52|/** One-line teaser of a transit interpretation, cut at a word boundary. */\\n53|function oneLiner(body: string, limit = 150): string {\\n54|  const flat = body.replace(/\\\\s+/g, \\\" \\\").trim();\\n55|  if (flat.length <= limit) return flat;\\n56|  const cut = flat.lastIndexOf(\\\" \\\", limit);\\n57|  return `${flat.slice(0, cut > 40 ? cut : limit).trim()}…`;\\n58|}\\n59|\\n60|/**\\n61| * The PRO daily layer — the first card on the dashboard. Everything is\\n62| * composed from data the dashboard already loads (today's overlaid\\n63| * transits) plus static copy: zero AI calls, zero extra queries.\\n64| *\\n65| * Planet names render as text chips, never glyphs: several astrological\\n66| * codepoints fall back to tofu boxes on real devices, which kills the\\n67| * premium feel instantly.\\n68| *\\n69| * Non-PRO users see the same day score (the tease) with the transit\\n70| * one-liners and the ritual question locked behind a PRO CTA.\\n71| */\\n72|export function ProDailyBrief({\\n73|  userId,\\n74|  dateIso,\\n75|  transits = [],\\n76|  isPremium,\\n77|  locale = \\\"ka\\\",\\n78|}: {\\n79|  userId: string;\\n80|  dateIso: string;\\n81|  transits?: TransitBreakdownItem[];\\n82|  isPremium: boolean;\\n83|  locale?: UserLocale;\\n84|}) {\\n85|  const en = locale !== \\\"ka\\\";\\n86|  const { score } = proDayScore(transits.map((t) => t.kind));\\n87|  const band = dayScoreBand(score, locale);\\n88|  const question = proRitualQuestion(dateIso, locale);\\n89|  const top = transits.slice(0, 3);\\n90|  const date = en\\n91|    ? new Intl.DateTimeFormat(\\\"en\\\", {\\n92|        day: \\\"numeric\\\",\\n93|        month: \\\"long\\\",\\n94|        timeZone: \\\"UTC\\\",\\n95|      }).format(new Date(`${dateIso}T00:00:00Z`))\\n96|    : kaLongDate(dateIso);\\n97|\\n98|  const [answer, setAnswer] = useState(\\\"\\\");\\n99|  const [saved, setSaved] = useState(false);\\n100|  const [mounted, setMounted] = useState(false);\\n101|\\n102|  useEffect(() => {\\n103|    const timer = window.setTimeout(() => {\\n104|      const stored = readProRitualAnswer(userId, dateIso);\\n105|      setAnswer(stored);\\n106|      setSaved(stored.trim().length > 0);\\n107|    }, 0);\\n108|    return () => window.clearTimeout(timer);\\n109|  }, [userId, dateIso]);\\n110|\\n111|  useEffect(() => {\\n112|    const timer = window.setTimeout(() => setMounted(true), 60);\\n113|    return () => window.clearTimeout(timer);\\n114|  }, []);\\n115|\\n116|  useEffect(() => {\\n117|    trackEvent(ANALYTICS_EVENT.proBriefViewed, {\\n118|      premium: isPremium ? 1 : 0,\\n119|      score,\\n120|    });\", \"total_lines\": 384, \"file_size\": 14050, \"truncated\": true, \"hint\": \"Use offset=121 to continue reading (showing 1-120 of 384 lines)\", \"is_binary\": false, \"is_image\": false, \"not_found\": false}", "duration_ms": 9, "is_error": false, "timestamp": 1791096955137}
+{"type": "tool_use", "name": "terminal", "input": {"command": "echo \"=== push-opt-in ===\"; sed -n '1,120p' components/push/push-opt-in.tsx; echo \"=== reminders action head ===\"; sed -n '1,80p' actions/reminders.ts; echo \"=== library page ===\"; ls app/library/; sed -n '1,60p' app/library/page.tsx 2>/dev/null | head -80", "workdir": "/Users/giviendeladze/Projects/vivida/vivida.ge"}, "timestamp": 1791096955138}
+{"type": "tool_result", "name": "terminal", "output": "{\"output\": \"=== push-opt-in ===\\n\\\"use client\\\";\\n\\nimport { useEffect, useRef, useState } from \\\"react\\\";\\nimport { Bell, BellOff, Check, Loader2, X } from \\\"lucide-react\\\";\\n\\nimport { Button } from \\\"@/components/ui/button\\\";\\nimport type { UserLocale } from \\\"@/lib/i18n/user-locale\\\";\\nimport { ANALYTICS_EVENT, trackEvent } from \\\"@/lib/analytics\\\";\\n\\nconst VAPID = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;\\nconst DISMISS_KEY = \\\"vivida_push_prompt_dismissed\\\";\\n\\n/** VAPID public key (base64url) → Uint8Array for pushManager.subscribe. */\\nfunction urlBase64ToUint8Array(base64: string): Uint8Array {\\n  const padding = \\\"=\\\".repeat((4 - (base64.length % 4)) % 4);\\n  const normalized = (base64 + padding).replace(/-/g, \\\"+\\\").replace(/_/g, \\\"/\\\");\\n  const raw = atob(normalized);\\n  const arr = new Uint8Array(raw.length);\\n  for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);\\n  return arr;\\n}\\n\\ntype State =\\n  | \\\"loading\\\"\\n  | \\\"unsupported\\\"\\n  | \\\"unconfigured\\\"\\n  | \\\"denied\\\"\\n  | \\\"off\\\"\\n  | \\\"on\\\"\\n  | \\\"working\\\";\\n\\nconst isIOS =\\n  typeof navigator !== \\\"undefined\\\" &&\\n  /iphone|ipad|ipod/i.test(navigator.userAgent);\\n\\n/**\\n * Web-push opt-in. `card` = a settings block (Account); `banner` = a compact\\n * dismissible dashboard prompt shown only when notifications aren't enabled.\\n */\\nexport function PushOptIn({\\n  variant = \\\"card\\\",\\n  locale = \\\"ka\\\",\\n}: {\\n  variant?: \\\"card\\\" | \\\"banner\\\";\\n  locale?: UserLocale;\\n}) {\\n  const en = locale !== \\\"ka\\\";\\n  const [state, setState] = useState<State>(\\\"loading\\\");\\n  const [error, setError] = useState<string | null>(null);\\n  const [dismissed, setDismissed] = useState(false);\\n  const promptTracked = useRef(false);\\n\\n  useEffect(() => {\\n    let cancelled = false;\\n    (async () => {\\n      try {\\n        if (typeof window !== \\\"undefined\\\") {\\n          setDismissed(localStorage.getItem(DISMISS_KEY) === \\\"1\\\");\\n        }\\n      } catch {\\n        /* ignore */\\n      }\\n      const browserOk =\\n        typeof window !== \\\"undefined\\\" &&\\n        \\\"serviceWorker\\\" in navigator &&\\n        \\\"PushManager\\\" in window &&\\n        \\\"Notification\\\" in window;\\n      if (!browserOk) {\\n        if (!cancelled) setState(\\\"unsupported\\\");\\n        return;\\n      }\\n      // Browser can do push, but our public key isn't in the bundle (env not\\n      // set at build time) — a config/deploy issue, not the user's browser.\\n      if (!VAPID) {\\n        if (!cancelled) setState(\\\"unconfigured\\\");\\n        return;\\n      }\\n      if (Notification.permission === \\\"denied\\\") {\\n        if (!cancelled) setState(\\\"denied\\\");\\n        return;\\n      }\\n      try {\\n        const reg = await navigator.serviceWorker.getRegistration();\\n        const sub = reg ? await reg.pushManager.getSubscription() : null;\\n        if (!cancelled) setState(sub ? \\\"on\\\" : \\\"off\\\");\\n      } catch {\\n        if (!cancelled) setState(\\\"off\\\");\\n      }\\n    })();\\n    return () => {\\n      cancelled = true;\\n    };\\n  }, []);\\n\\n  useEffect(() => {\\n    if (\\n      variant === \\\"banner\\\" &&\\n      state === \\\"off\\\" &&\\n      !dismissed &&\\n      !promptTracked.current\\n    ) {\\n      promptTracked.current = true;\\n      trackEvent(ANALYTICS_EVENT.pushPromptViewed, { surface: variant });\\n    }\\n  }, [dismissed, state, variant]);\\n\\n  async function enable() {\\n    setError(null);\\n    setState(\\\"working\\\");\\n    try {\\n      const perm = await Notification.requestPermission();\\n      if (perm !== \\\"granted\\\") {\\n        if (perm === \\\"denied\\\") {\\n          trackEvent(ANALYTICS_EVENT.pushPermissionDenied, {\\n            surface: variant,\\n          });\\n        }\\n        setState(perm === \\\"denied\\\" ? \\\"denied\\\" : \\\"off\\\");\\n        return;\\n      }\\n=== reminders action head ===\\n\\\"use server\\\";\\n\\nimport { revalidatePath } from \\\"next/cache\\\";\\n\\nimport { requireUser } from \\\"@/lib/auth-helpers\\\";\\nimport type { ReminderPreferences } from \\\"@/lib/reminder-config\\\";\\nimport {\\n  regenerateReminderCalendarToken,\\n  saveReminderPreferences,\\n} from \\\"@/lib/reminder-settings\\\";\\n\\nexport async function updateReminderPreferences(values: ReminderPreferences) {\\n  const user = await requireUser();\\n  const result = await saveReminderPreferences(user.id, values);\\n  revalidatePath(\\\"/account\\\");\\n  return result;\\n}\\n\\nexport async function regenerateReminderCalendar() {\\n  const user = await requireUser();\\n  const calendarToken = await regenerateReminderCalendarToken(user.id);\\n  revalidatePath(\\\"/account\\\");\\n  return { calendarToken };\\n}\\n=== library page ===\\n[id]\\npage.tsx\\nimport type { Metadata } from \\\"next\\\";\\nimport Link from \\\"next/link\\\";\\nimport {\\n  BookOpen,\\n  ChevronLeft,\\n  ChevronRight,\\n  Search,\\n  Star,\\n} from \\\"lucide-react\\\";\\n\\nimport { requireUser } from \\\"@/lib/auth-helpers\\\";\\nimport { getRequestLocale } from \\\"@/lib/i18n/request-locale\\\";\\nimport { getUserLocale } from \\\"@/lib/i18n/user-locale\\\";\\nimport { listLibraryEntries, type LibraryFil...", "duration_ms": 66, "is_error": false, "timestamp": 1791096955207}
+{"type": "tool_use", "name": "terminal", "input": {"command": "echo \"=== credit-economy milestones ===\"; grep -n \"ritualMilestone\\|RITUAL_MILESTONE\\|nextRitual\" lib/credit-economy.ts | head -20; echo \"=== reminder-config ===\"; sed -n '1,100p' lib/reminder-config.ts; echo \"=== popular tools ===\"; sed -n '1,80p' components/nav/popular-tools.tsx; echo \"=== social-share doc ===\"; head -60 docs/social-share-credits.md", "workdir": "/Users/giviendeladze/Projects/vivida/vivida.ge"}, "timestamp": 1791096960178}
+{"type": "tool_result", "name": "terminal", "output": "{\"output\": \"=== credit-economy milestones ===\\n15:export function nextRitualMilestone(streak: number): RitualMilestone | null {\\n19:export function ritualMilestoneAt(streak: number): RitualMilestone | null {\\n=== reminder-config ===\\nexport type TransitCadence = \\\"daily\\\" | \\\"weekly\\\";\\n\\nexport type ReminderPreferences = {\\n  transitPush: boolean;\\n  transitEmail: boolean;\\n  transitCadence: TransitCadence;\\n  forecastPush: boolean;\\n  forecastEmail: boolean;\\n  relationshipPush: boolean;\\n  relationshipEmail: boolean;\\n  localHour: number;\\n  weeklyDay: number;\\n  calendarEnabled: boolean;\\n};\\n\\nexport const DEFAULT_REMINDER_PREFERENCES: ReminderPreferences = {\\n  transitPush: false,\\n  transitEmail: false,\\n  transitCadence: \\\"weekly\\\",\\n  forecastPush: false,\\n  forecastEmail: false,\\n  // Preserve the existing per-partner push behavior once a settings row exists.\\n  relationshipPush: true,\\n  relationshipEmail: false,\\n  localHour: 9,\\n  weeklyDay: 1,\\n  calendarEnabled: false,\\n};\\n\\nconst WEEKDAY_INDEX: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };\\n\\nexport function localScheduleParts(now: Date, timezone: string): { hour: number; weekday: number; date: string } {\\n  try {\\n    const dateParts = new Intl.DateTimeFormat(\\\"en-CA\\\", {\\n      timeZone: timezone,\\n      year: \\\"numeric\\\",\\n      month: \\\"2-digit\\\",\\n      day: \\\"2-digit\\\",\\n    }).formatToParts(now);\\n    const get = (type: string) => dateParts.find((part) => part.type === type)?.value ?? \\\"\\\";\\n    const parts = new Intl.DateTimeFormat(\\\"en-US\\\", {\\n      timeZone: timezone,\\n      hour: \\\"2-digit\\\",\\n      hourCycle: \\\"h23\\\",\\n      weekday: \\\"short\\\",\\n    }).formatToParts(now);\\n    return {\\n      hour: Number(parts.find((part) => part.type === \\\"hour\\\")?.value ?? -1),\\n      weekday: WEEKDAY_INDEX[parts.find((part) => part.type === \\\"weekday\\\")?.value ?? \\\"\\\"] ?? -1,\\n      date: `${get(\\\"year\\\")}-${get(\\\"month\\\")}-${get(\\\"day\\\")}`,\\n    };\\n  } catch {\\n    return { hour: now.getUTCHours(), weekday: now.getUTCDay(), date: now.toISOString().slice(0, 10) };\\n  }\\n}\\n\\nexport function normalizeReminderPreferences(input: Partial<ReminderPreferences>): ReminderPreferences {\\n  const hour = Number.isInteger(input.localHour) ? Number(input.localHour) : 9;\\n  const weekday = Number.isInteger(input.weeklyDay) ? Number(input.weeklyDay) : 1;\\n  return {\\n    transitPush: Boolean(input.transitPush),\\n    transitEmail: Boolean(input.transitEmail),\\n    transitCadence: input.transitCadence === \\\"daily\\\" ? \\\"daily\\\" : \\\"weekly\\\",\\n    forecastPush: Boolean(input.forecastPush),\\n    forecastEmail: Boolean(input.forecastEmail),\\n    relationshipPush: Boolean(input.relationshipPush),\\n    relationshipEmail: Boolean(input.relationshipEmail),\\n    localHour: Math.max(0, Math.min(23, hour)),\\n    weeklyDay: Math.max(0, Math.min(6, weekday)),\\n    calendarEnabled: Boolean(input.calendarEnabled),\\n  };\\n}\\n=== popular tools ===\\nimport { ArrowRight, Stars, Wand2 } from \\\"lucide-react\\\";\\n\\nimport { TrackedPublicLink } from \\\"@/components/seo/tracked-public-link\\\";\\nimport type { UserLocale } from \\\"@/lib/i18n/user-locale\\\";\\nimport { localizedHref } from \\\"@/lib/seo/public-paths\\\";\\n\\nexport function PopularTools({\\n  locale = \\\"ka\\\",\\n  placement,\\n  publicEntry = false,\\n}: {\\n  locale?: UserLocale;\\n  placement: string;\\n  publicEntry?: boolean;\\n}) {\\n  const en = locale === \\\"en\\\";\\n\\n  return (\\n    <nav\\n      aria-label={en ? \\\"Most used\\\" : \\\"ყველაზე გამოყენებადი\\\"}\\n      className=\\\"grid gap-3 sm:grid-cols-2\\\"\\n    >\\n      <TrackedPublicLink\\n        href={localizedHref(\\\"/taro\\\", locale)}\\n        event=\\\"next\\\"\\n        target=\\\"/taro\\\"\\n        feature=\\\"popular_tools\\\"\\n        surface={placement}\\n        locale={locale}\\n        className=\\\"group relative overflow-hidden rounded-2xl border border-[var(--vivida-violet)]/30 bg-gradient-to-br from-[var(--vivida-violet)]/15 via-card/60 to-card/60 p-4 ring-1 ring-foreground/5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-[var(--vivida-violet)]/50 hover:shadow-[0_12px_40px_-16px_var(--vivida-violet)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--vivida-violet)]\\\"\\n      >\\n        <div\\n          aria-hidden\\n          className=\\\"pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--vivida-violet),transparent)]\\\"\\n        />\\n        <div className=\\\"flex items-center gap-3\\\">\\n          <span className=\\\"grid size-11 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,var(--vivida-violet),var(--vivida-pink))] text-white shadow-md shadow-[var(--vivida-violet)]/30\\\">\\n            <Wand2 aria-hidden=\\\"true\\\" className=\\\"size-5\\\" />\\n          </span>\\n          <span className=\\\"min-w-0 flex-1\\\">\\n            <span className=\\\"block text-[15px] font-semibold tracking-tight\\\">\\n              {en ? \\\"Tarot reading\\\" : \\\"ტარო\\\"}\\n            </s...", "duration_ms": 68, "is_error": false, "timestamp": 1791096960247}
+{"type": "tool_use", "name": "terminal", "input": {"command": "sed -n '1,40p' lib/credit-economy.ts; echo \"=== horoskopi public ===\"; ls app/horoskopi/ 2>/dev/null; echo \"=== weekly recap search ===\"; grep -rn \"weekly_recap\\|weekly-recap\\|kvira\" lib/analytics.ts | head; grep -n \"dailyRitual\\|daily_ritual\\|dailyFocus\\|dailyHoroscope\\|proBrief\\|pushPrompt\\|reminder\" lib/analytics.ts | head -30; echo \"=== pro-ritual-questions ===\"; sed -n '1,50p' lib/pro-ritual-questions.ts 2>/dev/null | head -60", "workdir": "/Users/giviendeladze/Projects/vivida/vivida.ge"}, "timestamp": 1791096966019}
+{"type": "tool_result", "name": "terminal", "output": "{\"output\": \"import { RITUAL_STREAK_MILESTONES } from \\\"@/lib/credits-config\\\";\\n\\nexport type RitualMilestone = (typeof RITUAL_STREAK_MILESTONES)[number];\\n\\n/** Monday-based UTC week key, stable across retries and server regions. */\\nexport function rewardWeekKey(now = new Date()): string {\\n  const day = now.getUTCDay();\\n  const mondayOffset = day === 0 ? -6 : 1 - day;\\n  const monday = new Date(\\n    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + mondayOffset),\\n  );\\n  return monday.toISOString().slice(0, 10);\\n}\\n\\nexport function nextRitualMilestone(streak: number): RitualMilestone | null {\\n  return RITUAL_STREAK_MILESTONES.find((milestone) => milestone.days > streak) ?? null;\\n}\\n\\nexport function ritualMilestoneAt(streak: number): RitualMilestone | null {\\n  return RITUAL_STREAK_MILESTONES.find((milestone) => milestone.days === streak) ?? null;\\n}\\n\\nexport function maxLifetimeRitualReward(): number {\\n  return RITUAL_STREAK_MILESTONES.reduce((sum, milestone) => sum + milestone.credits, 0);\\n}\\n=== horoskopi public ===\\nkvireuli\\npage.tsx\\ntviuri\\n=== weekly recap search ===\\n44:  dailyHoroscopeViewed: \\\"daily_horoscope_viewed\\\",\\n45:  dailyHoroscopeRead: \\\"daily_horoscope_read\\\",\\n46:  dailyFocusSelected: \\\"daily_focus_selected\\\",\\n47:  dailyRitualCompleted: \\\"daily_ritual_completed\\\",\\n48:  pushPromptViewed: \\\"push_prompt_viewed\\\",\\n101:  proBriefViewed: \\\"pro_brief_viewed\\\",\\n102:  proBriefAnswered: \\\"pro_brief_answered\\\",\\n123:  ANALYTICS_EVENT.dailyHoroscopeRead,\\n124:  ANALYTICS_EVENT.dailyRitualCompleted,\\n=== pro-ritual-questions ===\\nimport type { UserLocale } from \\\"./i18n/user-locale\\\";\\n\\n/**\\n * PRO-only daily reflection question. A static fortnightly rotation —\\n * original copy, no AI, no DB, no cost. Deterministic per calendar date so\\n * every PRO user reflects on the same question each day (shared ritual\\n * feel), and answers stay in the browser like the static-test pattern.\\n */\\n\\nconst QUESTIONS_KA: readonly string[] = [\\n  \\\"დღეს რა ერთი რამ შეგიძლია გაუშვა, რაც უკვე აღარ გჭირდება?\\\",\\n  \\\"რა გაღიმებს დღეს, თუნდაც სულ ცოტათი?\\\",\\n  \\\"ვის მიმართ მადლიერებას გრძნობ დღეს და რატომ?\\\",\\n  \\\"რა ერთი პატარა ნაბიჯი მიგიყვანს დღეს შენს მიზანთან უფრო ახლოს?\\\",\\n  \\\"როდის იგრძენი ბოლოს, რომ ნამდვილად საკუთარი თავი იყავი?\\\",\\n  \\\"რის გეშინია დღეს — და რას გეტყოდა ეს შიში, ხმამაღლა რომ ეთქვა?\\\",\\n  \\\"რა გჭირდება დღეს მოსასმენად — სხვისგან თუ საკუთარი თავისგან?\\\",\\n  \\\"რომელი შენი თვისებით ამაყობ ყველაზე მეტად ამ კვირაში?\\\",\\n  \\\"დღეს ვის შეგიძლია ერთი კეთილი სიტყვით დღე გაუნათო?\\\",\\n  \\\"რა გააკეთე ბოლოს პირველად და რას გასწავლა?\\\",\\n  \\\"შენი სხეული რას გეუბნება დღეს — უსმენ მას?\\\",\\n  \\\"რაზე ოცნებობდი ბავშვობაში, რაც დღესაც გაღელვებს?\\\",\\n  \\\"რა ერთი რამ გაამარტივებდა შენს დღეს ახლავე?\\\",\\n  \\\"საღამოს დღეს რომ შეაჯამებ, რა გინდა რომ გახსოვდეს?\\\",\\n];\\n\\nconst QUESTIONS_EN: readonly string[] = [\\n  \\\"What's one thing you can let go of today that you no longer need?\\\",\\n  \\\"What's making you smile today, even just a little?\\\",\\n  \\\"Who are you grateful for today, and why?\\\",\\n  \\\"What's one small step that would move you closer to your goal today?\\\",\\n  \\\"When did you last feel fully yourself?\\\",\\n  \\\"What are you afraid of today — and what would that fear say out loud?\\\",\\n  \\\"What do you need to hear today, from someone else or yourself?\\\",\\n  \\\"Which of your qualities are you proudest of this week?\\\",\\n  \\\"Whose day could you brighten with one kind word today?\\\",\\n  \\\"When did you last do something for the first time, and what did it teach you?\\\",\\n  \\\"What is your body telling you today — are you listening?\\\",\\n  \\\"What did you dream of as a child that still excites you?\\\",\\n  \\\"What one thing would simplify your day right now?\\\",\\n  \\\"When you look back on today tonight, what do you want to remember?\\\",\\n];\\n\\nexport const PRO_RITUAL_QUESTION_COUNT = QUESTIONS_KA.length;\\n\\n/** Day-of-year rotation over the local calendar date (`YYYY-MM-DD`). */\\nexport function proRitualQuestion(\\n  dateIso: string,\\n  locale: UserLocale = \\\"ka\\\",\\n): string {\", \"exit_code\": 0, \"error\": null}", "duration_ms": 70, "is_error": false, "timestamp": 1791096966091}
+{"type": "tool_use", "name": "terminal", "input": {"command": "grep -n \"RITUAL_STREAK_MILESTONES\\|CREDIT_COST\\s*=\\|tarot\\|weekly\\|SIGNUP\\|MONTHLY\\|REFERRAL\" lib/credits-config.ts | head -25", "workdir": "/Users/giviendeladze/Projects/vivida/vivida.ge"}, "timestamp": 1791097005686}
+{"type": "tool_result", "name": "terminal", "output": "{\"output\": \"12:export const SIGNUP_BONUS = 20;\\n14:export const STAGED_SIGNUP_BONUS = 10;\\n17:export const REFERRAL_REWARD = 10;\\n19:export const MONTHLY_BONUS = 5;\\n40:  /** One small weekly reward keeps the feed loop alive without replacing purchases. */\\n53:export const RITUAL_STREAK_MILESTONES = [\\n60:export const CREDIT_COST = {\\n70:  weeklyForecast: 10,\\n71:  tarot: 10,\\n72:  /** A follow-up question on an already-drawn tarot spread. */\\n73:  tarotFollowup: 5,\\n82:  /** Lifetime free tarot readings before each costs credits. */\\n83:  tarot: 1,\\n108:  | \\\"spend_weekly\\\"\\n109:  | \\\"spend_tarot\\\"\\n110:  | \\\"spend_tarot_followup\\\"\\n141:  spend_weekly: \\\"7-დღიანი პროგნოზი\\\",\\n142:  spend_tarot: \\\"ტარო კითხვა\\\",\\n143:  spend_tarot_followup: \\\"ტაროს დაზუსტება\\\",\\n170:  spend_weekly: \\\"7-day forecast\\\",\\n171:  spend_tarot: \\\"Tarot reading\\\",\\n172:  spend_tarot_followup: \\\"Tarot follow-up\\\",\", \"exit_code\": 0, \"error\": null}", "duration_ms": 47, "is_error": false, "timestamp": 1791097005734}
+{"type": "tool_use", "name": "read_file", "input": {"limit": 30, "offset": 53, "path": "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/credits-config.ts"}, "timestamp": 1791097007768}
+{"type": "tool_result", "name": "read_file", "output": "{\"content\": \"53|export const RITUAL_STREAK_MILESTONES = [\\n54|  { days: 7, credits: 1 },\\n55|  { days: 30, credits: 2 },\\n56|  { days: 100, credits: 5 },\\n57|] as const;\\n58|\\n59|/** What each gated action costs (beyond its free allowance). */\\n60|export const CREDIT_COST = {\\n61|  synastry: 5,\\n62|  chat: 2,\\n63|  /** One AI dream interpretation. No free allowance — every reading costs. */\\n64|  dream: 2,\\n65|  mbtiTest: 5,\\n66|  iqTest: 5,\\n67|  eqTest: 5,\\n68|  bigFiveTest: 5,\\n69|  pdfReport: 5,\\n70|  weeklyForecast: 10,\\n71|  tarot: 10,\\n72|  /** A follow-up question on an already-drawn tarot spread. */\\n73|  tarotFollowup: 5,\\n74|} as const;\\n75|\\n76|/** Free before credits are needed. */\\n77|export const FREE_ALLOWANCE = {\\n78|  /** Lifetime free compatibility charts. */\\n79|  synastry: 1,\\n80|  /** Free AI-chat messages per day. */\\n81|  chatPerDay: 2,\\n82|  /** Lifetime free tarot readings before each costs credits. */\", \"total_lines\": 175, \"file_size\": 6163, \"truncated\": true, \"hint\": \"Use offset=83 to continue reading (showing 53-82 of 175 lines)\", \"is_binary\": false, \"is_image\": false, \"not_found\": false}", "duration_ms": 3, "is_error": false, "timestamp": 1791097007773}
+{"type": "text", "text": "\n\nDA", "timestamp": 1791097015865}
+{"type": "text", "text": "ILY VALUE / RETENTION აუ", "timestamp": 1791097015866}
+{"type": "text", "text": "დიტი", "timestamp": 1791097015866}
+{"type": "text", "text": " — Vivida.ge (ქართული", "timestamp": 1791097015867}
+{"type": "text", "text": " მომხმარებელი", "timestamp": 1791097015867}
+{"type": "text", "text": ")\n\nშ", "timestamp": 1791097015885}
+{"type": "text", "text": "ემო", "timestamp": 1791097015956}
+{"type": "text", "text": "წმდა", "timestamp": 1791097016023}
+{"type": "text", "text": " 10", "timestamp": 1791097016093}
+{"type": "text", "text": "-ზე", "timestamp": 1791097016164}
+{"type": "text", "text": " მეტ", "timestamp": 1791097016234}
+{"type": "text", "text": "ი წყ", "timestamp": 1791097016299}
+{"type": "text", "text": "არ", "timestamp": 1791097016374}
+{"type": "text", "text": "ო ფ", "timestamp": 1791097016435}
+{"type": "text", "text": "აილი;", "timestamp": 1791097016504}
+{"type": "text", "text": " ქვ", "timestamp": 1791097016578}
+{"type": "text", "text": "ემ", "timestamp": 1791097016643}
+{"type": "text", "text": "ოთ „", "timestamp": 1791097016713}
+{"type": "text", "text": "დადას", "timestamp": 1791097016781}
+{"type": "text", "text": "ტურ", "timestamp": 1791097016850}
+{"type": "text", "text": "ებული", "timestamp": 1791097016920}
+{"type": "text", "text": "\"", "timestamp": 1791097016987}
+{"type": "text", "text": " ნიშნავს კოდ", "timestamp": 1791097017057}
+{"type": "text", "text": "ში ნ", "timestamp": 1791097017127}
+{"type": "text", "text": "ან", "timestamp": 1791097017195}
+{"type": "text", "text": "ახს", "timestamp": 1791097017270}
+{"type": "text", "text": " ც", "timestamp": 1791097017339}
+{"type": "text", "text": "იტატ", "timestamp": 1791097017403}
+{"type": "text", "text": "ით, „ჰ", "timestamp": 1791097017470}
+{"type": "text", "text": "იპოთ", "timestamp": 1791097017539}
+{"type": "text", "text": "ეზა", "timestamp": 1791097017609}
+{"type": "text", "text": "\" — დას", "timestamp": 1791097017678}
+{"type": "text", "text": "კვნ", "timestamp": 1791097017749}
+{"type": "text", "text": "ას", "timestamp": 1791097017818}
+{"type": "text", "text": " გაზ", "timestamp": 1791097017885}
+{"type": "text", "text": "ომ", "timestamp": 1791097017959}
+{"type": "text", "text": "ვის", "timestamp": 1791097018021}
+{"type": "text", "text": " გარეშე,", "timestamp": 1791097018093}
+{"type": "text", "text": " „შ", "timestamp": 1791097018159}
+{"type": "text", "text": "ეს", "timestamp": 1791097018229}
+{"type": "text", "text": "ას", "timestamp": 1791097018299}
+{"type": "text", "text": "რულებელი", "timestamp": 1791097018385}
+{"type": "text", "text": "\" — წინ", "timestamp": 1791097018436}
+{"type": "text", "text": "ად", "timestamp": 1791097018506}
+{"type": "text", "text": "ად", "timestamp": 1791097018572}
+{"type": "text", "text": "ებას.\n\n1", "timestamp": 1791097018641}
+{"type": "text", "text": ". დადასტურებული მიმდ", "timestamp": 1791097018709}
+{"type": "text", "text": "ინარე მდგომ", "timestamp": 1791097018776}
+{"type": "text", "text": "არეობა", "timestamp": 1791097018845}
+{"type": "text", "text": "\n\nდეშბორდ", "timestamp": 1791097018913}
+{"type": "text", "text": "ის რიგ", "timestamp": 1791097018983}
+{"type": "text", "text": "ი დღ", "timestamp": 1791097019052}
+{"type": "text", "text": "ეს ას", "timestamp": 1791097019121}
+{"type": "text", "text": "ეთ", "timestamp": 1791097019185}
+{"type": "text", "text": "ია (", "timestamp": 1791097019257}
+{"type": "text", "text": "app/dashboard/page.tsx:201", "timestamp": 1791097019324}
+{"type": "text", "text": "-243): მის", "timestamp": 1791097019391}
+{"type": "text", "text": "ალ", "timestamp": 1791097019460}
+{"type": "text", "text": "მ", "timestamp": 1791097019529}
+{"type": "text", "text": "ება → PopularTools (ტარო +", "timestamp": 1791097019596}
+{"type": "text", "text": " „", "timestamp": 1791097019666}
+{"type": "text", "text": "ჰკ", "timestamp": 1791097019737}
+{"type": "text", "text": "ითხე ვარსკვლავებს\",", "timestamp": 1791097019812}
+{"type": "text", "text": " dashboard", "timestamp": 1791097019875}
+{"type": "text", "text": "_top) → DailyDashboard →", "timestamp": 1791097019949}
+{"type": "text", "text": " PushOptIn banner", "timestamp": 1791097020016}
+{"type": "text", "text": " → billing n", "timestamp": 1791097020079}
+{"type": "text", "text": "udge → სტატ", "timestamp": 1791097020147}
+{"type": "text", "text": "ი", "timestamp": 1791097020220}
+{"type": "text", "text": "ები → ტესტის", "timestamp": 1791097020283}
+{"type": "text", "text": " პრომო", "timestamp": 1791097020351}
+{"type": "text", "text": ". ანუ", "timestamp": 1791097020423}
+{"type": "text", "text": " ფ", "timestamp": 1791097020488}
+{"type": "text", "text": "ასიანი", "timestamp": 1791097020553}
+{"type": "text", "text": " funnel", "timestamp": 1791097020621}
+{"type": "text", "text": "-ის", "timestamp": 1791097020688}
+{"type": "text", "text": " ო", "timestamp": 1791097020755}
+{"type": "text", "text": "რი tile", "timestamp": 1791097020825}
+{"type": "text", "text": " დ", "timestamp": 1791097020896}
+{"type": "text", "text": "გ", "timestamp": 1791097020970}
+{"type": "text", "text": "ას", "timestamp": 1791097021035}
+{"type": "text", "text": " უფასო", "timestamp": 1791097021109}
+{"type": "text", "text": " ყოველდღ", "timestamp": 1791097021169}
+{"type": "text", "text": "იურ", "timestamp": 1791097021235}
+{"type": "text", "text": " ღირ", "timestamp": 1791097021321}
+{"type": "text", "text": "ებულებ", "timestamp": 1791097021371}
+{"type": "text", "text": "აზე მაღ", "timestamp": 1791097021449}
+{"type": "text", "text": "ლა", "timestamp": 1791097021509}
+{"type": "text", "text": ",", "timestamp": 1791097021572}
+{"type": "text", "text": " და გვ", "timestamp": 1791097021643}
+{"type": "text", "text": "ერდს", "timestamp": 1791097021707}
+{"type": "text", "text": " არ აქვს", "timestamp": 1791097021775}
+{"type": "text", "text": " ერთი დომინ", "timestamp": 1791097021845}
+{"type": "text", "text": "ანტური", "timestamp": 1791097021915}
+{"type": "text", "text": " მოქმედება.\n\nყოვ", "timestamp": 1791097021988}
+{"type": "text", "text": "ელდღიური რ", "timestamp": 1791097022051}
+{"type": "text", "text": "იტუალი არსებ", "timestamp": 1791097022118}
+{"type": "text", "text": "ობს", "timestamp": 1791097022186}
+{"type": "text", "text": " და ტექ", "timestamp": 1791097022254}
+{"type": "text", "text": "ნიკ", "timestamp": 1791097022327}
+{"type": "text", "text": "ურად გამ", "timestamp": 1791097022391}
+{"type": "text", "text": "ართული", "timestamp": 1791097022459}
+{"type": "text", "text": "ა,", "timestamp": 1791097022526}
+{"type": "text", "text": " მაგრამ ო", "timestamp": 1791097022594}
+{"type": "text", "text": "რ", "timestamp": 1791097022662}
+{"type": "text", "text": "-ს", "timestamp": 1791097022733}
+{"type": "text", "text": "აფეხ", "timestamp": 1791097022804}
+{"type": "text", "text": "ურ", "timestamp": 1791097022871}
+{"type": "text", "text": "იან", "timestamp": 1791097022941}
+{"type": "text", "text": "ია: ჰ", "timestamp": 1791097023008}
+{"type": "text", "text": "ოროსკოპის", "timestamp": 1791097023080}
+{"type": "text", "text": " ბოლომ", "timestamp": 1791097023151}
+{"type": "text", "text": "დე ჩაკ", "timestamp": 1791097023220}
+{"type": "text", "text": "ით", "timestamp": 1791097023292}
+{"type": "text", "text": "ხვა (", "timestamp": 1791097023359}
+{"type": "text", "text": "IntersectionObserver,", "timestamp": 1791097023430}
+{"type": "text", "text": " threshold 0.6 —", "timestamp": 1791097023500}
+{"type": "text", "text": " components/dashboard/daily-card.tsx:82", "timestamp": 1791097023572}
+{"type": "text", "text": "-101", "timestamp": 1791097023641}
+{"type": "text", "text": ") + ფოკუსის არჩ", "timestamp": 1791097023713}
+{"type": "text", "text": "ევა სამ", "timestamp": 1791097023784}
+{"type": "text", "text": "ი ღილ", "timestamp": 1791097023854}
+{"type": "text", "text": "აკიდან (components", "timestamp": 1791097023926}
+{"type": "text", "text": "/dashboard/daily-ritual.tsx:148", "timestamp": 1791097023996}
+{"type": "text", "text": "-184", "timestamp": 1791097024065}
+{"type": "text", "text": "). დასრულ", "timestamp": 1791097024135}
+{"type": "text", "text": "ება ი", "timestamp": 1791097024214}
+{"type": "text", "text": "წ", "timestamp": 1791097024273}
+{"type": "text", "text": "ერ", "timestamp": 1791097024345}
+{"type": "text", "text": "ება ს", "timestamp": 1791097024419}
+{"type": "text", "text": "ერვ", "timestamp": 1791097024483}
+{"type": "text", "text": "ერ", "timestamp": 1791097024554}
+{"type": "text", "text": "ზე user_activity_day-", "timestamp": 1791097024623}
+{"type": "text", "text": "ში DAILY_RITUAL_VERSION =", "timestamp": 1791097024695}
+{"type": "text", "text": " 2-", "timestamp": 1791097024767}
+{"type": "text", "text": "ით (lib/daily-ritual-core.ts:9", "timestamp": 1791097024844}
+{"type": "text", "text": "-", "timestamp": 1791097024901}
+{"type": "text", "text": "60).", "timestamp": 1791097024970}
+{"type": "text", "text": " ს", "timestamp": 1791097025063}
+{"type": "text", "text": "ერია ", "timestamp": 1791097025108}
+{"type": "text", "text": "ითვლება მხოლოდ რ", "timestamp": 1791097025177}
+{"type": "text", "text": "იტუალით", "timestamp": 1791097025247}
+{"type": "text", "text": " დასრულებული", "timestamp": 1791097025314}
+{"type": "text", "text": " დღე", "timestamp": 1791097025381}
+{"type": "text", "text": "ებიდან", "timestamp": 1791097025451}
+{"type": "text", "text": " (", "timestamp": 1791097025519}
+{"type": "text", "text": "calculate", "timestamp": 1791097025588}
+{"type": "text", "text": "Streak,", "timestamp": 1791097025655}
+{"type": "text", "text": " lib/streak.ts:14-33", "timestamp": 1791097025724}
+{"type": "text", "text": ")", "timestamp": 1791097025793}
+{"type": "text", "text": " — ნ", "timestamp": 1791097025882}
+{"type": "text", "text": "ების", "timestamp": 1791097025933}
+{"type": "text", "text": "მიერი", "timestamp": 1791097025998}
+{"type": "text", "text": " აქტივ", "timestamp": 1791097026063}
+{"type": "text", "text": "ობა სერი", "timestamp": 1791097026141}
+{"type": "text", "text": "ას არ ზ", "timestamp": 1791097026204}
+{"type": "text", "text": "რდის", "timestamp": 1791097026262}
+{"type": "text", "text": ".\n\n", "timestamp": 1791097026328}
+{"type": "text", "text": "ჯილ", "timestamp": 1791097026395}
+{"type": "text", "text": "დო", "timestamp": 1791097026459}
+{"type": "text", "text": " გან", "timestamp": 1791097026525}
+{"type": "text", "text": "ზ", "timestamp": 1791097026599}
+{"type": "text", "text": "რ", "timestamp": 1791097026659}
+{"type": "text", "text": "ახ ს", "timestamp": 1791097026722}
+{"type": "text", "text": "უსტ", "timestamp": 1791097026793}
+{"type": "text", "text": "ია და", "timestamp": 1791097026864}
+{"type": "text", "text": " ეს სწ", "timestamp": 1791097026927}
+{"type": "text", "text": "ორ", "timestamp": 1791097026995}
+{"type": "text", "text": "ია: RIT", "timestamp": 1791097027062}
+{"type": "text", "text": "UAL_STREAK_MILESTONES =", "timestamp": 1791097027129}
+{"type": "text", "text": " 7 დღე", "timestamp": 1791097027196}
+{"type": "text", "text": " →", "timestamp": 1791097027265}
+{"type": "text", "text": " +1, 30 →", "timestamp": 1791097027332}
+{"type": "text", "text": " +2, 100 → +5,", "timestamp": 1791097027396}
+{"type": "text", "text": " lifetime", "timestamp": 1791097027464}
+{"type": "text", "text": "-", "timestamp": 1791097027540}
+{"type": "text", "text": "მაქ", "timestamp": 1791097027600}
+{"type": "text", "text": "სიმ", "timestamp": 1791097027667}
+{"type": "text", "text": "უმი", "timestamp": 1791097027739}
+{"type": "text", "text": " +8,", "timestamp": 1791097027808}
+{"type": "text", "text": " განმეო", "timestamp": 1791097027871}
+{"type": "text", "text": "რება არ არის", "timestamp": 1791097027938}
+{"type": "text", "text": " (lib/credits-config.ts:53-57). ფას", "timestamp": 1791097028005}
+{"type": "text", "text": "ები დადას", "timestamp": 1791097028076}
+{"type": "text", "text": "ტურებულია:", "timestamp": 1791097028152}
+{"type": "text", "text": " weeklyForecast 10, tar", "timestamp": 1791097028214}
+{"type": "text", "text": "ot 10, tar", "timestamp": 1791097028279}
+{"type": "text", "text": "otFollowup 5, chat 2, synastry", "timestamp": 1791097028351}
+{"type": "text", "text": " 5, ტესტ", "timestamp": 1791097028422}
+{"type": "text", "text": "ები 5, pdfReport 5 (lib/credits-config", "timestamp": 1791097028490}
+{"type": "text", "text": ".ts:60-74);", "timestamp": 1791097028555}
+{"type": "text", "text": " SIGN", "timestamp": 1791097028622}
+{"type": "text", "text": "UP_BONUS 20, MONTHLY_BONUS ", "timestamp": 1791097028692}
+{"type": "text", "text": "5, REFERRAL_REWARD 10.\n\nპ", "timestamp": 1791097028760}
+{"type": "text", "text": "ერსონალური", "timestamp": 1791097028829}
+{"type": "text", "text": " vs საჯ", "timestamp": 1791097028899}
+{"type": "text", "text": "არ", "timestamp": 1791097028966}
+{"type": "text", "text": "ო პროგნოზ", "timestamp": 1791097029036}
+{"type": "text", "text": "ი გ", "timestamp": 1791097029105}
+{"type": "text", "text": "აყ", "timestamp": 1791097029172}
+{"type": "text", "text": "ოფ", "timestamp": 1791097029240}
+{"type": "text", "text": "ილია", "timestamp": 1791097029313}
+{"type": "text", "text": " სწ", "timestamp": 1791097029385}
+{"type": "text", "text": "ორად: დ", "timestamp": 1791097029449}
+{"type": "text", "text": "ეშბორდზე", "timestamp": 1791097029509}
+{"type": "text", "text": " პ", "timestamp": 1791097029576}
+{"type": "text", "text": "ერსონალური daily", "timestamp": 1791097029645}
+{"type": "text", "text": " მოდ", "timestamp": 1791097029717}
+{"type": "text", "text": "ის ensureDailyFor(userId, locale)-", "timestamp": 1791097029776}
+{"type": "text", "text": "ით (actions/dashboard.ts:134", "timestamp": 1791097029847}
+{"type": "text", "text": "-138), საჯ", "timestamp": 1791097029913}
+{"type": "text", "text": "აროა", "timestamp": 1791097029989}
+{"type": "text", "text": " /", "timestamp": 1791097030052}
+{"type": "text", "text": "horoskopi (ნიშნ", "timestamp": 1791097030113}
+{"type": "text", "text": "ით, +kv", "timestamp": 1791097030179}
+{"type": "text", "text": "ireuli/tviuri). ო", "timestamp": 1791097030246}
+{"type": "text", "text": "რივ", "timestamp": 1791097030312}
+{"type": "text", "text": "ე არსებ", "timestamp": 1791097030380}
+{"type": "text", "text": "ობს, მაგრამ დ", "timestamp": 1791097030446}
+{"type": "text", "text": "ეშბორდი", "timestamp": 1791097030522}
+{"type": "text", "text": " არს", "timestamp": 1791097030588}
+{"type": "text", "text": "ად", "timestamp": 1791097030650}
+{"type": "text", "text": " ე", "timestamp": 1791097030713}
+{"type": "text", "text": "უბ", "timestamp": 1791097030782}
+{"type": "text", "text": "ნება", "timestamp": 1791097030856}
+{"type": "text", "text": " მომხმარებ", "timestamp": 1791097030918}
+{"type": "text", "text": "ელს „ეს", "timestamp": 1791097030983}
+{"type": "text", "text": " შენს", "timestamp": 1791097031049}
+{"type": "text", "text": " რუკაზეა", "timestamp": 1791097031117}
+{"type": "text", "text": " ა", "timestamp": 1791097031184}
+{"type": "text", "text": "წყ", "timestamp": 1791097031253}
+{"type": "text", "text": "ობ", "timestamp": 1791097031324}
+{"type": "text", "text": "ილი, საჯარო კი", "timestamp": 1791097031389}
+{"type": "text", "text": " ყველ", "timestamp": 1791097031455}
+{"type": "text", "text": "ასთვის ერთ", "timestamp": 1791097031527}
+{"type": "text", "text": "ია\" — აღ", "timestamp": 1791097031596}
+{"type": "text", "text": "ქ", "timestamp": 1791097031665}
+{"type": "text", "text": "მული პერსონ", "timestamp": 1791097031736}
+{"type": "text", "text": "ალიზ", "timestamp": 1791097031805}
+{"type": "text", "text": "აცია დაკ", "timestamp": 1791097031869}
+{"type": "text", "text": "არგული", "timestamp": 1791097031938}
+{"type": "text", "text": "ა.\n\nბ", "timestamp": 1791097032009}
+{"type": "text", "text": "იბლიოთ", "timestamp": 1791097032075}
+{"type": "text", "text": "ეკა /library", "timestamp": 1791097032143}
+{"type": "text", "text": " არსებობს", "timestamp": 1791097032214}
+{"type": "text", "text": " (daily", "timestamp": 1791097032281}
+{"type": "text", "text": "/", "timestamp": 1791097032349}
+{"type": "text", "text": "weekly/tarot/ai/report ფილტრ", "timestamp": 1791097032419}
+{"type": "text", "text": "ებით", "timestamp": 1791097032490}
+{"type": "text", "text": ", რ", "timestamp": 1791097032558}
+{"type": "text", "text": "ჩ", "timestamp": 1791097032627}
+{"type": "text", "text": "ეულ", "timestamp": 1791097032699}
+{"type": "text", "text": "ებით,", "timestamp": 1791097032770}
+{"type": "text", "text": " შენ", "timestamp": 1791097032837}
+{"type": "text", "text": "იშ", "timestamp": 1791097032907}
+{"type": "text", "text": "ვნებით), მაგრამ რიტუალ", "timestamp": 1791097032977}
+{"type": "text", "text": "თან კ", "timestamp": 1791097033049}
+{"type": "text", "text": "ავშირი", "timestamp": 1791097033143}
+{"type": "text", "text": " არ დავ", "timestamp": 1791097033194}
+{"type": "text", "text": "ინ", "timestamp": 1791097033275}
+{"type": "text", "text": "ახე", "timestamp": 1791097033340}
+{"type": "text", "text": ": daily-ritual.tsx-ს", "timestamp": 1791097038367}
+{"type": "text", "text": "ა", "timestamp": 1791097038368}
+{"type": "text", "text": " და daily-card.tsx-ის", "timestamp": 1791097038369}
+{"type": "text", "text": " შემოწმ", "timestamp": 1791097038369}
+{"type": "text", "text": "ებულ დი", "timestamp": 1791097038369}
+{"type": "text", "text": "აპაზ", "timestamp": 1791097038369}
+{"type": "text", "text": "ონებში", "timestamp": 1791097038369}
+{"type": "text", "text": " „ბ", "timestamp": 1791097038369}
+{"type": "text", "text": "იბლიოთეკაში შენახ", "timestamp": 1791097038369}
+{"type": "text", "text": "ვის", "timestamp": 1791097038369}
+{"type": "text", "text": "\" CTA", "timestamp": 1791097038369}
+{"type": "text", "text": " არ არის", "timestamp": 1791097038369}
+{"type": "text", "text": " —", "timestamp": 1791097038369}
+{"type": "text", "text": " დღევ", "timestamp": 1791097038370}
+{"type": "text", "text": "ანდელი მკ", "timestamp": 1791097038370}
+{"type": "text", "text": "ითხვ", "timestamp": 1791097038370}
+{"type": "text", "text": "ელი", "timestamp": 1791097038370}
+{"type": "text", "text": " ხ", "timestamp": 1791097038370}
+{"type": "text", "text": "ვალ გ", "timestamp": 1791097038370}
+{"type": "text", "text": "აქრ", "timestamp": 1791097038370}
+{"type": "text", "text": "ება. ყოველ", "timestamp": 1791097038370}
+{"type": "text", "text": "კვ", "timestamp": 1791097038370}
+{"type": "text", "text": "ირეული", "timestamp": 1791097038370}
+{"type": "text", "text": " რ", "timestamp": 1791097038370}
+{"type": "text", "text": "ეფ", "timestamp": 1791097038370}
+{"type": "text", "text": "ლ", "timestamp": 1791097038370}
+{"type": "text", "text": "ექსია/", "timestamp": 1791097038370}
+{"type": "text", "text": "weekly", "timestamp": 1791097038370}
+{"type": "text", "text": "_recap არ არსებ", "timestamp": 1791097038370}
+{"type": "text", "text": "ობს (ძ", "timestamp": 1791097038371}
+{"type": "text", "text": "იებამ", "timestamp": 1791097038371}
+{"type": "text", "text": " lib", "timestamp": 1791097038371}
+{"type": "text", "text": "/analytics.ts-ში", "timestamp": 1791097038371}
+{"type": "text", "text": " daily", "timestamp": 1791097038371}
+{"type": "text", "text": "_h", "timestamp": 1791097038371}
+{"type": "text", "text": "oroscope_viewed/read,", "timestamp": 1791097038371}
+{"type": "text", "text": " daily_focus_selected, daily_ritual_completed, pro_brief", "timestamp": 1791097038371}
+{"type": "text", "text": "_viewed/answered, push_prompt_viewed ა", "timestamp": 1791097038371}
+{"type": "text", "text": "ჩ", "timestamp": 1791097038371}
+{"type": "text", "text": "ვენა", "timestamp": 1791097038371}
+{"type": "text", "text": ";", "timestamp": 1791097038371}
+{"type": "text", "text": " weekly_re", "timestamp": 1791097038371}
+{"type": "text", "text": "cap-ს მს", "timestamp": 1791097038371}
+{"type": "text", "text": "გ", "timestamp": 1791097038371}
+{"type": "text", "text": "ავსი არ", "timestamp": 1791097038371}
+{"type": "text", "text": "აფ", "timestamp": 1791097038372}
+{"type": "text", "text": "ერი", "timestamp": 1791097038372}
+{"type": "text", "text": "). გან", "timestamp": 1791097038372}
+{"type": "text", "text": "წ", "timestamp": 1791097038372}
+{"type": "text", "text": "ყ", "timestamp": 1791097038372}
+{"type": "text", "text": "ობის check", "timestamp": 1791097038372}
+{"type": "text", "text": "-in არ არსებ", "timestamp": 1791097038372}
+{"type": "text", "text": "ობს;", "timestamp": 1791097038372}
+{"type": "text", "text": " რ", "timestamp": 1791097038372}
+{"type": "text", "text": "ეფლექსიური კ", "timestamp": 1791097038372}
+{"type": "text", "text": "ითხვა", "timestamp": 1791097038372}
+{"type": "text", "text": " მხოლოდ PRO-ში", "timestamp": 1791097038372}
+{"type": "text", "text": "ა,", "timestamp": 1791097038372}
+{"type": "text", "text": " local", "timestamp": 1791097038372}
+{"type": "text", "text": "Storage-ში,", "timestamp": 1791097038372}
+{"type": "text", "text": " ", "timestamp": 1791097038372}
+{"type": "text", "text": "14-დღიანი რ", "timestamp": 1791097038373}
+{"type": "text", "text": "ოტაცი", "timestamp": 1791097038373}
+{"type": "text", "text": "ით (lib/pro-ritual-questions.ts)", "timestamp": 1791097038373}
+{"type": "text", "text": " — უფასო მომხმარებ", "timestamp": 1791097038373}
+{"type": "text", "text": "ელს საღ", "timestamp": 1791097038373}
+{"type": "text", "text": "ამოს დახურვ", "timestamp": 1791097038373}
+{"type": "text", "text": "ა", "timestamp": 1791097038373}
+{"type": "text", "text": " არ აქვს", "timestamp": 1791097038373}
+{"type": "text", "text": ".\n\nშეხსენებები default", "timestamp": 1791097038373}
+{"type": "text", "text": "-", "timestamp": 1791097038436}
+{"type": "text", "text": "ით გამორ", "timestamp": 1791097038502}
+{"type": "text", "text": "თ", "timestamp": 1791097038572}
+{"type": "text", "text": "ულია", "timestamp": 1791097038641}
+{"type": "text", "text": " (", "timestamp": 1791097038713}
+{"type": "text", "text": "transitPush/for", "timestamp": 1791097038780}
+{"type": "text", "text": "ecastPush false;", "timestamp": 1791097038849}
+{"type": "text", "text": " მხოლოდ relationship", "timestamp": 1791097038922}
+{"type": "text", "text": "Push true — lib/reminder-config.ts),", "timestamp": 1791097038989}
+{"type": "text", "text": " ხ", "timestamp": 1791097039064}
+{"type": "text", "text": "ოლო", "timestamp": 1791097039132}
+{"type": "text", "text": " Push", "timestamp": 1791097039206}
+{"type": "text", "text": "OptIn banner", "timestamp": 1791097039277}
+{"type": "text", "text": " დეშ", "timestamp": 1791097039342}
+{"type": "text", "text": "ბორდზე", "timestamp": 1791097039411}
+{"type": "text", "text": " რ", "timestamp": 1791097039481}
+{"type": "text", "text": "იტუალის ქვემ", "timestamp": 1791097039549}
+{"type": "text", "text": "ოთ", "timestamp": 1791097039622}
+{"type": "text", "text": " დგას (page", "timestamp": 1791097039697}
+{"type": "text", "text": ".tsx:218),", "timestamp": 1791097039789}
+{"type": "text", "text": " ან", "timestamp": 1791097039836}
+{"type": "text", "text": "უ მომ", "timestamp": 1791097039907}
+{"type": "text", "text": "ხმარებელი მას", "timestamp": 1791097039988}
+{"type": "text", "text": " ხედ", "timestamp": 1791097040057}
+{"type": "text", "text": "ავს", "timestamp": 1791097040129}
+{"type": "text", "text": " მხოლოდ მას", "timestamp": 1791097040192}
+{"type": "text", "text": " შემდეგ, რაც", "timestamp": 1791097040261}
+{"type": "text", "text": " უკ", "timestamp": 1791097040331}
+{"type": "text", "text": "ვე და", "timestamp": 1791097040402}
+{"type": "text", "text": "ას", "timestamp": 1791097040472}
+{"type": "text", "text": "რულ", "timestamp": 1791097040542}
+{"type": "text", "text": "ა", "timestamp": 1791097040610}
+{"type": "text", "text": " ის", "timestamp": 1791097040682}
+{"type": "text", "text": " მო", "timestamp": 1791097040752}
+{"type": "text", "text": "ქმედება", "timestamp": 1791097040831}
+{"type": "text", "text": ", რომ", "timestamp": 1791097040893}
+{"type": "text", "text": "ლის შეხ", "timestamp": 1791097040962}
+{"type": "text", "text": "სენებაც", "timestamp": 1791097041031}
+{"type": "text", "text": " უნდა.", "timestamp": 1791097041101}
+{"type": "text", "text": " PRO brief", "timestamp": 1791097041200}
+{"type": "text", "text": " პირვ", "timestamp": 1791097041241}
+{"type": "text", "text": "ელი ბ", "timestamp": 1791097041316}
+{"type": "text", "text": "არათ", "timestamp": 1791097041379}
+{"type": "text", "text": "ია:", "timestamp": 1791097041446}
+{"type": "text", "text": " ქ", "timestamp": 1791097041510}
+{"type": "text", "text": "ულ", "timestamp": 1791097041618}
+{"type": "text", "text": "ა (", "timestamp": 1791097041753}
+{"type": "text", "text": "score) უფ", "timestamp": 1791097041982}
+{"type": "text", "text": "ასოდ", "timestamp": 1791097041982}
+{"type": "text", "text": " ჩ", "timestamp": 1791097041982}
+{"type": "text", "text": "ანს", "timestamp": 1791097041983}
+{"type": "text", "text": ", one", "timestamp": 1791097042003}
+{"type": "text", "text": "-liner", "timestamp": 1791097042077}
+{"type": "text", "text": "-", "timestamp": 1791097042148}
+{"type": "text", "text": "ები და რ", "timestamp": 1791097042229}
+{"type": "text", "text": "იტუ", "timestamp": 1791097042301}
+{"type": "text", "text": "ალური კითხვა", "timestamp": 1791097042372}
+{"type": "text", "text": " PRO-ს", "timestamp": 1791097042443}
+{"type": "text", "text": " მიღ", "timestamp": 1791097042514}
+{"type": "text", "text": "მა", "timestamp": 1791097042588}
+{"type": "text", "text": "ა", "timestamp": 1791097042662}
+{"type": "text", "text": " ჩაკ", "timestamp": 1791097042736}
+{"type": "text", "text": "ეტ", "timestamp": 1791097042804}
+{"type": "text", "text": "ილი (components/dashboard/pro-daily-brief.tsx:69-", "timestamp": 1791097042878}
+{"type": "text", "text": "70) — fre", "timestamp": 1791097042954}
+{"type": "text", "text": "emium ხ", "timestamp": 1791097043037}
+{"type": "text", "text": "აზი გ", "timestamp": 1791097043234}
+{"type": "text", "text": "ონივ", "timestamp": 1791097043242}
+{"type": "text", "text": "რულია", "timestamp": 1791097043490}
+{"type": "text", "text": ", მაგრამ ი", "timestamp": 1791097043490}
+{"type": "text", "text": "არ", "timestamp": 1791097043491}
+{"type": "text", "text": "ლ", "timestamp": 1791097043491}
+{"type": "text", "text": "ი", "timestamp": 1791097043530}
+{"type": "text", "text": "ყ", "timestamp": 1791097043601}
+{"type": "text", "text": "ი („", "timestamp": 1791097043673}
+{"type": "text", "text": "უფასო", "timestamp": 1791097043745}
+{"type": "text", "text": " დღეს", "timestamp": 1791097043819}
+{"type": "text", "text": " / PRO სიღ", "timestamp": 1791097043896}
+{"type": "text", "text": "რ", "timestamp": 1791097043981}
+{"type": "text", "text": "მ", "timestamp": 1791097044042}
+{"type": "text", "text": "ე\")", "timestamp": 1791097044121}
+{"type": "text", "text": " არს", "timestamp": 1791097044193}
+{"type": "text", "text": "ად წ", "timestamp": 1791097044269}
+{"type": "text", "text": "ერია", "timestamp": 1791097044340}
+{"type": "text", "text": ".\n\nრიც", "timestamp": 1791097044414}
+{"type": "text", "text": "ხვები (", "timestamp": 1791097044490}
+{"type": "text", "text": "დ", "timestamp": 1791097044566}
+{"type": "text", "text": "ოკუმენტის", "timestamp": 1791097044653}
+{"type": "text", "text": " მტ", "timestamp": 1791097044717}
+{"type": "text", "text": "კ", "timestamp": 1791097044785}
+{"type": "text", "text": "იც", "timestamp": 1791097044856}
+{"type": "text", "text": "ება, ჩემ", "timestamp": 1791097044925}
+{"type": "text", "text": "ით", "timestamp": 1791097044996}
+{"type": "text", "text": " unver", "timestamp": 1791097045078}
+{"type": "text", "text": "ified):", "timestamp": 1791097045143}
+{"type": "text", "text": " DA", "timestamp": 1791097045297}
+{"type": "text", "text": "U/MAU 3.7%, კვირ", "timestamp": 1791097045297}
+{"type": "text", "text": "აში", "timestamp": 1791097045365}
+{"type": "text", "text": " დაბრუნება", "timestamp": 1791097045439}
+{"type": "text", "text": " 31.8%, MA", "timestamp": 1791097045508}
+{"type": "text", "text": "U-ს", "timestamp": 1791097045579}
+{"type": "text", "text": " 48", "timestamp": 1791097045655}
+{"type": "text", "text": ".2% ერთ", "timestamp": 1791097045741}
+{"type": "text", "text": " დღეს", "timestamp": 1791097045794}
+{"type": "text", "text": "აა", "timestamp": 1791097045863}
+{"type": "text", "text": " აქტიური", "timestamp": 1791097045936}
+{"type": "text", "text": " (docs/product-growth-priorities.md).", "timestamp": 1791097046007}
+{"type": "text", "text": " ანალ", "timestamp": 1791097046077}
+{"type": "text", "text": "იტიკ", "timestamp": 1791097046148}
+{"type": "text", "text": "აზე", "timestamp": 1791097046218}
+{"type": "text", "text": " წვდ", "timestamp": 1791097046290}
+{"type": "text", "text": "ომა", "timestamp": 1791097046361}
+{"type": "text", "text": " არ მ", "timestamp": 1791097046436}
+{"type": "text", "text": "ქონია", "timestamp": 1791097046502}
+{"type": "text", "text": " —", "timestamp": 1791097046579}
+{"type": "text", "text": " ქვ", "timestamp": 1791097046649}
+{"type": "text", "text": "ემოთ არ", "timestamp": 1791097046716}
+{"type": "text", "text": "ც", "timestamp": 1791097046788}
+{"type": "text", "text": "ერთ", "timestamp": 1791097046868}
+{"type": "text", "text": " მეტ", "timestamp": 1791097046923}
+{"type": "text", "text": "რიკას ფ", "timestamp": 1791097046991}
+{"type": "text", "text": "აქტად", "timestamp": 1791097047060}
+{"type": "text", "text": " არ ვ", "timestamp": 1791097047128}
+{"type": "text", "text": "ასახ", "timestamp": 1791097047197}
+{"type": "text", "text": "ელ", "timestamp": 1791097047269}
+{"type": "text", "text": "ებ", "timestamp": 1791097047338}
+{"type": "text", "text": ".\n\n", "timestamp": 1791097047408}
+{"type": "text", "text": "ჰიპოთეზა,", "timestamp": 1791097047471}
+{"type": "text", "text": " რატომ", "timestamp": 1791097047542}
+{"type": "text", "text": " არ", "timestamp": 1791097047609}
+{"type": "text", "text": " ყ", "timestamp": 1791097047677}
+{"type": "text", "text": "ალ", "timestamp": 1791097047752}
+{"type": "text", "text": "იბდება ჩ", "timestamp": 1791097047838}
+{"type": "text", "text": "ვ", "timestamp": 1791097047883}
+{"type": "text", "text": "ევა", "timestamp": 1791097047954}
+{"type": "text", "text": ": (ა", "timestamp": 1791097052022}
+{"type": "text", "text": ") გვერდ", "timestamp": 1791097052023}
+{"type": "text", "text": "ი ი", "timestamp": 1791097052023}
+{"type": "text", "text": "წყება", "timestamp": 1791097052023}
+{"type": "text", "text": " არ", "timestamp": 1791097052023}
+{"type": "text", "text": "ჩევან", "timestamp": 1791097052023}
+{"type": "text", "text": "ით (", "timestamp": 1791097052023}
+{"type": "text", "text": "ტარო?", "timestamp": 1791097052023}
+{"type": "text", "text": " ჩატ", "timestamp": 1791097052024}
+{"type": "text", "text": "ი? ჰოროსკოპი", "timestamp": 1791097052024}
+{"type": "text", "text": "?) და არა ერთი", "timestamp": 1791097052024}
+{"type": "text", "text": " მო", "timestamp": 1791097052024}
+{"type": "text", "text": "ქმედებით;", "timestamp": 1791097052024}
+{"type": "text", "text": " (ბ) რიტუალის payoff", "timestamp": 1791097052024}
+{"type": "text", "text": " ს", "timestamp": 1791097052024}
+{"type": "text", "text": "უსტ", "timestamp": 1791097052024}
+{"type": "text", "text": "ია — ფოკუსის", "timestamp": 1791097052024}
+{"type": "text", "text": " არჩევა localStorage-ში იწ", "timestamp": 1791097052024}
+{"type": "text", "text": "ერება (lib", "timestamp": 1791097052024}
+{"type": "text", "text": "/daily-ritual.ts:25", "timestamp": 1791097052024}
+{"type": "text", "text": "-32", "timestamp": 1791097052024}
+{"type": "text", "text": "), ანუ", "timestamp": 1791097052024}
+{"type": "text", "text": " სხვა", "timestamp": 1791097052024}
+{"type": "text", "text": " მოწყობილობ", "timestamp": 1791097052025}
+{"type": "text", "text": "აზე ი", "timestamp": 1791097052025}
+{"type": "text", "text": "კ", "timestamp": 1791097052025}
+{"type": "text", "text": "არგ", "timestamp": 1791097052025}
+{"type": "text", "text": "ება და საღამოს არაფ", "timestamp": 1791097052025}
+{"type": "text", "text": "ერი ბრუნდება", "timestamp": 1791097052025}
+{"type": "text", "text": " მას", "timestamp": 1791097052025}
+{"type": "text", "text": "თან", "timestamp": 1791097052025}
+{"type": "text", "text": "; (გ) დაბრუნების", "timestamp": 1791097052025}
+{"type": "text", "text": " ტრიგ", "timestamp": 1791097052025}
+{"type": "text", "text": "ერი", "timestamp": 1791097052025}
+{"type": "text", "text": " არ არის", "timestamp": 1791097052025}
+{"type": "text", "text": " — შეხსენება default", "timestamp": 1791097052025}
+{"type": "text", "text": "-off-", "timestamp": 1791097052025}
+{"type": "text", "text": "ია და push", "timestamp": 1791097052025}
+{"type": "text", "text": "-პ", "timestamp": 1791097052025}
+{"type": "text", "text": "რომ", "timestamp": 1791097052026}
+{"type": "text", "text": "პ", "timestamp": 1791097052026}
+{"type": "text", "text": "ტი გვიან", "timestamp": 1791097052026}
+{"type": "text", "text": " ჩ", "timestamp": 1791097052026}
+{"type": "text", "text": "ნ", "timestamp": 1791097052026}
+{"type": "text", "text": "დება; (დ) უ", "timestamp": 1791097052026}
+{"type": "text", "text": "წყვ", "timestamp": 1791097052026}
+{"type": "text", "text": "ეტობა არ ჩ", "timestamp": 1791097052026}
+{"type": "text", "text": "ანს", "timestamp": 1791097052026}
+{"type": "text", "text": " — სერ", "timestamp": 1791097052026}
+{"type": "text", "text": "იის", "timestamp": 1791097052026}
+{"type": "text", "text": " გ", "timestamp": 1791097052026}
+{"type": "text", "text": "არდა", "timestamp": 1791097052026}
+{"type": "text", "text": " კვ", "timestamp": 1791097052026}
+{"type": "text", "text": "ირის/", "timestamp": 1791097052026}
+{"type": "text", "text": "თვის", "timestamp": 1791097052026}
+{"type": "text", "text": " შე", "timestamp": 1791097052026}
+{"type": "text", "text": "ჯ", "timestamp": 1791097052026}
+{"type": "text", "text": "ამება არ არსებ", "timestamp": 1791097052026}
+{"type": "text", "text": "ობს.\n\n2. პრ", "timestamp": 1791097052027}
+{"type": "text", "text": "იორ", "timestamp": 1791097052088}
+{"type": "text", "text": "იტეტ", "timestamp": 1791097052152}
+{"type": "text", "text": "ული რეკომ", "timestamp": 1791097052215}
+{"type": "text", "text": "ენდ", "timestamp": 1791097052282}
+{"type": "text", "text": "აციები (", "timestamp": 1791097052345}
+{"type": "text", "text": "მ", "timestamp": 1791097052423}
+{"type": "text", "text": "აქს", "timestamp": 1791097052469}
+{"type": "text", "text": ".", "timestamp": 1791097052537}
+{"type": "text", "text": " 6)\n\nR", "timestamp": 1791097052598}
+{"type": "text", "text": "1 — CHANGE.", "timestamp": 1791097052663}
+{"type": "text", "text": " ერთი დომინანტური მოქმედ", "timestamp": 1791097052726}
+{"type": "text", "text": "ება: Daily", "timestamp": 1791097052791}
+{"type": "text", "text": "Dashboard Popular", "timestamp": 1791097052852}
+{"type": "text", "text": "Tools-", "timestamp": 1791097052915}
+{"type": "text", "text": "ზე მაღლა", "timestamp": 1791097052980}
+{"type": "text", "text": ".\nმ", "timestamp": 1791097053044}
+{"type": "text", "text": "ომხმარებ", "timestamp": 1791097053150}
+{"type": "text", "text": "ლის პრობლემა", "timestamp": 1791097053181}
+{"type": "text", "text": ": დაბ", "timestamp": 1791097057803}
+{"type": "text", "text": "რუნებული", "timestamp": 1791097057804}
+{"type": "text", "text": " მომხმარებელი ხ", "timestamp": 1791097057804}
+{"type": "text", "text": "ვ", "timestamp": 1791097057804}
+{"type": "text", "text": "დება მაღ", "timestamp": 1791097057804}
+{"type": "text", "text": "აზ", "timestamp": 1791097057804}
+{"type": "text", "text": "იის ვ", "timestamp": 1791097057804}
+{"type": "text", "text": "იტრინ", "timestamp": 1791097057804}
+{"type": "text", "text": "აში და არა „", "timestamp": 1791097057804}
+{"type": "text", "text": "დღეს\"-", "timestamp": 1791097057805}
+{"type": "text", "text": "ში; 60-90 წამ", "timestamp": 1791097057805}
+{"type": "text", "text": "იანი რიტუალი არ", "timestamp": 1791097057805}
+{"type": "text", "text": " იწყება", "timestamp": 1791097057805}
+{"type": "text", "text": ".", "timestamp": 1791097057805}
+{"type": "text", "text": " უმც", "timestamp": 1791097057805}
+{"type": "text", "text": "ირ", "timestamp": 1791097057805}
+{"type": "text", "text": "ესი", "timestamp": 1791097057805}
+{"type": "text", "text": " იმ", "timestamp": 1791097057805}
+{"type": "text", "text": "პლ", "timestamp": 1791097057805}
+{"type": "text", "text": "ემენტაცია:", "timestamp": 1791097057805}
+{"type": "text", "text": " app/dashboard/page.tsx:210-214-", "timestamp": 1791097057805}
+{"type": "text", "text": "ში Daily", "timestamp": 1791097057805}
+{"type": "text", "text": "Dashboard ბ", "timestamp": 1791097057806}
+{"type": "text", "text": "ლოკის", "timestamp": 1791097057806}
+{"type": "text", "text": " Popular", "timestamp": 1791097057806}
+{"type": "text", "text": "Tools-ზე მაღლა", "timestamp": 1791097057806}
+{"type": "text", "text": " გადატ", "timestamp": 1791097057806}
+{"type": "text", "text": "ანა", "timestamp": 1791097057806}
+{"type": "text", "text": "; ტ", "timestamp": 1791097057806}
+{"type": "text", "text": "არო/ჩატის", "timestamp": 1791097057806}
+{"type": "text", "text": " tiles რ", "timestamp": 1791097057806}
+{"type": "text", "text": "ჩ", "timestamp": 1791097057806}
+{"type": "text", "text": "ება, მაგრამ რ", "timestamp": 1791097057806}
+{"type": "text", "text": "იტუალის დას", "timestamp": 1791097057806}
+{"type": "text", "text": "რულების ქვ", "timestamp": 1791097057806}
+{"type": "text", "text": "ემოთ. Anchor", "timestamp": 1791097057806}
+{"type": "text", "text": ": app/dashboard/page.tsx:210-214;", "timestamp": 1791097057807}
+{"type": "text", "text": " დამ", "timestamp": 1791097057807}
+{"type": "text", "text": "ოკ", "timestamp": 1791097057807}
+{"type": "text", "text": "იდ", "timestamp": 1791097057807}
+{"type": "text", "text": "ებულება", "timestamp": 1791097057807}
+{"type": "text", "text": ": არ აქვს", "timestamp": 1791097057807}
+{"type": "text", "text": ". Eff", "timestamp": 1791097057807}
+{"type": "text", "text": "ort: S.", "timestamp": 1791097057807}
+{"type": "text", "text": " მეტ", "timestamp": 1791097057807}
+{"type": "text", "text": "რიკა", "timestamp": 1791097057807}
+{"type": "text", "text": ": daily_ritual_completed /", "timestamp": 1791097057807}
+{"type": "text", "text": " dashboard", "timestamp": 1791097057807}
+{"type": "text", "text": " ვ", "timestamp": 1791097057807}
+{"type": "text", "text": "იზ", "timestamp": 1791097057807}
+{"type": "text", "text": "იტი", "timestamp": 1791097057807}
+{"type": "text", "text": ". მიღების", "timestamp": 1791097057808}
+{"type": "text", "text": " კრიტერიუმ", "timestamp": 1791097057808}
+{"type": "text", "text": "ი: რ", "timestamp": 1791097057808}
+{"type": "text", "text": "იტუ", "timestamp": 1791097057808}
+{"type": "text", "text": "ალური ბარათი პირველი", "timestamp": 1791097057808}
+{"type": "text", "text": " paint", "timestamp": 1791097057808}
+{"type": "text", "text": "-ით", "timestamp": 1791097057808}
+{"type": "text", "text": " ჩანს", "timestamp": 1791097057808}
+{"type": "text", "text": " ", "timestamp": 1791097057808}
+{"type": "text", "text": "320", "timestamp": 1791097057808}
+{"type": "text", "text": "px ეკ", "timestamp": 1791097057808}
+{"type": "text", "text": "რანზე ს", "timestamp": 1791097057808}
+{"type": "text", "text": "ქ", "timestamp": 1791097057808}
+{"type": "text", "text": "როლის გარეშე.\n\n", "timestamp": 1791097057808}
+{"type": "text", "text": "R2 — CHANGE. ფოკუსი სერვერზე", "timestamp": 1791097057808}
+{"type": "text", "text": " +", "timestamp": 1791097057878}
+{"type": "text", "text": " საღამოს ერთ-", "timestamp": 1791097057948}
+{"type": "text", "text": "ტ", "timestamp": 1791097058019}
+{"type": "text", "text": "აპიანი", "timestamp": 1791097058090}
+{"type": "text", "text": " დახურვა ბ", "timestamp": 1791097058164}
+{"type": "text", "text": "იბლიოთეკაში.\nპრ", "timestamp": 1791097058233}
+{"type": "text", "text": "ობლემა: დღის ფოკუს", "timestamp": 1791097058305}
+{"type": "text", "text": "ი ბრაუ", "timestamp": 1791097058376}
+{"type": "text", "text": "ზერის local", "timestamp": 1791097058448}
+{"type": "text", "text": "Storage-ში ი", "timestamp": 1791097058522}
+{"type": "text", "text": "კ", "timestamp": 1791097058592}
+{"type": "text", "text": "არგება და არ", "timestamp": 1791097058663}
+{"type": "text", "text": "აფრად", "timestamp": 1791097058733}
+{"type": "text", "text": " გ", "timestamp": 1791097058807}
+{"type": "text", "text": "არდა", "timestamp": 1791097058876}
+{"type": "text", "text": "ი", "timestamp": 1791097058949}
+{"type": "text", "text": "ქმ", "timestamp": 1791097059019}
+{"type": "text", "text": "ნება —", "timestamp": 1791097059086}
+{"type": "text", "text": " payoff", "timestamp": 1791097059157}
+{"type": "text", "text": " არ არის", "timestamp": 1791097059225}
+{"type": "text", "text": ". უმცირესი იმპლემენტაცია: focus", "timestamp": 1791097059298}
+{"type": "text", "text": "-ის", "timestamp": 1791097059366}
+{"type": "text", "text": " შენახვა user_activity_day-ში", "timestamp": 1791097059439}
+{"type": "text", "text": " (actions/d", "timestamp": 1791097059504}
+{"type": "text", "text": "aily-ritual.ts-ის", "timestamp": 1791097059567}
+{"type": "text", "text": " გ", "timestamp": 1791097059634}
+{"type": "text", "text": "აფართ", "timestamp": 1791097059696}
+{"type": "text", "text": "ოება", "timestamp": 1791097059771}
+{"type": "text", "text": "),", "timestamp": 1791097059824}
+{"type": "text", "text": " + საღამოს ერთი შ", "timestamp": 1791097059891}
+{"type": "text", "text": "ეკით", "timestamp": 1791097059947}
+{"type": "text", "text": "ხვა", "timestamp": 1791097060011}
+{"type": "text", "text": " „დღემ", "timestamp": 1791097060070}
+{"type": "text", "text": " ჩ", "timestamp": 1791097060131}
+{"type": "text", "text": "ა", "timestamp": 1791097060202}
+{"type": "text", "text": "ი", "timestamp": 1791097060257}
+{"type": "text", "text": "არა", "timestamp": 1791097060317}
+{"type": "text", "text": " როგორც", "timestamp": 1791097060379}
+{"type": "text", "text": " ფ", "timestamp": 1791097060447}
+{"type": "text", "text": "ოკუსი", "timestamp": 1791097060526}
+{"type": "text", "text": "?\"", "timestamp": 1791097060568}
+{"type": "text", "text": " (კ", "timestamp": 1791097060629}
+{"type": "text", "text": "ი/ნ", "timestamp": 1791097060712}
+{"type": "text", "text": "ახევ", "timestamp": 1791097060758}
+{"type": "text", "text": "რად", "timestamp": 1791097060827}
+{"type": "text", "text": "/არა", "timestamp": 1791097060883}
+{"type": "text", "text": ") library", "timestamp": 1791097060947}
+{"type": "text", "text": " note", "timestamp": 1791097061004}
+{"type": "text", "text": "-ად", "timestamp": 1791097061067}
+{"type": "text", "text": ".", "timestamp": 1791097061127}
+{"type": "text", "text": " ეს", "timestamp": 1791097061191}
+{"type": "text", "text": " არის", "timestamp": 1791097061253}
+{"type": "text", "text": " უფასო რეფ", "timestamp": 1791097061316}
+{"type": "text", "text": "ლექსია დღ", "timestamp": 1791097061376}
+{"type": "text", "text": "ეს", "timestamp": 1791097061437}
+{"type": "text", "text": " არს", "timestamp": 1791097061499}
+{"type": "text", "text": "ებული", "timestamp": 1791097061567}
+{"type": "text", "text": " PRO-კითხ", "timestamp": 1791097061635}
+{"type": "text", "text": "ვის (", "timestamp": 1791097061704}
+{"type": "text", "text": "lib/pro-ritual-questions.ts) უფ", "timestamp": 1791097061759}
+{"type": "text", "text": "ასო,", "timestamp": 1791097061824}
+{"type": "text", "text": " მინიმ", "timestamp": 1791097061890}
+{"type": "text", "text": "ალური ან", "timestamp": 1791097061959}
+{"type": "text", "text": "ალ", "timestamp": 1791097062025}
+{"type": "text", "text": "ოგი. Anchor", "timestamp": 1791097062094}
+{"type": "text", "text": ": actions", "timestamp": 1791097063667}
+{"type": "text", "text": "/daily-ritual.ts, lib/daily-ritual", "timestamp": 1791097063667}
+{"type": "text", "text": ".ts, lib/library.ts. დამოკიდებულ", "timestamp": 1791097063667}
+{"type": "text", "text": "ება: R", "timestamp": 1791097063667}
+{"type": "text", "text": "1. Effort: M. მეტრიკა", "timestamp": 1791097063667}
+{"type": "text", "text": ": სა", "timestamp": 1791097063668}
+{"type": "text", "text": "ღამოს დახურვის", "timestamp": 1791097063668}
+{"type": "text", "text": " წ", "timestamp": 1791097063668}
+{"type": "text", "text": "ილი", "timestamp": 1791097063668}
+{"type": "text", "text": " რ", "timestamp": 1791097063668}
+{"type": "text", "text": "იტუალდ", "timestamp": 1791097063668}
+{"type": "text", "text": "ასრულებულებში", "timestamp": 1791097063668}
+{"type": "text", "text": "; library_item_opened ", "timestamp": 1791097063668}
+{"type": "text", "text": "7-დღიანი", "timestamp": 1791097063668}
+{"type": "text", "text": " reopen.", "timestamp": 1791097063668}
+{"type": "text", "text": " მიღების", "timestamp": 1791097063668}
+{"type": "text", "text": " კრიტერიუმი: მეო", "timestamp": 1791097063668}
+{"type": "text", "text": "რე მოწყობილობიდან ფოკუსი ჩანს", "timestamp": 1791097063668}
+{"type": "text", "text": ",", "timestamp": 1791097063668}
+{"type": "text", "text": " საღამოს პას", "timestamp": 1791097063668}
+{"type": "text", "text": "უხი ბიბლიოთეკაში", "timestamp": 1791097063668}
+{"type": "text", "text": " ინ", "timestamp": 1791097063668}
+{"type": "text", "text": "ახება.\n\nR3 — ADD. რიტუალთან", "timestamp": 1791097063668}
+{"type": "text", "text": " მ", "timestamp": 1791097063742}
+{"type": "text", "text": "იბმ", "timestamp": 1791097063814}
+{"type": "text", "text": "ული დ", "timestamp": 1791097063888}
+{"type": "text", "text": "ილის შ", "timestamp": 1791097063956}
+{"type": "text", "text": "ეხსენება (opt", "timestamp": 1791097064023}
+{"type": "text", "text": "-in, ერთი", "timestamp": 1791097064088}
+{"type": "text", "text": " ტაპ", "timestamp": 1791097064158}
+{"type": "text", "text": "ით", "timestamp": 1791097064228}
+{"type": "text", "text": ").\nპრობლემა: დაბ", "timestamp": 1791097064299}
+{"type": "text", "text": "რუნების ტრიგერი არ არსებ", "timestamp": 1791097064370}
+{"type": "text", "text": "ობს —", "timestamp": 1791097064437}
+{"type": "text", "text": " default", "timestamp": 1791097064520}
+{"type": "text", "text": "-off", "timestamp": 1791097064582}
+{"type": "text", "text": " შეხსენებები (", "timestamp": 1791097064651}
+{"type": "text", "text": "lib/reminder-config.ts) + fold", "timestamp": 1791097064759}
+{"type": "text", "text": "-ის ქვ", "timestamp": 1791097064793}
+{"type": "text", "text": "ემოთ push-", "timestamp": 1791097064879}
+{"type": "text", "text": "ბანერი", "timestamp": 1791097064941}
+{"type": "text", "text": ". უმც", "timestamp": 1791097065011}
+{"type": "text", "text": "ირესი იმპლემენტაცია: მეორე", "timestamp": 1791097065075}
+{"type": "text", "text": " დას", "timestamp": 1791097065146}
+{"type": "text", "text": "რულებული რიტუალის შემდეგ რ", "timestamp": 1791097065213}
+{"type": "text", "text": "იტუალურ", "timestamp": 1791097065287}
+{"type": "text", "text": " ბარათში", "timestamp": 1791097065352}
+{"type": "text", "text": " ჩნ", "timestamp": 1791097065424}
+{"type": "text", "text": "დება ერთი", "timestamp": 1791097065494}
+{"type": "text", "text": " წინად", "timestamp": 1791097065567}
+{"type": "text", "text": "ადება „დილის ", "timestamp": 1791097065635}
+{"type": "text", "text": "9:00-", "timestamp": 1791097065707}
+{"type": "text", "text": "ზე შეგ", "timestamp": 1791097065771}
+{"type": "text", "text": "ახს", "timestamp": 1791097065846}
+{"type": "text", "text": "ენო?\" → დაჭ", "timestamp": 1791097065910}
+{"type": "text", "text": "ერა", "timestamp": 1791097065980}
+{"type": "text", "text": " =", "timestamp": 1791097066048}
+{"type": "text", "text": " transitPush ან", "timestamp": 1791097066121}
+{"type": "text", "text": " forecastPush ჩ", "timestamp": 1791097066194}
+{"type": "text", "text": "ართვა", "timestamp": 1791097066263}
+{"type": "text", "text": " არს", "timestamp": 1791097066326}
+{"type": "text", "text": "ებული update", "timestamp": 1791097066396}
+{"type": "text", "text": "ReminderPreferences-ით (", "timestamp": 1791097066464}
+{"type": "text", "text": "actions/reminders.ts). არავ", "timestamp": 1791097066532}
+{"type": "text", "text": "ით", "timestamp": 1791097066602}
+{"type": "text", "text": "არ", "timestamp": 1791097066668}
+{"type": "text", "text": " შემთხვევაში", "timestamp": 1791097066738}
+{"type": "text", "text": " auto", "timestamp": 1791097066814}
+{"type": "text", "text": "-on. Anchor: components/dashboard", "timestamp": 1791097066876}
+{"type": "text", "text": "/daily-ritual.tsx:185-204", "timestamp": 1791097066945}
+{"type": "text", "text": ", components/push/push-opt-in.tsx,", "timestamp": 1791097067022}
+{"type": "text", "text": " actions/reminders.ts. დამოკიდებულება:", "timestamp": 1791097067085}
+{"type": "text", "text": " R1. Effort: S", "timestamp": 1791097067150}
+{"type": "text", "text": ". მეტრიკა:", "timestamp": 1791097067218}
+{"type": "text", "text": " notification", "timestamp": 1791097067288}
+{"type": "text", "text": "-to-value completion", "timestamp": 1791097067352}
+{"type": "text", "text": " (reminder", "timestamp": 1791097067420}
+{"type": "text", "text": "-funnel view", "timestamp": 1791097067488}
+{"type": "text", "text": " უკ", "timestamp": 1791097067556}
+{"type": "text", "text": "ვე არსებობს", "timestamp": 1791097067636}
+{"type": "text", "text": "),", "timestamp": 1791097067694}
+{"type": "text", "text": " opt-out სტაბ", "timestamp": 1791097067760}
+{"type": "text", "text": "ილურ", "timestamp": 1791097067828}
+{"type": "text", "text": "ობით", "timestamp": 1791097067896}
+{"type": "text", "text": ". მიღების კრიტერიუმ", "timestamp": 1791097067963}
+{"type": "text", "text": "ი: ჩ", "timestamp": 1791097068028}
+{"type": "text", "text": "ართვა მ", "timestamp": 1791097068097}
+{"type": "text", "text": "აქ", "timestamp": 1791097068165}
+{"type": "text", "text": "ს.", "timestamp": 1791097068235}
+{"type": "text", "text": " 2 ტაპია", "timestamp": 1791097068326}
+{"type": "text", "text": " /", "timestamp": 1791097068374}
+{"type": "text", "text": "account-", "timestamp": 1791097068432}
+{"type": "text", "text": "ში გად", "timestamp": 1791097068502}
+{"type": "text", "text": "ასვ", "timestamp": 1791097068568}
+{"type": "text", "text": "ლის გარეშე.\n\n", "timestamp": 1791097068638}
+{"type": "text", "text": "R4 — ADD. „შ", "timestamp": 1791097068716}
+{"type": "text", "text": "ენი კვირ", "timestamp": 1791097068773}
+{"type": "text", "text": "ა ერთ", "timestamp": 1791097068839}
+{"type": "text", "text": " ბარათში\" — უფას", "timestamp": 1791097068907}
+{"type": "text", "text": "ო ყოველ", "timestamp": 1791097068973}
+{"type": "text", "text": "კვირეული რეფლექსია", "timestamp": 1791097069038}
+{"type": "text", "text": ".\nპრობლემა: ს", "timestamp": 1791097069107}
+{"type": "text", "text": "ერიის ც", "timestamp": 1791097069242}
+{"type": "text", "text": "იფრის", "timestamp": 1791097069243}
+{"type": "text", "text": " გარდა უწყვეტ", "timestamp": 1791097069310}
+{"type": "text", "text": "ობის გან", "timestamp": 1791097069373}
+{"type": "text", "text": "ცდა", "timestamp": 1791097069452}
+{"type": "text", "text": " არაფ", "timestamp": 1791097069513}
+{"type": "text", "text": "ერ", "timestamp": 1791097069695}
+{"type": "text", "text": "ია; weekly", "timestamp": 1791097069699}
+{"type": "text", "text": "_recap არ არსებ", "timestamp": 1791097069940}
+{"type": "text", "text": "ობს. უმცირესი იმპლემენტაცია:", "timestamp": 1791097069941}
+{"type": "text", "text": " კვირ", "timestamp": 1791097069941}
+{"type": "text", "text": "ის", "timestamp": 1791097069942}
+{"type": "text", "text": " რ", "timestamp": 1791097069987}
+{"type": "text", "text": "იტუალების", "timestamp": 1791097070049}
+{"type": "text", "text": "/", "timestamp": 1791097070121}
+{"type": "text", "text": "ფოკუს", "timestamp": 1791097070187}
+{"type": "text", "text": "ების", "timestamp": 1791097070254}
+{"type": "text", "text": "გან", "timestamp": 1791097070321}
+{"type": "text", "text": " ა", "timestamp": 1791097070407}
+{"type": "text", "text": "წყობ", "timestamp": 1791097070454}
+{"type": "text", "text": "ილი მხოლოდ", "timestamp": 1791097070524}
+{"type": "text", "text": "-", "timestamp": 1791097070591}
+{"type": "text", "text": "წაკ", "timestamp": 1791097070674}
+{"type": "text", "text": "ით", "timestamp": 1791097070725}
+{"type": "text", "text": "ხვადი შეჯ", "timestamp": 1791097070794}
+{"type": "text", "text": "ამება /", "timestamp": 1791097070864}
+{"type": "text", "text": "library-ში (", "timestamp": 1791097070933}
+{"type": "text", "text": "არსებული", "timestamp": 1791097070996}
+{"type": "text", "text": " list", "timestamp": 1791097071061}
+{"type": "text", "text": "LibraryEntries-ის", "timestamp": 1791097071128}
+{"type": "text", "text": " თავ", "timestamp": 1791097071197}
+{"type": "text", "text": "ზე),", "timestamp": 1791097071261}
+{"type": "text", "text": " უფ", "timestamp": 1791097071333}
+{"type": "text", "text": "ასო", "timestamp": 1791097071402}
+{"type": "text", "text": "; PRO სიღრმ", "timestamp": 1791097071480}
+{"type": "text", "text": "ე =", "timestamp": 1791097071554}
+{"type": "text", "text": " თ", "timestamp": 1791097071607}
+{"type": "text", "text": "ვის", "timestamp": 1791097071673}
+{"type": "text", "text": " შეჯ", "timestamp": 1791097071738}
+{"type": "text", "text": "ამება + ტ", "timestamp": 1791097071808}
+{"type": "text", "text": "აროს", "timestamp": 1791097071883}
+{"type": "text", "text": "თან", "timestamp": 1791097071943}
+{"type": "text", "text": " კვ", "timestamp": 1791097072012}
+{"type": "text", "text": "ეთ", "timestamp": 1791097072087}
+{"type": "text", "text": "ა. Anchor", "timestamp": 1791097072151}
+{"type": "text", "text": ": app/library/page.tsx, lib/library.ts. დამოკიდ", "timestamp": 1791097074629}
+{"type": "text", "text": "ებულება: R2 (", "timestamp": 1791097074630}
+{"type": "text", "text": "ფოკუსი", "timestamp": 1791097074630}
+{"type": "text", "text": " სერვერზე", "timestamp": 1791097074630}
+{"type": "text", "text": "). Effort: M. მეტრიკა", "timestamp": 1791097074630}
+{"type": "text", "text": ": ", "timestamp": 1791097074630}
+{"type": "text", "text": "8+", "timestamp": 1791097074630}
+{"type": "text", "text": " დღიანი MA", "timestamp": 1791097074630}
+{"type": "text", "text": "U წ", "timestamp": 1791097074630}
+{"type": "text", "text": "ილი;", "timestamp": 1791097074630}
+{"type": "text", "text": " ბ", "timestamp": 1791097074630}
+{"type": "text", "text": "იბლიოთეკის", "timestamp": 1791097074631}
+{"type": "text", "text": " reopen rate", "timestamp": 1791097074631}
+{"type": "text", "text": ". მიღების კრიტერიუმ", "timestamp": 1791097074631}
+{"type": "text", "text": "ი: ", "timestamp": 1791097074631}
+{"type": "text", "text": "3", "timestamp": 1791097074631}
+{"type": "text", "text": "+ რ", "timestamp": 1791097074631}
+{"type": "text", "text": "იტუ", "timestamp": 1791097074631}
+{"type": "text", "text": "ალი", "timestamp": 1791097074631}
+{"type": "text", "text": "ანი", "timestamp": 1791097074631}
+{"type": "text", "text": " კვირა წარმ", "timestamp": 1791097074631}
+{"type": "text", "text": "ოშ", "timestamp": 1791097074631}
+{"type": "text", "text": "ობს", "timestamp": 1791097074631}
+{"type": "text", "text": " შეჯ", "timestamp": 1791097074631}
+{"type": "text", "text": "ამებას ნულ", "timestamp": 1791097074631}
+{"type": "text", "text": "ოვანი", "timestamp": 1791097074632}
+{"type": "text", "text": " AI-ღ", "timestamp": 1791097074632}
+{"type": "text", "text": "ირ", "timestamp": 1791097074632}
+{"type": "text", "text": "ებულებით", "timestamp": 1791097074632}
+{"type": "text", "text": " (", "timestamp": 1791097074632}
+{"type": "text", "text": "წ", "timestamp": 1791097074632}
+{"type": "text", "text": "ინ", "timestamp": 1791097074632}
+{"type": "text", "text": "ასწ", "timestamp": 1791097074632}
+{"type": "text", "text": "არ", "timestamp": 1791097074632}
+{"type": "text", "text": " აწყ", "timestamp": 1791097074632}
+{"type": "text", "text": "ობილი ტექსტები", "timestamp": 1791097074632}
+{"type": "text", "text": ").\n\nR5 — REMOVE/HIDE. პირველი ", "timestamp": 1791097074632}
+{"type": "text", "text": "7 დღის", "timestamp": 1791097074699}
+{"type": "text", "text": " მომხმარებლის", "timestamp": 1791097074753}
+{"type": "text", "text": "თვის", "timestamp": 1791097074814}
+{"type": "text", "text": " მეო", "timestamp": 1791097074885}
+{"type": "text", "text": "რადი", "timestamp": 1791097074949}
+{"type": "text", "text": " ბ", "timestamp": 1791097075009}
+{"type": "text", "text": "ლოკების დამალ", "timestamp": 1791097075069}
+{"type": "text", "text": "ვა", "timestamp": 1791097075130}
+{"type": "text", "text": "/", "timestamp": 1791097075223}
+{"type": "text", "text": "ჩ", "timestamp": 1791097075256}
+{"type": "text", "text": "ამ", "timestamp": 1791097075318}
+{"type": "text", "text": "ოწ", "timestamp": 1791097075397}
+{"type": "text", "text": "ევა", "timestamp": 1791097075442}
+{"type": "text", "text": ".\nპრობლემა: სტ", "timestamp": 1791097075506}
+{"type": "text", "text": "ატიების", "timestamp": 1791097075568}
+{"type": "text", "text": " რ", "timestamp": 1791097075651}
+{"type": "text", "text": "ეკომენდაცია, ტესტის პრომო,", "timestamp": 1791097075711}
+{"type": "text", "text": " suggested-", "timestamp": 1791097075774}
+{"type": "text", "text": "people rail", "timestamp": 1791097075836}
+{"type": "text", "text": " (page.tsx", "timestamp": 1791097075915}
+{"type": "text", "text": ":232-243, SOCIAL", "timestamp": 1791097078927}
+{"type": "text", "text": "_FEATURES.suggestedPeopleRail) ახ", "timestamp": 1791097078927}
+{"type": "text", "text": "ალ მომხმარებ", "timestamp": 1791097078927}
+{"type": "text", "text": "ელს ", "timestamp": 1791097078928}
+{"type": "text", "text": "10 არჩ", "timestamp": 1791097078928}
+{"type": "text", "text": "ევანს", "timestamp": 1791097078928}
+{"type": "text", "text": " აძლ", "timestamp": 1791097078928}
+{"type": "text", "text": "ევს", "timestamp": 1791097078928}
+{"type": "text", "text": " ერთ", "timestamp": 1791097078928}
+{"type": "text", "text": "ის ნ", "timestamp": 1791097078928}
+{"type": "text", "text": "აც", "timestamp": 1791097078928}
+{"type": "text", "text": "ვლ", "timestamp": 1791097078928}
+{"type": "text", "text": "ად. უმცირესი იმპლემენტაცია:", "timestamp": 1791097078929}
+{"type": "text", "text": " რეგისტ", "timestamp": 1791097078929}
+{"type": "text", "text": "რაცი", "timestamp": 1791097078929}
+{"type": "text", "text": "იდან 7 დღე", "timestamp": 1791097078929}
+{"type": "text", "text": " მხოლოდ", "timestamp": 1791097078929}
+{"type": "text", "text": " რიტუალი + ერთი", "timestamp": 1791097078929}
+{"type": "text", "text": " შემდეგ", "timestamp": 1791097078930}
+{"type": "text", "text": "ი ნ", "timestamp": 1791097078930}
+{"type": "text", "text": "აბი", "timestamp": 1791097078930}
+{"type": "text", "text": "ჯი (next", "timestamp": 1791097078930}
+{"type": "text", "text": "-best-action);", "timestamp": 1791097078930}
+{"type": "text", "text": " დანარჩენი", "timestamp": 1791097078930}
+{"type": "text", "text": " რ", "timestamp": 1791097078930}
+{"type": "text", "text": "ჩება, მაგრამ", "timestamp": 1791097078930}
+{"type": "text", "text": " რ", "timestamp": 1791097078930}
+{"type": "text", "text": "იტუალის ქვ", "timestamp": 1791097078930}
+{"type": "text", "text": "ემოთ. Anchor: app/dashboard/page.tsx:232", "timestamp": 1791097078930}
+{"type": "text", "text": "-243. დამოკიდ", "timestamp": 1791097078930}
+{"type": "text", "text": "ებულება: R", "timestamp": 1791097078931}
+{"type": "text", "text": "1. Effort: S. მეტრიკა", "timestamp": 1791097078931}
+{"type": "text", "text": ": D7", "timestamp": 1791097078931}
+{"type": "text", "text": " return;", "timestamp": 1791097078931}
+{"type": "text", "text": " meaningful actions per valuable session. მიღების კრიტერიუმ", "timestamp": 1791097078931}
+{"type": "text", "text": "ი: ახალი", "timestamp": 1791097078931}
+{"type": "text", "text": " მომხმარებ", "timestamp": 1791097078931}
+{"type": "text", "text": "ლის პირველ", "timestamp": 1791097078931}
+{"type": "text", "text": " ეკრანზე", "timestamp": 1791097078931}
+{"type": "text", "text": " მაქს", "timestamp": 1791097078931}
+{"type": "text", "text": ". 2 მოქმედ", "timestamp": 1791097078931}
+{"type": "text", "text": "ების", "timestamp": 1791097078931}
+{"type": "text", "text": " არ", "timestamp": 1791097078931}
+{"type": "text", "text": "ჩევანია.\n\nR6 — CHANGE. freem", "timestamp": 1791097078931}
+{"type": "text", "text": "ium ხაზის იარლ", "timestamp": 1791097079004}
+{"type": "text", "text": "იყ", "timestamp": 1791097079066}
+{"type": "text", "text": "ი:", "timestamp": 1791097079132}
+{"type": "text", "text": " „უფასო დღეს / PRO სიღრმე", "timestamp": 1791097079205}
+{"type": "text", "text": " / ერთჯ", "timestamp": 1791097079269}
+{"type": "text", "text": "ერ", "timestamp": 1791097079337}
+{"type": "text", "text": "ადი ტარო\".\nპრობლემა:", "timestamp": 1791097079411}
+{"type": "text", "text": " უფ", "timestamp": 1791097079471}
+{"type": "text", "text": "ასო daily", "timestamp": 1791097079539}
+{"type": "text", "text": " ს", "timestamp": 1791097079605}
+{"type": "text", "text": "რულია,", "timestamp": 1791097079674}
+{"type": "text", "text": " მაგრამ მომხმარებ", "timestamp": 1791097079741}
+{"type": "text", "text": "ელ", "timestamp": 1791097079808}
+{"type": "text", "text": "მა არ იცის", "timestamp": 1791097079876}
+{"type": "text", "text": " სად მთავ", "timestamp": 1791097079942}
+{"type": "text", "text": "რდ", "timestamp": 1791097080012}
+{"type": "text", "text": "ება უფასო და ი", "timestamp": 1791097080076}
+{"type": "text", "text": "წყება ფ", "timestamp": 1791097080147}
+{"type": "text", "text": "ასიანი — weeklyForecast", "timestamp": 1791097080211}
+{"type": "text", "text": " 10 კრ", "timestamp": 1791097080282}
+{"type": "text", "text": "ედიტის teaser", "timestamp": 1791097080348}
+{"type": "text", "text": " (actions", "timestamp": 1791097080417}
+{"type": "text", "text": "/dashboard.ts:120", "timestamp": 1791097080484}
+{"type": "text", "text": ",", "timestamp": 1791097080552}
+{"type": "text", "text": " strip", "timestamp": 1791097080625}
+{"type": "text", "text": "WeeklyTeaser) და PRO brief", "timestamp": 1791097080688}
+{"type": "text", "text": "-ის ლ", "timestamp": 1791097080779}
+{"type": "text", "text": "ოქ", "timestamp": 1791097080825}
+{"type": "text", "text": "ი (", "timestamp": 1791097080889}
+{"type": "text", "text": "pro-daily-brief.tsx)", "timestamp": 1791097080957}
+{"type": "text", "text": " გაურ", "timestamp": 1791097081023}
+{"type": "text", "text": "კ", "timestamp": 1791097081095}
+{"type": "text", "text": "ვ", "timestamp": 1791097081159}
+{"type": "text", "text": "ევ", "timestamp": 1791097081228}
+{"type": "text", "text": "ლ", "timestamp": 1791097081294}
+{"type": "text", "text": "ად ე", "timestamp": 1791097081364}
+{"type": "text", "text": "რ", "timestamp": 1791097081428}
+{"type": "text", "text": "წყ", "timestamp": 1791097081499}
+{"type": "text", "text": "მის", "timestamp": 1791097081569}
+{"type": "text", "text": ".", "timestamp": 1791097081631}
+{"type": "text", "text": " უმცირესი იმპლემენტაცია: სამ", "timestamp": 1791097081707}
+{"type": "text", "text": "ივ", "timestamp": 1791097081783}
+{"type": "text", "text": "ე ბარ", "timestamp": 1791097081837}
+{"type": "text", "text": "ათზე ერთი", "timestamp": 1791097081898}
+{"type": "text", "text": " ხ", "timestamp": 1791097081968}
+{"type": "text", "text": "აზ", "timestamp": 1791097082032}
+{"type": "text", "text": "ი", "timestamp": 1791097082098}
+{"type": "text", "text": " —", "timestamp": 1791097082167}
+{"type": "text", "text": " „დღევ", "timestamp": 1791097082248}
+{"type": "text", "text": "ანდელი უფას", "timestamp": 1791097082301}
+{"type": "text", "text": "ოა", "timestamp": 1791097082368}
+{"type": "text", "text": "\", „კვირა", "timestamp": 1791097082435}
+{"type": "text", "text": " — 10 კრედიტი ან", "timestamp": 1791097082502}
+{"type": "text", "text": " PRO\", „ტარო — ერთ", "timestamp": 1791097082566}
+{"type": "text", "text": "ჯერადი 10 კრედიტი\". Anchor: components", "timestamp": 1791097082633}
+{"type": "text", "text": "/dashboard/weekly-forecast-locked.tsx, pro", "timestamp": 1791097082698}
+{"type": "text", "text": "-daily-brief.tsx:", "timestamp": 1791097082769}
+{"type": "text", "text": "69-70. დამოკიდებულება: არ", "timestamp": 1791097082836}
+{"type": "text", "text": " აქვს. Effort: S. მეტრიკა", "timestamp": 1791097082900}
+{"type": "text", "text": ": paywall_viewed →", "timestamp": 1791097084645}
+{"type": "text", "text": " product_selected (conf", "timestamp": 1791097084645}
+{"type": "text", "text": "usion", "timestamp": 1791097084645}
+{"type": "text", "text": "-ის შემ", "timestamp": 1791097084646}
+{"type": "text", "text": "ც", "timestamp": 1791097084646}
+{"type": "text", "text": "ირება,", "timestamp": 1791097084646}
+{"type": "text", "text": " არა ზ", "timestamp": 1791097084646}
+{"type": "text", "text": "ე", "timestamp": 1791097084646}
+{"type": "text", "text": "წ", "timestamp": 1791097084647}
+{"type": "text", "text": "ოლ", "timestamp": 1791097084647}
+{"type": "text", "text": "ა). მიღების კრიტერიუმ", "timestamp": 1791097084647}
+{"type": "text", "text": "ი: copy", "timestamp": 1791097084647}
+{"type": "text", "text": "-ში", "timestamp": 1791097084647}
+{"type": "text", "text": " „", "timestamp": 1791097084647}
+{"type": "text", "text": "შეზ", "timestamp": 1791097084647}
+{"type": "text", "text": "ღ", "timestamp": 1791097084647}
+{"type": "text", "text": "უდული დრო", "timestamp": 1791097084647}
+{"type": "text", "text": "\",", "timestamp": 1791097084647}
+{"type": "text", "text": " „დარჩ", "timestamp": 1791097084647}
+{"type": "text", "text": "ა", "timestamp": 1791097084648}
+{"type": "text", "text": " X\"", "timestamp": 1791097084648}
+{"type": "text", "text": " ტ", "timestamp": 1791097084648}
+{"type": "text", "text": "იპის", "timestamp": 1791097084648}
+{"type": "text", "text": " ე", "timestamp": 1791097084648}
+{"type": "text", "text": "ნა", "timestamp": 1791097084648}
+{"type": "text", "text": " არ არის.\n\nპირველი 7 დღის გზ", "timestamp": 1791097084648}
+{"type": "text", "text": "ა (შ", "timestamp": 1791097084714}
+{"type": "text", "text": "ე", "timestamp": 1791097084781}
+{"type": "text", "text": "ჯამება,", "timestamp": 1791097084848}
+{"type": "text", "text": " არა ფ", "timestamp": 1791097084912}
+{"type": "text", "text": "უნქცი", "timestamp": 1791097084991}
+{"type": "text", "text": "ების ს", "timestamp": 1791097085049}
+{"type": "text", "text": "ია): დღ", "timestamp": 1791097085117}
+{"type": "text", "text": "ე 1 — onboarding „", "timestamp": 1791097085188}
+{"type": "text", "text": "aha\" (Big", "timestamp": 1791097085260}
+{"type": "text", "text": " Three უკ", "timestamp": 1791097085322}
+{"type": "text", "text": "ვე shipped", "timestamp": 1791097085414}
+{"type": "text", "text": ")", "timestamp": 1791097085452}
+{"type": "text", "text": " → პირველი", "timestamp": 1791097085783}
+{"type": "text", "text": " რიტუალი ", "timestamp": 1791097085784}
+{"type": "text", "text": "90", "timestamp": 1791097085784}
+{"type": "text", "text": " წამში; დღე 2 — R3", "timestamp": 1791097085785}
+{"type": "text", "text": "-ის შ", "timestamp": 1791097085785}
+{"type": "text", "text": "ეხსენების", "timestamp": 1791097085849}
+{"type": "text", "text": " შეთავაზ", "timestamp": 1791097085918}
+{"type": "text", "text": "ება მეო", "timestamp": 1791097085983}
+{"type": "text", "text": "რე ვ", "timestamp": 1791097086052}
+{"type": "text", "text": "იზიტზე", "timestamp": 1791097086113}
+{"type": "text", "text": "; დღე 3-6 — ერთი", "timestamp": 1791097086181}
+{"type": "text", "text": " მო", "timestamp": 1791097086245}
+{"type": "text", "text": "ქმედება ყოველ დ", "timestamp": 1791097086316}
+{"type": "text", "text": "ილით", "timestamp": 1791097086382}
+{"type": "text", "text": " (", "timestamp": 1791097086475}
+{"type": "text", "text": "R1), სა", "timestamp": 1791097086521}
+{"type": "text", "text": "ღამოს დახურვა (R2); დღე ", "timestamp": 1791097086591}
+{"type": "text", "text": "7 — ს", "timestamp": 1791097086653}
+{"type": "text", "text": "ერიის +", "timestamp": 1791097086719}
+{"type": "text", "text": "1 milestone", "timestamp": 1791097086784}
+{"type": "text", "text": " (არს", "timestamp": 1791097086830}
+{"type": "text", "text": "ებული", "timestamp": 1791097086897}
+{"type": "text", "text": ") + პირველი კვირის შეჯ", "timestamp": 1791097086957}
+{"type": "text", "text": "ამება (R4)", "timestamp": 1791097087019}
+{"type": "text", "text": " → მიზ", "timestamp": 1791097087083}
+{"type": "text", "text": "ეზ", "timestamp": 1791097087144}
+{"type": "text", "text": "ი მეო", "timestamp": 1791097087203}
+{"type": "text", "text": "რე კვირისთვის", "timestamp": 1791097087274}
+{"type": "text", "text": ".", "timestamp": 1791097087326}
+{"type": "text", "text": " ფ", "timestamp": 1791097087386}
+{"type": "text", "text": "ასიანი ტარო მთ", "timestamp": 1791097087449}
+{"type": "text", "text": "ელი გზის", "timestamp": 1791097087511}
+{"type": "text", "text": " მან", "timestamp": 1791097087571}
+{"type": "text", "text": "ძ", "timestamp": 1791097087634}
+{"type": "text", "text": "ილზე", "timestamp": 1791097087693}
+{"type": "text", "text": " გვერდ", "timestamp": 1791097087756}
+{"type": "text", "text": "ით", "timestamp": 1791097087817}
+{"type": "text", "text": "აა", "timestamp": 1791097087882}
+{"type": "text", "text": ", არა გზ", "timestamp": 1791097087950}
+{"type": "text", "text": "აზე.\n\n", "timestamp": 1791097088003}
+{"type": "text", "text": "3. რა არ უნდა", "timestamp": 1791097088066}
+{"type": "text", "text": " გ", "timestamp": 1791097088135}
+{"type": "text", "text": "აკეთდეს", "timestamp": 1791097088190}
+{"type": "text", "text": "\n\nარ", "timestamp": 1791097088262}
+{"type": "text", "text": "ავ", "timestamp": 1791097088318}
+{"type": "text", "text": "ითარი", "timestamp": 1791097088376}
+{"type": "text", "text": " სასჯ", "timestamp": 1791097088437}
+{"type": "text", "text": "ელი", "timestamp": 1791097088498}
+{"type": "text", "text": "ანი", "timestamp": 1791097088560}
+{"type": "text", "text": " სერია („", "timestamp": 1791097088626}
+{"type": "text", "text": "ს", "timestamp": 1791097088694}
+{"type": "text", "text": "ერ", "timestamp": 1791097088741}
+{"type": "text", "text": "ია გ", "timestamp": 1791097088818}
+{"type": "text", "text": "�ყ", "timestamp": 1791097088870}
+{"type": "text", "text": "დება!", "timestamp": 1791097088932}
+{"type": "text", "text": "\"), შ", "timestamp": 1791097088989}
+{"type": "text", "text": "ფ", "timestamp": 1791097089052}
+{"type": "text", "text": "ოთ", "timestamp": 1791097089113}
+{"type": "text", "text": "ვით", "timestamp": 1791097089174}
+{"type": "text", "text": "ი", "timestamp": 1791097089238}
+{"type": "text", "text": "/FOM", "timestamp": 1791097089303}
+{"type": "text", "text": "O ენა", "timestamp": 1791097089368}
+{"type": "text", "text": ", ს", "timestamp": 1791097089435}
+{"type": "text", "text": "ავ", "timestamp": 1791097089499}
+{"type": "text", "text": "ალდ", "timestamp": 1791097089570}
+{"type": "text", "text": "ებულ", "timestamp": 1791097089630}
+{"type": "text", "text": "ო გაზ", "timestamp": 1791097089692}
+{"type": "text", "text": "ი", "timestamp": 1791097089752}
+{"type": "text", "text": "არ", "timestamp": 1791097089813}
+{"type": "text", "text": "ება (", "timestamp": 1791097089883}
+{"type": "text", "text": "social-share-credits დ", "timestamp": 1791097089937}
+{"type": "text", "text": "ოკი", "timestamp": 1791097090009}
+{"type": "text", "text": " სწორ", "timestamp": 1791097090084}
+{"type": "text", "text": "ად ი", "timestamp": 1791097090121}
+{"type": "text", "text": "ხ", "timestamp": 1791097090189}
+{"type": "text", "text": "დ", "timestamp": 1791097090246}
+{"type": "text", "text": "ის მხოლოდ გაზ", "timestamp": 1791097090313}
+{"type": "text", "text": "ომილ", "timestamp": 1791097090371}
+{"type": "text", "text": " შედეგზე", "timestamp": 1791097090441}
+{"type": "text", "text": " — ის", "timestamp": 1791097090500}
+{"type": "text", "text": "ედ", "timestamp": 1791097090575}
+{"type": "text", "text": "აც", "timestamp": 1791097090632}
+{"type": "text", "text": " proposal სტ", "timestamp": 1791097090698}
+{"type": "text", "text": "ატუსში", "timestamp": 1791097090766}
+{"type": "text", "text": "ა), განმეო", "timestamp": 1791097090836}
+{"type": "text", "text": "რებ", "timestamp": 1791097090906}
+{"type": "text", "text": "ადი დღ", "timestamp": 1791097090956}
+{"type": "text", "text": "იური კრედიტის ო", "timestamp": 1791097091026}
+{"type": "text", "text": "ნკ", "timestamp": 1791097091088}
+{"type": "text", "text": "ანი", "timestamp": 1791097091142}
+{"type": "text", "text": " (free", "timestamp": 1791097091206}
+{"type": "text", "text": "/sp", "timestamp": 1791097091268}
+{"type": "text", "text": "end 4.52×-", "timestamp": 1791097091331}
+{"type": "text", "text": "ზე guard", "timestamp": 1791097091395}
+{"type": "text", "text": "rail „", "timestamp": 1791097091458}
+{"type": "text", "text": "stop\"-", "timestamp": 1791097091525}
+{"type": "text", "text": "ია — docs", "timestamp": 1791097091583}
+{"type": "text", "text": "/product-growth-priorities.md:172-178", "timestamp": 1791097091644}
+{"type": "text", "text": "), მკ", "timestamp": 1791097091707}
+{"type": "text", "text": "ითხ", "timestamp": 1791097091775}
+{"type": "text", "text": "აობ", "timestamp": 1791097091842}
+{"type": "text", "text": "ა", "timestamp": 1791097091906}
+{"type": "text", "text": " სამედ", "timestamp": 1791097091978}
+{"type": "text", "text": "იცინ", "timestamp": 1791097092050}
+{"type": "text", "text": "ო/ფინ", "timestamp": 1791097092111}
+{"type": "text", "text": "ანსური რ", "timestamp": 1791097092173}
+{"type": "text", "text": "ჩ", "timestamp": 1791097092239}
+{"type": "text", "text": "ევ", "timestamp": 1791097092311}
+{"type": "text", "text": "ისთვის", "timestamp": 1791097092385}
+{"type": "text", "text": ", და არავ", "timestamp": 1791097092448}
+{"type": "text", "text": "ითარი", "timestamp": 1791097092516}
+{"type": "text", "text": " 10 ახალი tile — თით", "timestamp": 1791097092583}
+{"type": "text", "text": "ოეული ახალი", "timestamp": 1791097092655}
+{"type": "text", "text": " ბლოკი R", "timestamp": 1791097092720}
+{"type": "text", "text": "1-ს", "timestamp": 1791097092788}
+{"type": "text", "text": " კლ", "timestamp": 1791097092855}
+{"type": "text", "text": "ავს", "timestamp": 1791097092926}
+{"type": "text", "text": ".", "timestamp": 1791097093006}
+{"type": "text", "text": " PWA offline", "timestamp": 1791097093066}
+{"type": "text", "text": "-ქ", "timestamp": 1791097093146}
+{"type": "text", "text": "ეშ", "timestamp": 1791097093198}
+{"type": "text", "text": "ირ", "timestamp": 1791097093264}
+{"type": "text", "text": "ება ჯ", "timestamp": 1791097093336}
+{"type": "text", "text": "ერ", "timestamp": 1791097093416}
+{"type": "text", "text": " არ არის", "timestamp": 1791097093479}
+{"type": "text", "text": " (growth", "timestamp": 1791097093550}
+{"type": "text", "text": " doc", "timestamp": 1791097093623}
+{"type": "text", "text": " ად", "timestamp": 1791097093693}
+{"type": "text", "text": "ას", "timestamp": 1791097093768}
+{"type": "text", "text": "ტურ", "timestamp": 1791097093848}
+{"type": "text", "text": "ებს)", "timestamp": 1791097093910}
+{"type": "text", "text": " — „", "timestamp": 1791097093982}
+{"type": "text", "text": "და", "timestamp": 1791097094053}
+{"type": "text", "text": "ა", "timestamp": 1791097094128}
+{"type": "text", "text": "ყენე აპ", "timestamp": 1791097094195}
+{"type": "text", "text": "ი\" კ", "timestamp": 1791097094269}
+{"type": "text", "text": "ამპ", "timestamp": 1791097094340}
+{"type": "text", "text": "ანია ა", "timestamp": 1791097094410}
+{"type": "text", "text": "ზ", "timestamp": 1791097094486}
+{"type": "text", "text": "რ", "timestamp": 1791097094559}
+{"type": "text", "text": "იანია", "timestamp": 1791097094626}
+{"type": "text", "text": " მხოლოდ R1", "timestamp": 1791097094704}
+{"type": "text", "text": "-R3-ის შემდეგ, თ", "timestamp": 1791097094778}
+{"type": "text", "text": "ორ", "timestamp": 1791097094846}
+{"type": "text", "text": "ემ", "timestamp": 1791097094918}
+{"type": "text", "text": " დ", "timestamp": 1791097094988}
+{"type": "text", "text": "აყენებული ეკ", "timestamp": 1791097095058}
+{"type": "text", "text": "რანი ც", "timestamp": 1791097095131}
+{"type": "text", "text": "არიელ", "timestamp": 1791097095200}
+{"type": "text", "text": " ვ", "timestamp": 1791097095281}
+{"type": "text", "text": "იტრინ", "timestamp": 1791097095344}
+{"type": "text", "text": "ას", "timestamp": 1791097095426}
+{"type": "text", "text": " ა", "timestamp": 1791097095486}
+{"type": "text", "text": "ჩვენ", "timestamp": 1791097095561}
+{"type": "text", "text": "ებს.\n\n4. უ", "timestamp": 1791097095633}
+{"type": "text", "text": "ძლ", "timestamp": 1791097095702}
+{"type": "text", "text": "იერ", "timestamp": 1791097095766}
+{"type": "text", "text": "ესი კონტრ", "timestamp": 1791097095839}
+{"type": "text", "text": "არგუმ", "timestamp": 1791097095911}
+{"type": "text", "text": "ენტი R", "timestamp": 1791097095985}
+{"type": "text", "text": "1-ის", "timestamp": 1791097096074}
+{"type": "text", "text": " წინა", "timestamp": 1791097096123}
+{"type": "text", "text": "აღმდეგ", "timestamp": 1791097096193}
+{"type": "text", "text": "\n\nტ", "timestamp": 1791097096263}
+{"type": "text", "text": "არო +", "timestamp": 1791097096334}
+{"type": "text", "text": " ნატალური PDF კრ", "timestamp": 1791097096409}
+{"type": "text", "text": "ედიტის ხ", "timestamp": 1791097096476}
+{"type": "text", "text": "არჯ", "timestamp": 1791097096548}
+{"type": "text", "text": "ვის 79.5%-ს ი", "timestamp": 1791097096616}
+{"type": "text", "text": "ძლ", "timestamp": 1791097096685}
+{"type": "text", "text": "ევა", "timestamp": 1791097096756}
+{"type": "text", "text": " (growth", "timestamp": 1791097096827}
+{"type": "text", "text": " doc-ის მტკიც", "timestamp": 1791097096900}
+{"type": "text", "text": "ება). PopularTools", "timestamp": 1791097096965}
+{"type": "text", "text": "-ის", "timestamp": 1791097097045}
+{"type": "text", "text": " ჩამო", "timestamp": 1791097097107}
+{"type": "text", "text": "წევამ", "timestamp": 1791097097177}
+{"type": "text", "text": " შეიძლება შე", "timestamp": 1791097097247}
+{"type": "text", "text": "ამცირ", "timestamp": 1791097097319}
+{"type": "text", "text": "ოს spend", "timestamp": 1791097097391}
+{"type": "text", "text": "_tarot-", "timestamp": 1791097097454}
+{"type": "text", "text": " unlock", "timestamp": 1791097097524}
+{"type": "text", "text": "-ები და მო", "timestamp": 1791097097599}
+{"type": "text", "text": "კ", "timestamp": 1791097097664}
+{"type": "text", "text": "ლ", "timestamp": 1791097097728}
+{"type": "text", "text": "ევად", "timestamp": 1791097097798}
+{"type": "text", "text": "იანი შემ", "timestamp": 1791097097866}
+{"type": "text", "text": "ოს", "timestamp": 1791097097953}
+{"type": "text", "text": "ავ", "timestamp": 1791097097998}
+{"type": "text", "text": "ალი, მაშინ", "timestamp": 1791097098064}
+{"type": "text", "text": " რ", "timestamp": 1791097098130}
+{"type": "text", "text": "ოცა", "timestamp": 1791097098197}
+{"type": "text", "text": " რიტუალის", "timestamp": 1791097098283}
+{"type": "text", "text": " ლიფ", "timestamp": 1791097098336}
+{"type": "text", "text": "ტი თ", "timestamp": 1791097098400}
+{"type": "text", "text": "ვე", "timestamp": 1791097098465}
+{"type": "text", "text": "ების", "timestamp": 1791097098533}
+{"type": "text", "text": " შემდეგ", "timestamp": 1791097098598}
+{"type": "text", "text": " გამო", "timestamp": 1791097098663}
+{"type": "text", "text": "ჩ", "timestamp": 1791097098734}
+{"type": "text", "text": "ნ", "timestamp": 1791097098793}
+{"type": "text", "text": "დება. ამ", "timestamp": 1791097098864}
+{"type": "text", "text": "იტომ R1 მარტ", "timestamp": 1791097098926}
+{"type": "text", "text": "ო არ", "timestamp": 1791097098989}
+{"type": "text", "text": " გა", "timestamp": 1791097099057}
+{"type": "text", "text": "იშ", "timestamp": 1791097099121}
+{"type": "text", "text": "ვას", "timestamp": 1791097099183}
+{"type": "text", "text": ": guard", "timestamp": 1791097100751}
+{"type": "text", "text": "rail-ად", "timestamp": 1791097100751}
+{"type": "text", "text": " paywall", "timestamp": 1791097100751}
+{"type": "text", "text": "-to-checkout და 30-", "timestamp": 1791097100751}
+{"type": "text", "text": "დღიანი payer conversion (", "timestamp": 1791097100751}
+{"type": "text", "text": "growth doc §", "timestamp": 1791097100751}
+{"type": "text", "text": "Credit", "timestamp": 1791097100751}
+{"type": "text", "text": "-economy guardrails),", "timestamp": 1791097100751}
+{"type": "text", "text": " და თუ ტ", "timestamp": 1791097100751}
+{"type": "text", "text": "აროს unlock", "timestamp": 1791097100751}
+{"type": "text", "text": " ", "timestamp": 1791097100751}
+{"type": "text", "text": "2", "timestamp": 1791097100752}
+{"type": "text", "text": " კვირაში ვარდ", "timestamp": 1791097100752}
+{"type": "text", "text": "ება", "timestamp": 1791097100752}
+{"type": "text", "text": " — tiles", "timestamp": 1791097100752}
+{"type": "text", "text": "-ის", "timestamp": 1791097100752}
+{"type": "text", "text": " კომპ", "timestamp": 1791097100752}
+{"type": "text", "text": "აქტ", "timestamp": 1791097100752}
+{"type": "text", "text": "ური ვერს", "timestamp": 1791097100752}
+{"type": "text", "text": "ია რ", "timestamp": 1791097100752}
+{"type": "text", "text": "იტუალის გვერდ", "timestamp": 1791097100752}
+{"type": "text", "text": "ით", "timestamp": 1791097100752}
+{"type": "text", "text": ", არა ზ", "timestamp": 1791097100752}
+{"type": "text", "text": "ემ", "timestamp": 1791097100752}
+{"type": "text", "text": "ოთ.\n\n5", "timestamp": 1791097100752}
+{"type": "text", "text": ". გაურ", "timestamp": 1791097100820}
+{"type": "text", "text": "კვევლ", "timestamp": 1791097100888}
+{"type": "text", "text": "ობები (", "timestamp": 1791097100965}
+{"type": "text", "text": "პ", "timestamp": 1791097101027}
+{"type": "text", "text": "ატიო", "timestamp": 1791097101094}
+{"type": "text", "text": "სანი", "timestamp": 1791097101165}
+{"type": "text", "text": " ს", "timestamp": 1791097101235}
+{"type": "text", "text": "ია)\n\nრე", "timestamp": 1791097101307}
+{"type": "text", "text": "ალური", "timestamp": 1791097101377}
+{"type": "text", "text": " DAU/retention/re", "timestamp": 1791097101449}
+{"type": "text", "text": "venue არ", "timestamp": 1791097101520}
+{"type": "text", "text": " მინ", "timestamp": 1791097101602}
+{"type": "text", "text": "ახავს", "timestamp": 1791097101655}
+{"type": "text", "text": " — GA4 მხოლოდ", "timestamp": 1791097101724}
+{"type": "text", "text": " თანხ", "timestamp": 1791097101795}
+{"type": "text", "text": "მობ", "timestamp": 1791097101871}
+{"type": "text", "text": "იან directional", "timestamp": 1791097101938}
+{"type": "text", "text": " ს", "timestamp": 1791097102013}
+{"type": "text", "text": "იგნალ", "timestamp": 1791097102083}
+{"type": "text", "text": "ს", "timestamp": 1791097102154}
+{"type": "text", "text": " იძლ", "timestamp": 1791097102227}
+{"type": "text", "text": "ევა, ჭ", "timestamp": 1791097102299}
+{"type": "text", "text": "ეშ", "timestamp": 1791097102369}
+{"type": "text", "text": "მარ", "timestamp": 1791097102446}
+{"type": "text", "text": "იტება", "timestamp": 1791097102523}
+{"type": "text", "text": " server", "timestamp": 1791097102585}
+{"type": "text", "text": "-sideა", "timestamp": 1791097102662}
+{"type": "text", "text": ".", "timestamp": 1791097102737}
+{"type": "text", "text": " არ ვ", "timestamp": 1791097102802}
+{"type": "text", "text": "იცი:", "timestamp": 1791097102885}
+{"type": "text", "text": " აღი", "timestamp": 1791097102940}
+{"type": "text", "text": "ქმ", "timestamp": 1791097103028}
+{"type": "text", "text": "ება", "timestamp": 1791097103086}
+{"type": "text", "text": " თუ", "timestamp": 1791097103226}
+{"type": "text", "text": " არა", "timestamp": 1791097103258}
+{"type": "text", "text": " daily", "timestamp": 1791097103303}
+{"type": "text", "text": " ტექ", "timestamp": 1791097103373}
+{"type": "text", "text": "სტი", "timestamp": 1791097103445}
+{"type": "text", "text": " პერსონალ", "timestamp": 1791097103517}
+{"type": "text", "text": "ურად (vs", "timestamp": 1791097103603}
+{"type": "text", "text": " გ", "timestamp": 1791097103660}
+{"type": "text", "text": "ენერიკ", "timestamp": 1791097103736}
+{"type": "text", "text": "ად", "timestamp": 1791097103813}
+{"type": "text", "text": "),", "timestamp": 1791097103883}
+{"type": "text", "text": " iOS push", "timestamp": 1791097103967}
+{"type": "text", "text": "-", "timestamp": 1791097104023}
+{"type": "text", "text": "თან", "timestamp": 1791097104099}
+{"type": "text", "text": "ხ", "timestamp": 1791097104172}
+{"type": "text", "text": "მობის რე", "timestamp": 1791097104364}
+{"type": "text", "text": "ალური", "timestamp": 1791097104367}
+{"type": "text", "text": " წილი, სა", "timestamp": 1791097104598}
+{"type": "text", "text": "ჯ", "timestamp": 1791097104599}
+{"type": "text", "text": "არო /", "timestamp": 1791097104600}
+{"type": "text", "text": "horoskopi წამ", "timestamp": 1791097104600}
+{"type": "text", "text": "კ", "timestamp": 1791097104661}
+{"type": "text", "text": "ით", "timestamp": 1791097104719}
+{"type": "text", "text": "ხველ", "timestamp": 1791097104792}
+{"type": "text", "text": "ების", "timestamp": 1791097104857}
+{"type": "text", "text": " წ", "timestamp": 1791097104931}
+{"type": "text", "text": "ილი, რომლებიც", "timestamp": 1791097105000}
+{"type": "text", "text": " არ", "timestamp": 1791097105081}
+{"type": "text", "text": "ას", "timestamp": 1791097105131}
+{"type": "text", "text": "დ", "timestamp": 1791097105208}
+{"type": "text", "text": "როს რეგისტ", "timestamp": 1791097105315}
+{"type": "text", "text": "რირდები", "timestamp": 1791097105330}
+{"type": "text", "text": "ან, და რამდენი", "timestamp": 1791097105401}
+{"type": "text", "text": " რ", "timestamp": 1791097105465}
+{"type": "text", "text": "იტუალდ", "timestamp": 1791097105532}
+{"type": "text", "text": "ასრულება იკ", "timestamp": 1791097105598}
+{"type": "text", "text": "არგება", "timestamp": 1791097105666}
+{"type": "text", "text": " localStorage-წ", "timestamp": 1791097105732}
+{"type": "text", "text": "არ", "timestamp": 1791097105799}
+{"type": "text", "text": "უ", "timestamp": 1791097105868}
+{"type": "text", "text": "მ", "timestamp": 1791097105930}
+{"type": "text", "text": "ატებლ", "timestamp": 1791097105995}
+{"type": "text", "text": "ობით", "timestamp": 1791097106062}
+{"type": "text", "text": ". გ", "timestamp": 1791097106128}
+{"type": "text", "text": "არე შედ", "timestamp": 1791097106196}
+{"type": "text", "text": "არ", "timestamp": 1791097106259}
+{"type": "text", "text": "ება არ მომ", "timestamp": 1791097106328}
+{"type": "text", "text": "იძ", "timestamp": 1791097106411}
+{"type": "text", "text": "ი", "timestamp": 1791097106458}
+{"type": "text", "text": "ები", "timestamp": 1791097106526}
+{"type": "text", "text": "ა — ზ", "timestamp": 1791097106597}
+{"type": "text", "text": "ემოთ ყველა", "timestamp": 1791097106657}
+{"type": "text", "text": " მ", "timestamp": 1791097106725}
+{"type": "text", "text": "ტკიცება ლ", "timestamp": 1791097106792}
+{"type": "text", "text": "ოკალური", "timestamp": 1791097106856}
+{"type": "text", "text": " კოდიდანაა.", "timestamp": 1791097106926}
+{"type": "result", "session_id": "20261004_105501_a5cf2e", "exit_code": 0, "text": "DAILY VALUE / RETENTION აუდიტი — Vivida.ge (ქართული მომხმარებელი)\n\nშემოწმდა 10-ზე მეტი წყარო ფაილი; ქვემოთ „დადასტურებული\" ნიშნავს კოდში ნანახს ციტატით, „ჰიპოთეზა\" — დასკვნას გაზომვის გარეშე, „შესასრულებელი\" — წინადადებას.\n\n1. დადასტურებული მიმდინარე მდგომარეობა\n\nდეშბორდის რიგი დღეს ასეთია (app/dashboard/page.tsx:201-243): მისალმება → PopularTools (ტარო + „ჰკითხე ვარსკვლავებს\", dashboard_top) → DailyDashboard → PushOptIn banner → billing nudge → სტატიები → ტესტის პრომო. ანუ ფასიანი funnel-ის ორი tile დგას უფასო ყოველდღიურ ღირებულებაზე მაღლა, და გვერდს არ აქვს ერთი დომინანტური მოქმედება.\n\nყოველდღიური რიტუალი არსებობს და ტექნიკურად გამართულია, მაგრამ ორ-საფეხურიანია: ჰოროსკოპის ბოლომდე ჩაკითხვა (IntersectionObserver, threshold 0.6 — components/dashboard/daily-card.tsx:82-101) + ფოკუსის არჩევა სამი ღილაკიდან (components/dashboard/daily-ritual.tsx:148-184). დასრულება იწერება სერვერზე user_activity_day-ში DAILY_RITUAL_VERSION = 2-ით (lib/daily-ritual-core.ts:9-60). სერია ითვლება მხოლოდ რიტუალით დასრულებული დღეებიდან (calculateStreak, lib/streak.ts:14-33) — ნებისმიერი აქტივობა სერიას არ ზრდის.\n\nჯილდო განზრახ სუსტია და ეს სწორია: RITUAL_STREAK_MILESTONES = 7 დღე → +1, 30 → +2, 100 → +5, lifetime-მაქსიმუმი +8, განმეორება არ არის (lib/credits-config.ts:53-57). ფასები დადასტურებულია: weeklyForecast 10, tarot 10, tarotFollowup 5, chat 2, synastry 5, ტესტები 5, pdfReport 5 (lib/credits-config.ts:60-74); SIGNUP_BONUS 20, MONTHLY_BONUS 5, REFERRAL_REWARD 10.\n\nპერსონალური vs საჯარო პროგნოზი გაყოფილია სწორად: დეშბორდზე პერსონალური daily მოდის ensureDailyFor(userId, locale)-ით (actions/dashboard.ts:134-138), საჯაროა /horoskopi (ნიშნით, +kvireuli/tviuri). ორივე არსებობს, მაგრამ დეშბორდი არსად ეუბნება მომხმარებელს „ეს შენს რუკაზეა აწყობილი, საჯარო კი ყველასთვის ერთია\" — აღქმული პერსონალიზაცია დაკარგულია.\n\nბიბლიოთეკა /library არსებობს (daily/weekly/tarot/ai/report ფილტრებით, რჩეულებით, შენიშვნებით), მაგრამ რიტუალთან კავშირი არ დავინახე: daily-ritual.tsx-სა და daily-card.tsx-ის შემოწმებულ დიაპაზონებში „ბიბლიოთეკაში შენახვის\" CTA არ არის — დღევანდელი მკითხველი ხვალ გაქრება. ყოველკვირეული რეფლექსია/weekly_recap არ არსებობს (ძიებამ lib/analytics.ts-ში daily_horoscope_viewed/read, daily_focus_selected, daily_ritual_completed, pro_brief_viewed/answered, push_prompt_viewed აჩვენა; weekly_recap-ს მსგავსი არაფერი). განწყობის check-in არ არსებობს; რეფლექსიური კითხვა მხოლოდ PRO-შია, localStorage-ში, 14-დღიანი როტაციით (lib/pro-ritual-questions.ts) — უფასო მომხმარებელს საღამოს დახურვა არ აქვს.\n\nშეხსენებები default-ით გამორთულია (transitPush/forecastPush false; მხოლოდ relationshipPush true — lib/reminder-config.ts), ხოლო PushOptIn banner დეშბორდზე რიტუალის ქვემოთ დგას (page.tsx:218), ანუ მომხმარებელი მას ხედავს მხოლოდ მას შემდეგ, რაც უკვე დაასრულა ის მოქმედება, რომლის შეხსენებაც უნდა. PRO brief პირველი ბარათია: ქულა (score) უფასოდ ჩანს, one-liner-ები და რიტუალური კითხვა PRO-ს მიღმაა ჩაკეტილი (components/dashboard/pro-daily-brief.tsx:69-70) — freemium ხაზი გონივრულია, მაგრამ იარლიყი („უფასო დღეს / PRO სიღრმე\") არსად წერია.\n\nრიცხვები (დოკუმენტის მტკიცება, ჩემით unverified): DAU/MAU 3.7%, კვირაში დაბრუნება 31.8%, MAU-ს 48.2% ერთ დღესაა აქტიური (docs/product-growth-priorities.md). ანალიტიკაზე წვდომა არ მქონია — ქვემოთ არცერთ მეტრიკას ფაქტად არ ვასახელებ.\n\nჰიპოთეზა, რატომ არ ყალიბდება ჩვევა: (ა) გვერდი იწყება არჩევანით (ტარო? ჩატი? ჰოროსკოპი?) და არა ერთი მოქმედებით; (ბ) რიტუალის payoff სუსტია — ფოკუსის არჩევა localStorage-ში იწერება (lib/daily-ritual.ts:25-32), ანუ სხვა მოწყობილობაზე იკარგება და საღამოს არაფერი ბრუნდება მასთან; (გ) დაბრუნების ტრიგერი არ არის — შეხსენება default-off-ია და push-პრომპტი გვიან ჩნდება; (დ) უწყვეტობა არ ჩანს — სერიის გარდა კვირის/თვის შეჯამება არ არსებობს.\n\n2. პრიორიტეტული რეკომენდაციები (მაქს. 6)\n\nR1 — CHANGE. ერთი დომინანტური მოქმედება: DailyDashboard PopularTools-ზე მაღლა.\nმომხმარებლის პრობლემა: დაბრუნებული მომხმარებელი ხვდება მაღაზიის ვიტრინაში და არა „დღეს\"-ში; 60-90 წამიანი რიტუალი არ იწყება. უმცირესი იმპლემენტაცია: app/dashboard/page.tsx:210-214-ში DailyDashboard ბლოკის PopularTools-ზე მაღლა გადატანა; ტარო/ჩატის tiles რჩება, მაგრამ რიტუალის დასრულების ქვემოთ. Anchor: app/dashboard/page.tsx:210-214; დამოკიდებულება: არ აქვს. Effort: S. მეტრიკა: daily_ritual_completed / dashboard ვიზიტი. მიღების კრიტერიუმი: რიტუალური ბარათი პირველი paint-ით ჩანს 320px ეკრანზე სქროლის გარეშე.\n\nR2 — CHANGE. ფოკუსი სერვერზე + საღამოს ერთ-ტაპიანი დახურვა ბიბლიოთეკაში.\nპრობლემა: დღის ფოკუსი ბრაუზერის localStorage-ში იკარგება და არაფრად გარდაიქმნება — payoff არ არის. უმცირესი იმპლემენტაცია: focus-ის შენახვა user_activity_day-ში (actions/daily-ritual.ts-ის გაფართოება), + საღამოს ერთი შეკითხვა „დღემ ჩაიარა როგორც ფოკუსი?\" (კი/ნახევრად/არა) library note-ად. ეს არის უფასო რეფლექსია დღეს არსებული PRO-კითხვის (lib/pro-ritual-questions.ts) უფასო, მინიმალური ანალოგი. Anchor: actions/daily-ritual.ts, lib/daily-ritual.ts, lib/library.ts. დამოკიდებულება: R1. Effort: M. მეტრიკა: საღამოს დახურვის წილი რიტუალდასრულებულებში; library_item_opened 7-დღიანი reopen. მიღების კრიტერიუმი: მეორე მოწყობილობიდან ფოკუსი ჩანს, საღამოს პასუხი ბიბლიოთეკაში ინახება.\n\nR3 — ADD. რიტუალთან მიბმული დილის შეხსენება (opt-in, ერთი ტაპით).\nპრობლემა: დაბრუნების ტრიგერი არ არსებობს — default-off შეხსენებები (lib/reminder-config.ts) + fold-ის ქვემოთ push-ბანერი. უმცირესი იმპლემენტაცია: მეორე დასრულებული რიტუალის შემდეგ რიტუალურ ბარათში ჩნდება ერთი წინადადება „დილის 9:00-ზე შეგახსენო?\" → დაჭერა = transitPush ან forecastPush ჩართვა არსებული updateReminderPreferences-ით (actions/reminders.ts). არავითარ შემთხვევაში auto-on. Anchor: components/dashboard/daily-ritual.tsx:185-204, components/push/push-opt-in.tsx, actions/reminders.ts. დამოკიდებულება: R1. Effort: S. მეტრიკა: notification-to-value completion (reminder-funnel view უკვე არსებობს), opt-out სტაბილურობით. მიღების კრიტერიუმი: ჩართვა მაქს. 2 ტაპია /account-ში გადასვლის გარეშე.\n\nR4 — ADD. „შენი კვირა ერთ ბარათში\" — უფასო ყოველკვირეული რეფლექსია.\nპრობლემა: სერიის ციფრის გარდა უწყვეტობის განცდა არაფერია; weekly_recap არ არსებობს. უმცირესი იმპლემენტაცია: კვირის რიტუალების/ფოკუსებისგან აწყობილი მხოლოდ-წაკითხვადი შეჯამება /library-ში (არსებული listLibraryEntries-ის თავზე), უფასო; PRO სიღრმე = თვის შეჯამება + ტაროსთან კვეთა. Anchor: app/library/page.tsx, lib/library.ts. დამოკიდებულება: R2 (ფოკუსი სერვერზე). Effort: M. მეტრიკა: 8+ დღიანი MAU წილი; ბიბლიოთეკის reopen rate. მიღების კრიტერიუმი: 3+ რიტუალიანი კვირა წარმოშობს შეჯამებას ნულოვანი AI-ღირებულებით (წინასწარ აწყობილი ტექსტები).\n\nR5 — REMOVE/HIDE. პირველი 7 დღის მომხმარებლისთვის მეორადი ბლოკების დამალვა/ჩამოწევა.\nპრობლემა: სტატიების რეკომენდაცია, ტესტის პრომო, suggested-people rail (page.tsx:232-243, SOCIAL_FEATURES.suggestedPeopleRail) ახალ მომხმარებელს 10 არჩევანს აძლევს ერთის ნაცვლად. უმცირესი იმპლემენტაცია: რეგისტრაციიდან 7 დღე მხოლოდ რიტუალი + ერთი შემდეგი ნაბიჯი (next-best-action); დანარჩენი რჩება, მაგრამ რიტუალის ქვემოთ. Anchor: app/dashboard/page.tsx:232-243. დამოკიდებულება: R1. Effort: S. მეტრიკა: D7 return; meaningful actions per valuable session. მიღების კრიტერიუმი: ახალი მომხმარებლის პირველ ეკრანზე მაქს. 2 მოქმედების არჩევანია.\n\nR6 — CHANGE. freemium ხაზის იარლიყი: „უფასო დღეს / PRO სიღრმე / ერთჯერადი ტარო\".\nპრობლემა: უფასო daily სრულია, მაგრამ მომხმარებელმა არ იცის სად მთავრდება უფასო და იწყება ფასიანი — weeklyForecast 10 კრედიტის teaser (actions/dashboard.ts:120, stripWeeklyTeaser) და PRO brief-ის ლოქი (pro-daily-brief.tsx) გაურკვევლად ერწყმის. უმცირესი იმპლემენტაცია: სამივე ბარათზე ერთი ხაზი — „დღევანდელი უფასოა\", „კვირა — 10 კრედიტი ან PRO\", „ტარო — ერთჯერადი 10 კრედიტი\". Anchor: components/dashboard/weekly-forecast-locked.tsx, pro-daily-brief.tsx:69-70. დამოკიდებულება: არ აქვს. Effort: S. მეტრიკა: paywall_viewed → product_selected (confusion-ის შემცირება, არა ზეწოლა). მიღების კრიტერიუმი: copy-ში „შეზღუდული დრო\", „დარჩა X\" ტიპის ენა არ არის.\n\nპირველი 7 დღის გზა (შეჯამება, არა ფუნქციების სია): დღე 1 — onboarding „aha\" (Big Three უკვე shipped) → პირველი რიტუალი 90 წამში; დღე 2 — R3-ის შეხსენების შეთავაზება მეორე ვიზიტზე; დღე 3-6 — ერთი მოქმედება ყოველ დილით (R1), საღამოს დახურვა (R2); დღე 7 — სერიის +1 milestone (არსებული) + პირველი კვირის შეჯამება (R4) → მიზეზი მეორე კვირისთვის. ფასიანი ტარო მთელი გზის მანძილზე გვერდითაა, არა გზაზე.\n\n3. რა არ უნდა გაკეთდეს\n\nარავითარი სასჯელიანი სერია („სერია გ�ყდება!\"), შფოთვითი/FOMO ენა, სავალდებულო გაზიარება (social-share-credits დოკი სწორად იხდის მხოლოდ გაზომილ შედეგზე — ისედაც proposal სტატუსშია), განმეორებადი დღიური კრედიტის ონკანი (free/spend 4.52×-ზე guardrail „stop\"-ია — docs/product-growth-priorities.md:172-178), მკითხაობა სამედიცინო/ფინანსური რჩევისთვის, და არავითარი 10 ახალი tile — თითოეული ახალი ბლოკი R1-ს კლავს. PWA offline-ქეშირება ჯერ არ არის (growth doc ადასტურებს) — „დააყენე აპი\" კამპანია აზრიანია მხოლოდ R1-R3-ის შემდეგ, თორემ დაყენებული ეკრანი ცარიელ ვიტრინას აჩვენებს.\n\n4. უძლიერესი კონტრარგუმენტი R1-ის წინააღმდეგ\n\nტარო + ნატალური PDF კრედიტის ხარჯვის 79.5%-ს იძლევა (growth doc-ის მტკიცება). PopularTools-ის ჩამოწევამ შეიძლება შეამციროს spend_tarot- unlock-ები და მოკლევადიანი შემოსავალი, მაშინ როცა რიტუალის ლიფტი თვეების შემდეგ გამოჩნდება. ამიტომ R1 მარტო არ გაიშვას: guardrail-ად paywall-to-checkout და 30-დღიანი payer conversion (growth doc §Credit-economy guardrails), და თუ ტაროს unlock 2 კვირაში ვარდება — tiles-ის კომპაქტური ვერსია რიტუალის გვერდით, არა ზემოთ.\n\n5. გაურკვევლობები (პატიოსანი სია)\n\nრეალური DAU/retention/revenue არ მინახავს — GA4 მხოლოდ თანხმობიან directional სიგნალს იძლევა, ჭეშმარიტება server-sideა. არ ვიცი: აღიქმება თუ არა daily ტექსტი პერსონალურად (vs გენერიკად), iOS push-თანხმობის რეალური წილი, საჯარო /horoskopi წამკითხველების წილი, რომლებიც არასდროს რეგისტრირდებიან, და რამდენი რიტუალდასრულება იკარგება localStorage-წარუმატებლობით. გარე შედარება არ მომიძიებია — ზემოთ ყველა მტკიცება ლოკალური კოდიდანაა.", "tokens": {"input": 310750, "output": 8652, "total": 369556, "cache_read": 50154, "cache_write": 0}, "duration_ms": 205864, "timestamp": 1791097107212}
+
+session_id: 20261004_105501_a5cf2e

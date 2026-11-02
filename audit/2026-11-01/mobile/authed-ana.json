@@ -1,0 +1,47 @@
+[
+  {
+    "url": "/dashboard",
+    "pattern": "/dashboard",
+    "dynamic": false
+  },
+  {
+    "url": "/feed",
+    "pattern": "/feed",
+    "dynamic": false
+  },
+  {
+    "url": "/subscription",
+    "pattern": "/subscription",
+    "dynamic": false
+  },
+  {
+    "url": "/credits",
+    "pattern": "/credits",
+    "dynamic": false
+  },
+  {
+    "url": "/account",
+    "pattern": "/account",
+    "dynamic": false
+  },
+  {
+    "url": "/library",
+    "pattern": "/library",
+    "dynamic": false
+  },
+  {
+    "url": "/messages",
+    "pattern": "/messages",
+    "dynamic": false
+  },
+  {
+    "url": "/people",
+    "pattern": "/people",
+    "dynamic": false
+  },
+  {
+    "url": "/u/ana-audit",
+    "pattern": "/u/ana-audit",
+    "dynamic": false
+  }
+]

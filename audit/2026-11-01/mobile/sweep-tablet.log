@@ -1,0 +1,52 @@
+
+=== 768x1024: 17 routes (concurrency 2) ===
+[1/17] 768 /horoskopi textx3 tap<24 x15 (3s)
+[2/17] 768 / under+81 textx3 tap<24 x15 zoom x2 (3s)
+[3/17] 768 /zodiac/datit textx3 tap<24 x8 (6s)
+[4/17] 768 /zodiac/aries textx3 tap<24 x9 (7s)
+[5/17] 768 /tests textx3 tap<24 x8 (9s)
+[6/17] 768 /taro/the-magician textx3 tap<24 x8 (10s)
+[7/17] 768 /privacy textx3 tap<24 x7 (11s)
+[8/17] 768 /astrologiuri-saxlebi textx3 tap<24 x9 (12s)
+[9/17] 768 /tavsebadoba textx1 tap<24 x2 zoom x2 (13s)
+[10/17] 768 /nataluri-ruka textx3 tap<24 x15 (14s)
+[11/17] 768 /mbti/intj textx3 tap<24 x10 (16s)
+[12/17] 768 /en textx2 tap<24 x15 (17s)
+[13/17] 768 /en/readings textx2 tap<24 x9 zoom x1 (18s)
+[14/17] 768 /savse-mtvare textx3 tap<24 x7 (20s)
+[15/17] 768 /numerologia textx3 tap<24 x11 zoom x1 (21s)
+[16/17] 768 /articles textx3 tap<24 x15 (23s)
+[17/17] 768 /zodiac/tavsebadoba textx3 tap<24 x8 (23s)
+=== 768 done: 17 routes in 23s ===
+
+=== 1280x900: 17 routes (concurrency 2) ===
+[1/17] 1280 /horoskopi tap<24 x15 (3s)
+[2/17] 1280 / tap<24 x15 zoom x2 (3s)
+[3/17] 1280 /zodiac/datit tap<24 x8 (6s)
+[4/17] 1280 /zodiac/aries tap<24 x9 (6s)
+[5/17] 1280 /tests tap<24 x8 (8s)
+[6/17] 1280 /taro/the-magician tap<24 x8 (9s)
+[7/17] 1280 /privacy tap<24 x7 (11s)
+[8/17] 1280 /astrologiuri-saxlebi tap<24 x9 (11s)
+[9/17] 1280 /tavsebadoba tap<24 x2 zoom x2 (13s)
+[10/17] 1280 /nataluri-ruka tap<24 x15 (13s)
+[11/17] 1280 /mbti/intj tap<24 x10 (15s)
+[12/17] 1280 /en tap<24 x15 (16s)
+[13/17] 1280 /en/readings tap<24 x9 zoom x1 (17s)
+[14/17] 1280 /savse-mtvare tap<24 x7 (18s)
+[15/17] 1280 /numerologia tap<24 x11 zoom x1 (19s)
+[16/17] 1280 /articles tap<24 x15 (21s)
+[17/17] 1280 /zodiac/tavsebadoba tap<24 x8 (22s)
+=== 1280 done: 17 routes in 22s ===
+[
+  {
+    "width": 768,
+    "height": 1024,
+    "count": 17
+  },
+  {
+    "width": 1280,
+    "height": 900,
+    "count": 17
+  }
+]

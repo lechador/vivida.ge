@@ -304,7 +304,7 @@ export function upgradeEnglishDetailSlug(cleanPath: string): string {
     if (!cleanPath.startsWith(prefix)) continue;
     const rest = cleanPath.slice(prefix.length);
     if (!rest || rest.includes("/")) return cleanPath;
-    const match = pairs.find((p) => p.ka === rest);
+    const match = pairs.find((p) => p.ka === rest || p.pl === rest);
     return match ? `${prefix}${match.en}` : cleanPath;
   }
   return cleanPath;

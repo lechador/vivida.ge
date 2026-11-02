@@ -5,7 +5,8 @@ import { VividaMark } from "@/components/brand/vivida-mark";
 import { LunarPhaseDisc } from "@/components/brand/celestial-icons";
 import { computeMoonPhase, PHASE_LABEL_EN } from "@/lib/moon-phase";
 import { ObservatoryDrawer } from "@/components/nav/observatory-drawer";
-import { GEORGIAN_SITE_URL, englishSiteHref } from "@/lib/seo/locales";
+import { PublicLanguageSwitcher } from "@/components/i18n/international-language-switcher";
+import { englishSiteHref } from "@/lib/seo/locales";
 import { requestIsEnglishHost } from "@/lib/i18n/request-locale";
 
 const NAV_ITEMS = [
@@ -23,7 +24,6 @@ export async function EnglishHeader({
 }) {
   const onEnglishHost = await requestIsEnglishHost();
   const href = (path: string) => englishSiteHref(path, onEnglishHost);
-  const kaUrl = `${GEORGIAN_SITE_URL}${georgianPath === "/" ? "" : georgianPath}`;
   const moonSnapshot = computeMoonPhase(new Date());
   const illumPct = moonSnapshot
     ? Math.round(moonSnapshot.illumination * 100)
@@ -60,8 +60,13 @@ export async function EnglishHeader({
           ))}
         </nav>
 
-        {/* Zone 3: Primary CTA */}
-        <div className="flex shrink-0 items-center gap-3">
+        {/* Zone 3: Language Switcher + Primary CTA */}
+        <div className="flex shrink-0 items-center gap-2.5 sm:gap-3">
+          <PublicLanguageSwitcher
+            currentLocale="en"
+            georgianPath={georgianPath}
+            onEnglishHost={onEnglishHost}
+          />
           <Link
             href="/login"
             className="hidden whitespace-nowrap text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline"
@@ -108,13 +113,6 @@ export async function EnglishHeader({
           </div>
 
           <div className="flex shrink-0 items-center gap-3">
-            <a
-              href={kaUrl}
-              hrefLang="ka-GE"
-              className="whitespace-nowrap font-mono text-[11px] font-medium uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
-            >
-              KA
-            </a>
             <ObservatoryDrawer authed={false} locale="en" />
           </div>
         </div>

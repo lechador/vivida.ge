@@ -65,10 +65,16 @@ export async function signOutAction(destination: "/" | "/login" = "/") {
 
 const TURNSTILE_ERROR_EN =
   "We could not verify that you are human. Please try again.";
+const TURNSTILE_ERROR_PL =
+  "Nie udało się potwierdzić, że jesteś człowiekiem. Spróbuj ponownie.";
 
-function localized(locale: UserLocale, ka: string, en: string): string {
-  // Georgian for Georgian, English for everyone else. Testing `=== "en"` sent
-  // Armenian users Georgian error text, which is the least useful of the two.
+function localized(
+  locale: UserLocale,
+  ka: string,
+  en: string,
+  pl?: string,
+): string {
+  if (locale === "pl") return pl ?? en;
   return locale === "ka" ? ka : en;
 }
 
@@ -77,18 +83,25 @@ function localized(locale: UserLocale, ka: string, en: string): string {
 function registerError(error: string, locale: UserLocale): string {
   switch (error) {
     case "invalid_name":
-      return localized(locale, "შეიყვანე შენი სახელი", "Enter your name");
+      return localized(
+        locale,
+        "შეიყვანე შენი სახელი",
+        "Enter your name",
+        "Wpisz swoje imię",
+      );
     case "invalid_email":
       return localized(
         locale,
         "არასწორი ელფოსტა",
         "Enter a valid email address",
+        "Wpisz prawidłowy adres e-mail",
       );
     case "weak_password":
       return localized(
         locale,
         `პაროლი მინიმუმ ${MIN_PASSWORD_LEN} სიმბოლო უნდა იყოს`,
         `Password must be at least ${MIN_PASSWORD_LEN} characters`,
+        `Hasło musi mieć co najmniej ${MIN_PASSWORD_LEN} znaków`,
       );
     case "email_taken":
     case "oauth_only":
@@ -96,30 +109,35 @@ function registerError(error: string, locale: UserLocale): string {
         locale,
         "ეს ელფოსტა უკვე დარეგისტრირებულია. სცადე შესვლა ან პაროლის აღდგენა.",
         "This email is already registered. Try signing in or resetting your password.",
+        "Ten adres e-mail jest już zarejestrowany. Spróbuj się zalogować lub zresetuj hasło.",
       );
     case "duplicate_registration":
       return localized(
         locale,
         "ამ მონაცემებით რეგისტრაცია დამატებით შემოწმებას საჭიროებს. სცადე არსებულ ანგარიშში შესვლა ან მოგვწერე მხარდაჭერას.",
         "This registration needs review. Try signing in to your existing account or contact support.",
+        "Ta rejestracja wymaga dodatkowej weryfikacji. Spróbuj zalogować się na istniejące konto lub skontaktuj się ze wsparciem.",
       );
     case "signup_rate_limited":
       return localized(
         locale,
         "ამ კავშირიდან ძალიან ბევრი რეგისტრაციის მცდელობა იყო. სცადე მოგვიანებით.",
         "Too many registration attempts from this connection. Please try again later.",
+        "Zbyt wiele prób rejestracji z tego połączenia. Spróbuj ponownie później.",
       );
     case "phone_taken":
       return localized(
         locale,
         "ეს ნომერი უკვე მიბმულია სხვა ანგარიშზე. სცადე შესვლა ნომრით ან მიუთითე სხვა ნომერი.",
         "This number is already linked to another account. Sign in with it or use a different number.",
+        "Ten numer jest już powiązany z innym kontem. Zaloguj się za jego pomocą lub użyj innego numeru.",
       );
     case "phone_claim_invalid":
       return localized(
         locale,
         "ნომრის დადასტურებას ვადა გაუვიდა. დაადასტურე ხელახლა ან წაშალე ნომერი და გააგრძელე მის გარეშე.",
         "Your phone verification has expired. Verify it again, or remove the number and continue without it.",
+        "Weryfikacja numeru telefonu wygasła. Zweryfikuj go ponownie lub usuń numer i kontynuuj bez niego.",
       );
     case "failed":
     default:
@@ -127,6 +145,7 @@ function registerError(error: string, locale: UserLocale): string {
         locale,
         "ანგარიშის შექმნა ვერ მოხერხდა. სცადე თავიდან.",
         "We could not create your account. Please try again.",
+        "Nie udało się utworzyć konta. Spróbuj ponownie.",
       );
   }
 }
@@ -157,7 +176,12 @@ export async function signUpWithEmail(
   if (!human) {
     return {
       ok: false,
-      error: locale === "ka" ? TURNSTILE_ERROR_KA : TURNSTILE_ERROR_EN,
+      error:
+        locale === "pl"
+          ? TURNSTILE_ERROR_PL
+          : locale === "ka"
+            ? TURNSTILE_ERROR_KA
+            : TURNSTILE_ERROR_EN,
     };
   }
 
@@ -226,6 +250,7 @@ export async function signUpWithEmail(
         token: verifyToken,
         code: verifyCode,
         origin,
+        locale,
       });
     } catch (err) {
       console.warn(
@@ -296,6 +321,7 @@ export async function requestVerificationEmail(input: {
         token: dispatch.token,
         code: dispatch.code,
         origin: await siteOriginFromHeaders(),
+        locale,
       });
     } catch (err) {
       console.warn(
@@ -464,7 +490,7 @@ export async function verifyEmailWithCode(input: {
   let phoneLinked: boolean | undefined;
   // Phone claims are Georgian-host only (SMS codes go to Georgian numbers);
   // an English-host token is ignored even if posted directly.
-  if (input.phoneClaimToken && locale !== "en") {
+  if (input.phoneClaimToken && locale === "ka") {
     try {
       phoneLinked = await finalizeSignupPhoneClaim(
         result.userId,
@@ -509,7 +535,12 @@ export async function requestPasswordReset(input: {
   if (!human) {
     return {
       ok: false,
-      error: locale === "ka" ? TURNSTILE_ERROR_KA : TURNSTILE_ERROR_EN,
+      error:
+        locale === "pl"
+          ? TURNSTILE_ERROR_PL
+          : locale === "ka"
+            ? TURNSTILE_ERROR_KA
+            : TURNSTILE_ERROR_EN,
     };
   }
 
@@ -556,6 +587,7 @@ export async function requestPasswordReset(input: {
         name: dispatch.name,
         token: dispatch.token,
         origin: await siteOriginFromHeaders(),
+        locale,
       });
     } catch (err) {
       console.warn(
@@ -618,7 +650,12 @@ export async function signInWithEmail(
   if (!human) {
     return {
       ok: false,
-      error: locale === "ka" ? TURNSTILE_ERROR_KA : TURNSTILE_ERROR_EN,
+      error:
+        locale === "pl"
+          ? TURNSTILE_ERROR_PL
+          : locale === "ka"
+            ? TURNSTILE_ERROR_KA
+            : TURNSTILE_ERROR_EN,
     };
   }
 
@@ -641,6 +678,7 @@ export async function signInWithEmail(
           locale,
           "შესვლის ძალიან ბევრი მცდელობა იყო. სცადე ცოტა ხანში.",
           "Too many sign-in attempts. Please try again in a few minutes.",
+          "Zbyt wiele prób logowania. Spróbuj ponownie za kilka minut.",
         ),
       };
     }
@@ -652,6 +690,7 @@ export async function signInWithEmail(
           locale,
           "ელფოსტა ჯერ არ არის დადასტურებული. შეამოწმე საფოსტო ყუთი.",
           "Your email has not been verified yet. Check your inbox.",
+          "Twój adres e-mail nie został jeszcze zweryfikowany. Sprawdź skrzynkę odbiorczą.",
         ),
       };
     }
@@ -662,6 +701,7 @@ export async function signInWithEmail(
         locale,
         "ელფოსტა ან პაროლი არასწორია",
         "Incorrect email or password",
+        "Nieprawidłowy adres e-mail lub hasło",
       ),
     };
   }

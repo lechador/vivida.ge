@@ -254,9 +254,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   events: {
-    // Stamp users.lastLoginAt on every successful sign-in. Wrapped so a
-    // transient DB blip can never break the auth flow itself, losing one
-    // last-login update is much better than refusing the login.
+    // Stamp users.lastLoginAt on every successful sign-in, and sync
+    // interfaceLanguage when signing in on the Polish international surface.
     async signIn({ user }) {
       if (!user?.id) return;
       try {
@@ -267,6 +266,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       } catch (err) {
         console.warn(
           "[auth.signIn] failed to update lastLoginAt:",
+          (err as Error).message,
+        );
+      }
+      try {
+        const signupLocale = await getSignupLocale();
+        if (signupLocale === "pl") {
+          await db
+            .update(users)
+            .set({ interfaceLanguage: "pl" })
+            .where(eq(users.id, user.id));
+        } else if (signupLocale === "en") {
+          await db
+            .update(users)
+            .set({ interfaceLanguage: "en" })
+            .where(
+              and(eq(users.id, user.id), eq(users.interfaceLanguage, "ka")),
+            );
+        }
+      } catch (err) {
+        console.warn(
+          "[auth.signIn] interface language sync failed:",
           (err as Error).message,
         );
       }

@@ -1,0 +1,42 @@
+
+=== 768x1024: 12 routes (concurrency 2) ===
+[1/12] 768 /dashboard textx1 tap<24 x4 (4s)
+[2/12] 768 /feed tap<24 x15 (4s)
+[3/12] 768 /friends tap<24 x5 (7s)
+[4/12] 768 /report tap<24 x3 (8s)
+[5/12] 768 /account ok (11s)
+[6/12] 768 /messages?with=22222222-2222-4222-8222-222222222222 tap<24 x2 covered x2 (11s)
+[7/12] 768 /synastry/new tap<24 x2 (15s)
+[8/12] 768 /u/luka-audit tap<24 x4 (15s)
+[9/12] 768 /library tap<24 x1 (18s)
+[10/12] 768 /ask tap<24 x1 (19s)
+[11/12] 768 /people tap<24 x11 covered x1 (22s)
+[12/12] 768 /subscription tap<24 x1 (22s)
+=== 768 done: 12 routes in 22s ===
+
+=== 1280x900: 12 routes (concurrency 2) ===
+[1/12] 1280 /dashboard tap<24 x9 zoom x1 (4s)
+[2/12] 1280 /feed tap<24 x15 zoom x2 (4s)
+[3/12] 1280 /friends tap<24 x10 zoom x1 (7s)
+[4/12] 1280 /report tap<24 x8 zoom x1 (8s)
+[5/12] 1280 /messages?with=22222222-2222-4222-8222-222222222222 tap<24 x7 zoom x2 (11s)
+[6/12] 1280 /account tap<24 x6 zoom x5 (11s)
+[7/12] 1280 /u/luka-audit tap<24 x9 zoom x1 (15s)
+[8/12] 1280 /synastry/new tap<24 x7 zoom x1 (15s)
+[9/12] 1280 /ask tap<24 x6 zoom x1 (19s)
+[10/12] 1280 /library tap<24 x6 zoom x2 (19s)
+[11/12] 1280 /subscription tap<24 x6 zoom x1 (22s)
+[12/12] 1280 /people tap<24 x15 zoom x2 (22s)
+=== 1280 done: 12 routes in 22s ===
+[
+  {
+    "width": 768,
+    "height": 1024,
+    "count": 12
+  },
+  {
+    "width": 1280,
+    "height": 900,
+    "count": 12
+  }
+]

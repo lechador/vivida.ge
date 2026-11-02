@@ -1,0 +1,180 @@
+[
+  {
+    "agent": "daily-habit-v2",
+    "model_in_init": "meta/muse-spark-1.3-contributor",
+    "session_id": "20261004_105501_a5cf2e",
+    "exit_code": 0,
+    "result_subtype": null,
+    "result_keys": [
+      "type",
+      "session_id",
+      "exit_code",
+      "text",
+      "tokens",
+      "duration_ms",
+      "timestamp"
+    ],
+    "result_characters": 9800,
+    "tools": {
+      "read_file": 15,
+      "search_files": 4,
+      "terminal": 7
+    },
+    "distinct_files_read": 15,
+    "read_paths": [
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/AGENTS.md",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/actions/daily-ritual.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/actions/dashboard.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/app/dashboard/page.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/dashboard/daily-card.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/dashboard/daily-dashboard.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/dashboard/daily-ritual.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/dashboard/pro-daily-brief.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/docs/analytics-events.md",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/docs/product-growth-priorities.md",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/credits-config.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/daily-ritual-core.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/daily-ritual.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/streak-credits.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/streak.ts"
+    ],
+    "terminal_commands": [
+      "pwd; ls; ls app 2>&1 | head -50; ls docs 2>&1 | head -50",
+      "ls app/dashboard/; echo ---; ls actions/ | head -60; echo ---; ls components/ | head -80; echo ---; ls lib/ | head -100",
+      "ls components/dashboard/; echo ---; ls lib/ | grep -i -E \"streak|reminder|push|notif|library|mood|check\"; echo ---; ls actions/ | grep -i -E \"remind|push|libr|notif\"; echo ---; cat docs/pwa-install-plan-ka.md | head -80",
+      "echo \"=== push-opt-in ===\"; sed -n '1,120p' components/push/push-opt-in.tsx; echo \"=== reminders action head ===\"; sed -n '1,80p' actions/reminders.ts; echo \"=== library page ===\"; ls app/library/; sed -n '1,60p' app/library/page.tsx 2>/dev/null | head -80",
+      "echo \"=== credit-economy milestones ===\"; grep -n \"ritualMilestone\\|RITUAL_MILESTONE\\|nextRitual\" lib/credit-economy.ts | head -20; echo \"=== reminder-config ===\"; sed -n '1,100p' lib/reminder-config.ts; echo \"=== popular tools ===\"; sed -n '1,80p' components/nav/popular-tools.tsx; echo \"=== social-share doc ===\"; head -60 docs/social-share-credits.md",
+      "sed -n '1,40p' lib/credit-economy.ts; echo \"=== horoskopi public ===\"; ls app/horoskopi/ 2>/dev/null; echo \"=== weekly recap search ===\"; grep -rn \"weekly_recap\\|weekly-recap\\|kvira\" lib/analytics.ts | head; grep -n \"dailyRitual\\|daily_ritual\\|dailyFocus\\|dailyHoroscope\\|proBrief\\|pushPrompt\\|reminder\" lib/analytics.ts | head -30; echo \"=== pro-ritual-questions ===\"; sed -n '1,50p' lib/pro-ritual-questions.ts 2>/dev/null | head -60",
+      "grep -n \"RITUAL_STREAK_MILESTONES\\|CREDIT_COST\\s*=\\|tarot\\|weekly\\|SIGNUP\\|MONTHLY\\|REFERRAL\" lib/credits-config.ts | head -25"
+    ],
+    "report": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/retention/daily-habit-v2.md",
+    "usage": {
+      "input": 310750,
+      "output": 8652,
+      "total": 369556,
+      "cache_read": 50154,
+      "cache_write": 0
+    },
+    "verified_requested_model": true,
+    "write_tool_calls": []
+  },
+  {
+    "agent": "simplification-v2",
+    "model_in_init": "meta/muse-spark-1.3-contributor",
+    "session_id": "20261004_105501_9485c4",
+    "exit_code": 0,
+    "result_subtype": null,
+    "result_keys": [
+      "type",
+      "session_id",
+      "exit_code",
+      "text",
+      "tokens",
+      "duration_ms",
+      "timestamp"
+    ],
+    "result_characters": 11536,
+    "tools": {
+      "read_file": 31,
+      "search_files": 12
+    },
+    "distinct_files_read": 28,
+    "read_paths": [
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/AGENTS.md",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/app/dashboard/page.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/app/horoskopi/page.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/app/layout.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/app/login/page.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/app/nataluri-ruka/page.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/app/onboarding/page.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/app/page.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/app/taro/page.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/dashboard/billing-nudge.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/dashboard/daily-dashboard.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/dashboard/daily-ritual.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/landing/hero.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/nav/app-header.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/nav/desktop-sidebar.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/nav/mobile-nav.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/nav/mobile-tab-bar.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/nav/nav-items.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/nav/nav-links.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/nav/popular-tools.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/onboarding/fast-onboarding.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/onboarding/step-date.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/onboarding/step-visibility.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/onboarding/wizard.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/components/tarot/tarot-conversion-landing.tsx",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/docs/analytics-events.md",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/docs/product-growth-priorities.md",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/credits-config.ts"
+    ],
+    "terminal_commands": [],
+    "report": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/retention/simplification-v2.md",
+    "usage": {
+      "input": 417169,
+      "output": 10347,
+      "total": 567112,
+      "cache_read": 139596,
+      "cache_write": 0
+    },
+    "verified_requested_model": true,
+    "write_tool_calls": []
+  },
+  {
+    "agent": "experiments-v2",
+    "model_in_init": "meta/muse-spark-1.3-contributor",
+    "session_id": "20261004_105501_be974c",
+    "exit_code": 0,
+    "result_subtype": null,
+    "result_keys": [
+      "type",
+      "session_id",
+      "exit_code",
+      "text",
+      "tokens",
+      "duration_ms",
+      "timestamp"
+    ],
+    "result_characters": 13854,
+    "tools": {
+      "read_file": 21,
+      "search_files": 11
+    },
+    "distinct_files_read": 21,
+    "read_paths": [
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/db/tables/archive.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/db/tables/community.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/db/tables/credits.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/db/tables/experiments.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/db/tables/libraries.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/db/tables/messaging.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/db/tables/users.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/docs/analytics-events.md",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/docs/product-growth-priorities.md",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/docs/pwa-install-plan-ka.md",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/docs/social-share-credits.md",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/analytics.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/billing-config.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/credit-economy-metrics.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/credit-economy.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/credits-config.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/growth-metrics.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/referral.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/reminder-funnel.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/signup-credit-experiment-config.ts",
+      "/Users/giviendeladze/Projects/vivida/vivida.ge/lib/signup-credit-experiment.ts"
+    ],
+    "terminal_commands": [],
+    "report": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/retention/experiments-v2.md",
+    "usage": {
+      "input": 386795,
+      "output": 11317,
+      "total": 413864,
+      "cache_read": 15752,
+      "cache_write": 0
+    },
+    "verified_requested_model": true,
+    "write_tool_calls": []
+  }
+]

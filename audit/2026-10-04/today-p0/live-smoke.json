@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://www.vivida.ge/",
+    "exit_code": 0,
+    "response": "200 https://www.vivida.ge/"
+  },
+  {
+    "url": "https://www.vivida.ge/horoskopi",
+    "exit_code": 0,
+    "response": "200 https://www.vivida.ge/horoskopi"
+  },
+  {
+    "url": "https://www.vivida.ge/taro",
+    "exit_code": 0,
+    "response": "200 https://www.vivida.ge/taro"
+  },
+  {
+    "url": "https://www.vivida.ge/tests",
+    "exit_code": 0,
+    "response": "200 https://www.vivida.ge/tests"
+  },
+  {
+    "url": "https://www.vivida.ge/nataluri-ruka",
+    "exit_code": 0,
+    "response": "200 https://www.vivida.ge/nataluri-ruka"
+  },
+  {
+    "url": "https://www.vividaastro.com/",
+    "exit_code": 0,
+    "response": "200 https://www.vividaastro.com/"
+  },
+  {
+    "url": "https://www.vivida.ge/dashboard",
+    "exit_code": 0,
+    "response": "200 https://www.vivida.ge/?from=%2Fdashboard"
+  },
+  {
+    "url": "https://www.vivida.ge/ask",
+    "exit_code": 0,
+    "response": "200 https://www.vivida.ge/login?next=%2Fask"
+  },
+  {
+    "url": "https://www.vivida.ge/library",
+    "exit_code": 0,
+    "response": "200 https://www.vivida.ge/login?next=%2Flibrary"
+  }
+]

@@ -43,7 +43,9 @@ import {
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
-  return { title: locale !== "ka" ? "Account" : "ანგარიში" };
+  return {
+    title: locale === "pl" ? "Konto" : locale !== "ka" ? "Account" : "ანგარიში",
+  };
 }
 export const dynamic = "force-dynamic";
 
@@ -94,6 +96,7 @@ export default async function AccountPage() {
   const locale = await getRequestLocale(
     normalizeUserLocale(emailPrefs?.locale),
   );
+  const pl = locale === "pl";
   const en = locale !== "ka";
   const onEnglishHost = await requestIsEnglishHost();
 
@@ -127,14 +130,18 @@ export default async function AccountPage() {
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-6 sm:px-6 sm:pb-24 sm:pt-8">
         <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          {en ? "Account" : "ანგარიში"}
+          {pl ? "Konto" : en ? "Account" : "ანგარიში"}
         </div>
         <h1 className="mb-8 text-balance text-3xl font-semibold tracking-tight sm:mb-10 sm:text-5xl">
-          {en
+          {pl
             ? user.name
-              ? `${user.name.split(" ")[0]}'s account`
-              : "Your account"
-            : `${user.name?.split(" ")[0] ?? "შენი"}-ის ანგარიში`}
+              ? `Konto: ${user.name.split(" ")[0]}`
+              : "Twoje konto"
+            : en
+              ? user.name
+                ? `${user.name.split(" ")[0]}'s account`
+                : "Your account"
+              : `${user.name?.split(" ")[0] ?? "შენი"}-ის ანგარიში`}
         </h1>
 
         {/* Profile */}
@@ -154,7 +161,11 @@ export default async function AccountPage() {
               {headerData.isPremium && (
                 <VerifiedBadge
                   label={
-                    en ? "Vivida PRO verified" : "Vivida PRO ვერიფიცირებული"
+                    pl
+                      ? "Zweryfikowany Vivida PRO"
+                      : en
+                        ? "Vivida PRO verified"
+                        : "Vivida PRO ვერიფიცირებული"
                   }
                 />
               )}
@@ -214,18 +225,24 @@ export default async function AccountPage() {
               <h2 className="text-lg font-semibold tracking-tight">
                 {headerData.isPremium
                   ? "Vivida PRO"
-                  : en
-                    ? "Credits"
-                    : "კრედიტები"}
+                  : pl
+                    ? "Kredyty"
+                    : en
+                      ? "Credits"
+                      : "კრედიტები"}
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {headerData.isPremium
-                  ? en
-                    ? "Manage your subscription, billing, and renewal."
-                    : "მართე გამოწერა, გადახდა და განახლება."
-                  : en
-                    ? "View your balance, top up, or invite a friend."
-                    : "ნახე ბალანსი, შეავსე ან მოიწვიე მეგობარი."}
+                  ? pl
+                    ? "Zarządzaj subskrypcją, płatnościami i odnowieniem."
+                    : en
+                      ? "Manage your subscription, billing, and renewal."
+                      : "მართე გამოწერა, გადახდა და განახლება."
+                  : pl
+                    ? "Zobacz saldo, doładuj kredyty lub zaproś znajomego."
+                    : en
+                      ? "View your balance, top up, or invite a friend."
+                      : "ნახე ბალანსი, შეავსე ან მოიწვიე მეგობარი."}
               </p>
             </div>
             <span
@@ -370,13 +387,17 @@ export default async function AccountPage() {
         <div className="mb-6 rounded-2xl border border-border bg-card/65 p-6 ring-1 ring-foreground/5 backdrop-blur-xl">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold">
-              {en ? "Birth details" : "დაბადების მონაცემები"}
+              {pl
+                ? "Dane urodzenia"
+                : en
+                  ? "Birth details"
+                  : "დაბადების მონაცემები"}
             </h2>
             {profile?.dateOfBirth && (
               <Button asChild variant="ghost" size="sm">
                 <Link href="/onboarding">
                   <Pencil className="size-3.5" />
-                  {en ? "Edit" : "რედაქტირება"}
+                  {pl ? "Edytuj" : en ? "Edit" : "რედაქტირება"}
                 </Link>
               </Button>
             )}
@@ -384,25 +405,47 @@ export default async function AccountPage() {
           {profile?.dateOfBirth ? (
             <dl className="grid grid-cols-1 gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
               <Field
-                label={en ? "Date of birth" : "დაბადების თარიღი"}
+                label={
+                  pl
+                    ? "Data urodzenia"
+                    : en
+                      ? "Date of birth"
+                      : "დაბადების თარიღი"
+                }
                 value={profile.dateOfBirth}
               />
               <Field
-                label={en ? "Time of birth" : "დაბადების დრო"}
+                label={
+                  pl
+                    ? "Godzina urodzenia"
+                    : en
+                      ? "Time of birth"
+                      : "დაბადების დრო"
+                }
                 value={
                   profile.timeOfBirth
                     ? profile.timeOfBirth.slice(0, 5)
-                    : en
-                      ? "Unknown (12:00 used)"
-                      : "უცნობია (გამოყენებულია 12:00)"
+                    : pl
+                      ? "Nieznana (użyto 12:00)"
+                      : en
+                        ? "Unknown (12:00 used)"
+                        : "უცნობია (გამოყენებულია 12:00)"
                 }
               />
               <Field
-                label={en ? "Place of birth" : "დაბადების ადგილი"}
+                label={
+                  pl
+                    ? "Miejsce urodzenia"
+                    : en
+                      ? "Place of birth"
+                      : "დაბადების ადგილი"
+                }
                 value={profile.cityName}
               />
               <Field
-                label={en ? "Time zone" : "დროის სარტყელი"}
+                label={
+                  pl ? "Strefa czasowa" : en ? "Time zone" : "დროის სარტყელი"
+                }
                 value={profile.timezone}
               />
               <div className="sm:col-span-2">
@@ -419,14 +462,20 @@ export default async function AccountPage() {
           ) : (
             <div>
               <p className="text-sm text-muted-foreground">
-                {en
-                  ? "You have not created an astrology profile yet. Add your birth details to unlock your chart, horoscope and compatibility."
-                  : "ასტრო პროფილი ჯერ არ შეგიქმნია. შეავსე დაბადების მონაცემები და გახსენი რუკა, ჰოროსკოპი და თავსებადობა."}
+                {pl
+                  ? "Nie utworzyłeś jeszcze profilu astrologicznego. Uzupełnij dane urodzenia, aby odblokować kosmogram, horoskop i zgodność."
+                  : en
+                    ? "You have not created an astrology profile yet. Add your birth details to unlock your chart, horoscope and compatibility."
+                    : "ასტრო პროფილი ჯერ არ შეგიქმნია. შეავსე დაბადების მონაცემები და გახსენი რუკა, ჰოროსკოპი და თავსებადობა."}
               </p>
               <Button asChild variant="mystic" className="mt-4">
                 <Link href="/onboarding">
                   <Sparkles className="size-4" />
-                  {en ? "Create astrology profile" : "ასტრო პროფილის შექმნა"}
+                  {pl
+                    ? "Utwórz profil astrologiczny"
+                    : en
+                      ? "Create astrology profile"
+                      : "ასტრო პროფილის შექმნა"}
                 </Link>
               </Button>
             </div>
@@ -440,11 +489,14 @@ export default async function AccountPage() {
 }
 
 function formatAccountDate(date: Date, locale: string) {
-  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "ka-GE", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(date);
+  return new Intl.DateTimeFormat(
+    locale === "pl" ? "pl-PL" : locale === "en" ? "en-GB" : "ka-GE",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    },
+  ).format(date);
 }
 
 function Field({

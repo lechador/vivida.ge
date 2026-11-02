@@ -1,0 +1,127 @@
+[
+  {
+    "url": "/",
+    "pattern": "/",
+    "dynamic": false
+  },
+  {
+    "url": "/horoskopi",
+    "pattern": "/horoskopi",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/aries",
+    "pattern": "/zodiac/aries",
+    "dynamic": false
+  },
+  {
+    "url": "/taro",
+    "pattern": "/taro",
+    "dynamic": false
+  },
+  {
+    "url": "/nataluri-ruka",
+    "pattern": "/nataluri-ruka",
+    "dynamic": false
+  },
+  {
+    "url": "/mbti/intj",
+    "pattern": "/mbti/intj",
+    "dynamic": false
+  },
+  {
+    "url": "/chinuri-horoskopi/dragon",
+    "pattern": "/chinuri-horoskopi/dragon",
+    "dynamic": false
+  },
+  {
+    "url": "/en",
+    "pattern": "/en",
+    "dynamic": false
+  },
+  {
+    "url": "/en/readings",
+    "pattern": "/en/readings",
+    "dynamic": false
+  },
+  {
+    "url": "/login",
+    "pattern": "/login",
+    "dynamic": false
+  },
+  {
+    "url": "/signup",
+    "pattern": "/signup",
+    "dynamic": false
+  },
+  {
+    "url": "/tests",
+    "pattern": "/tests",
+    "dynamic": false
+  },
+  {
+    "url": "/piradi-ruka",
+    "pattern": "/piradi-ruka",
+    "dynamic": false
+  },
+  {
+    "url": "/savse-mtvare",
+    "pattern": "/savse-mtvare",
+    "dynamic": false
+  },
+  {
+    "url": "/mtvaris-kalendari",
+    "pattern": "/mtvaris-kalendari",
+    "dynamic": false
+  },
+  {
+    "url": "/numerologia",
+    "pattern": "/numerologia",
+    "dynamic": false
+  },
+  {
+    "url": "/astrologiuri-kalendari",
+    "pattern": "/astrologiuri-kalendari",
+    "dynamic": false
+  },
+  {
+    "url": "/sizmris-akhsna/gveli",
+    "pattern": "/sizmris-akhsna/gveli",
+    "dynamic": false
+  },
+  {
+    "url": "/astrologiuri-saxlebi/1",
+    "pattern": "/astrologiuri-saxlebi/1",
+    "dynamic": false
+  },
+  {
+    "url": "/tavsebadoba",
+    "pattern": "/tavsebadoba",
+    "dynamic": false
+  },
+  {
+    "url": "/big-five",
+    "pattern": "/big-five",
+    "dynamic": false
+  },
+  {
+    "url": "/horoskopi/tviuri",
+    "pattern": "/horoskopi/tviuri",
+    "dynamic": false
+  },
+  {
+    "url": "/articles",
+    "pattern": "/articles",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/tavsebadoba/aries-gemini",
+    "pattern": "/zodiac/tavsebadoba/aries-gemini",
+    "dynamic": false
+  },
+  {
+    "url": "/mkitxaoba",
+    "pattern": "/mkitxaoba",
+    "dynamic": false
+  }
+]

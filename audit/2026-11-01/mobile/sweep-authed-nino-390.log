@@ -1,0 +1,48 @@
+
+=== 390x844: 38 routes (concurrency 2) ===
+[1/38] 390 /feed tap<24 x15 zoom x1 covered x3 (4s)
+[2/38] 390 /dashboard tap<24 x2 covered x1 (4s)
+[3/38] 390 /feed/post-3 tap<24 x3 zoom x1 (7s)
+[4/38] 390 /feed/post-1 tap<24 x9 zoom x1 covered x1 (7s)
+[5/38] 390 /friends?tab=incoming textx4 tap<24 x2 (11s)
+[6/38] 390 /friends textx2 tap<24 x2 (11s)
+[7/38] 390 /friends?tab=compatibility tap<24 x2 (14s)
+[8/38] 390 /people tap<24 x10 zoom x1 covered x3 (14s)
+[9/38] 390 /messages ok (18s)
+[10/38] 390 /messages?with=22222222-2222-4222-8222-222222222222 tap<24 x1 zoom x1 (18s)
+[11/38] 390 /ask ok (22s)
+[12/38] 390 /discover tap<24 x2 covered x1 (22s)
+[13/38] 390 /credits ok (27s)
+[14/38] 390 /account zoom x4 (27s)
+[15/38] 390 /library zoom x1 covered x1 (31s)
+[16/38] 390 /subscription covered x1 (31s)
+[17/38] 390 /library/lib-2 zoom x1 (39s)
+[18/38] 390 /library/lib-1 zoom x1 (39s)
+[19/38] 390 /synastry ok (45s)
+[20/38] 390 /synastry/new tap<24 x1 covered x3 (45s)
+[21/38] 390 /piradi-horoskopi tap<24 x2 (52s)
+[22/38] 390 /piradi-ruka tap<24 x10 (52s)
+[23/38] 390 /sky covered x1 (58s)
+[24/38] 390 /nataluri-ruka tap<24 x13 (58s)
+[25/38] 390 /reminders HTTP404 (65s)
+[26/38] 390 /timing ok (65s)
+[27/38] 390 /reports covered x1 (99s)
+[28/38] 390 /report textx6 tap<24 x2 covered x1 (99s)
+[29/38] 390 /post-login tap<24 x2 covered x1 (103s)
+[30/38] 390 /u/nino-audit ok (107s)
+[31/38] 390 /onboarding/result ok (109s)
+[32/38] 390 /u/luka-audit tap<24 x3 (111s)
+[33/38] 390 /iq-testi/shedegi/iq-audit-1 ok (113s)
+[34/38] 390 /iq-testi/shedegi/iq-audit-2 ok (114s)
+[35/38] 390 /eq-testi/shedegi/eq-audit-1 tap<24 x1 (119s)
+[36/38] 390 /big-five/shedegi/bf-audit-1 textx2 (119s)
+[37/38] 390 /pirovnebis-testi/claim ok (126s)
+[38/38] 390 /test-results/iq-audit-1 HTTP404 (126s)
+=== 390 done: 38 routes in 126s ===
+[
+  {
+    "width": 390,
+    "height": 844,
+    "count": 38
+  }
+]

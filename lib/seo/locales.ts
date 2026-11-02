@@ -3,7 +3,12 @@ import type { Metadata } from "next";
 // Relative, not "@/": this module is imported by next.config.ts, which is
 // loaded outside the app's tsconfig path aliases.
 import { upgradeEnglishDetailSlug, upgradePolishDetailSlug } from "./en-slugs";
-import { internationalPublicPath, polishPublicPath } from "./public-paths";
+import {
+  internationalInternalPath,
+  internationalPublicPath,
+  polishInternalPath,
+  polishPublicPath,
+} from "./public-paths";
 
 export const GEORGIAN_SITE_URL = "https://www.vivida.ge";
 export const ENGLISH_SITE_URL = "https://www.vividaastro.com";
@@ -169,7 +174,7 @@ export const DEFAULT_OG_IMAGE = "/opengraph-image";
  * Resolve an English-site content link for whichever host is serving.
  */
 export function englishSiteHref(path: string, onEnglishHost: boolean): string {
-  const publicPath = internationalPublicPath(path);
+  const publicPath = upgradeEnglishDetailSlug(resolveEnglishPath(path));
   if (onEnglishHost) return publicPath;
   return `${ENGLISH_SITE_URL}${publicPath === "/" ? "" : publicPath}`;
 }
@@ -178,9 +183,38 @@ export function englishSiteHref(path: string, onEnglishHost: boolean): string {
  * Resolve a Polish-site content link for whichever host is serving.
  */
 export function polishSiteHref(path: string, onEnglishHost: boolean): string {
-  const publicPath = polishPublicPath(path);
+  const publicPath = upgradePolishDetailSlug(polishPublicPath(path));
   if (onEnglishHost) return publicPath;
   return `${ENGLISH_SITE_URL}${publicPath === "/" ? "" : publicPath}`;
+}
+
+/**
+ * Compute exact English ↔ Polish counterpart URLs for any current pathname
+ * on vividaastro.com, falling back to `fallbackGeorgianPath` when needed.
+ */
+export function resolveInternationalLanguageSwitchHrefs(
+  pathname: string | null | undefined,
+  fallbackGeorgianPath: string = "/",
+  onEnglishHost: boolean = true,
+): { enHref: string; plHref: string } {
+  const current = pathname && pathname.startsWith("/") ? pathname : null;
+  let internalPath = fallbackGeorgianPath || "/";
+  if (current) {
+    if (current === "/pl" || current.startsWith("/pl/")) {
+      internalPath = polishInternalPath(current);
+    } else if (current !== "/" || fallbackGeorgianPath === "/") {
+      const corePair = CORE_LANGUAGE_PAIRS.find(
+        (p) => p.en === current || p.internalEn === current,
+      );
+      internalPath = corePair
+        ? corePair.ka
+        : internationalInternalPath(current);
+    }
+  }
+  return {
+    enHref: englishSiteHref(internalPath, onEnglishHost),
+    plHref: polishSiteHref(internalPath, onEnglishHost),
+  };
 }
 
 /**

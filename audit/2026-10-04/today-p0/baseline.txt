@@ -1,0 +1,7 @@
+Clean isolated worktree at e3fa20e: npm run check exit 0; npx vitest run exit 0, 109 files passed / 2 skipped, 508 tests passed / 8 skipped. Original main has pre-existing package.json/package-lock.json changes; do not stage them.
+e3fa20ee5697e9670b598ba717e571d583998115
+/Users/giviendeladze/Projects/vivida/vivida.ge                                           e3fa20e [main]
+/Users/giviendeladze/.hermes/cache/scratch/vivida-today-p0-spark-20261004                e3fa20e [feat/today-p0-spark-20261004]
+/Users/giviendeladze/Projects/vivida/vivida.ge/.claude/worktrees/clever-jennings-d230da  f47f2dc (detached HEAD)
+80b103c90835efe7bb66f0bec46265d133229c9ef3583e78c46c5809fa6d0488  package.json
+85fce1cd32bd51106fc35c72f6c958d699f79513fdaad25cd70b41647b575383  package-lock.json

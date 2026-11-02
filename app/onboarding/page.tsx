@@ -7,7 +7,9 @@ import { requireUser } from "@/lib/auth-helpers";
 import { Starfield } from "@/components/landing/starfield";
 import { OnboardingWizard } from "@/components/onboarding/wizard";
 import { VividaMark } from "@/components/brand/vivida-mark";
+import { AppLanguageSwitcher } from "@/components/i18n/international-language-switcher";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { getUserLocale } from "@/lib/i18n/user-locale";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { FastOnboarding } from "@/components/onboarding/fast-onboarding";
@@ -38,7 +40,7 @@ export default async function OnboardingPage({
   searchParams: Promise<{ next?: string; fast?: string }>;
 }) {
   const user = await requireUser();
-  const locale = await getRequestLocale();
+  const locale = await getUserLocale(user.id);
   const en = locale !== "ka";
   const { next, fast } = await searchParams;
 
@@ -71,23 +73,29 @@ export default async function OnboardingPage({
 
       <header className="relative z-10 border-b border-border/80 bg-background/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-2.5">
+          <Link
+            href={locale === "pl" ? "/pl" : "/"}
+            className="flex items-center gap-2.5"
+          >
             <VividaMark size={30} id="onboarding" />
             <span className="font-display text-2xl font-medium tracking-tight text-foreground">
               Vivida
             </span>
           </Link>
-          <div className="font-mono text-xs text-muted-foreground">
-            {locale === "pl"
-              ? "Tworzenie kosmogramu"
-              : en
-                ? "Observatory Setup"
-                : "პირადი რუკის შექმნა"}{" "}
-            ·{" "}
-            <span className="text-foreground">
-              {user.name?.split(" ")[0] ??
-                (locale === "pl" ? "Odkrywca" : en ? "Stargazer" : "სტუმარი")}
-            </span>
+          <div className="flex items-center gap-3">
+            <AppLanguageSwitcher locale={locale} authed />
+            <div className="font-mono text-xs text-muted-foreground">
+              {locale === "pl"
+                ? "Tworzenie kosmogramu"
+                : en
+                  ? "Observatory Setup"
+                  : "პირადი რუკის შექმნა"}{" "}
+              ·{" "}
+              <span className="text-foreground">
+                {user.name?.split(" ")[0] ??
+                  (locale === "pl" ? "Odkrywca" : en ? "Stargazer" : "სტუმარი")}
+              </span>
+            </div>
           </div>
         </div>
       </header>

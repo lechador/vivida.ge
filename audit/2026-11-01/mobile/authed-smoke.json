@@ -1,0 +1,27 @@
+[
+  {
+    "url": "/dashboard",
+    "pattern": "/dashboard",
+    "dynamic": false
+  },
+  {
+    "url": "/feed",
+    "pattern": "/feed",
+    "dynamic": false
+  },
+  {
+    "url": "/messages",
+    "pattern": "/messages",
+    "dynamic": false
+  },
+  {
+    "url": "/piradi-ruka",
+    "pattern": "/piradi-ruka",
+    "dynamic": false
+  },
+  {
+    "url": "/u/nino-audit",
+    "pattern": "/u/nino-audit",
+    "dynamic": false
+  }
+]

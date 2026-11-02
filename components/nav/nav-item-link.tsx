@@ -5,6 +5,7 @@ import type { ComponentProps } from "react";
 
 import { ANALYTICS_EVENT, productEventBase, trackEvent } from "@/lib/analytics";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { localizedHref } from "@/lib/seo/public-paths";
 
 type LinkProps = Omit<ComponentProps<typeof Link>, "href" | "onClick">;
 
@@ -31,7 +32,7 @@ export function NavItemLink({
 }) {
   return (
     <Link
-      href={href}
+      href={localizedHref(href, locale)}
       onClick={() => {
         trackEvent(ANALYTICS_EVENT.navItemSelected, {
           ...productEventBase("navigation", surface, locale),

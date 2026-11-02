@@ -13,11 +13,14 @@ export function PopularTools({
   placement: string;
   publicEntry?: boolean;
 }) {
+  const pl = locale === "pl";
   const en = locale === "en";
 
   return (
     <nav
-      aria-label={en ? "Most used" : "ყველაზე გამოყენებადი"}
+      aria-label={
+        pl ? "Najczęściej używane" : en ? "Most used" : "ყველაზე გამოყენებადი"
+      }
       className="grid gap-4 sm:grid-cols-2"
     >
       <TrackedPublicLink
@@ -34,12 +37,14 @@ export function PopularTools({
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-sm font-semibold tracking-tight text-foreground">
-            {en ? "Tarot reading" : "ტაროს გაშლა"}
+            {pl ? "Rozkład Tarota" : en ? "Tarot reading" : "ტაროს გაშლა"}
           </span>
           <span className="mt-0.5 block text-xs text-muted-foreground">
-            {en
-              ? "Ask a question, draw 3 cards"
-              : "დასვი კითხვა, გააშლე 3 კარტი"}
+            {pl
+              ? "Zadaj pytanie, wylosuj 3 karty"
+              : en
+                ? "Ask a question, draw 3 cards"
+                : "დასვი კითხვა, გააშლე 3 კარტი"}
           </span>
         </span>
         <ArrowRight
@@ -62,16 +67,24 @@ export function PopularTools({
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-sm font-semibold tracking-tight text-foreground">
-            {en ? "Ask your chart" : "ჰკითხე ვარსკვლავებს"}
+            {pl
+              ? "Zapytaj swój kosmogram"
+              : en
+                ? "Ask your chart"
+                : "ჰკითხე ვარსკვლავებს"}
           </span>
           <span className="mt-0.5 block text-xs text-muted-foreground">
             {publicEntry
-              ? en
-                ? "Personal astrologer · Account required"
-                : "პირადი ასტროლოგი · საჭიროა ანგარიში"
-              : en
-                ? "Personal astrologer"
-                : "პირადი ასტროლოგი"}
+              ? pl
+                ? "Osobisty astrolog · Wymagane konto"
+                : en
+                  ? "Personal astrologer · Account required"
+                  : "პირადი ასტროლოგი · საჭიროა ანგარიში"
+              : pl
+                ? "Osobisty astrolog"
+                : en
+                  ? "Personal astrologer"
+                  : "პირადი ასტროლოგი"}
           </span>
         </span>
         <ArrowRight

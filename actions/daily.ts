@@ -83,10 +83,7 @@ export async function ensureDailyFor(
     .select()
     .from(dailyHoroscopes)
     .where(
-      and(
-        eq(dailyHoroscopes.userId, userId),
-        eq(dailyHoroscopes.date, today)
-      )
+      and(eq(dailyHoroscopes.userId, userId), eq(dailyHoroscopes.date, today)),
     )
     .limit(1);
   if (existing) {
@@ -109,184 +106,158 @@ export async function ensureDailyFor(
   }
 
   try {
+    const now = new Date();
+    const transits = computeTransits(
+      now,
+      profile.latitude ?? 0,
+      profile.longitude ?? 0,
+    );
 
-  const now = new Date();
-  const transits = computeTransits(
-    now,
-    profile.latitude ?? 0,
-    profile.longitude ?? 0
-  );
+    // Map natal bodies for aspect detection
+    const natalBodies = Object.fromEntries(
+      Object.entries(chart.data.bodies).map(([k, v]) => [
+        k,
+        { longitude: v.longitude },
+      ]),
+    );
 
-  // Map natal bodies for aspect detection
-  const natalBodies = Object.fromEntries(
-    Object.entries(chart.data.bodies).map(([k, v]) => [
-      k,
-      { longitude: v.longitude },
-    ])
-  );
+    // All transit-natal aspects, sorted by tightness
+    const allAspects = detectCrossAspects(transits, natalBodies);
 
-  // All transit-natal aspects, sorted by tightness
-  const allAspects = detectCrossAspects(transits, natalBodies);
+    // Categorize by transiting body's speed
+    const moonAspects = allAspects
+      .filter((a) => a.transit === "moon" && a.orb <= 4)
+      .slice(0, 5);
+    const innerKeys = new Set(["mercury", "venus", "mars"]);
+    const outerKeys = new Set([
+      "jupiter",
+      "saturn",
+      "uranus",
+      "neptune",
+      "pluto",
+    ]);
+    const innerAspects = allAspects
+      .filter((a) => innerKeys.has(a.transit) && a.orb <= 3)
+      .slice(0, 5);
+    const outerAspects = allAspects
+      .filter((a) => outerKeys.has(a.transit))
+      .slice(0, 4);
 
-  // Categorize by transiting body's speed
-  const moonAspects = allAspects
-    .filter((a) => a.transit === "moon" && a.orb <= 4)
-    .slice(0, 5);
-  const innerKeys = new Set(["mercury", "venus", "mars"]);
-  const outerKeys = new Set([
-    "jupiter",
-    "saturn",
-    "uranus",
-    "neptune",
-    "pluto",
-  ]);
-  const innerAspects = allAspects
-    .filter((a) => innerKeys.has(a.transit) && a.orb <= 3)
-    .slice(0, 5);
-  const outerAspects = allAspects
-    .filter((a) => outerKeys.has(a.transit))
-    .slice(0, 4);
+    // Transit-house assignments (which natal house each transit falls in)
+    const houseFor = (lng: number) => houseOfLongitude(lng, chart.data.houses);
 
-  // Transit-house assignments (which natal house each transit falls in)
-  const houseFor = (lng: number) =>
-    houseOfLongitude(lng, chart.data.houses);
+    const moonPos = transits.moon;
+    const sunPos = transits.sun;
+    const moonHouse = moonPos ? houseFor(moonPos.longitude) : null;
+    const sunHouse = sunPos ? houseFor(sunPos.longitude) : null;
 
-  const moonPos = transits.moon;
-  const sunPos = transits.sun;
-  const moonHouse = moonPos ? houseFor(moonPos.longitude) : null;
-  const sunHouse = sunPos ? houseFor(sunPos.longitude) : null;
+    const innerPlanets: DailyDayContext["innerPlanets"] = (
+      ["mercury", "venus", "mars"] as const
+    )
+      .filter((k) => transits[k])
+      .map((k) => ({
+        key: k,
+        signEn: signByIndex(Math.floor(transits[k].longitude / 30)).labelEn,
+        natalHouse: houseFor(transits[k].longitude),
+      }));
 
-  const innerPlanets: DailyDayContext["innerPlanets"] = (
-    ["mercury", "venus", "mars"] as const
-  )
-    .filter((k) => transits[k])
-    .map((k) => ({
-      key: k,
-      signEn: signByIndex(Math.floor(transits[k].longitude / 30)).labelEn,
-      natalHouse: houseFor(transits[k].longitude),
-    }));
+    const dateLocale =
+      locale === "pl" ? "pl-PL" : locale === "en" ? "en-US" : "ka-GE";
+    const localizedDate = new Intl.DateTimeFormat(dateLocale, {
+      timeZone: profile.timezone,
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(now);
+    const weekday = new Intl.DateTimeFormat(dateLocale, {
+      timeZone: profile.timezone,
+      weekday: "long",
+    }).format(now);
 
-  const dateLocale = locale === "en" ? "en-US" : "ka-GE";
-  const localizedDate = new Intl.DateTimeFormat(dateLocale, {
-    timeZone: profile.timezone,
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(now);
-  const weekday = new Intl.DateTimeFormat(dateLocale, {
-    timeZone: profile.timezone,
-    weekday: "long",
-  }).format(now);
-
-  const context: DailyDayContext = {
-    localizedDate,
-    weekday,
-    moon: {
-      signEn: moonPos
-        ? signByIndex(Math.floor(moonPos.longitude / 30)).labelEn
-        : "Unknown",
-      natalHouse: moonHouse,
-      aspectsToNatal: moonAspects,
-    },
-    sun: {
-      signEn: sunPos
-        ? signByIndex(Math.floor(sunPos.longitude / 30)).labelEn
-        : "Unknown",
-      natalHouse: sunHouse,
-    },
-    innerPlanets,
-    innerAspects,
-    outerAspects,
-  };
-
-  // Fast path: compose the reading from the pre-generated transit library,
-  // zero AI calls, instant. Falls back to the full per-user model call only
-  // when a needed library row is missing (self-healed in the background).
-  let reading: {
-    headline: string;
-    summary: string;
-    body: string;
-    themes: string[];
-  } | null = null;
-  let model = OPENROUTER_MODEL;
-  let source: "library" | "ai" = "ai";
-
-  if (moonPos) {
-    const facts: TransitDayFacts = {
+    const context: DailyDayContext = {
+      localizedDate,
+      weekday,
       moon: {
-        sign: signByIndex(Math.floor(moonPos.longitude / 30)).key,
-        house: moonHouse,
-        aspects: moonAspects,
+        signEn: moonPos
+          ? signByIndex(Math.floor(moonPos.longitude / 30)).labelEn
+          : "Unknown",
+        natalHouse: moonHouse,
+        aspectsToNatal: moonAspects,
       },
-      sun: { house: sunHouse },
+      sun: {
+        signEn: sunPos
+          ? signByIndex(Math.floor(sunPos.longitude / 30)).labelEn
+          : "Unknown",
+        natalHouse: sunHouse,
+      },
+      innerPlanets,
       innerAspects,
       outerAspects,
     };
-    const combos = combosForDay(facts);
-    const entries = await getTransitLibraryEntries(
-      combos.map((c) => c.key),
-      locale,
-    );
-    const composed = composeDailyFromLibrary(facts, entries, locale, today);
-    if (composed) {
-      reading = composed;
-      model = "library";
-      source = "library";
-    } else {
-      const missing = combos.filter((c) => !entries.has(c.key));
-      void ensureTransitLibraryFor(missing).catch(() => {});
+
+    // Fast path: compose the reading from the pre-generated transit library,
+    // zero AI calls, instant. Falls back to the full per-user model call only
+    // when a needed library row is missing (self-healed in the background).
+    let reading: {
+      headline: string;
+      summary: string;
+      body: string;
+      themes: string[];
+    } | null = null;
+    let model = OPENROUTER_MODEL;
+    let source: "library" | "ai" = "ai";
+
+    if (moonPos) {
+      const facts: TransitDayFacts = {
+        moon: {
+          sign: signByIndex(Math.floor(moonPos.longitude / 30)).key,
+          house: moonHouse,
+          aspects: moonAspects,
+        },
+        sun: { house: sunHouse },
+        innerAspects,
+        outerAspects,
+      };
+      const combos = combosForDay(facts);
+      const entries = await getTransitLibraryEntries(
+        combos.map((c) => c.key),
+        locale,
+      );
+      const composed = composeDailyFromLibrary(facts, entries, locale, today);
+      if (composed) {
+        reading = composed;
+        model = "library";
+        source = "library";
+      } else {
+        const missing = combos.filter((c) => !entries.has(c.key));
+        void ensureTransitLibraryFor(missing).catch(() => {});
+      }
     }
-  }
 
-  if (!reading) {
-    if (!isOpenRouterConfigured()) return null;
-    const [user] = await db
-      .select({ name: users.name })
-      .from(users)
-      .where(eq(users.id, userId))
-      .limit(1);
-    const firstName = user?.name?.split(" ")[0] ?? null;
+    if (!reading) {
+      if (!isOpenRouterConfigured()) return null;
+      const [user] = await db
+        .select({ name: users.name })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+      const firstName = user?.name?.split(" ")[0] ?? null;
 
-    reading = await generateDailyReading({
-      firstName,
-      chart: chart.data,
-      context,
-    });
-  }
+      reading = await generateDailyReading({
+        firstName,
+        chart: chart.data,
+        context,
+      });
+    }
 
-  if (!reading) return null;
+    if (!reading) return null;
 
-  const [inserted] = await db
-    .insert(dailyHoroscopes)
-    .values({
-      userId,
-      date: today,
-      headline: reading.headline,
-      summary: reading.summary,
-      body: reading.body,
-      themes: reading.themes,
-      transits: {
-        topAspects: allAspects.slice(0, 10),
-        promptVersion: DAILY_PROMPT_VERSION,
-        natalInputHash: chart.inputHash,
-        moonHouse,
-        moonSignEn: context.moon.signEn,
-        headlineAspect: moonAspects[0]
-          ? {
-              transit: moonAspects[0].transit,
-              natal: moonAspects[0].natal,
-              kind: moonAspects[0].kind,
-            }
-          : null,
-        source,
-      },
-      model,
-      language: locale,
-    })
-    .onConflictDoUpdate({
-      target: [dailyHoroscopes.userId, dailyHoroscopes.date],
-      set: {
+    const [inserted] = await db
+      .insert(dailyHoroscopes)
+      .values({
+        userId,
+        date: today,
         headline: reading.headline,
         summary: reading.summary,
         body: reading.body,
@@ -308,16 +279,41 @@ export async function ensureDailyFor(
         },
         model,
         language: locale,
-      },
-    })
-    .returning();
+      })
+      .onConflictDoUpdate({
+        target: [dailyHoroscopes.userId, dailyHoroscopes.date],
+        set: {
+          headline: reading.headline,
+          summary: reading.summary,
+          body: reading.body,
+          themes: reading.themes,
+          transits: {
+            topAspects: allAspects.slice(0, 10),
+            promptVersion: DAILY_PROMPT_VERSION,
+            natalInputHash: chart.inputHash,
+            moonHouse,
+            moonSignEn: context.moon.signEn,
+            headlineAspect: moonAspects[0]
+              ? {
+                  transit: moonAspects[0].transit,
+                  natal: moonAspects[0].natal,
+                  kind: moonAspects[0].kind,
+                }
+              : null,
+            source,
+          },
+          model,
+          language: locale,
+        },
+      })
+      .returning();
 
-  if (inserted) {
-    await archiveDailyReading(userId, inserted).catch((error) =>
-      console.warn("[library] daily archive failed:", error),
-    );
-  }
-  return inserted ?? null;
+    if (inserted) {
+      await archiveDailyReading(userId, inserted).catch((error) =>
+        console.warn("[library] daily archive failed:", error),
+      );
+    }
+    return inserted ?? null;
   } finally {
     await releaseGeneration(lockKey).catch(() => {});
   }

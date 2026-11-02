@@ -1,0 +1,12 @@
+[
+  {
+    "url": "/",
+    "pattern": "/",
+    "dynamic": false
+  },
+  {
+    "url": "/en",
+    "pattern": "/en",
+    "dynamic": false
+  }
+]

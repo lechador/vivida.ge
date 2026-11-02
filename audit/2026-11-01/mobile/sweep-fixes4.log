@@ -1,0 +1,40 @@
+
+=== 320x568: 11 routes (concurrency 2) ===
+[1/11] 320 /astrologiuri-saxlebi tap<24 x4 (3s)
+[2/11] 320 /privacy tap<24 x2 (3s)
+[3/11] 320 /siyvarulis-horoskopi/aries tap<24 x2 (6s)
+[4/11] 320 /siyvarulis-horoskopi/taurus tap<24 x2 (6s)
+[5/11] 320 /zodiac/aries/dghes tap<24 x3 (8s)
+[6/11] 320 /taro/the-magician tap<24 x3 (8s)
+[7/11] 320 /zodiac/reitingebi tap<24 x3 (11s)
+[8/11] 320 /sizmris-akhsna tap<24 x3 (11s)
+[9/11] 320 /taro tap<24 x2 (14s)
+[10/11] 320 /zodiac/aries/2026 tap<24 x3 (15s)
+[11/11] 320 /zodiac/aries tap<24 x4 (17s)
+=== 320 done: 11 routes in 17s ===
+
+=== 390x844: 11 routes (concurrency 2) ===
+[1/11] 390 /astrologiuri-saxlebi tap<24 x4 (3s)
+[2/11] 390 /privacy tap<24 x2 (3s)
+[3/11] 390 /siyvarulis-horoskopi/taurus tap<24 x2 (5s)
+[4/11] 390 /siyvarulis-horoskopi/aries tap<24 x2 (5s)
+[5/11] 390 /zodiac/aries/dghes tap<24 x4 (8s)
+[6/11] 390 /taro/the-magician tap<24 x3 (8s)
+[7/11] 390 /zodiac/reitingebi tap<24 x3 (10s)
+[8/11] 390 /sizmris-akhsna tap<24 x3 (11s)
+[9/11] 390 /taro tap<24 x3 (13s)
+[10/11] 390 /zodiac/aries/2026 tap<24 x4 (14s)
+[11/11] 390 /zodiac/aries tap<24 x4 (16s)
+=== 390 done: 11 routes in 16s ===
+[
+  {
+    "width": 320,
+    "height": 568,
+    "count": 11
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "count": 11
+  }
+]

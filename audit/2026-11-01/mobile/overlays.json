@@ -1,0 +1,1648 @@
+[
+  {
+    "name": "consent-320",
+    "width": 320,
+    "error": null,
+    "overlays": [
+      {
+        "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+        "left": 16,
+        "right": 272,
+        "top": -80,
+        "bottom": -38,
+        "width": 256,
+        "height": 42,
+        "scrollWidth": 254,
+        "clientWidth": 254,
+        "text": "მთავარ კონტენტზე გადასვლა",
+        "escaping": []
+      },
+      {
+        "cls": "fixed inset-x-3 bottom-3 z-[100] mx-auto flex max-h-[60svh] ",
+        "left": 12,
+        "right": 308,
+        "top": 289,
+        "bottom": 556,
+        "width": 296,
+        "height": 268,
+        "scrollWidth": 294,
+        "clientWidth": 294,
+        "text": "შენი კონფიდენციალურობის არჩევანი Top.ge ვიზიტებს ითვლის vivida.ge-ზე ა",
+        "escaping": []
+      }
+    ],
+    "metrics": {
+      "docWidth": 320,
+      "bodyScrollWidth": 320,
+      "overlays": [
+        {
+          "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+          "left": 16,
+          "right": 272,
+          "top": -80,
+          "bottom": -38,
+          "width": 256,
+          "height": 42,
+          "scrollWidth": 254,
+          "clientWidth": 254,
+          "text": "მთავარ კონტენტზე გადასვლა",
+          "escaping": []
+        },
+        {
+          "cls": "fixed inset-x-3 bottom-3 z-[100] mx-auto flex max-h-[60svh] ",
+          "left": 12,
+          "right": 308,
+          "top": 289,
+          "bottom": 556,
+          "width": 296,
+          "height": 268,
+          "scrollWidth": 294,
+          "clientWidth": 294,
+          "text": "შენი კონფიდენციალურობის არჩევანი Top.ge ვიზიტებს ითვლის vivida.ge-ზე ა",
+          "escaping": []
+        }
+      ]
+    },
+    "docOverflow": 0,
+    "screenshot": "shots/overlay-consent-320.jpg"
+  },
+  {
+    "name": "drawer-320",
+    "width": 320,
+    "error": null,
+    "overlays": [
+      {
+        "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+        "left": 16,
+        "right": 272,
+        "top": -80,
+        "bottom": -38,
+        "width": 256,
+        "height": 42,
+        "scrollWidth": 254,
+        "clientWidth": 254,
+        "text": "მთავარ კონტენტზე გადასვლა",
+        "escaping": []
+      },
+      {
+        "cls": "fixed inset-x-0 bottom-0 z-40 lg:hidden border-t border-[var",
+        "left": 0,
+        "right": 320,
+        "top": 494,
+        "bottom": 568,
+        "width": 320,
+        "height": 74,
+        "scrollWidth": 320,
+        "clientWidth": 320,
+        "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი",
+        "escaping": []
+      },
+      {
+        "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+        "left": 12,
+        "right": 52,
+        "top": 440,
+        "bottom": 480,
+        "width": 40,
+        "height": 40,
+        "scrollWidth": 38,
+        "clientWidth": 38,
+        "text": "",
+        "escaping": []
+      },
+      {
+        "cls": "vivida-drawer-overlay fixed inset-0 z-50 bg-black/75 backdro",
+        "left": 0,
+        "right": 320,
+        "top": 0,
+        "bottom": 568,
+        "width": 320,
+        "height": 568,
+        "scrollWidth": 320,
+        "clientWidth": 320,
+        "text": "",
+        "escaping": []
+      },
+      {
+        "cls": "vivida-drawer-right fixed inset-y-0 right-0 z-50 flex w-[min",
+        "left": 26,
+        "right": 320,
+        "top": 0,
+        "bottom": 568,
+        "width": 294,
+        "height": 568,
+        "scrollWidth": 293,
+        "clientWidth": 293,
+        "text": "Vivida · ინდექსი ობსერვატორიის ნავიგაცია 01 · პირადი სივრცე 14 01 დღეს",
+        "escaping": [
+          {
+            "tag": "DIV",
+            "text": "01 · პირადი სივრცე1401დღეს02ტარო03ჰკითხე04ბიბლიოთე",
+            "right": 300,
+            "left": 47,
+            "bottom": 684
+          },
+          {
+            "tag": "DIV",
+            "text": "01დღეს02ტარო03ჰკითხე04ბიბლიოთეკა05ჩემი რუკა06ცა ახ",
+            "right": 300,
+            "left": 47,
+            "bottom": 684
+          },
+          {
+            "tag": "A",
+            "text": "12თავსებადობა",
+            "right": 299,
+            "left": 48,
+            "bottom": 602
+          },
+          {
+            "tag": "DIV",
+            "text": "12თავსებადობა",
+            "right": 220,
+            "left": 62,
+            "bottom": 591
+          },
+          {
+            "tag": "SPAN",
+            "text": "12",
+            "right": 75,
+            "left": 62,
+            "bottom": 589
+          },
+          {
+            "tag": "SPAN",
+            "text": "",
+            "right": 107,
+            "left": 87,
+            "bottom": 591
+          }
+        ]
+      }
+    ],
+    "metrics": {
+      "docWidth": 320,
+      "bodyScrollWidth": 320,
+      "overlays": [
+        {
+          "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+          "left": 16,
+          "right": 272,
+          "top": -80,
+          "bottom": -38,
+          "width": 256,
+          "height": 42,
+          "scrollWidth": 254,
+          "clientWidth": 254,
+          "text": "მთავარ კონტენტზე გადასვლა",
+          "escaping": []
+        },
+        {
+          "cls": "fixed inset-x-0 bottom-0 z-40 lg:hidden border-t border-[var",
+          "left": 0,
+          "right": 320,
+          "top": 494,
+          "bottom": 568,
+          "width": 320,
+          "height": 74,
+          "scrollWidth": 320,
+          "clientWidth": 320,
+          "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი",
+          "escaping": []
+        },
+        {
+          "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+          "left": 12,
+          "right": 52,
+          "top": 440,
+          "bottom": 480,
+          "width": 40,
+          "height": 40,
+          "scrollWidth": 38,
+          "clientWidth": 38,
+          "text": "",
+          "escaping": []
+        },
+        {
+          "cls": "vivida-drawer-overlay fixed inset-0 z-50 bg-black/75 backdro",
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 568,
+          "width": 320,
+          "height": 568,
+          "scrollWidth": 320,
+          "clientWidth": 320,
+          "text": "",
+          "escaping": []
+        },
+        {
+          "cls": "vivida-drawer-right fixed inset-y-0 right-0 z-50 flex w-[min",
+          "left": 26,
+          "right": 320,
+          "top": 0,
+          "bottom": 568,
+          "width": 294,
+          "height": 568,
+          "scrollWidth": 293,
+          "clientWidth": 293,
+          "text": "Vivida · ინდექსი ობსერვატორიის ნავიგაცია 01 · პირადი სივრცე 14 01 დღეს",
+          "escaping": [
+            {
+              "tag": "DIV",
+              "text": "01 · პირადი სივრცე1401დღეს02ტარო03ჰკითხე04ბიბლიოთე",
+              "right": 300,
+              "left": 47,
+              "bottom": 684
+            },
+            {
+              "tag": "DIV",
+              "text": "01დღეს02ტარო03ჰკითხე04ბიბლიოთეკა05ჩემი რუკა06ცა ახ",
+              "right": 300,
+              "left": 47,
+              "bottom": 684
+            },
+            {
+              "tag": "A",
+              "text": "12თავსებადობა",
+              "right": 299,
+              "left": 48,
+              "bottom": 602
+            },
+            {
+              "tag": "DIV",
+              "text": "12თავსებადობა",
+              "right": 220,
+              "left": 62,
+              "bottom": 591
+            },
+            {
+              "tag": "SPAN",
+              "text": "12",
+              "right": 75,
+              "left": 62,
+              "bottom": 589
+            },
+            {
+              "tag": "SPAN",
+              "text": "",
+              "right": 107,
+              "left": 87,
+              "bottom": 591
+            }
+          ]
+        }
+      ]
+    },
+    "docOverflow": 0,
+    "screenshot": "shots/overlay-drawer-320.jpg"
+  },
+  {
+    "name": "mobilemenu-320",
+    "width": 320,
+    "error": null,
+    "overlays": [
+      {
+        "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+        "left": 16,
+        "right": 272,
+        "top": -80,
+        "bottom": -38,
+        "width": 256,
+        "height": 42,
+        "scrollWidth": 254,
+        "clientWidth": 254,
+        "text": "მთავარ კონტენტზე გადასვლა",
+        "escaping": []
+      },
+      {
+        "cls": "fixed inset-x-0 bottom-0 z-40 lg:hidden border-t border-[var",
+        "left": 0,
+        "right": 320,
+        "top": 494,
+        "bottom": 568,
+        "width": 320,
+        "height": 74,
+        "scrollWidth": 320,
+        "clientWidth": 320,
+        "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი",
+        "escaping": []
+      },
+      {
+        "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+        "left": 12,
+        "right": 52,
+        "top": 440,
+        "bottom": 480,
+        "width": 40,
+        "height": 40,
+        "scrollWidth": 38,
+        "clientWidth": 38,
+        "text": "",
+        "escaping": []
+      },
+      {
+        "cls": "vivida-drawer-overlay fixed inset-0 z-50 bg-black/70 backdro",
+        "left": 0,
+        "right": 320,
+        "top": 0,
+        "bottom": 568,
+        "width": 320,
+        "height": 568,
+        "scrollWidth": 320,
+        "clientWidth": 320,
+        "text": "",
+        "escaping": []
+      },
+      {
+        "cls": "vivida-drawer-left fixed inset-y-0 left-0 z-50 flex w-[min(2",
+        "left": 0,
+        "right": 272,
+        "top": 0,
+        "bottom": 568,
+        "width": 272,
+        "height": 568,
+        "scrollWidth": 271,
+        "clientWidth": 271,
+        "text": "Vivida ნავიგაცია დღეს ტარო ჰკითხე ბიბლიოთეკა ჩემი რუკა ცა ახლა რეპორტე",
+        "escaping": [
+          {
+            "tag": "A",
+            "text": "ტესტები",
+            "right": 251,
+            "left": 20,
+            "bottom": 603
+          },
+          {
+            "tag": "SPAN",
+            "text": "",
+            "right": 59,
+            "left": 35,
+            "bottom": 592
+          },
+          {
+            "tag": "svg",
+            "text": "",
+            "right": 56,
+            "left": 38,
+            "bottom": 589
+          },
+          {
+            "tag": "path",
+            "text": "",
+            "right": 49,
+            "left": 45,
+            "bottom": 581
+          },
+          {
+            "tag": "path",
+            "text": "",
+            "right": 52,
+            "left": 43,
+            "bottom": 576
+          },
+          {
+            "tag": "path",
+            "text": "",
+            "right": 54,
+            "left": 51,
+            "bottom": 579
+          }
+        ]
+      }
+    ],
+    "metrics": {
+      "docWidth": 320,
+      "bodyScrollWidth": 320,
+      "overlays": [
+        {
+          "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+          "left": 16,
+          "right": 272,
+          "top": -80,
+          "bottom": -38,
+          "width": 256,
+          "height": 42,
+          "scrollWidth": 254,
+          "clientWidth": 254,
+          "text": "მთავარ კონტენტზე გადასვლა",
+          "escaping": []
+        },
+        {
+          "cls": "fixed inset-x-0 bottom-0 z-40 lg:hidden border-t border-[var",
+          "left": 0,
+          "right": 320,
+          "top": 494,
+          "bottom": 568,
+          "width": 320,
+          "height": 74,
+          "scrollWidth": 320,
+          "clientWidth": 320,
+          "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი",
+          "escaping": []
+        },
+        {
+          "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+          "left": 12,
+          "right": 52,
+          "top": 440,
+          "bottom": 480,
+          "width": 40,
+          "height": 40,
+          "scrollWidth": 38,
+          "clientWidth": 38,
+          "text": "",
+          "escaping": []
+        },
+        {
+          "cls": "vivida-drawer-overlay fixed inset-0 z-50 bg-black/70 backdro",
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 568,
+          "width": 320,
+          "height": 568,
+          "scrollWidth": 320,
+          "clientWidth": 320,
+          "text": "",
+          "escaping": []
+        },
+        {
+          "cls": "vivida-drawer-left fixed inset-y-0 left-0 z-50 flex w-[min(2",
+          "left": 0,
+          "right": 272,
+          "top": 0,
+          "bottom": 568,
+          "width": 272,
+          "height": 568,
+          "scrollWidth": 271,
+          "clientWidth": 271,
+          "text": "Vivida ნავიგაცია დღეს ტარო ჰკითხე ბიბლიოთეკა ჩემი რუკა ცა ახლა რეპორტე",
+          "escaping": [
+            {
+              "tag": "A",
+              "text": "ტესტები",
+              "right": 251,
+              "left": 20,
+              "bottom": 603
+            },
+            {
+              "tag": "SPAN",
+              "text": "",
+              "right": 59,
+              "left": 35,
+              "bottom": 592
+            },
+            {
+              "tag": "svg",
+              "text": "",
+              "right": 56,
+              "left": 38,
+              "bottom": 589
+            },
+            {
+              "tag": "path",
+              "text": "",
+              "right": 49,
+              "left": 45,
+              "bottom": 581
+            },
+            {
+              "tag": "path",
+              "text": "",
+              "right": 52,
+              "left": 43,
+              "bottom": 576
+            },
+            {
+              "tag": "path",
+              "text": "",
+              "right": 54,
+              "left": 51,
+              "bottom": 579
+            }
+          ]
+        }
+      ]
+    },
+    "docOverflow": 0,
+    "screenshot": "shots/overlay-mobilemenu-320.jpg"
+  },
+  {
+    "name": "chat-320",
+    "width": 320,
+    "error": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('[data-chat-launcher]').first()\n",
+    "overlays": []
+  },
+  {
+    "name": "notifications-320",
+    "width": 320,
+    "error": null,
+    "overlays": [
+      {
+        "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+        "left": 16,
+        "right": 272,
+        "top": -80,
+        "bottom": -38,
+        "width": 256,
+        "height": 42,
+        "scrollWidth": 254,
+        "clientWidth": 254,
+        "text": "მთავარ კონტენტზე გადასვლა",
+        "escaping": []
+      },
+      {
+        "cls": "fixed inset-x-0 bottom-0 z-40 lg:hidden border-t border-[var",
+        "left": 0,
+        "right": 320,
+        "top": 494,
+        "bottom": 568,
+        "width": 320,
+        "height": 74,
+        "scrollWidth": 320,
+        "clientWidth": 320,
+        "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი",
+        "escaping": []
+      },
+      {
+        "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+        "left": 12,
+        "right": 52,
+        "top": 440,
+        "bottom": 480,
+        "width": 40,
+        "height": 40,
+        "scrollWidth": 38,
+        "clientWidth": 38,
+        "text": "",
+        "escaping": []
+      },
+      {
+        "cls": "",
+        "left": 0,
+        "right": 320,
+        "top": 58,
+        "bottom": 367,
+        "width": 320,
+        "height": 309,
+        "scrollWidth": 320,
+        "clientWidth": 320,
+        "text": "შეტყობინებები 3 vivida user გამოეხმაურა შენს პოსტს 1 დღის წინ vivida u",
+        "escaping": []
+      }
+    ],
+    "metrics": {
+      "docWidth": 320,
+      "bodyScrollWidth": 320,
+      "overlays": [
+        {
+          "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+          "left": 16,
+          "right": 272,
+          "top": -80,
+          "bottom": -38,
+          "width": 256,
+          "height": 42,
+          "scrollWidth": 254,
+          "clientWidth": 254,
+          "text": "მთავარ კონტენტზე გადასვლა",
+          "escaping": []
+        },
+        {
+          "cls": "fixed inset-x-0 bottom-0 z-40 lg:hidden border-t border-[var",
+          "left": 0,
+          "right": 320,
+          "top": 494,
+          "bottom": 568,
+          "width": 320,
+          "height": 74,
+          "scrollWidth": 320,
+          "clientWidth": 320,
+          "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი",
+          "escaping": []
+        },
+        {
+          "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+          "left": 12,
+          "right": 52,
+          "top": 440,
+          "bottom": 480,
+          "width": 40,
+          "height": 40,
+          "scrollWidth": 38,
+          "clientWidth": 38,
+          "text": "",
+          "escaping": []
+        },
+        {
+          "cls": "",
+          "left": 0,
+          "right": 320,
+          "top": 58,
+          "bottom": 367,
+          "width": 320,
+          "height": 309,
+          "scrollWidth": 320,
+          "clientWidth": 320,
+          "text": "შეტყობინებები 3 vivida user გამოეხმაურა შენს პოსტს 1 დღის წინ vivida u",
+          "escaping": []
+        }
+      ]
+    },
+    "docOverflow": 0,
+    "screenshot": "shots/overlay-notifications-320.jpg"
+  },
+  {
+    "name": "chartzoom-320",
+    "width": 320,
+    "error": null,
+    "overlays": [
+      {
+        "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+        "left": 16,
+        "right": 272,
+        "top": -80,
+        "bottom": -38,
+        "width": 256,
+        "height": 42,
+        "scrollWidth": 254,
+        "clientWidth": 254,
+        "text": "მთავარ კონტენტზე გადასვლა",
+        "escaping": []
+      },
+      {
+        "cls": "fixed inset-x-0 bottom-0 z-40 lg:hidden border-t border-[var",
+        "left": 0,
+        "right": 320,
+        "top": 494,
+        "bottom": 568,
+        "width": 320,
+        "height": 74,
+        "scrollWidth": 320,
+        "clientWidth": 320,
+        "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი",
+        "escaping": []
+      },
+      {
+        "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+        "left": 12,
+        "right": 52,
+        "top": 440,
+        "bottom": 480,
+        "width": 40,
+        "height": 40,
+        "scrollWidth": 38,
+        "clientWidth": 38,
+        "text": "",
+        "escaping": []
+      },
+      {
+        "cls": "fixed inset-0 z-50 bg-black/70 backdrop-blur-md data-[state=",
+        "left": 0,
+        "right": 320,
+        "top": 0,
+        "bottom": 568,
+        "width": 320,
+        "height": 568,
+        "scrollWidth": 320,
+        "clientWidth": 320,
+        "text": "",
+        "escaping": []
+      },
+      {
+        "cls": "fixed left-[50%] top-[50%] z-50 grid w-[calc(100%-1rem)] tra",
+        "left": 13,
+        "right": 307,
+        "top": 137,
+        "bottom": 431,
+        "width": 294,
+        "height": 294,
+        "scrollWidth": 292,
+        "clientWidth": 292,
+        "text": "ნატალური რუკა ♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓ 1 2 3 4 5 6 7 8 9 10 11 12 AC IC",
+        "escaping": []
+      }
+    ],
+    "metrics": {
+      "docWidth": 320,
+      "bodyScrollWidth": 320,
+      "overlays": [
+        {
+          "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+          "left": 16,
+          "right": 272,
+          "top": -80,
+          "bottom": -38,
+          "width": 256,
+          "height": 42,
+          "scrollWidth": 254,
+          "clientWidth": 254,
+          "text": "მთავარ კონტენტზე გადასვლა",
+          "escaping": []
+        },
+        {
+          "cls": "fixed inset-x-0 bottom-0 z-40 lg:hidden border-t border-[var",
+          "left": 0,
+          "right": 320,
+          "top": 494,
+          "bottom": 568,
+          "width": 320,
+          "height": 74,
+          "scrollWidth": 320,
+          "clientWidth": 320,
+          "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი",
+          "escaping": []
+        },
+        {
+          "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+          "left": 12,
+          "right": 52,
+          "top": 440,
+          "bottom": 480,
+          "width": 40,
+          "height": 40,
+          "scrollWidth": 38,
+          "clientWidth": 38,
+          "text": "",
+          "escaping": []
+        },
+        {
+          "cls": "fixed inset-0 z-50 bg-black/70 backdrop-blur-md data-[state=",
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 568,
+          "width": 320,
+          "height": 568,
+          "scrollWidth": 320,
+          "clientWidth": 320,
+          "text": "",
+          "escaping": []
+        },
+        {
+          "cls": "fixed left-[50%] top-[50%] z-50 grid w-[calc(100%-1rem)] tra",
+          "left": 13,
+          "right": 307,
+          "top": 137,
+          "bottom": 431,
+          "width": 294,
+          "height": 294,
+          "scrollWidth": 292,
+          "clientWidth": 292,
+          "text": "ნატალური რუკა ♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓ 1 2 3 4 5 6 7 8 9 10 11 12 AC IC",
+          "escaping": []
+        }
+      ]
+    },
+    "docOverflow": 0,
+    "screenshot": "shots/overlay-chartzoom-320.jpg"
+  },
+  {
+    "name": "onboarding-320",
+    "width": 320,
+    "error": null,
+    "overlays": [
+      {
+        "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+        "left": 16,
+        "right": 272,
+        "top": -80,
+        "bottom": -38,
+        "width": 256,
+        "height": 42,
+        "scrollWidth": 254,
+        "clientWidth": 254,
+        "text": "მთავარ კონტენტზე გადასვლა",
+        "escaping": []
+      },
+      {
+        "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+        "left": 12,
+        "right": 52,
+        "top": 516,
+        "bottom": 556,
+        "width": 40,
+        "height": 40,
+        "scrollWidth": 38,
+        "clientWidth": 38,
+        "text": "",
+        "escaping": []
+      }
+    ],
+    "metrics": {
+      "docWidth": 320,
+      "bodyScrollWidth": 320,
+      "overlays": [
+        {
+          "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+          "left": 16,
+          "right": 272,
+          "top": -80,
+          "bottom": -38,
+          "width": 256,
+          "height": 42,
+          "scrollWidth": 254,
+          "clientWidth": 254,
+          "text": "მთავარ კონტენტზე გადასვლა",
+          "escaping": []
+        },
+        {
+          "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+          "left": 12,
+          "right": 52,
+          "top": 516,
+          "bottom": 556,
+          "width": 40,
+          "height": 40,
+          "scrollWidth": 38,
+          "clientWidth": 38,
+          "text": "",
+          "escaping": []
+        }
+      ]
+    },
+    "docOverflow": 0,
+    "screenshot": "shots/overlay-onboarding-320.jpg"
+  },
+  {
+    "name": "consent-390",
+    "width": 390,
+    "error": null,
+    "overlays": [
+      {
+        "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+        "left": 16,
+        "right": 272,
+        "top": -80,
+        "bottom": -38,
+        "width": 256,
+        "height": 42,
+        "scrollWidth": 254,
+        "clientWidth": 254,
+        "text": "მთავარ კონტენტზე გადასვლა",
+        "escaping": []
+      },
+      {
+        "cls": "fixed inset-x-3 bottom-3 z-[100] mx-auto flex max-h-[60svh] ",
+        "left": 12,
+        "right": 378,
+        "top": 604,
+        "bottom": 832,
+        "width": 366,
+        "height": 228,
+        "scrollWidth": 364,
+        "clientWidth": 364,
+        "text": "შენი კონფიდენციალურობის არჩევანი Top.ge ვიზიტებს ითვლის vivida.ge-ზე ა",
+        "escaping": []
+      }
+    ],
+    "metrics": {
+      "docWidth": 390,
+      "bodyScrollWidth": 390,
+      "overlays": [
+        {
+          "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+          "left": 16,
+          "right": 272,
+          "top": -80,
+          "bottom": -38,
+          "width": 256,
+          "height": 42,
+          "scrollWidth": 254,
+          "clientWidth": 254,
+          "text": "მთავარ კონტენტზე გადასვლა",
+          "escaping": []
+        },
+        {
+          "cls": "fixed inset-x-3 bottom-3 z-[100] mx-auto flex max-h-[60svh] ",
+          "left": 12,
+          "right": 378,
+          "top": 604,
+          "bottom": 832,
+          "width": 366,
+          "height": 228,
+          "scrollWidth": 364,
+          "clientWidth": 364,
+          "text": "შენი კონფიდენციალურობის არჩევანი Top.ge ვიზიტებს ითვლის vivida.ge-ზე ა",
+          "escaping": []
+        }
+      ]
+    },
+    "docOverflow": 0,
+    "screenshot": "shots/overlay-consent-390.jpg"
+  },
+  {
+    "name": "drawer-390",
+    "width": 390,
+    "error": null,
+    "overlays": [
+      {
+        "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+        "left": 16,
+        "right": 272,
+        "top": -80,
+        "bottom": -38,
+        "width": 256,
+        "height": 42,
+        "scrollWidth": 254,
+        "clientWidth": 254,
+        "text": "მთავარ კონტენტზე გადასვლა",
+        "escaping": []
+      },
+      {
+        "cls": "fixed inset-x-0 bottom-0 z-40 lg:hidden border-t border-[var",
+        "left": 0,
+        "right": 390,
+        "top": 770,
+        "bottom": 844,
+        "width": 390,
+        "height": 74,
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი",
+        "escaping": []
+      },
+      {
+        "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+        "left": 12,
+        "right": 52,
+        "top": 716,
+        "bottom": 756,
+        "width": 40,
+        "height": 40,
+        "scrollWidth": 38,
+        "clientWidth": 38,
+        "text": "",
+        "escaping": []
+      },
+      {
+        "cls": "vivida-drawer-overlay fixed inset-0 z-50 bg-black/75 backdro",
+        "left": 0,
+        "right": 390,
+        "top": 0,
+        "bottom": 844,
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "text": "",
+        "escaping": []
+      },
+      {
+        "cls": "vivida-drawer-right fixed inset-y-0 right-0 z-50 flex w-[min",
+        "left": 31,
+        "right": 390,
+        "top": 0,
+        "bottom": 844,
+        "width": 359,
+        "height": 844,
+        "scrollWidth": 358,
+        "clientWidth": 358,
+        "text": "Vivida · ინდექსი ობსერვატორიის ნავიგაცია 01 · პირადი სივრცე 14 01 დღეს",
+        "escaping": [
+          {
+            "tag": "DIV",
+            "text": "02 · ასტრონომიული ალმანახი801დღის ჰოროსკოპი02ნატალ",
+            "right": 370,
+            "left": 52,
+            "bottom": 1062
+          },
+          {
+            "tag": "DIV",
+            "text": "01დღის ჰოროსკოპი02ნატალური რუკა03ტაროს 3-კარტიანი ",
+            "right": 370,
+            "left": 52,
+            "bottom": 1062
+          },
+          {
+            "tag": "A",
+            "text": "03ტაროს 3-კარტიანი გაშლა",
+            "right": 369,
+            "left": 53,
+            "bottom": 857
+          },
+          {
+            "tag": "DIV",
+            "text": "03ტაროს 3-კარტიანი გაშლა",
+            "right": 281,
+            "left": 67,
+            "bottom": 846
+          },
+          {
+            "tag": "SPAN",
+            "text": "ტაროს 3-კარტიანი გაშლა",
+            "right": 281,
+            "left": 92,
+            "bottom": 846
+          },
+          {
+            "tag": "A",
+            "text": "04მთვარის კალენდარი",
+            "right": 369,
+            "left": 53,
+            "bottom": 898
+          }
+        ]
+      }
+    ],
+    "metrics": {
+      "docWidth": 390,
+      "bodyScrollWidth": 390,
+      "overlays": [
+        {
+          "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+          "left": 16,
+          "right": 272,
+          "top": -80,
+          "bottom": -38,
+          "width": 256,
+          "height": 42,
+          "scrollWidth": 254,
+          "clientWidth": 254,
+          "text": "მთავარ კონტენტზე გადასვლა",
+          "escaping": []
+        },
+        {
+          "cls": "fixed inset-x-0 bottom-0 z-40 lg:hidden border-t border-[var",
+          "left": 0,
+          "right": 390,
+          "top": 770,
+          "bottom": 844,
+          "width": 390,
+          "height": 74,
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი",
+          "escaping": []
+        },
+        {
+          "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+          "left": 12,
+          "right": 52,
+          "top": 716,
+          "bottom": 756,
+          "width": 40,
+          "height": 40,
+          "scrollWidth": 38,
+          "clientWidth": 38,
+          "text": "",
+          "escaping": []
+        },
+        {
+          "cls": "vivida-drawer-overlay fixed inset-0 z-50 bg-black/75 backdro",
+          "left": 0,
+          "right": 390,
+          "top": 0,
+          "bottom": 844,
+          "width": 390,
+          "height": 844,
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "text": "",
+          "escaping": []
+        },
+        {
+          "cls": "vivida-drawer-right fixed inset-y-0 right-0 z-50 flex w-[min",
+          "left": 31,
+          "right": 390,
+          "top": 0,
+          "bottom": 844,
+          "width": 359,
+          "height": 844,
+          "scrollWidth": 358,
+          "clientWidth": 358,
+          "text": "Vivida · ინდექსი ობსერვატორიის ნავიგაცია 01 · პირადი სივრცე 14 01 დღეს",
+          "escaping": [
+            {
+              "tag": "DIV",
+              "text": "02 · ასტრონომიული ალმანახი801დღის ჰოროსკოპი02ნატალ",
+              "right": 370,
+              "left": 52,
+              "bottom": 1062
+            },
+            {
+              "tag": "DIV",
+              "text": "01დღის ჰოროსკოპი02ნატალური რუკა03ტაროს 3-კარტიანი ",
+              "right": 370,
+              "left": 52,
+              "bottom": 1062
+            },
+            {
+              "tag": "A",
+              "text": "03ტაროს 3-კარტიანი გაშლა",
+              "right": 369,
+              "left": 53,
+              "bottom": 857
+            },
+            {
+              "tag": "DIV",
+              "text": "03ტაროს 3-კარტიანი გაშლა",
+              "right": 281,
+              "left": 67,
+              "bottom": 846
+            },
+            {
+              "tag": "SPAN",
+              "text": "ტაროს 3-კარტიანი გაშლა",
+              "right": 281,
+              "left": 92,
+              "bottom": 846
+            },
+            {
+              "tag": "A",
+              "text": "04მთვარის კალენდარი",
+              "right": 369,
+              "left": 53,
+              "bottom": 898
+            }
+          ]
+        }
+      ]
+    },
+    "docOverflow": 0,
+    "screenshot": "shots/overlay-drawer-390.jpg"
+  },
+  {
+    "name": "mobilemenu-390",
+    "width": 390,
+    "error": null,
+    "overlays": [
+      {
+        "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+        "left": 16,
+        "right": 272,
+        "top": -80,
+        "bottom": -38,
+        "width": 256,
+        "height": 42,
+        "scrollWidth": 254,
+        "clientWidth": 254,
+        "text": "მთავარ კონტენტზე გადასვლა",
+        "escaping": []
+      },
+      {
+        "cls": "fixed inset-x-0 bottom-0 z-40 lg:hidden border-t border-[var",
+        "left": 0,
+        "right": 390,
+        "top": 770,
+        "bottom": 844,
+        "width": 390,
+        "height": 74,
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი",
+        "escaping": []
+      },
+      {
+        "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+        "left": 12,
+        "right": 52,
+        "top": 716,
+        "bottom": 756,
+        "width": 40,
+        "height": 40,
+        "scrollWidth": 38,
+        "clientWidth": 38,
+        "text": "",
+        "escaping": []
+      },
+      {
+        "cls": "vivida-drawer-overlay fixed inset-0 z-50 bg-black/70 backdro",
+        "left": 0,
+        "right": 390,
+        "top": 0,
+        "bottom": 844,
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "text": "",
+        "escaping": []
+      },
+      {
+        "cls": "vivida-drawer-left fixed inset-y-0 left-0 z-50 flex w-[min(2",
+        "left": 0,
+        "right": 320,
+        "top": 0,
+        "bottom": 844,
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 319,
+        "clientWidth": 319,
+        "text": "Vivida ნავიგაცია დღეს ტარო ჰკითხე ბიბლიოთეკა ჩემი რუკა ცა ახლა რეპორტე",
+        "escaping": []
+      }
+    ],
+    "metrics": {
+      "docWidth": 390,
+      "bodyScrollWidth": 390,
+      "overlays": [
+        {
+          "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+          "left": 16,
+          "right": 272,
+          "top": -80,
+          "bottom": -38,
+          "width": 256,
+          "height": 42,
+          "scrollWidth": 254,
+          "clientWidth": 254,
+          "text": "მთავარ კონტენტზე გადასვლა",
+          "escaping": []
+        },
+        {
+          "cls": "fixed inset-x-0 bottom-0 z-40 lg:hidden border-t border-[var",
+          "left": 0,
+          "right": 390,
+          "top": 770,
+          "bottom": 844,
+          "width": 390,
+          "height": 74,
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი",
+          "escaping": []
+        },
+        {
+          "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+          "left": 12,
+          "right": 52,
+          "top": 716,
+          "bottom": 756,
+          "width": 40,
+          "height": 40,
+          "scrollWidth": 38,
+          "clientWidth": 38,
+          "text": "",
+          "escaping": []
+        },
+        {
+          "cls": "vivida-drawer-overlay fixed inset-0 z-50 bg-black/70 backdro",
+          "left": 0,
+          "right": 390,
+          "top": 0,
+          "bottom": 844,
+          "width": 390,
+          "height": 844,
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "text": "",
+          "escaping": []
+        },
+        {
+          "cls": "vivida-drawer-left fixed inset-y-0 left-0 z-50 flex w-[min(2",
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 844,
+          "width": 320,
+          "height": 844,
+          "scrollWidth": 319,
+          "clientWidth": 319,
+          "text": "Vivida ნავიგაცია დღეს ტარო ჰკითხე ბიბლიოთეკა ჩემი რუკა ცა ახლა რეპორტე",
+          "escaping": []
+        }
+      ]
+    },
+    "docOverflow": 0,
+    "screenshot": "shots/overlay-mobilemenu-390.jpg"
+  },
+  {
+    "name": "chat-390",
+    "width": 390,
+    "error": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('[data-chat-launcher]').first()\n",
+    "overlays": []
+  },
+  {
+    "name": "notifications-390",
+    "width": 390,
+    "error": null,
+    "overlays": [
+      {
+        "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+        "left": 16,
+        "right": 272,
+        "top": -80,
+        "bottom": -38,
+        "width": 256,
+        "height": 42,
+        "scrollWidth": 254,
+        "clientWidth": 254,
+        "text": "მთავარ კონტენტზე გადასვლა",
+        "escaping": []
+      },
+      {
+        "cls": "fixed inset-x-0 bottom-0 z-40 lg:hidden border-t border-[var",
+        "left": 0,
+        "right": 390,
+        "top": 770,
+        "bottom": 844,
+        "width": 390,
+        "height": 74,
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი",
+        "escaping": []
+      },
+      {
+        "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+        "left": 12,
+        "right": 52,
+        "top": 716,
+        "bottom": 756,
+        "width": 40,
+        "height": 40,
+        "scrollWidth": 38,
+        "clientWidth": 38,
+        "text": "",
+        "escaping": []
+      },
+      {
+        "cls": "",
+        "left": 6,
+        "right": 326,
+        "top": 58,
+        "bottom": 367,
+        "width": 320,
+        "height": 309,
+        "scrollWidth": 320,
+        "clientWidth": 320,
+        "text": "შეტყობინებები 3 vivida user გამოეხმაურა შენს პოსტს 1 დღის წინ vivida u",
+        "escaping": []
+      }
+    ],
+    "metrics": {
+      "docWidth": 390,
+      "bodyScrollWidth": 390,
+      "overlays": [
+        {
+          "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+          "left": 16,
+          "right": 272,
+          "top": -80,
+          "bottom": -38,
+          "width": 256,
+          "height": 42,
+          "scrollWidth": 254,
+          "clientWidth": 254,
+          "text": "მთავარ კონტენტზე გადასვლა",
+          "escaping": []
+        },
+        {
+          "cls": "fixed inset-x-0 bottom-0 z-40 lg:hidden border-t border-[var",
+          "left": 0,
+          "right": 390,
+          "top": 770,
+          "bottom": 844,
+          "width": 390,
+          "height": 74,
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი",
+          "escaping": []
+        },
+        {
+          "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+          "left": 12,
+          "right": 52,
+          "top": 716,
+          "bottom": 756,
+          "width": 40,
+          "height": 40,
+          "scrollWidth": 38,
+          "clientWidth": 38,
+          "text": "",
+          "escaping": []
+        },
+        {
+          "cls": "",
+          "left": 6,
+          "right": 326,
+          "top": 58,
+          "bottom": 367,
+          "width": 320,
+          "height": 309,
+          "scrollWidth": 320,
+          "clientWidth": 320,
+          "text": "შეტყობინებები 3 vivida user გამოეხმაურა შენს პოსტს 1 დღის წინ vivida u",
+          "escaping": []
+        }
+      ]
+    },
+    "docOverflow": 0,
+    "screenshot": "shots/overlay-notifications-390.jpg"
+  },
+  {
+    "name": "chartzoom-390",
+    "width": 390,
+    "error": null,
+    "overlays": [
+      {
+        "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+        "left": 16,
+        "right": 272,
+        "top": -80,
+        "bottom": -38,
+        "width": 256,
+        "height": 42,
+        "scrollWidth": 254,
+        "clientWidth": 254,
+        "text": "მთავარ კონტენტზე გადასვლა",
+        "escaping": []
+      },
+      {
+        "cls": "fixed inset-x-0 bottom-0 z-40 lg:hidden border-t border-[var",
+        "left": 0,
+        "right": 390,
+        "top": 770,
+        "bottom": 844,
+        "width": 390,
+        "height": 74,
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი",
+        "escaping": []
+      },
+      {
+        "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+        "left": 12,
+        "right": 52,
+        "top": 716,
+        "bottom": 756,
+        "width": 40,
+        "height": 40,
+        "scrollWidth": 38,
+        "clientWidth": 38,
+        "text": "",
+        "escaping": []
+      },
+      {
+        "cls": "fixed inset-0 z-50 bg-black/70 backdrop-blur-md data-[state=",
+        "left": 0,
+        "right": 390,
+        "top": 0,
+        "bottom": 844,
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "text": "",
+        "escaping": []
+      },
+      {
+        "cls": "fixed left-[50%] top-[50%] z-50 grid w-[calc(100%-1rem)] tra",
+        "left": 16,
+        "right": 374,
+        "top": 243,
+        "bottom": 601,
+        "width": 359,
+        "height": 359,
+        "scrollWidth": 357,
+        "clientWidth": 357,
+        "text": "ნატალური რუკა ♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓ 1 2 3 4 5 6 7 8 9 10 11 12 AC IC",
+        "escaping": []
+      }
+    ],
+    "metrics": {
+      "docWidth": 390,
+      "bodyScrollWidth": 390,
+      "overlays": [
+        {
+          "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+          "left": 16,
+          "right": 272,
+          "top": -80,
+          "bottom": -38,
+          "width": 256,
+          "height": 42,
+          "scrollWidth": 254,
+          "clientWidth": 254,
+          "text": "მთავარ კონტენტზე გადასვლა",
+          "escaping": []
+        },
+        {
+          "cls": "fixed inset-x-0 bottom-0 z-40 lg:hidden border-t border-[var",
+          "left": 0,
+          "right": 390,
+          "top": 770,
+          "bottom": 844,
+          "width": 390,
+          "height": 74,
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "text": "დღეს ტარო ჰკითხე ჩემი ისტორია მეტი",
+          "escaping": []
+        },
+        {
+          "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+          "left": 12,
+          "right": 52,
+          "top": 716,
+          "bottom": 756,
+          "width": 40,
+          "height": 40,
+          "scrollWidth": 38,
+          "clientWidth": 38,
+          "text": "",
+          "escaping": []
+        },
+        {
+          "cls": "fixed inset-0 z-50 bg-black/70 backdrop-blur-md data-[state=",
+          "left": 0,
+          "right": 390,
+          "top": 0,
+          "bottom": 844,
+          "width": 390,
+          "height": 844,
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "text": "",
+          "escaping": []
+        },
+        {
+          "cls": "fixed left-[50%] top-[50%] z-50 grid w-[calc(100%-1rem)] tra",
+          "left": 16,
+          "right": 374,
+          "top": 243,
+          "bottom": 601,
+          "width": 359,
+          "height": 359,
+          "scrollWidth": 357,
+          "clientWidth": 357,
+          "text": "ნატალური რუკა ♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓ 1 2 3 4 5 6 7 8 9 10 11 12 AC IC",
+          "escaping": []
+        }
+      ]
+    },
+    "docOverflow": 0,
+    "screenshot": "shots/overlay-chartzoom-390.jpg"
+  },
+  {
+    "name": "onboarding-390",
+    "width": 390,
+    "error": null,
+    "overlays": [
+      {
+        "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+        "left": 16,
+        "right": 272,
+        "top": -80,
+        "bottom": -38,
+        "width": 256,
+        "height": 42,
+        "scrollWidth": 254,
+        "clientWidth": 254,
+        "text": "მთავარ კონტენტზე გადასვლა",
+        "escaping": []
+      },
+      {
+        "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+        "left": 12,
+        "right": 52,
+        "top": 792,
+        "bottom": 832,
+        "width": 40,
+        "height": 40,
+        "scrollWidth": 38,
+        "clientWidth": 38,
+        "text": "",
+        "escaping": []
+      }
+    ],
+    "metrics": {
+      "docWidth": 390,
+      "bodyScrollWidth": 390,
+      "overlays": [
+        {
+          "cls": "fixed left-4 top-4 z-[100] -translate-y-24 rounded-md border",
+          "left": 16,
+          "right": 272,
+          "top": -80,
+          "bottom": -38,
+          "width": 256,
+          "height": 42,
+          "scrollWidth": 254,
+          "clientWidth": 254,
+          "text": "მთავარ კონტენტზე გადასვლა",
+          "escaping": []
+        },
+        {
+          "cls": "fixed bottom-3 left-3 z-[90] inline-flex size-10 items-cente",
+          "left": 12,
+          "right": 52,
+          "top": 792,
+          "bottom": 832,
+          "width": 40,
+          "height": 40,
+          "scrollWidth": 38,
+          "clientWidth": 38,
+          "text": "",
+          "escaping": []
+        }
+      ]
+    },
+    "docOverflow": 0,
+    "screenshot": "shots/overlay-onboarding-390.jpg"
+  }
+]

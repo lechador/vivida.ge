@@ -1,0 +1,46 @@
+
+=== 360x780: 36 routes (concurrency 2) ===
+[1/36] 360 /feed tap<24 x15 covered x4 (5s)
+[2/36] 360 /dashboard tap<24 x2 (5s)
+[3/36] 360 /feed/post-1 tap<24 x9 covered x1 (10s)
+[4/36] 360 /feed/post-3 tap<24 x3 (10s)
+[5/36] 360 /friends tap<24 x2 (14s)
+[6/36] 360 /friends?tab=incoming tap<24 x4 (14s)
+[7/36] 360 /friends?tab=compatibility tap<24 x2 (17s)
+[8/36] 360 /people tap<24 x10 covered x2 (18s)
+[9/36] 360 /messages ok (21s)
+[10/36] 360 /messages?with=22222222-2222-4222-8222-222222222222 tap<24 x1 (21s)
+[11/36] 360 /ask ok (25s)
+[12/36] 360 /discover tap<24 x2 (25s)
+[13/36] 360 /account ok (32s)
+[14/36] 360 /credits ok (36s)
+[15/36] 360 /subscription covered x1 (38s)
+[16/36] 360 /library ok (39s)
+[17/36] 360 /library/lib-1 ok (42s)
+[18/36] 360 /library/lib-2 ok (43s)
+[19/36] 360 /synastry covered x1 (47s)
+[20/36] 360 /synastry/new tap<24 x1 (47s)
+[21/36] 360 /piradi-ruka tap<24 x10 (51s)
+[22/36] 360 /piradi-horoskopi tap<24 x2 (51s)
+[23/36] 360 /sky ok (56s)
+[24/36] 360 /nataluri-ruka tap<24 x13 (56s)
+[25/36] 360 /timing ok (60s)
+[26/36] 360 /reports ok (60s)
+[27/36] 360 /onboarding/result ok (64s)
+[28/36] 360 /report tap<24 x2 (67s)
+[29/36] 360 /post-login tap<24 x2 (68s)
+[30/36] 360 /u/nino-audit ok (72s)
+[31/36] 360 /u/luka-audit tap<24 x3 (72s)
+[32/36] 360 /iq-testi/shedegi/iq-audit-2 ok (77s)
+[33/36] 360 /iq-testi/shedegi/iq-audit-1 ok (77s)
+[34/36] 360 /big-five/shedegi/bf-audit-1 ok (82s)
+[35/36] 360 /eq-testi/shedegi/eq-audit-1 tap<24 x1 covered x1 (82s)
+[36/36] 360 /pirovnebis-testi/claim ok (88s)
+=== 360 done: 36 routes in 88s ===
+[
+  {
+    "width": 360,
+    "height": 780,
+    "count": 36
+  }
+]

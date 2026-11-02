@@ -1,0 +1,36 @@
+
+=== 390x844: 9 routes (concurrency 2) ===
+[1/9] 390 /dashboard ok (3s)
+[2/9] 390 /feed tap<24 x15 (4s)
+[3/9] 390 /subscription ok (7s)
+[4/9] 390 /credits ok (7s)
+[5/9] 390 /library ok (10s)
+[6/9] 390 /account ok (10s)
+[7/9] 390 /messages ok (14s)
+[8/9] 390 /people tap<24 x10 covered x2 (14s)
+[9/9] 390 /u/ana-audit tap<24 x3 covered x3 (17s)
+=== 390 done: 9 routes in 17s ===
+
+=== 320x568: 9 routes (concurrency 2) ===
+[1/9] 320 /dashboard ok (3s)
+[2/9] 320 /feed tap<24 x15 covered x1 (4s)
+[3/9] 320 /subscription ok (7s)
+[4/9] 320 /credits ok (7s)
+[5/9] 320 /library ok (10s)
+[6/9] 320 /account ok (11s)
+[7/9] 320 /messages ok (14s)
+[8/9] 320 /people tap<24 x10 covered x2 (14s)
+[9/9] 320 /u/ana-audit tap<24 x3 (17s)
+=== 320 done: 9 routes in 17s ===
+[
+  {
+    "width": 390,
+    "height": 844,
+    "count": 9
+  },
+  {
+    "width": 320,
+    "height": 568,
+    "count": 9
+  }
+]

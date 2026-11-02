@@ -1,0 +1,180 @@
+[
+  {
+    "case": {
+      "name": "ka-free-mobile",
+      "locale": "ka",
+      "state": "free",
+      "width": 390,
+      "height": 844,
+      "mobile": true
+    },
+    "dom": {
+      "url": "http://127.0.0.1:3113/today-p0-preview?locale=ka&state=free",
+      "title": "Local Today P0 component preview · Vivida",
+      "text": "მთავარ კონტენტზე გადასვლა\n\nVivida ყოველთვის ხელთ გქონდეს\n\nდაამატე ვებ აპი მთავარ ეკრანზე, რომ სწრაფად გახსნა.\n\nდაამატე მთავარ ეკრანზე\nvivida\nლოკალური preview · სატესტო მონაცემები\nსალამი, მკითხველო\nდღევანდელი დღე · კვირა, 4 ოქტომბერი\nდაუთმე დრო იმას, რაც შენთვის მნიშვნელოვანია\nსიმშვიდე\nგამბედაობა\nურთიერთობები\n\nმშვიდი დასაწყისი დაგეხმარება დაინახო, რას სჭირდება შენი ყურადღება. ყველაფრის ერთად მოგვარების ნაცვლად, აირჩიე ერთი მცირე მოქმედება.\n\nდღის პატარა რიტუალი\n\n0 დღიანი სერია\n\n7 დღეში +1\n\nაირჩიე დღევანდელი ფოკუსი\n\nსიმშვიდე\nგამბედაობა\nურთიერთობები\nდეტალები და ტრანზიტები\n\nხვალ ახალი წინასწარმეტყველება გელოდება.\n\nდღევანდელი მთვარე\nბოლო მეოთხედი · ♋ კირჩხიბი\nდრო მშვიდი ტემპისთვის\n39% განათებული\n23.2 დღე\n\nდაიტოვე დრო ერთი საქმის დასასრულებლად, სანამ შემდეგზე გადახვალ.\n\nგააგრძელე კითხვა\n›\nშენი PRO დღე\n\nკვირა, 4 ოქტომბერი\n\n6/10\n\nწონასწორული დღე · არც წინაღობა ჩანს, არც საჩუქარი — რიტმს შენ ქმნი.\n\nდღის ტრანზიტები\n\nმთვარე\n△\nმზე\n· ტრინი\n\nსივრცე მშვიდი საუბრისთვის\n\nეს თემა გამოიყენე რეფლექსიისთვის, არა წინასწარმეტყველებად. რას შეცვლიდა ცოტა მეტი მოთმინება დღევანდელ საუბარში?\n\nPRO რიტუალი\n\nშენი სხეული რას გეუბნება დღეს — უსმენ მას?\n\nგანბლოკე PRO-ით\nდღეს\nტარო\nჰკითხე\nჩემი ისტორია\nმეტი",
+      "width": 390,
+      "scrollWidth": 390,
+      "headings": [
+        "სალამი, მკითხველო",
+        "დაუთმე დრო იმას, რაც შენთვის მნიშვნელოვანია",
+        "დღის პატარა რიტუალი",
+        "",
+        "დრო მშვიდი ტემპისთვის",
+        "შენი PRO დღე",
+        "დღის ტრანზიტები",
+        "PRO რიტუალი"
+      ],
+      "mobileLinks": [
+        {
+          "href": "/dashboard",
+          "text": "დღეს"
+        },
+        {
+          "href": "/taro",
+          "text": "ტარო"
+        },
+        {
+          "href": "/ask",
+          "text": "ჰკითხე"
+        },
+        {
+          "href": "/library",
+          "text": "ჩემი ისტორია"
+        }
+      ],
+      "mobileButtons": [
+        {
+          "label": "მეტი",
+          "text": "მეტი"
+        }
+      ],
+      "dialogs": 0,
+      "details": [
+        {
+          "open": false,
+          "label": "დეტალები და ტრანზიტები"
+        },
+        {
+          "open": false,
+          "label": "გააგრძელე კითხვა\n›"
+        }
+      ],
+      "focusButtons": [
+        {
+          "text": "სიმშვიდე",
+          "disabled": false,
+          "top": 691,
+          "bottom": 721
+        },
+        {
+          "text": "გამბედაობა",
+          "disabled": false,
+          "top": 691,
+          "bottom": 721
+        }
+      ]
+    },
+    "interactions": {
+      "detailsClicked": true,
+      "detailsOpened": true,
+      "detailsText": "დეტალები და ტრანზიტები\n\nახალი ვალდებულების აღებამდე ცოტა დრო დაუთმე საკუთარ თავს. მკაფიო საზღვარი დაგიტოვებს დროს იმისთვის, რაც უკვე მნიშვნელოვანია.\n\nმოკლე საუბარი შეიძლება დაგეხმაროს, უკეთ გაიგო სხვა ადამიანის საჭიროება. ჯერ მოუსმინე, შემდეგ გადაწყვიტე, რისი თქმა გინდა.\n\nდღის ტრანზიტები\n☽ მთვარე\n△\n☉ მზე\nტრინი\n\nსივრცე მშვიდი საუბრისთვის\n\nეს თემა გამოიყენე რეფლექსიისთვის, არა წინასწარმეტყველებად. რას შეცვლიდა ცოტა მეტი მოთმინება დღევანდელ საუბარში?",
+      "detailsClosed": false,
+      "moreClicked": true,
+      "drawerOpened": true,
+      "drawerLinks": [
+        {
+          "href": "/dashboard",
+          "text": "vivida"
+        },
+        {
+          "href": "/dashboard",
+          "text": "დღეს"
+        },
+        {
+          "href": "/taro",
+          "text": "ტარო"
+        },
+        {
+          "href": "/ask",
+          "text": "ჰკითხე"
+        },
+        {
+          "href": "/library",
+          "text": "ბიბლიოთეკა"
+        },
+        {
+          "href": "/report",
+          "text": "ჩემი რუკა"
+        },
+        {
+          "href": "/sky",
+          "text": "ცა ახლა"
+        },
+        {
+          "href": "/reports",
+          "text": "რეპორტები"
+        },
+        {
+          "href": "/timing",
+          "text": "როდის"
+        },
+        {
+          "href": "/feed",
+          "text": "ფიდი"
+        },
+        {
+          "href": "/tests",
+          "text": "ტესტები"
+        },
+        {
+          "href": "/messages",
+          "text": "3\nწერილები"
+        },
+        {
+          "href": "/synastry",
+          "text": "თავსებადობა"
+        },
+        {
+          "href": "/friends",
+          "text": "მეგობრები"
+        }
+      ],
+      "drawerScreenshot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser-action-polish/ka-free-mobile-more.png",
+      "focusBeforeTab": {
+        "hasFocus": true,
+        "tag": "BUTTON",
+        "label": "მეტი",
+        "inDialog": false
+      },
+      "tabFocusInDialog": false,
+      "escapeClosed": false,
+      "keyDiagnostics": {
+        "keys": ["Tab", "Escape"],
+        "hasFocus": true,
+        "tag": "NEXTJS-PORTAL",
+        "label": null,
+        "drawerRect": {
+          "x": -319.4024963378906,
+          "y": 0,
+          "width": 320,
+          "height": 844,
+          "top": 0,
+          "right": 0.597503662109375,
+          "bottom": 844,
+          "left": -319.4024963378906
+        }
+      },
+      "focusReturnedToMore": false
+    },
+    "errors": [],
+    "failures": [
+      "forecast details do not open/close",
+      "drawer interaction failed: tabFocusInDialog",
+      "drawer interaction failed: escapeClosed",
+      "drawer interaction failed: focusReturnedToMore",
+      "More missing /account"
+    ],
+    "topShot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser-action-polish/ka-free-mobile-top.png",
+    "fullShot": "/Users/giviendeladze/Projects/vivida/vivida.ge/audit/2026-10-04/today-p0/browser-action-polish/ka-free-mobile-full.png"
+  }
+]

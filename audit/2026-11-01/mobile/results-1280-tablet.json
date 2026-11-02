@@ -1,0 +1,4642 @@
+[
+  {
+    "url": "/",
+    "pattern": "/",
+    "width": 1280,
+    "status": 200,
+    "finalUrl": "/",
+    "title": "ნატალური რუკა, ჰოროსკოპი და თავსებადობა ქართულად, Vivida",
+    "lang": "ka",
+    "screenshot": "shots/home__1280-tablet.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "scrollHeight": 9474,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "div.flex.h-full > div.my-4.flex:nth-of-type(2) > div.relative.grid > svg.relative.size-full > g.cursor-pointer:nth-of-type(3)",
+        "tag": "g",
+        "w": 13,
+        "h": 13,
+        "size": 13,
+        "label": "Moon"
+      },
+      {
+        "selector": "div.flex.h-full > div.my-4.flex:nth-of-type(2) > div.relative.grid > svg.relative.size-full > g.cursor-pointer:nth-of-type(4)",
+        "tag": "g",
+        "w": 13,
+        "h": 13,
+        "size": 13,
+        "label": "Ascendant"
+      },
+      {
+        "selector": "div.flex.h-full > div.my-4.flex:nth-of-type(2) > div.relative.grid > svg.relative.size-full > g.cursor-pointer:nth-of-type(5)",
+        "tag": "g",
+        "w": 13,
+        "h": 13,
+        "size": 13,
+        "label": "Mercury"
+      },
+      {
+        "selector": "div.flex.h-full > div.my-4.flex:nth-of-type(2) > div.relative.grid > svg.relative.size-full > g.cursor-pointer:nth-of-type(6)",
+        "tag": "g",
+        "w": 13,
+        "h": 13,
+        "size": 13,
+        "label": "Venus"
+      },
+      {
+        "selector": "div.flex.h-full > div.my-4.flex:nth-of-type(2) > div.relative.grid > svg.relative.size-full > g.cursor-pointer:nth-of-type(7)",
+        "tag": "g",
+        "w": 13,
+        "h": 13,
+        "size": 13,
+        "label": "Mars"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "tag": "A",
+        "w": 233,
+        "h": 17,
+        "size": 17,
+        "label": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.grid.items-stretch:nth-of-type(2) > div.flex.min-w-0:nth-of-type(1) > div.mt-10.border-t:nth-of-type(2) > div.mt-4.flex:nth-of-type(2) > a.text-\\[var\\(--vivida-gold\\)\\].transition-colors:nth-of-type(1)",
+        "tag": "A",
+        "w": 163,
+        "h": 17,
+        "size": 17,
+        "label": "01. ნატალური რუკა →"
+      },
+      {
+        "selector": "div.grid.items-stretch:nth-of-type(2) > div.flex.min-w-0:nth-of-type(1) > div.mt-10.border-t:nth-of-type(2) > div.mt-4.flex:nth-of-type(2) > a.text-primary.transition-colors:nth-of-type(2)",
+        "tag": "A",
+        "w": 146,
+        "h": 17,
+        "size": 17,
+        "label": "02. ტაროს გაშლა →"
+      },
+      {
+        "selector": "div.grid.items-stretch:nth-of-type(2) > div.flex.min-w-0:nth-of-type(1) > div.mt-10.border-t:nth-of-type(2) > div.mt-4.flex:nth-of-type(2) > a.text-\\[var\\(--vivida-cyan\\)\\].transition-colors:nth-of-type(3)",
+        "tag": "A",
+        "w": 155,
+        "h": 17,
+        "size": 17,
+        "label": "03. მთვარის ფაზა →"
+      },
+      {
+        "selector": "div.relative.overflow-hidden > div.grid.gap-5 > div.flex.min-w-0:nth-of-type(2) > div.mt-6.flex:nth-of-type(2) > a.font-mono.text-\\[11px\\]",
+        "tag": "A",
+        "w": 226,
+        "h": 17,
+        "size": 17,
+        "label": "წყვილის სრული გზამკვლევი →"
+      },
+      {
+        "selector": "div.relative.overflow-hidden > div.grid.gap-5:nth-of-type(2) > div.flex.flex-col:nth-of-type(2) > div.mt-8.flex:nth-of-type(2) > a.font-mono.text-xs",
+        "tag": "A",
+        "w": 205,
+        "h": 18,
+        "size": 18,
+        "label": "ნახე რუკის ნიმუში →"
+      },
+      {
+        "selector": "section.relative.z-10:nth-of-type(8) > div.grid.gap-5:nth-of-type(2) > article.group.overflow-hidden:nth-of-type(1) > div.flex.flex-1 > a.mt-6.inline-flex",
+        "tag": "A",
+        "w": 156,
+        "h": 18,
+        "size": 18,
+        "label": "წაიკითხე სტატია"
+      },
+      {
+        "selector": "section.relative.z-10:nth-of-type(8) > div.grid.gap-5:nth-of-type(2) > article.group.overflow-hidden:nth-of-type(2) > div.flex.flex-1 > a.mt-6.inline-flex",
+        "tag": "A",
+        "w": 156,
+        "h": 18,
+        "size": 18,
+        "label": "წაიკითხე სტატია"
+      },
+      {
+        "selector": "section.relative.z-10:nth-of-type(8) > div.grid.gap-5:nth-of-type(2) > article.group.overflow-hidden:nth-of-type(3) > div.flex.flex-1 > a.mt-6.inline-flex",
+        "tag": "A",
+        "w": 156,
+        "h": 18,
+        "size": 18,
+        "label": "წაიკითხე სტატია"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 98,
+        "h": 23,
+        "size": 23,
+        "label": "ჰოროსკოპი"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "tag": "A",
+        "w": 24,
+        "h": 41,
+        "size": 24,
+        "label": "EN"
+      },
+      {
+        "selector": "div.flex.h-full > div.my-4.flex:nth-of-type(2) > div.relative.grid > svg.relative.size-full > g.cursor-pointer:nth-of-type(2)",
+        "tag": "g",
+        "w": 24,
+        "h": 24,
+        "size": 24,
+        "label": "Sun"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 188,
+        "h": 32,
+        "size": 32,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-w-0:nth-of-type(2) > div.flex.h-full > div:nth-of-type(1) > div.mt-3.grid:nth-of-type(2) > button.whitespace-nowrap.rounded-md:nth-of-type(1)",
+        "tag": "BUTTON",
+        "w": 153,
+        "h": 32,
+        "size": 32,
+        "label": "01 · ნატალური"
+      },
+      {
+        "selector": "div.flex.min-w-0:nth-of-type(2) > div.flex.h-full > div:nth-of-type(1) > div.mt-3.grid:nth-of-type(2) > button.whitespace-nowrap.rounded-md:nth-of-type(2)",
+        "tag": "BUTTON",
+        "w": 153,
+        "h": 32,
+        "size": 32,
+        "label": "02 · დღის ცა"
+      },
+      {
+        "selector": "div.flex.min-w-0:nth-of-type(2) > div.flex.h-full > div:nth-of-type(1) > div.mt-3.grid:nth-of-type(2) > button.whitespace-nowrap.rounded-md:nth-of-type(3)",
+        "tag": "BUTTON",
+        "w": 153,
+        "h": 32,
+        "size": 32,
+        "label": "03 · სინასტრია"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 116,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "div.flex.h-full > div.border-t.border-border:nth-of-type(3) > div.grid.grid-cols-1:nth-of-type(2) > div.divide-y.divide-border\\/70:nth-of-type(1) > button.flex.w-full:nth-of-type(3)",
+        "tag": "BUTTON",
+        "w": 240,
+        "h": 36,
+        "size": 36,
+        "label": "↑ ასცენდენტი · ♍ ქალწული 22°45′"
+      },
+      {
+        "selector": "div.flex.h-full > div.border-t.border-border:nth-of-type(3) > div.grid.grid-cols-1:nth-of-type(2) > div.divide-y.divide-border\\/70:nth-of-type(2) > button.flex.w-full:nth-of-type(3)",
+        "tag": "BUTTON",
+        "w": 241,
+        "h": 36,
+        "size": 36,
+        "label": "♂ მარსი · ♏ მორიელი 27°51′"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > footer.relative.z-10 > div.mx-auto.flex:nth-of-type(1) > div.max-w-sm:nth-of-type(1) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 120,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "div.flex.h-full > div.border-t.border-border:nth-of-type(3) > div.grid.grid-cols-1:nth-of-type(2) > div.divide-y.divide-border\\/70:nth-of-type(1) > button.flex.w-full:nth-of-type(1)",
+        "tag": "BUTTON",
+        "w": 240,
+        "h": 37,
+        "size": 37,
+        "label": "☉ მზე · ♌ ლომი 14°28′"
+      },
+      {
+        "selector": "div.flex.h-full > div.border-t.border-border:nth-of-type(3) > div.grid.grid-cols-1:nth-of-type(2) > div.divide-y.divide-border\\/70:nth-of-type(1) > button.flex.w-full:nth-of-type(2)",
+        "tag": "BUTTON",
+        "w": 240,
+        "h": 37,
+        "size": 37,
+        "label": "☽ მთვარე · ♓ თევზები 08°12′"
+      },
+      {
+        "selector": "div.flex.h-full > div.border-t.border-border:nth-of-type(3) > div.grid.grid-cols-1:nth-of-type(2) > div.divide-y.divide-border\\/70:nth-of-type(2) > button.flex.w-full:nth-of-type(1)",
+        "tag": "BUTTON",
+        "w": 241,
+        "h": 37,
+        "size": 37,
+        "label": "☿ მერკური · ♍ ქალწული 03°19′"
+      },
+      {
+        "selector": "div.flex.h-full > div.border-t.border-border:nth-of-type(3) > div.grid.grid-cols-1:nth-of-type(2) > div.divide-y.divide-border\\/70:nth-of-type(2) > button.flex.w-full:nth-of-type(2)",
+        "tag": "BUTTON",
+        "w": 241,
+        "h": 37,
+        "size": 37,
+        "label": "♀ ვენერა · ♎ სასწორი 19°04′"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.inline-flex.items-center:nth-of-type(2)",
+        "tag": "A",
+        "w": 126,
+        "h": 41,
+        "size": 41,
+        "label": "რუკის შექმნა"
+      }
+    ],
+    "inputZoom": [
+      {
+        "selector": "#compat-sign-a",
+        "type": "select",
+        "fontSize": 15.75,
+        "placeholder": ""
+      },
+      {
+        "selector": "#compat-sign-b",
+        "type": "select",
+        "fontSize": 15.75,
+        "placeholder": ""
+      }
+    ],
+    "tinyText": [
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > span.hidden.uppercase",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.truncate:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden.text-\\[var\\(--vivida-gold\\)\\]:nth-of-type(3)",
+        "fontSize": 11,
+        "text": "♌ ლომი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden:nth-of-type(5)",
+        "fontSize": 11,
+        "text": "54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "fontSize": 11,
+        "text": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10:nth-of-type(1) > div.relative.overflow-hidden > div.flex.flex-wrap:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "VOL. IV · ასტრონომიული ალმანახი და პირადი ობსერვატორია თბილი"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 288,
+        "h": 47,
+        "top": -90,
+        "bottom": -43,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 45,
+        "h": 45,
+        "top": 842,
+        "bottom": 887,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/articles",
+    "pattern": "/articles",
+    "width": 1280,
+    "status": 200,
+    "finalUrl": "/articles",
+    "title": "სტატიები ფსიქოლოგიაზე, თვითგანვითარებასა და ასტროლოგიაზე · Vivida",
+    "lang": "ka",
+    "screenshot": "shots/articles__1280-tablet.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "scrollHeight": 9554,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "tag": "A",
+        "w": 233,
+        "h": 17,
+        "size": 17,
+        "label": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.grid.gap-5 > div:nth-of-type(1) > article.group.overflow-hidden > div.flex.flex-1 > a.mt-6.inline-flex",
+        "tag": "A",
+        "w": 156,
+        "h": 18,
+        "size": 18,
+        "label": "წაიკითხე სტატია"
+      },
+      {
+        "selector": "div.grid.gap-5 > div:nth-of-type(2) > article.group.overflow-hidden > div.flex.flex-1 > a.mt-6.inline-flex",
+        "tag": "A",
+        "w": 156,
+        "h": 18,
+        "size": 18,
+        "label": "წაიკითხე სტატია"
+      },
+      {
+        "selector": "div.grid.gap-5 > div:nth-of-type(3) > article.group.overflow-hidden > div.flex.flex-1 > a.mt-6.inline-flex",
+        "tag": "A",
+        "w": 156,
+        "h": 18,
+        "size": 18,
+        "label": "წაიკითხე სტატია"
+      },
+      {
+        "selector": "div.grid.gap-5 > div:nth-of-type(4) > article.group.overflow-hidden > div.flex.flex-1 > a.mt-6.inline-flex",
+        "tag": "A",
+        "w": 156,
+        "h": 18,
+        "size": 18,
+        "label": "წაიკითხე სტატია"
+      },
+      {
+        "selector": "div.grid.gap-5 > div:nth-of-type(5) > article.group.overflow-hidden > div.flex.flex-1 > a.mt-6.inline-flex",
+        "tag": "A",
+        "w": 156,
+        "h": 18,
+        "size": 18,
+        "label": "წაიკითხე სტატია"
+      },
+      {
+        "selector": "div.grid.gap-5 > div:nth-of-type(6) > article.group.overflow-hidden > div.flex.flex-1 > a.mt-6.inline-flex",
+        "tag": "A",
+        "w": 156,
+        "h": 18,
+        "size": 18,
+        "label": "წაიკითხე სტატია"
+      },
+      {
+        "selector": "div.grid.gap-5 > div:nth-of-type(7) > article.group.overflow-hidden > div.flex.flex-1 > a.mt-6.inline-flex",
+        "tag": "A",
+        "w": 156,
+        "h": 18,
+        "size": 18,
+        "label": "წაიკითხე სტატია"
+      },
+      {
+        "selector": "div.grid.gap-5 > div:nth-of-type(8) > article.group.overflow-hidden > div.flex.flex-1 > a.mt-6.inline-flex",
+        "tag": "A",
+        "w": 156,
+        "h": 18,
+        "size": 18,
+        "label": "წაიკითხე სტატია"
+      },
+      {
+        "selector": "div.grid.gap-5 > div:nth-of-type(9) > article.group.overflow-hidden > div.flex.flex-1 > a.mt-6.inline-flex",
+        "tag": "A",
+        "w": 156,
+        "h": 18,
+        "size": 18,
+        "label": "წაიკითხე სტატია"
+      },
+      {
+        "selector": "div.grid.gap-5 > div:nth-of-type(10) > article.group.overflow-hidden > div.flex.flex-1 > a.mt-6.inline-flex",
+        "tag": "A",
+        "w": 156,
+        "h": 18,
+        "size": 18,
+        "label": "წაიკითხე სტატია"
+      },
+      {
+        "selector": "div.grid.gap-5 > div:nth-of-type(11) > article.group.overflow-hidden > div.flex.flex-1 > a.mt-6.inline-flex",
+        "tag": "A",
+        "w": 156,
+        "h": 18,
+        "size": 18,
+        "label": "წაიკითხე სტატია"
+      },
+      {
+        "selector": "div.grid.gap-5 > div:nth-of-type(12) > article.group.overflow-hidden > div.flex.flex-1 > a.mt-6.inline-flex",
+        "tag": "A",
+        "w": 156,
+        "h": 18,
+        "size": 18,
+        "label": "წაიკითხე სტატია"
+      },
+      {
+        "selector": "div.grid.gap-5 > div:nth-of-type(13) > article.group.overflow-hidden > div.flex.flex-1 > a.mt-6.inline-flex",
+        "tag": "A",
+        "w": 156,
+        "h": 18,
+        "size": 18,
+        "label": "წაიკითხე სტატია"
+      },
+      {
+        "selector": "div.grid.gap-5 > div:nth-of-type(14) > article.group.overflow-hidden > div.flex.flex-1 > a.mt-6.inline-flex",
+        "tag": "A",
+        "w": 156,
+        "h": 18,
+        "size": 18,
+        "label": "წაიკითხე სტატია"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "tag": "A",
+        "w": 24,
+        "h": 41,
+        "size": 24,
+        "label": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 188,
+        "h": 32,
+        "size": 32,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > div.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 116,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "div.relative.isolate > footer.relative.z-10 > div.mx-auto.flex:nth-of-type(1) > div.max-w-sm:nth-of-type(1) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 120,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "div.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.inline-flex.items-center:nth-of-type(2)",
+        "tag": "A",
+        "w": 126,
+        "h": 41,
+        "size": 41,
+        "label": "რუკის შექმნა"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > div.relative.isolate > main.relative.z-10 > nav.article-category-nav.mx-auto > a.shrink-0.rounded-full:nth-of-type(1)",
+        "tag": "A",
+        "w": 92,
+        "h": 43,
+        "size": 43,
+        "label": "ყველა"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > div.relative.isolate > main.relative.z-10 > nav.article-category-nav.mx-auto > a.shrink-0.rounded-full:nth-of-type(2)",
+        "tag": "A",
+        "w": 150,
+        "h": 43,
+        "size": 43,
+        "label": "ფსიქოლოგია"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > div.relative.isolate > main.relative.z-10 > nav.article-category-nav.mx-auto > a.shrink-0.rounded-full:nth-of-type(3)",
+        "tag": "A",
+        "w": 146,
+        "h": 43,
+        "size": 43,
+        "label": "ფილოსოფია"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > div.relative.isolate > main.relative.z-10 > nav.article-category-nav.mx-auto > a.shrink-0.rounded-full:nth-of-type(4)",
+        "tag": "A",
+        "w": 193,
+        "h": 43,
+        "size": 43,
+        "label": "თვითგანვითარება"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > div.relative.isolate > main.relative.z-10 > nav.article-category-nav.mx-auto > a.shrink-0.rounded-full:nth-of-type(5)",
+        "tag": "A",
+        "w": 170,
+        "h": 43,
+        "size": 43,
+        "label": "ურთიერთობები"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > div.relative.isolate > main.relative.z-10 > nav.article-category-nav.mx-auto > a.shrink-0.rounded-full:nth-of-type(6)",
+        "tag": "A",
+        "w": 165,
+        "h": 43,
+        "size": 43,
+        "label": "კეთილდღეობა"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > div.relative.isolate > main.relative.z-10 > nav.article-category-nav.mx-auto > a.shrink-0.rounded-full:nth-of-type(7)",
+        "tag": "A",
+        "w": 152,
+        "h": 43,
+        "size": 43,
+        "label": "ასტროლოგია"
+      },
+      {
+        "selector": "div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.max-w-xs:nth-of-type(2) > div > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 267,
+        "h": 43,
+        "size": 43,
+        "label": "დაამატე მთავარ ეკრანზე"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "div.relative.isolate > header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > span.hidden.uppercase",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.truncate:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden.text-\\[var\\(--vivida-gold\\)\\]:nth-of-type(3)",
+        "fontSize": 11,
+        "text": "♌ ლომი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden:nth-of-type(5)",
+        "fontSize": 11,
+        "text": "54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "fontSize": 11,
+        "text": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "footer.relative.z-10 > div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.flex-col:nth-of-type(1) > span.text-\\[10px\\].font-semibold",
+        "fontSize": 10,
+        "text": "უსაფრთხო გადახდა"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 288,
+        "h": 47,
+        "top": -90,
+        "bottom": -43,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 45,
+        "h": 45,
+        "top": 842,
+        "bottom": 887,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/astrologiuri-saxlebi",
+    "pattern": "/astrologiuri-saxlebi",
+    "width": 1280,
+    "status": 200,
+    "finalUrl": "/astrologiuri-saxlebi",
+    "title": "ასტროლოგიური სახლები, ნატალური რუკის 12 სახლის მნიშვნელობა",
+    "lang": "ka",
+    "screenshot": "shots/astrologiuri_saxlebi__1280-tablet.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "scrollHeight": 3880,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "tag": "A",
+        "w": 233,
+        "h": 17,
+        "size": 17,
+        "label": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > article.relative.z-10 > nav.mb-7.flex > a",
+        "tag": "A",
+        "w": 61,
+        "h": 18,
+        "size": 18,
+        "label": "მთავარი"
+      },
+      {
+        "selector": "main.relative.isolate > article.relative.z-10 > nav.mb-7.flex > span.contents > a",
+        "tag": "A",
+        "w": 181,
+        "h": 18,
+        "size": 18,
+        "label": "ასტროლოგიური სახლები"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 98,
+        "h": 23,
+        "size": 23,
+        "label": "ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(2)",
+        "tag": "A",
+        "w": 133,
+        "h": 23,
+        "size": 23,
+        "label": "ნატალური რუკა"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(3)",
+        "tag": "A",
+        "w": 77,
+        "h": 23,
+        "size": 23,
+        "label": "ზოდიაქო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(4)",
+        "tag": "A",
+        "w": 47,
+        "h": 23,
+        "size": 23,
+        "label": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(5)",
+        "tag": "A",
+        "w": 71,
+        "h": 23,
+        "size": 23,
+        "label": "ტესტები"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.hidden.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 63,
+        "h": 23,
+        "size": 23,
+        "label": "შესვლა"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "tag": "A",
+        "w": 24,
+        "h": 41,
+        "size": 24,
+        "label": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 188,
+        "h": 32,
+        "size": 32,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 116,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > footer.relative.z-10 > div.mx-auto.flex:nth-of-type(1) > div.max-w-sm:nth-of-type(1) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 120,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.inline-flex.items-center:nth-of-type(2)",
+        "tag": "A",
+        "w": 126,
+        "h": 41,
+        "size": 41,
+        "label": "რუკის შექმნა"
+      },
+      {
+        "selector": "div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.max-w-xs:nth-of-type(2) > div > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 267,
+        "h": 43,
+        "size": 43,
+        "label": "დაამატე მთავარ ეკრანზე"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > span.hidden.uppercase",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.truncate:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden.text-\\[var\\(--vivida-gold\\)\\]:nth-of-type(3)",
+        "fontSize": 11,
+        "text": "♌ ლომი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden:nth-of-type(5)",
+        "fontSize": 11,
+        "text": "54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "fontSize": 11,
+        "text": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "article.relative.z-10 > section.mt-10.grid:nth-of-type(1) > a.group.rounded-2xl:nth-of-type(1) > ul.mt-4.flex > li.rounded-full.border:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "ასცენდენტი"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 288,
+        "h": 47,
+        "top": -90,
+        "bottom": -43,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 45,
+        "h": 45,
+        "top": 842,
+        "bottom": 887,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/en",
+    "pattern": "/en",
+    "width": 1280,
+    "status": 200,
+    "finalUrl": "/en",
+    "title": "Natal Charts, Horoscopes and Zodiac Guides, Vivida",
+    "lang": "en",
+    "screenshot": "shots/en__1280-tablet.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "scrollHeight": 3766,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "div.flex.h-full > div.my-4.flex:nth-of-type(2) > div.relative.grid > svg.relative.size-full > g.cursor-pointer:nth-of-type(3)",
+        "tag": "g",
+        "w": 13,
+        "h": 13,
+        "size": 13,
+        "label": "Moon"
+      },
+      {
+        "selector": "div.flex.h-full > div.my-4.flex:nth-of-type(2) > div.relative.grid > svg.relative.size-full > g.cursor-pointer:nth-of-type(4)",
+        "tag": "g",
+        "w": 13,
+        "h": 13,
+        "size": 13,
+        "label": "Ascendant"
+      },
+      {
+        "selector": "div.flex.h-full > div.my-4.flex:nth-of-type(2) > div.relative.grid > svg.relative.size-full > g.cursor-pointer:nth-of-type(5)",
+        "tag": "g",
+        "w": 13,
+        "h": 13,
+        "size": 13,
+        "label": "Mercury"
+      },
+      {
+        "selector": "div.flex.h-full > div.my-4.flex:nth-of-type(2) > div.relative.grid > svg.relative.size-full > g.cursor-pointer:nth-of-type(6)",
+        "tag": "g",
+        "w": 13,
+        "h": 13,
+        "size": 13,
+        "label": "Venus"
+      },
+      {
+        "selector": "div.flex.h-full > div.my-4.flex:nth-of-type(2) > div.relative.grid > svg.relative.size-full > g.cursor-pointer:nth-of-type(7)",
+        "tag": "g",
+        "w": 13,
+        "h": 13,
+        "size": 13,
+        "label": "Mars"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.whitespace-nowrap.font-mono",
+        "tag": "A",
+        "w": 15,
+        "h": 17,
+        "size": 15,
+        "label": "KA"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 220,
+        "h": 17,
+        "size": 17,
+        "label": "Last Quarter · ♌ Leo · 54%"
+      },
+      {
+        "selector": "div.grid.items-stretch:nth-of-type(2) > div.flex.flex-col:nth-of-type(1) > div.mt-10.border-t:nth-of-type(2) > div.mt-4.flex > a.text-\\[var\\(--vivida-gold\\)\\].transition-colors:nth-of-type(1)",
+        "tag": "A",
+        "w": 146,
+        "h": 17,
+        "size": 17,
+        "label": "01. NATAL CHART →"
+      },
+      {
+        "selector": "div.grid.items-stretch:nth-of-type(2) > div.flex.flex-col:nth-of-type(1) > div.mt-10.border-t:nth-of-type(2) > div.mt-4.flex > a.text-\\[var\\(--vivida-pink\\)\\].transition-colors:nth-of-type(2)",
+        "tag": "A",
+        "w": 122,
+        "h": 17,
+        "size": 17,
+        "label": "02. SYNASTRY →"
+      },
+      {
+        "selector": "div.grid.items-stretch:nth-of-type(2) > div.flex.flex-col:nth-of-type(1) > div.mt-10.border-t:nth-of-type(2) > div.mt-4.flex > a.text-\\[var\\(--vivida-cyan\\)\\].transition-colors:nth-of-type(3)",
+        "tag": "A",
+        "w": 163,
+        "h": 17,
+        "size": 17,
+        "label": "03. MOON CALENDAR →"
+      },
+      {
+        "selector": "div.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 123,
+        "h": 23,
+        "size": 23,
+        "label": "Daily Horoscope"
+      },
+      {
+        "selector": "div.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(2)",
+        "tag": "A",
+        "w": 86,
+        "h": 23,
+        "size": 23,
+        "label": "Natal Chart"
+      },
+      {
+        "selector": "div.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(3)",
+        "tag": "A",
+        "w": 94,
+        "h": 23,
+        "size": 23,
+        "label": "Zodiac Signs"
+      },
+      {
+        "selector": "div.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(4)",
+        "tag": "A",
+        "w": 100,
+        "h": 23,
+        "size": 23,
+        "label": "Compatibility"
+      },
+      {
+        "selector": "div.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(5)",
+        "tag": "A",
+        "w": 38,
+        "h": 23,
+        "size": 23,
+        "label": "Tests"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "div.flex.h-full > div.my-4.flex:nth-of-type(2) > div.relative.grid > svg.relative.size-full > g.cursor-pointer:nth-of-type(2)",
+        "tag": "g",
+        "w": 24,
+        "h": 24,
+        "size": 24,
+        "label": "Sun"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 171,
+        "h": 32,
+        "size": 32,
+        "label": "All Instruments"
+      },
+      {
+        "selector": "div.flex.flex-col:nth-of-type(2) > div.flex.h-full > div:nth-of-type(1) > div.mt-3.grid:nth-of-type(2) > button.whitespace-nowrap.rounded-md:nth-of-type(1)",
+        "tag": "BUTTON",
+        "w": 153,
+        "h": 32,
+        "size": 32,
+        "label": "01 · Natal Chart"
+      },
+      {
+        "selector": "div.flex.flex-col:nth-of-type(2) > div.flex.h-full > div:nth-of-type(1) > div.mt-3.grid:nth-of-type(2) > button.whitespace-nowrap.rounded-md:nth-of-type(2)",
+        "tag": "BUTTON",
+        "w": 153,
+        "h": 32,
+        "size": 32,
+        "label": "02 · Live Sky"
+      },
+      {
+        "selector": "div.flex.flex-col:nth-of-type(2) > div.flex.h-full > div:nth-of-type(1) > div.mt-3.grid:nth-of-type(2) > button.whitespace-nowrap.rounded-md:nth-of-type(3)",
+        "tag": "BUTTON",
+        "w": 153,
+        "h": 32,
+        "size": 32,
+        "label": "03 · Synastry"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > div.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 116,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "div.flex.h-full > div.border-t.border-border:nth-of-type(3) > div.grid.grid-cols-1:nth-of-type(2) > div.divide-y.divide-border\\/70:nth-of-type(1) > button.flex.w-full:nth-of-type(3)",
+        "tag": "BUTTON",
+        "w": 240,
+        "h": 36,
+        "size": 36,
+        "label": "↑ Ascendant · ♍ Virgo 22°45′"
+      },
+      {
+        "selector": "div.flex.h-full > div.border-t.border-border:nth-of-type(3) > div.grid.grid-cols-1:nth-of-type(2) > div.divide-y.divide-border\\/70:nth-of-type(2) > button.flex.w-full:nth-of-type(3)",
+        "tag": "BUTTON",
+        "w": 241,
+        "h": 36,
+        "size": 36,
+        "label": "♂ Mars · ♏ Scorpio 27°51′"
+      },
+      {
+        "selector": "div.relative.isolate > footer.relative.z-10 > div.mx-auto.grid:nth-of-type(1) > div.max-w-md:nth-of-type(1) > a.inline-flex.items-center:nth-of-type(1)",
+        "tag": "A",
+        "w": 112,
+        "h": 36,
+        "size": 36,
+        "label": "vivida"
+      },
+      {
+        "selector": "div.flex.h-full > div.border-t.border-border:nth-of-type(3) > div.grid.grid-cols-1:nth-of-type(2) > div.divide-y.divide-border\\/70:nth-of-type(1) > button.flex.w-full:nth-of-type(1)",
+        "tag": "BUTTON",
+        "w": 240,
+        "h": 37,
+        "size": 37,
+        "label": "☉ Sun · ♌ Leo 14°28′"
+      },
+      {
+        "selector": "div.flex.h-full > div.border-t.border-border:nth-of-type(3) > div.grid.grid-cols-1:nth-of-type(2) > div.divide-y.divide-border\\/70:nth-of-type(1) > button.flex.w-full:nth-of-type(2)",
+        "tag": "BUTTON",
+        "w": 240,
+        "h": 37,
+        "size": 37,
+        "label": "☽ Moon · ♓ Pisces 08°12′"
+      },
+      {
+        "selector": "div.flex.h-full > div.border-t.border-border:nth-of-type(3) > div.grid.grid-cols-1:nth-of-type(2) > div.divide-y.divide-border\\/70:nth-of-type(2) > button.flex.w-full:nth-of-type(1)",
+        "tag": "BUTTON",
+        "w": 241,
+        "h": 37,
+        "size": 37,
+        "label": "☿ Mercury · ♍ Virgo 03°19′"
+      },
+      {
+        "selector": "div.flex.h-full > div.border-t.border-border:nth-of-type(3) > div.grid.grid-cols-1:nth-of-type(2) > div.divide-y.divide-border\\/70:nth-of-type(2) > button.flex.w-full:nth-of-type(2)",
+        "tag": "BUTTON",
+        "w": 241,
+        "h": 37,
+        "size": 37,
+        "label": "♀ Venus · ♎ Libra 19°04′"
+      },
+      {
+        "selector": "div.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.inline-flex.items-center:nth-of-type(2)",
+        "tag": "A",
+        "w": 111,
+        "h": 41,
+        "size": 41,
+        "label": "Create chart"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "div.relative.isolate > header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "EPHEMERIS · UTC+4 Last Quarter · ♌ Leo · 54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > span.uppercase.tracking-\\[0\\.16em\\]",
+        "fontSize": 11,
+        "text": "EPHEMERIS · UTC+4"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.items-center",
+        "fontSize": 11,
+        "text": "Last Quarter · ♌ Leo · 54%"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.items-center > span.truncate:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "Last Quarter"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.items-center > span.hidden.text-\\[var\\(--vivida-gold\\)\\]:nth-of-type(3)",
+        "fontSize": 11,
+        "text": "♌ Leo"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.items-center > span.hidden:nth-of-type(5)",
+        "fontSize": 11,
+        "text": "54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.whitespace-nowrap.font-mono",
+        "fontSize": 11,
+        "text": "KA"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ALL INSTRUMENTS"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ALL INSTRUMENTS"
+      },
+      {
+        "selector": "div.relative.isolate > main.relative.z-10 > section.mx-auto.w-full:nth-of-type(1) > div.relative.overflow-hidden > div.flex.flex-wrap:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "VOL. IV · ASTRONOMICAL ALMANAC & PERSONAL OBSERVATORY EPHEME"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 288,
+        "h": 47,
+        "top": -90,
+        "bottom": -43,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 45,
+        "h": 45,
+        "top": 842,
+        "bottom": 887,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/en/readings",
+    "pattern": "/en/readings",
+    "width": 1280,
+    "status": 200,
+    "finalUrl": "/en/readings",
+    "title": "Insight Bazaar, Book a Personal Astrology Reading, Vivida",
+    "lang": "en",
+    "screenshot": "shots/en_readings__1280-tablet.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "scrollHeight": 1759,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.whitespace-nowrap.font-mono",
+        "tag": "A",
+        "w": 15,
+        "h": 17,
+        "size": 15,
+        "label": "KA"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 220,
+        "h": 17,
+        "size": 17,
+        "label": "Last Quarter · ♌ Leo · 54%"
+      },
+      {
+        "selector": "div.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 123,
+        "h": 23,
+        "size": 23,
+        "label": "Daily Horoscope"
+      },
+      {
+        "selector": "div.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(2)",
+        "tag": "A",
+        "w": 86,
+        "h": 23,
+        "size": 23,
+        "label": "Natal Chart"
+      },
+      {
+        "selector": "div.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(3)",
+        "tag": "A",
+        "w": 94,
+        "h": 23,
+        "size": 23,
+        "label": "Zodiac Signs"
+      },
+      {
+        "selector": "div.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(4)",
+        "tag": "A",
+        "w": 100,
+        "h": 23,
+        "size": 23,
+        "label": "Compatibility"
+      },
+      {
+        "selector": "div.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(5)",
+        "tag": "A",
+        "w": 38,
+        "h": 23,
+        "size": 23,
+        "label": "Tests"
+      },
+      {
+        "selector": "div.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.hidden.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 51,
+        "h": 23,
+        "size": 23,
+        "label": "Sign in"
+      },
+      {
+        "selector": "div.relative.isolate > footer.relative.z-10 > div.mx-auto.grid:nth-of-type(1) > div.max-w-md:nth-of-type(1) > a.mt-3.inline-block:nth-of-type(2)",
+        "tag": "A",
+        "w": 116,
+        "h": 23,
+        "size": 23,
+        "label": "hello@vivida.ge"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 171,
+        "h": 32,
+        "size": 32,
+        "label": "All Instruments"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > div.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 116,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "div.relative.isolate > footer.relative.z-10 > div.mx-auto.grid:nth-of-type(1) > div.max-w-md:nth-of-type(1) > a.inline-flex.items-center:nth-of-type(1)",
+        "tag": "A",
+        "w": 112,
+        "h": 36,
+        "size": 36,
+        "label": "vivida"
+      },
+      {
+        "selector": "div.mt-8.flex:nth-of-type(2) > div.flex.flex-wrap > button.rounded-full.px-4:nth-of-type(1)",
+        "tag": "BUTTON",
+        "w": 119,
+        "h": 38,
+        "size": 38,
+        "label": "Everything"
+      },
+      {
+        "selector": "div.mt-8.flex:nth-of-type(2) > div.flex.flex-wrap > button.rounded-full.px-4:nth-of-type(2)",
+        "tag": "BUTTON",
+        "w": 76,
+        "h": 38,
+        "size": 38,
+        "label": "Tarot"
+      },
+      {
+        "selector": "div.mt-8.flex:nth-of-type(2) > div.flex.flex-wrap > button.rounded-full.px-4:nth-of-type(3)",
+        "tag": "BUTTON",
+        "w": 117,
+        "h": 38,
+        "size": 38,
+        "label": "Birth chart"
+      },
+      {
+        "selector": "div.mt-8.flex:nth-of-type(2) > div.flex.flex-wrap > button.rounded-full.px-4:nth-of-type(4)",
+        "tag": "BUTTON",
+        "w": 136,
+        "h": 38,
+        "size": 38,
+        "label": "Compatibility"
+      },
+      {
+        "selector": "div.mt-8.flex:nth-of-type(2) > div.flex.flex-wrap > button.rounded-full.px-4:nth-of-type(5)",
+        "tag": "BUTTON",
+        "w": 81,
+        "h": 38,
+        "size": 38,
+        "label": "Other"
+      },
+      {
+        "selector": "div.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.inline-flex.items-center:nth-of-type(2)",
+        "tag": "A",
+        "w": 111,
+        "h": 41,
+        "size": 41,
+        "label": "Create chart"
+      },
+      {
+        "selector": "main.relative.z-10 > div.mx-auto.w-full > div.flex.flex-col:nth-of-type(1) > div.flex.shrink-0:nth-of-type(2) > button.rounded-full.px-5:nth-of-type(1)",
+        "tag": "BUTTON",
+        "w": 161,
+        "h": 43,
+        "size": 43,
+        "label": "Book a reading"
+      },
+      {
+        "selector": "main.relative.z-10 > div.mx-auto.w-full > div.flex.flex-col:nth-of-type(1) > div.flex.shrink-0:nth-of-type(2) > button.rounded-full.border:nth-of-type(2)",
+        "tag": "BUTTON",
+        "w": 131,
+        "h": 43,
+        "size": 43,
+        "label": "My readings"
+      },
+      {
+        "selector": "main.relative.z-10 > div.mx-auto.w-full > div.flex.flex-col:nth-of-type(1) > div.flex.shrink-0:nth-of-type(2) > button.rounded-full.border:nth-of-type(3)",
+        "tag": "BUTTON",
+        "w": 166,
+        "h": 43,
+        "size": 43,
+        "label": "Become a reader"
+      },
+      {
+        "selector": "div.mt-8.flex:nth-of-type(2) > input.w-full.rounded-xl",
+        "tag": "INPUT",
+        "w": 360,
+        "h": 43,
+        "size": 43,
+        "label": "Search readings or readers…"
+      }
+    ],
+    "inputZoom": [
+      {
+        "selector": "div.mt-8.flex:nth-of-type(2) > input.w-full.rounded-xl",
+        "type": "input",
+        "fontSize": 15.75,
+        "placeholder": "Search readings or readers…"
+      }
+    ],
+    "tinyText": [
+      {
+        "selector": "div.relative.isolate > header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "EPHEMERIS · UTC+4 Last Quarter · ♌ Leo · 54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > span.uppercase.tracking-\\[0\\.16em\\]",
+        "fontSize": 11,
+        "text": "EPHEMERIS · UTC+4"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.items-center",
+        "fontSize": 11,
+        "text": "Last Quarter · ♌ Leo · 54%"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.items-center > span.truncate:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "Last Quarter"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.items-center > span.hidden.text-\\[var\\(--vivida-gold\\)\\]:nth-of-type(3)",
+        "fontSize": 11,
+        "text": "♌ Leo"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.items-center > span.hidden:nth-of-type(5)",
+        "fontSize": 11,
+        "text": "54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.whitespace-nowrap.font-mono",
+        "fontSize": 11,
+        "text": "KA"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ALL INSTRUMENTS"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ALL INSTRUMENTS"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 288,
+        "h": 47,
+        "top": -90,
+        "bottom": -43,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 45,
+        "h": 45,
+        "top": 842,
+        "bottom": 887,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/horoskopi",
+    "pattern": "/horoskopi",
+    "width": 1280,
+    "status": 200,
+    "finalUrl": "/horoskopi",
+    "title": "ჰოროსკოპი, დღის ჰოროსკოპი ყველა ზოდიაქოს ნიშნისთვის",
+    "lang": "ka",
+    "screenshot": "shots/horoskopi__1280-tablet.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "scrollHeight": 5059,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "tag": "A",
+        "w": 233,
+        "h": 17,
+        "size": 17,
+        "label": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > nav.mb-6.flex > a",
+        "tag": "A",
+        "w": 57,
+        "h": 18,
+        "size": 18,
+        "label": "მთავარი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > div.mb-8.space-y-3:nth-of-type(1) > div.flex.flex-wrap:nth-of-type(2) > a:nth-of-type(1)",
+        "tag": "A",
+        "w": 202,
+        "h": 18,
+        "size": 18,
+        "label": "ასტროლოგიური კალენდარი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > div.mb-8.space-y-3:nth-of-type(1) > div.flex.flex-wrap:nth-of-type(2) > a:nth-of-type(2)",
+        "tag": "A",
+        "w": 131,
+        "h": 18,
+        "size": 18,
+        "label": "იღბლიანი დღეები"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > div.mb-8.space-y-3:nth-of-type(1) > div.flex.flex-wrap:nth-of-type(2) > a:nth-of-type(3)",
+        "tag": "A",
+        "w": 168,
+        "h": 18,
+        "size": 18,
+        "label": "სავსე და ახალი მთვარე"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > div.mb-8.space-y-3:nth-of-type(1) > div.flex.flex-wrap:nth-of-type(2) > a:nth-of-type(4)",
+        "tag": "A",
+        "w": 98,
+        "h": 18,
+        "size": 18,
+        "label": "დაბნელებები"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > div.mb-8.space-y-3:nth-of-type(1) > div.flex.flex-wrap:nth-of-type(2) > a:nth-of-type(5)",
+        "tag": "A",
+        "w": 169,
+        "h": 18,
+        "size": 18,
+        "label": "მერკური რეტროგრადში"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > div.mb-8.space-y-3:nth-of-type(1) > div.flex.flex-wrap:nth-of-type(2) > a:nth-of-type(6)",
+        "tag": "A",
+        "w": 149,
+        "h": 18,
+        "size": 18,
+        "label": "მთვარის კალენდარი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-12.rounded-xl:nth-of-type(1) > div.flex.flex-col:nth-of-type(1) > a.shrink-0.font-mono",
+        "tag": "A",
+        "w": 83,
+        "h": 18,
+        "size": 18,
+        "label": "ცა ახლა →"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-12:nth-of-type(2) > div.mt-4.grid > div.flex.items-center:nth-of-type(1) > a.shrink-0.font-mono:nth-of-type(2)",
+        "tag": "A",
+        "w": 58,
+        "h": 18,
+        "size": 18,
+        "label": "ხვალ →"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-12:nth-of-type(2) > div.mt-4.grid > div.flex.items-center:nth-of-type(2) > a.shrink-0.font-mono:nth-of-type(2)",
+        "tag": "A",
+        "w": 58,
+        "h": 18,
+        "size": 18,
+        "label": "ხვალ →"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-12:nth-of-type(2) > div.mt-4.grid > div.flex.items-center:nth-of-type(3) > a.shrink-0.font-mono:nth-of-type(2)",
+        "tag": "A",
+        "w": 58,
+        "h": 18,
+        "size": 18,
+        "label": "ხვალ →"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-12:nth-of-type(2) > div.mt-4.grid > div.flex.items-center:nth-of-type(4) > a.shrink-0.font-mono:nth-of-type(2)",
+        "tag": "A",
+        "w": 58,
+        "h": 18,
+        "size": 18,
+        "label": "ხვალ →"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-12:nth-of-type(2) > div.mt-4.grid > div.flex.items-center:nth-of-type(5) > a.shrink-0.font-mono:nth-of-type(2)",
+        "tag": "A",
+        "w": 58,
+        "h": 18,
+        "size": 18,
+        "label": "ხვალ →"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-12:nth-of-type(2) > div.mt-4.grid > div.flex.items-center:nth-of-type(6) > a.shrink-0.font-mono:nth-of-type(2)",
+        "tag": "A",
+        "w": 58,
+        "h": 18,
+        "size": 18,
+        "label": "ხვალ →"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "tag": "A",
+        "w": 24,
+        "h": 41,
+        "size": 24,
+        "label": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 188,
+        "h": 32,
+        "size": 32,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 116,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > footer.relative.z-10 > div.mx-auto.flex:nth-of-type(1) > div.max-w-sm:nth-of-type(1) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 120,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-12.rounded-2xl:nth-of-type(3) > div.mt-4.flex:nth-of-type(2) > a.inline-flex.items-center:nth-of-type(1)",
+        "tag": "A",
+        "w": 319,
+        "h": 38,
+        "size": 38,
+        "label": "♈ ვერძი — 2027 წლის ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-12.rounded-2xl:nth-of-type(3) > div.mt-4.flex:nth-of-type(2) > a.inline-flex.items-center:nth-of-type(2)",
+        "tag": "A",
+        "w": 314,
+        "h": 38,
+        "size": 38,
+        "label": "♉ კურო — 2027 წლის ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-12.rounded-2xl:nth-of-type(3) > div.mt-4.flex:nth-of-type(2) > a.inline-flex.items-center:nth-of-type(3)",
+        "tag": "A",
+        "w": 337,
+        "h": 38,
+        "size": 38,
+        "label": "♊ ტყუპები — 2027 წლის ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-12.rounded-2xl:nth-of-type(3) > div.mt-4.flex:nth-of-type(2) > a.inline-flex.items-center:nth-of-type(4)",
+        "tag": "A",
+        "w": 347,
+        "h": 38,
+        "size": 38,
+        "label": "♋ კირჩხიბი — 2027 წლის ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-12.rounded-2xl:nth-of-type(3) > div.mt-4.flex:nth-of-type(2) > a.inline-flex.items-center:nth-of-type(5)",
+        "tag": "A",
+        "w": 318,
+        "h": 38,
+        "size": 38,
+        "label": "♌ ლომი — 2027 წლის ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-12.rounded-2xl:nth-of-type(3) > div.mt-4.flex:nth-of-type(2) > a.inline-flex.items-center:nth-of-type(6)",
+        "tag": "A",
+        "w": 350,
+        "h": 38,
+        "size": 38,
+        "label": "♍ ქალწული — 2027 წლის ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-12.rounded-2xl:nth-of-type(3) > div.mt-4.flex:nth-of-type(2) > a.inline-flex.items-center:nth-of-type(7)",
+        "tag": "A",
+        "w": 341,
+        "h": 38,
+        "size": 38,
+        "label": "♎ სასწორი — 2027 წლის ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-12.rounded-2xl:nth-of-type(3) > div.mt-4.flex:nth-of-type(2) > a.inline-flex.items-center:nth-of-type(8)",
+        "tag": "A",
+        "w": 349,
+        "h": 38,
+        "size": 38,
+        "label": "♏ მორიელი — 2027 წლის ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-12.rounded-2xl:nth-of-type(3) > div.mt-4.flex:nth-of-type(2) > a.inline-flex.items-center:nth-of-type(9)",
+        "tag": "A",
+        "w": 387,
+        "h": 38,
+        "size": 38,
+        "label": "♐ მშვილდოსანი — 2027 წლის ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-12.rounded-2xl:nth-of-type(3) > div.mt-4.flex:nth-of-type(2) > a.inline-flex.items-center:nth-of-type(10)",
+        "tag": "A",
+        "w": 346,
+        "h": 38,
+        "size": 38,
+        "label": "♑ თხის რქა — 2027 წლის ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-12.rounded-2xl:nth-of-type(3) > div.mt-4.flex:nth-of-type(2) > a.inline-flex.items-center:nth-of-type(11)",
+        "tag": "A",
+        "w": 356,
+        "h": 38,
+        "size": 38,
+        "label": "♒ მერწყული — 2027 წლის ჰოროსკოპი"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > span.hidden.uppercase",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.truncate:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden.text-\\[var\\(--vivida-gold\\)\\]:nth-of-type(3)",
+        "fontSize": 11,
+        "text": "♌ ლომი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden:nth-of-type(5)",
+        "fontSize": 11,
+        "text": "54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "fontSize": 11,
+        "text": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > header.mb-8.border-b > div.font-mono.text-\\[11px\\]",
+        "fontSize": 11,
+        "text": "კვირა, 1 ნოემბერი 2026"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 288,
+        "h": 47,
+        "top": -90,
+        "bottom": -43,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 45,
+        "h": 45,
+        "top": 842,
+        "bottom": 887,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/mbti/intj",
+    "pattern": "/mbti/intj",
+    "width": 1280,
+    "status": 200,
+    "finalUrl": "/mbti/intj",
+    "title": "INTJ, არქიტექტორი | პიროვნების ტიპი",
+    "lang": "ka",
+    "screenshot": "shots/mbti_intj__1280-tablet.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "scrollHeight": 3145,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "tag": "A",
+        "w": 233,
+        "h": 17,
+        "size": 17,
+        "label": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > nav.mb-6.flex > a:nth-of-type(1)",
+        "tag": "A",
+        "w": 61,
+        "h": 18,
+        "size": 18,
+        "label": "ტესტები"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > nav.mb-6.flex > a:nth-of-type(2)",
+        "tag": "A",
+        "w": 138,
+        "h": 18,
+        "size": 18,
+        "label": "პიროვნების ტიპები"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 98,
+        "h": 23,
+        "size": 23,
+        "label": "ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(2)",
+        "tag": "A",
+        "w": 133,
+        "h": 23,
+        "size": 23,
+        "label": "ნატალური რუკა"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(3)",
+        "tag": "A",
+        "w": 77,
+        "h": 23,
+        "size": 23,
+        "label": "ზოდიაქო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(4)",
+        "tag": "A",
+        "w": 47,
+        "h": 23,
+        "size": 23,
+        "label": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(5)",
+        "tag": "A",
+        "w": 71,
+        "h": 23,
+        "size": 23,
+        "label": "ტესტები"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.hidden.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 63,
+        "h": 23,
+        "size": 23,
+        "label": "შესვლა"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-10:nth-of-type(2) > div.mt-4:nth-of-type(2) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 117,
+        "h": 23,
+        "size": 23,
+        "label": "ყველა ტიპი"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "tag": "A",
+        "w": 24,
+        "h": 41,
+        "size": 24,
+        "label": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 188,
+        "h": 32,
+        "size": 32,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 116,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > footer.relative.z-10 > div.mx-auto.flex:nth-of-type(1) > div.max-w-sm:nth-of-type(1) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 120,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.inline-flex.items-center:nth-of-type(2)",
+        "tag": "A",
+        "w": 126,
+        "h": 41,
+        "size": 41,
+        "label": "რუკის შექმნა"
+      },
+      {
+        "selector": "div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.max-w-xs:nth-of-type(2) > div > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 267,
+        "h": 43,
+        "size": 43,
+        "label": "დაამატე მთავარ ეკრანზე"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > span.hidden.uppercase",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.truncate:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden.text-\\[var\\(--vivida-gold\\)\\]:nth-of-type(3)",
+        "fontSize": 11,
+        "text": "♌ ლომი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden:nth-of-type(5)",
+        "fontSize": 11,
+        "text": "54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "fontSize": 11,
+        "text": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "footer.relative.z-10 > div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.flex-col:nth-of-type(1) > span.text-\\[10px\\].font-semibold",
+        "fontSize": 10,
+        "text": "უსაფრთხო გადახდა"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 288,
+        "h": 47,
+        "top": -90,
+        "bottom": -43,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 45,
+        "h": 45,
+        "top": 842,
+        "bottom": 887,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/nataluri-ruka",
+    "pattern": "/nataluri-ruka",
+    "width": 1280,
+    "status": 200,
+    "finalUrl": "/nataluri-ruka",
+    "title": "ნატალური რუკა ონლაინ, უფასო გამოთვლა",
+    "lang": "ka",
+    "screenshot": "shots/nataluri_ruka__1280-tablet.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "scrollHeight": 3855,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "tag": "A",
+        "w": 233,
+        "h": 17,
+        "size": 17,
+        "label": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.rounded-md.border > form.space-y-6 > div.space-y-2:nth-of-type(2) > div.flex.items-center:nth-of-type(1) > button.text-xs.transition-colors",
+        "tag": "BUTTON",
+        "w": 137,
+        "h": 18,
+        "size": 18,
+        "label": "არ ვიცი ზუსტი დრო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 98,
+        "h": 23,
+        "size": 23,
+        "label": "ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(2)",
+        "tag": "A",
+        "w": 133,
+        "h": 23,
+        "size": 23,
+        "label": "ნატალური რუკა"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(3)",
+        "tag": "A",
+        "w": 77,
+        "h": 23,
+        "size": 23,
+        "label": "ზოდიაქო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(4)",
+        "tag": "A",
+        "w": 47,
+        "h": 23,
+        "size": 23,
+        "label": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(5)",
+        "tag": "A",
+        "w": 71,
+        "h": 23,
+        "size": 23,
+        "label": "ტესტები"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.hidden.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 63,
+        "h": 23,
+        "size": 23,
+        "label": "შესვლა"
+      },
+      {
+        "selector": "section.relative.z-10 > article.mt-16.space-y-10 > section.border-t.border-border:nth-of-type(6) > div.flex.flex-wrap > a:nth-of-type(1)",
+        "tag": "A",
+        "w": 106,
+        "h": 23,
+        "size": 23,
+        "label": "პირადი რუკა"
+      },
+      {
+        "selector": "section.relative.z-10 > article.mt-16.space-y-10 > section.border-t.border-border:nth-of-type(6) > div.flex.flex-wrap > a:nth-of-type(2)",
+        "tag": "A",
+        "w": 155,
+        "h": 23,
+        "size": 23,
+        "label": "ზოდიაქოს ნიშნები"
+      },
+      {
+        "selector": "section.relative.z-10 > article.mt-16.space-y-10 > section.border-t.border-border:nth-of-type(6) > div.flex.flex-wrap > a:nth-of-type(3)",
+        "tag": "A",
+        "w": 112,
+        "h": 23,
+        "size": 23,
+        "label": "თავსებადობა"
+      },
+      {
+        "selector": "section.relative.z-10 > article.mt-16.space-y-10 > section.border-t.border-border:nth-of-type(6) > div.flex.flex-wrap > a:nth-of-type(4)",
+        "tag": "A",
+        "w": 145,
+        "h": 23,
+        "size": 23,
+        "label": "დღის ჰოროსკოპი"
+      },
+      {
+        "selector": "section.relative.z-10 > article.mt-16.space-y-10 > section.border-t.border-border:nth-of-type(6) > div.flex.flex-wrap > a:nth-of-type(5)",
+        "tag": "A",
+        "w": 163,
+        "h": 23,
+        "size": 23,
+        "label": "პირადი ჰოროსკოპი"
+      },
+      {
+        "selector": "section.relative.z-10 > article.mt-16.space-y-10 > section.border-t.border-border:nth-of-type(6) > div.flex.flex-wrap > a:nth-of-type(6)",
+        "tag": "A",
+        "w": 46,
+        "h": 23,
+        "size": 23,
+        "label": "ტარო"
+      },
+      {
+        "selector": "section.relative.z-10 > article.mt-16.space-y-10 > section.border-t.border-border:nth-of-type(6) > div.flex.flex-wrap > a:nth-of-type(7)",
+        "tag": "A",
+        "w": 71,
+        "h": 23,
+        "size": 23,
+        "label": "ტესტები"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "tag": "A",
+        "w": 24,
+        "h": 41,
+        "size": 24,
+        "label": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 188,
+        "h": 32,
+        "size": 32,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 116,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > footer.relative.z-10 > div.mx-auto.flex:nth-of-type(1) > div.max-w-sm:nth-of-type(1) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 120,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.inline-flex.items-center:nth-of-type(2)",
+        "tag": "A",
+        "w": 126,
+        "h": 41,
+        "size": 41,
+        "label": "რუკის შექმნა"
+      },
+      {
+        "selector": "div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.max-w-xs:nth-of-type(2) > div > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 267,
+        "h": 43,
+        "size": 43,
+        "label": "დაამატე მთავარ ეკრანზე"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > span.hidden.uppercase",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.truncate:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden.text-\\[var\\(--vivida-gold\\)\\]:nth-of-type(3)",
+        "fontSize": 11,
+        "text": "♌ ლომი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden:nth-of-type(5)",
+        "fontSize": 11,
+        "text": "54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "fontSize": 11,
+        "text": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > header.border-b.border-border > p.font-mono.text-\\[11px\\]:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "NATAL CHART EPHEMERIS · ონლაინ კალკულატორი"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 288,
+        "h": 47,
+        "top": -90,
+        "bottom": -43,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 45,
+        "h": 45,
+        "top": 842,
+        "bottom": 887,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/numerologia",
+    "pattern": "/numerologia",
+    "width": 1280,
+    "status": 200,
+    "finalUrl": "/numerologia",
+    "title": "ნუმეროლოგია, ბედის რიცხვის გამოთვლა და მნიშვნელობა",
+    "lang": "ka",
+    "screenshot": "shots/numerologia__1280-tablet.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "scrollHeight": 3487,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "tag": "A",
+        "w": 233,
+        "h": 17,
+        "size": 17,
+        "label": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > nav.mb-8.flex > a",
+        "tag": "A",
+        "w": 59,
+        "h": 17,
+        "size": 17,
+        "label": "მთავარი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 98,
+        "h": 23,
+        "size": 23,
+        "label": "ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(2)",
+        "tag": "A",
+        "w": 133,
+        "h": 23,
+        "size": 23,
+        "label": "ნატალური რუკა"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(3)",
+        "tag": "A",
+        "w": 77,
+        "h": 23,
+        "size": 23,
+        "label": "ზოდიაქო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(4)",
+        "tag": "A",
+        "w": 47,
+        "h": 23,
+        "size": 23,
+        "label": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(5)",
+        "tag": "A",
+        "w": 71,
+        "h": 23,
+        "size": 23,
+        "label": "ტესტები"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.hidden.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 63,
+        "h": 23,
+        "size": 23,
+        "label": "შესვლა"
+      },
+      {
+        "selector": "div.relative.border:nth-of-type(1) > div.p-6:nth-of-type(2) > div.flex.flex-wrap:nth-of-type(1) > div.flex.flex-wrap > button.rounded-sm.border:nth-of-type(1)",
+        "tag": "BUTTON",
+        "w": 86,
+        "h": 23,
+        "size": 23,
+        "label": "1994-08-17"
+      },
+      {
+        "selector": "div.relative.border:nth-of-type(1) > div.p-6:nth-of-type(2) > div.flex.flex-wrap:nth-of-type(1) > div.flex.flex-wrap > button.rounded-sm.border:nth-of-type(2)",
+        "tag": "BUTTON",
+        "w": 86,
+        "h": 23,
+        "size": 23,
+        "label": "1998-11-29"
+      },
+      {
+        "selector": "div.relative.border:nth-of-type(1) > div.p-6:nth-of-type(2) > div.flex.flex-wrap:nth-of-type(1) > div.flex.flex-wrap > button.rounded-sm.border:nth-of-type(3)",
+        "tag": "BUTTON",
+        "w": 86,
+        "h": 23,
+        "size": 23,
+        "label": "2001-03-14"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "tag": "A",
+        "w": 24,
+        "h": 41,
+        "size": 24,
+        "label": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 188,
+        "h": 32,
+        "size": 32,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 116,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > footer.relative.z-10 > div.mx-auto.flex:nth-of-type(1) > div.max-w-sm:nth-of-type(1) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 120,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.inline-flex.items-center:nth-of-type(2)",
+        "tag": "A",
+        "w": 126,
+        "h": 41,
+        "size": 41,
+        "label": "რუკის შექმნა"
+      },
+      {
+        "selector": "div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.max-w-xs:nth-of-type(2) > div > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 267,
+        "h": 43,
+        "size": 43,
+        "label": "დაამატე მთავარ ეკრანზე"
+      }
+    ],
+    "inputZoom": [
+      {
+        "selector": "#lifepath-date",
+        "type": "date",
+        "fontSize": 15.75,
+        "placeholder": ""
+      }
+    ],
+    "tinyText": [
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > span.hidden.uppercase",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.truncate:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden.text-\\[var\\(--vivida-gold\\)\\]:nth-of-type(3)",
+        "fontSize": 11,
+        "text": "♌ ლომი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden:nth-of-type(5)",
+        "fontSize": 11,
+        "text": "54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "fontSize": 11,
+        "text": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > nav.mb-8.flex > a",
+        "fontSize": 11,
+        "text": "მთავარი"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 288,
+        "h": 47,
+        "top": -90,
+        "bottom": -43,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 45,
+        "h": 45,
+        "top": 842,
+        "bottom": 887,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/privacy",
+    "pattern": "/privacy",
+    "width": 1280,
+    "status": 200,
+    "finalUrl": "/privacy",
+    "title": "კონფიდენციალურობა · Vivida",
+    "lang": "ka",
+    "screenshot": "shots/privacy__1280-tablet.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "scrollHeight": 5513,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "tag": "A",
+        "w": 233,
+        "h": 17,
+        "size": 17,
+        "label": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 98,
+        "h": 23,
+        "size": 23,
+        "label": "ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(2)",
+        "tag": "A",
+        "w": 133,
+        "h": 23,
+        "size": 23,
+        "label": "ნატალური რუკა"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(3)",
+        "tag": "A",
+        "w": 77,
+        "h": 23,
+        "size": 23,
+        "label": "ზოდიაქო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(4)",
+        "tag": "A",
+        "w": 47,
+        "h": 23,
+        "size": 23,
+        "label": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(5)",
+        "tag": "A",
+        "w": 71,
+        "h": 23,
+        "size": 23,
+        "label": "ტესტები"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.hidden.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 63,
+        "h": 23,
+        "size": 23,
+        "label": "შესვლა"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "tag": "A",
+        "w": 24,
+        "h": 41,
+        "size": 24,
+        "label": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 188,
+        "h": 32,
+        "size": 32,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 116,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > footer.relative.z-10 > div.mx-auto.flex:nth-of-type(1) > div.max-w-sm:nth-of-type(1) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 120,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.inline-flex.items-center:nth-of-type(2)",
+        "tag": "A",
+        "w": 126,
+        "h": 41,
+        "size": 41,
+        "label": "რუკის შექმნა"
+      },
+      {
+        "selector": "div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.max-w-xs:nth-of-type(2) > div > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 267,
+        "h": 43,
+        "size": 43,
+        "label": "დაამატე მთავარ ეკრანზე"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > span.hidden.uppercase",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.truncate:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden.text-\\[var\\(--vivida-gold\\)\\]:nth-of-type(3)",
+        "fontSize": 11,
+        "text": "♌ ლომი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden:nth-of-type(5)",
+        "fontSize": 11,
+        "text": "54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "fontSize": 11,
+        "text": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "footer.relative.z-10 > div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.flex-col:nth-of-type(1) > span.text-\\[10px\\].font-semibold",
+        "fontSize": 10,
+        "text": "უსაფრთხო გადახდა"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 288,
+        "h": 47,
+        "top": -90,
+        "bottom": -43,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 45,
+        "h": 45,
+        "top": 842,
+        "bottom": 887,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/savse-mtvare",
+    "pattern": "/savse-mtvare",
+    "width": 1280,
+    "status": 200,
+    "finalUrl": "/savse-mtvare",
+    "title": "სავსე მთვარე, თარიღები, დრო და მნიშვნელობა",
+    "lang": "ka",
+    "screenshot": "shots/savse_mtvare__1280-tablet.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "scrollHeight": 2986,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "tag": "A",
+        "w": 233,
+        "h": 17,
+        "size": 17,
+        "label": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 98,
+        "h": 23,
+        "size": 23,
+        "label": "ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(2)",
+        "tag": "A",
+        "w": 133,
+        "h": 23,
+        "size": 23,
+        "label": "ნატალური რუკა"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(3)",
+        "tag": "A",
+        "w": 77,
+        "h": 23,
+        "size": 23,
+        "label": "ზოდიაქო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(4)",
+        "tag": "A",
+        "w": 47,
+        "h": 23,
+        "size": 23,
+        "label": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(5)",
+        "tag": "A",
+        "w": 71,
+        "h": 23,
+        "size": 23,
+        "label": "ტესტები"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.hidden.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 63,
+        "h": 23,
+        "size": 23,
+        "label": "შესვლა"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "tag": "A",
+        "w": 24,
+        "h": 41,
+        "size": 24,
+        "label": "EN"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-12:nth-of-type(4) > div.mt-4.space-y-3 > details.rounded-2xl.border:nth-of-type(1) > summary.cursor-pointer.font-medium",
+        "tag": "SUMMARY",
+        "w": 1051,
+        "h": 27,
+        "size": 27,
+        "label": "როდის არის შემდეგი სავსე მთვარე?"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-12:nth-of-type(4) > div.mt-4.space-y-3 > details.rounded-2xl.border:nth-of-type(2) > summary.cursor-pointer.font-medium",
+        "tag": "SUMMARY",
+        "w": 1051,
+        "h": 27,
+        "size": 27,
+        "label": "სავსე მთვარე რამდენ ხანს გრძელდება?"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-12:nth-of-type(4) > div.mt-4.space-y-3 > details.rounded-2xl.border:nth-of-type(3) > summary.cursor-pointer.font-medium",
+        "tag": "SUMMARY",
+        "w": 1051,
+        "h": 27,
+        "size": 27,
+        "label": "ყველა ქვეყანაში ერთი თარიღია?"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 188,
+        "h": 32,
+        "size": 32,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 116,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > footer.relative.z-10 > div.mx-auto.flex:nth-of-type(1) > div.max-w-sm:nth-of-type(1) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 120,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.inline-flex.items-center:nth-of-type(2)",
+        "tag": "A",
+        "w": 126,
+        "h": 41,
+        "size": 41,
+        "label": "რუკის შექმნა"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > nav.mt-7.flex > a.rounded-full.border:nth-of-type(1)",
+        "tag": "A",
+        "w": 150,
+        "h": 43,
+        "size": 43,
+        "label": "სავსე მთვარე"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > nav.mt-7.flex > a.rounded-full.border:nth-of-type(2)",
+        "tag": "A",
+        "w": 158,
+        "h": 43,
+        "size": 43,
+        "label": "ახალი მთვარე"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > nav.mt-7.flex > a.rounded-full.border:nth-of-type(3)",
+        "tag": "A",
+        "w": 152,
+        "h": 43,
+        "size": 43,
+        "label": "დაბნელებები"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > nav.mt-7.flex > a.rounded-full.border:nth-of-type(4)",
+        "tag": "A",
+        "w": 211,
+        "h": 43,
+        "size": 43,
+        "label": "მთვარის კალენდარი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > section.mt-10.rounded-3xl:nth-of-type(1) > a.mt-5.inline-flex",
+        "tag": "A",
+        "w": 215,
+        "h": 43,
+        "size": 43,
+        "label": "სრული განმარტება →"
+      },
+      {
+        "selector": "div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.max-w-xs:nth-of-type(2) > div > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 267,
+        "h": 43,
+        "size": 43,
+        "label": "დაამატე მთავარ ეკრანზე"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > span.hidden.uppercase",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.truncate:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden.text-\\[var\\(--vivida-gold\\)\\]:nth-of-type(3)",
+        "fontSize": 11,
+        "text": "♌ ლომი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden:nth-of-type(5)",
+        "fontSize": 11,
+        "text": "54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "fontSize": 11,
+        "text": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "footer.relative.z-10 > div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.flex-col:nth-of-type(1) > span.text-\\[10px\\].font-semibold",
+        "fontSize": 10,
+        "text": "უსაფრთხო გადახდა"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 288,
+        "h": 47,
+        "top": -90,
+        "bottom": -43,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 45,
+        "h": 45,
+        "top": 842,
+        "bottom": 887,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/taro/the-magician",
+    "pattern": "/taro/the-magician",
+    "width": 1280,
+    "status": 200,
+    "finalUrl": "/taro/the-magician",
+    "title": "მაგი, ტაროს კარტის მნიშვნელობა",
+    "lang": "ka",
+    "screenshot": "shots/taro_the_magician__1280-tablet.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "scrollHeight": 3970,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "tag": "A",
+        "w": 233,
+        "h": 17,
+        "size": 17,
+        "label": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > nav.mb-6.flex > a",
+        "tag": "A",
+        "w": 39,
+        "h": 18,
+        "size": 18,
+        "label": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 98,
+        "h": 23,
+        "size": 23,
+        "label": "ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(2)",
+        "tag": "A",
+        "w": 133,
+        "h": 23,
+        "size": 23,
+        "label": "ნატალური რუკა"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(3)",
+        "tag": "A",
+        "w": 77,
+        "h": 23,
+        "size": 23,
+        "label": "ზოდიაქო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(4)",
+        "tag": "A",
+        "w": 47,
+        "h": 23,
+        "size": 23,
+        "label": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(5)",
+        "tag": "A",
+        "w": 71,
+        "h": 23,
+        "size": 23,
+        "label": "ტესტები"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.hidden.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 63,
+        "h": 23,
+        "size": 23,
+        "label": "შესვლა"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "tag": "A",
+        "w": 24,
+        "h": 41,
+        "size": 24,
+        "label": "EN"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-12:nth-of-type(1) > div.space-y-3 > details.group.rounded-2xl:nth-of-type(1) > summary.flex.cursor-pointer",
+        "tag": "SUMMARY",
+        "w": 763,
+        "h": 27,
+        "size": 27,
+        "label": "რას ნიშნავს ტაროს კარტი „მაგი\"? ✦"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-12:nth-of-type(1) > div.space-y-3 > details.group.rounded-2xl:nth-of-type(2) > summary.flex.cursor-pointer",
+        "tag": "SUMMARY",
+        "w": 763,
+        "h": 27,
+        "size": 27,
+        "label": "რას ნიშნავს შებრუნებული „მაგი\"? ✦"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-12:nth-of-type(1) > div.space-y-3 > details.group.rounded-2xl:nth-of-type(3) > summary.flex.cursor-pointer",
+        "tag": "SUMMARY",
+        "w": 763,
+        "h": 27,
+        "size": 27,
+        "label": "„მაგი\" სიყვარულში რას ნიშნავს? ✦"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 188,
+        "h": 32,
+        "size": 32,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 116,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > footer.relative.z-10 > div.mx-auto.flex:nth-of-type(1) > div.max-w-sm:nth-of-type(1) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 120,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-14:nth-of-type(2) > div.flex.flex-wrap > a.inline-flex.items-center:nth-of-type(1)",
+        "tag": "A",
+        "w": 114,
+        "h": 38,
+        "size": 38,
+        "label": "🃏 ბრიყვი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-14:nth-of-type(2) > div.flex.flex-wrap > a.inline-flex.items-center:nth-of-type(2)",
+        "tag": "A",
+        "w": 204,
+        "h": 38,
+        "size": 38,
+        "label": "🌙 უმაღლესი ქურუმი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-14:nth-of-type(2) > div.flex.flex-wrap > a.inline-flex.items-center:nth-of-type(3)",
+        "tag": "A",
+        "w": 166,
+        "h": 38,
+        "size": 38,
+        "label": "🌷 იმპერატრიცა"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-14:nth-of-type(2) > div.flex.flex-wrap > a.inline-flex.items-center:nth-of-type(4)",
+        "tag": "A",
+        "w": 160,
+        "h": 38,
+        "size": 38,
+        "label": "🏛️ იმპერატორი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-14:nth-of-type(2) > div.flex.flex-wrap > a.inline-flex.items-center:nth-of-type(5)",
+        "tag": "A",
+        "w": 152,
+        "h": 38,
+        "size": 38,
+        "label": "🗝️ იეროფანტი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-14:nth-of-type(2) > div.flex.flex-wrap > a.inline-flex.items-center:nth-of-type(6)",
+        "tag": "A",
+        "w": 187,
+        "h": 38,
+        "size": 38,
+        "label": "💞 შეყვარებულები"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-14:nth-of-type(2) > div.flex.flex-wrap > a.inline-flex.items-center:nth-of-type(7)",
+        "tag": "A",
+        "w": 103,
+        "h": 38,
+        "size": 38,
+        "label": "🐎 ეტლი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-14:nth-of-type(2) > div.flex.flex-wrap > a.inline-flex.items-center:nth-of-type(8)",
+        "tag": "A",
+        "w": 100,
+        "h": 38,
+        "size": 38,
+        "label": "🦁 ძალა"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > span.hidden.uppercase",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.truncate:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden.text-\\[var\\(--vivida-gold\\)\\]:nth-of-type(3)",
+        "fontSize": 11,
+        "text": "♌ ლომი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden:nth-of-type(5)",
+        "fontSize": 11,
+        "text": "54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "fontSize": 11,
+        "text": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "section.relative.z-10 > div.mt-10.grid:nth-of-type(1) > article.rounded-2xl.border:nth-of-type(1) > div.mt-2.flex > span.text-\\[11px\\].text-\\[var\\(--vivida-cyan\\)\\]:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "#ძალა"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 288,
+        "h": 47,
+        "top": -90,
+        "bottom": -43,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 45,
+        "h": 45,
+        "top": 842,
+        "bottom": 887,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/tavsebadoba",
+    "pattern": "/tavsebadoba",
+    "width": 1280,
+    "status": 200,
+    "finalUrl": "/tavsebadoba",
+    "title": "ზოდიაქოს თავსებადობა, შეამოწმე შენი წყვილი | Vivida",
+    "lang": "ka",
+    "screenshot": "shots/tavsebadoba__1280-tablet.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "scrollHeight": 2403,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "div.relative.overflow-hidden > div.grid.gap-5 > div.flex.min-w-0:nth-of-type(2) > div.mt-6.flex:nth-of-type(2) > a.font-mono.text-\\[11px\\]",
+        "tag": "A",
+        "w": 226,
+        "h": 17,
+        "size": 17,
+        "label": "წყვილის სრული გზამკვლევი →"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > header.relative.z-10 > a.text-sm.text-muted-foreground:nth-of-type(2)",
+        "tag": "A",
+        "w": 62,
+        "h": 23,
+        "size": 23,
+        "label": "შესვლა"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > header.relative.z-10 > a.flex.items-center:nth-of-type(1)",
+        "tag": "A",
+        "w": 100,
+        "h": 36,
+        "size": 36,
+        "label": "vivida"
+      },
+      {
+        "selector": "main.relative.isolate > footer.relative.z-10 > div.mx-auto.flex:nth-of-type(1) > div.max-w-sm:nth-of-type(1) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 120,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "div.relative.overflow-hidden > div.grid.gap-5 > div.flex.min-w-0:nth-of-type(2) > div.mt-6.flex:nth-of-type(2) > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 272,
+        "h": 41,
+        "size": 41,
+        "label": "სრული რუკების შედარება"
+      },
+      {
+        "selector": "div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.max-w-xs:nth-of-type(2) > div > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 267,
+        "h": 43,
+        "size": 43,
+        "label": "დაამატე მთავარ ეკრანზე"
+      }
+    ],
+    "inputZoom": [
+      {
+        "selector": "#compat-sign-a",
+        "type": "select",
+        "fontSize": 15.75,
+        "placeholder": ""
+      },
+      {
+        "selector": "#compat-sign-b",
+        "type": "select",
+        "fontSize": 15.75,
+        "placeholder": ""
+      }
+    ],
+    "tinyText": [
+      {
+        "selector": "div.relative.overflow-hidden > div.grid.gap-5 > div.flex.min-w-0:nth-of-type(1) > div:nth-of-type(1) > div.inline-flex.items-center:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "სინასტრიის ინსტრუმენტი · სწრაფი ტესტი"
+      },
+      {
+        "selector": "div.flex.min-w-0:nth-of-type(1) > div:nth-of-type(1) > div.mt-6.grid:nth-of-type(2) > div:nth-of-type(1) > label.block.font-mono",
+        "fontSize": 10,
+        "text": "პირველი ნიშანი (მზე)"
+      },
+      {
+        "selector": "div.flex.min-w-0:nth-of-type(1) > div:nth-of-type(1) > div.mt-6.grid:nth-of-type(2) > div:nth-of-type(2) > label.block.font-mono",
+        "fontSize": 10,
+        "text": "მეორე ნიშანი (მზე)"
+      },
+      {
+        "selector": "section.relative.mx-auto > div.relative.overflow-hidden > div.grid.gap-5 > div.flex.min-w-0:nth-of-type(1) > div.mt-6.border-t:nth-of-type(2)",
+        "fontSize": 10,
+        "text": "ANGULAR SEPARATION · 180° ARC"
+      },
+      {
+        "selector": "div:nth-of-type(1) > div.flex.flex-wrap > div.flex.items-center:nth-of-type(1) > div.ml-1 > div.font-mono.text-\\[11px\\]:nth-of-type(2)",
+        "fontSize": 11,
+        "text": "ცეცხლი · ჰაერი · 180°"
+      },
+      {
+        "selector": "div.flex.min-w-0:nth-of-type(2) > div:nth-of-type(1) > div.flex.flex-wrap > div.text-right:nth-of-type(2) > div.font-mono.text-\\[10px\\]:nth-of-type(1)",
+        "fontSize": 10,
+        "text": "გამომწვევი"
+      },
+      {
+        "selector": "div.relative.overflow-hidden > div.grid.gap-5 > div.flex.min-w-0:nth-of-type(2) > div.mt-6.flex:nth-of-type(2) > a.font-mono.text-\\[11px\\]",
+        "fontSize": 11,
+        "text": "წყვილის სრული გზამკვლევი →"
+      },
+      {
+        "selector": "footer.relative.z-10 > div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.flex-col:nth-of-type(1) > span.text-\\[10px\\].font-semibold",
+        "fontSize": 10,
+        "text": "უსაფრთხო გადახდა"
+      },
+      {
+        "selector": "footer.relative.z-10 > div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.max-w-xs:nth-of-type(2) > span.text-\\[10px\\].font-semibold",
+        "fontSize": 10,
+        "text": "VIVIDA ვებზე"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 288,
+        "h": 47,
+        "top": -90,
+        "bottom": -43,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 45,
+        "h": 45,
+        "top": 842,
+        "bottom": 887,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/tests",
+    "pattern": "/tests",
+    "width": 1280,
+    "status": 200,
+    "finalUrl": "/tests",
+    "title": "ტესტები და ქვიზები ქართულად, IQ, პიროვნების ტესტი და ზოდიაქო",
+    "lang": "ka",
+    "screenshot": "shots/tests__1280-tablet.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "scrollHeight": 3573,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "tag": "A",
+        "w": 233,
+        "h": 17,
+        "size": 17,
+        "label": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 98,
+        "h": 23,
+        "size": 23,
+        "label": "ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(2)",
+        "tag": "A",
+        "w": 133,
+        "h": 23,
+        "size": 23,
+        "label": "ნატალური რუკა"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(3)",
+        "tag": "A",
+        "w": 77,
+        "h": 23,
+        "size": 23,
+        "label": "ზოდიაქო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(4)",
+        "tag": "A",
+        "w": 47,
+        "h": 23,
+        "size": 23,
+        "label": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(5)",
+        "tag": "A",
+        "w": 71,
+        "h": 23,
+        "size": 23,
+        "label": "ტესტები"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.hidden.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 63,
+        "h": 23,
+        "size": 23,
+        "label": "შესვლა"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > div.mt-8.flex > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 121,
+        "h": 23,
+        "size": 23,
+        "label": "ყველა ტიპი"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "tag": "A",
+        "w": 24,
+        "h": 41,
+        "size": 24,
+        "label": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 188,
+        "h": 32,
+        "size": 32,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 116,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > footer.relative.z-10 > div.mx-auto.flex:nth-of-type(1) > div.max-w-sm:nth-of-type(1) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 120,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.inline-flex.items-center:nth-of-type(2)",
+        "tag": "A",
+        "w": 126,
+        "h": 41,
+        "size": 41,
+        "label": "რუკის შექმნა"
+      },
+      {
+        "selector": "div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.max-w-xs:nth-of-type(2) > div > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 267,
+        "h": 43,
+        "size": 43,
+        "label": "დაამატე მთავარ ეკრანზე"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > span.hidden.uppercase",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.truncate:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden.text-\\[var\\(--vivida-gold\\)\\]:nth-of-type(3)",
+        "fontSize": 11,
+        "text": "♌ ლომი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden:nth-of-type(5)",
+        "fontSize": 11,
+        "text": "54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "fontSize": 11,
+        "text": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > header.mb-10.border-b > div.font-mono.text-\\[11px\\]",
+        "fontSize": 11,
+        "text": "PSYCHOMETRICS & ARCHETYPES · ტესტები და ქვიზები"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 288,
+        "h": 47,
+        "top": -90,
+        "bottom": -43,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 45,
+        "h": 45,
+        "top": 842,
+        "bottom": 887,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/zodiac/aries",
+    "pattern": "/zodiac/aries",
+    "width": 1280,
+    "status": 200,
+    "finalUrl": "/zodiac/aries",
+    "title": "ვერძი: თარიღი, ხასიათი, სიყვარული და თავსებადობა",
+    "lang": "ka",
+    "screenshot": "shots/zodiac_aries__1280-tablet.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "scrollHeight": 6407,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "tag": "A",
+        "w": 233,
+        "h": 17,
+        "size": 17,
+        "label": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > nav.mb-6.flex > a",
+        "tag": "A",
+        "w": 84,
+        "h": 18,
+        "size": 18,
+        "label": "ცის ნიშნები"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-12:nth-of-type(6) > div.mb-5.flex:nth-of-type(1) > a.shrink-0.text-xs",
+        "tag": "A",
+        "w": 119,
+        "h": 18,
+        "size": 18,
+        "label": "ყველა წყვილი →"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 98,
+        "h": 23,
+        "size": 23,
+        "label": "ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(2)",
+        "tag": "A",
+        "w": 133,
+        "h": 23,
+        "size": 23,
+        "label": "ნატალური რუკა"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(3)",
+        "tag": "A",
+        "w": 77,
+        "h": 23,
+        "size": 23,
+        "label": "ზოდიაქო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(4)",
+        "tag": "A",
+        "w": 47,
+        "h": 23,
+        "size": 23,
+        "label": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(5)",
+        "tag": "A",
+        "w": 71,
+        "h": 23,
+        "size": 23,
+        "label": "ტესტები"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.hidden.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 63,
+        "h": 23,
+        "size": 23,
+        "label": "შესვლა"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "tag": "A",
+        "w": 24,
+        "h": 41,
+        "size": 24,
+        "label": "EN"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-12.max-w-3xl:nth-of-type(8) > div.space-y-3 > details.group.rounded-2xl:nth-of-type(1) > summary.flex.cursor-pointer",
+        "tag": "SUMMARY",
+        "w": 817,
+        "h": 27,
+        "size": 27,
+        "label": "რა არის ვერძის ძლიერი მხარეები? ✦"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-12.max-w-3xl:nth-of-type(8) > div.space-y-3 > details.group.rounded-2xl:nth-of-type(2) > summary.flex.cursor-pointer",
+        "tag": "SUMMARY",
+        "w": 817,
+        "h": 27,
+        "size": 27,
+        "label": "როგორია ვერძი სიყვარულში? ✦"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-12.max-w-3xl:nth-of-type(8) > div.space-y-3 > details.group.rounded-2xl:nth-of-type(3) > summary.flex.cursor-pointer",
+        "tag": "SUMMARY",
+        "w": 817,
+        "h": 27,
+        "size": 27,
+        "label": "ვისთან აქვს ვერძს საუკეთესო თავსებადობა? ✦"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-12.max-w-3xl:nth-of-type(8) > div.space-y-3 > details.group.rounded-2xl:nth-of-type(4) > summary.flex.cursor-pointer",
+        "tag": "SUMMARY",
+        "w": 817,
+        "h": 27,
+        "size": 27,
+        "label": "რა პროფესიებია შესაფერისი ვერძისთვის? ✦"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-12.max-w-3xl:nth-of-type(8) > div.space-y-3 > details.group.rounded-2xl:nth-of-type(5) > summary.flex.cursor-pointer",
+        "tag": "SUMMARY",
+        "w": 817,
+        "h": 27,
+        "size": 27,
+        "label": "რა არის ვერძის სუსტი მხარეები? ✦"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 188,
+        "h": 32,
+        "size": 32,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "article.relative.overflow-hidden > div.relative.flex:nth-of-type(2) > div.min-w-0.flex-1:nth-of-type(2) > div.mt-4.flex:nth-of-type(2) > a.transition-opacity",
+        "tag": "A",
+        "w": 182,
+        "h": 34,
+        "size": 34,
+        "label": "ცეცხლი ელემენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 116,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > footer.relative.z-10 > div.mx-auto.flex:nth-of-type(1) > div.max-w-sm:nth-of-type(1) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 120,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-14:nth-of-type(11) > div.flex.flex-wrap > a.inline-flex.items-center:nth-of-type(1)",
+        "tag": "A",
+        "w": 99,
+        "h": 38,
+        "size": 38,
+        "label": "♉ კურო"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-14:nth-of-type(11) > div.flex.flex-wrap > a.inline-flex.items-center:nth-of-type(2)",
+        "tag": "A",
+        "w": 123,
+        "h": 38,
+        "size": 38,
+        "label": "♊ ტყუპები"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-14:nth-of-type(11) > div.flex.flex-wrap > a.inline-flex.items-center:nth-of-type(3)",
+        "tag": "A",
+        "w": 133,
+        "h": 38,
+        "size": 38,
+        "label": "♋ კირჩხიბი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-14:nth-of-type(11) > div.flex.flex-wrap > a.inline-flex.items-center:nth-of-type(4)",
+        "tag": "A",
+        "w": 104,
+        "h": 38,
+        "size": 38,
+        "label": "♌ ლომი"
+      },
+      {
+        "selector": "main.relative.isolate > section.relative.z-10 > section.mt-14:nth-of-type(11) > div.flex.flex-wrap > a.inline-flex.items-center:nth-of-type(5)",
+        "tag": "A",
+        "w": 136,
+        "h": 38,
+        "size": 38,
+        "label": "♍ ქალწული"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > span.hidden.uppercase",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.truncate:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden.text-\\[var\\(--vivida-gold\\)\\]:nth-of-type(3)",
+        "fontSize": 11,
+        "text": "♌ ლომი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden:nth-of-type(5)",
+        "fontSize": 11,
+        "text": "54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "fontSize": 11,
+        "text": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "section.mt-12:nth-of-type(6) > div.grid.gap-3:nth-of-type(2) > a.block.rounded-2xl:nth-of-type(1) > div.flex.items-baseline > span.rounded-full.border",
+        "fontSize": 11,
+        "text": "ძლიერი"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 288,
+        "h": 47,
+        "top": -90,
+        "bottom": -43,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 45,
+        "h": 45,
+        "top": 842,
+        "bottom": 887,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/zodiac/datit",
+    "pattern": "/zodiac/datit",
+    "width": 1280,
+    "status": 200,
+    "finalUrl": "/zodiac/datit",
+    "title": "ცის ნიშანი დაბადების თარიღით - გაიგე შენი ზოდიაქო",
+    "lang": "ka",
+    "screenshot": "shots/zodiac_datit__1280-tablet.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "scrollHeight": 4316,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "tag": "A",
+        "w": 233,
+        "h": 17,
+        "size": 17,
+        "label": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > nav.mb-6.flex > a",
+        "tag": "A",
+        "w": 84,
+        "h": 18,
+        "size": 18,
+        "label": "ცის ნიშნები"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 98,
+        "h": 23,
+        "size": 23,
+        "label": "ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(2)",
+        "tag": "A",
+        "w": 133,
+        "h": 23,
+        "size": 23,
+        "label": "ნატალური რუკა"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(3)",
+        "tag": "A",
+        "w": 77,
+        "h": 23,
+        "size": 23,
+        "label": "ზოდიაქო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(4)",
+        "tag": "A",
+        "w": 47,
+        "h": 23,
+        "size": 23,
+        "label": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(5)",
+        "tag": "A",
+        "w": 71,
+        "h": 23,
+        "size": 23,
+        "label": "ტესტები"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.hidden.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 63,
+        "h": 23,
+        "size": 23,
+        "label": "შესვლა"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "tag": "A",
+        "w": 24,
+        "h": 41,
+        "size": 24,
+        "label": "EN"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-14.max-w-3xl:nth-of-type(3) > div.space-y-3 > details.group.rounded-2xl:nth-of-type(1) > summary.flex.cursor-pointer",
+        "tag": "SUMMARY",
+        "w": 817,
+        "h": 27,
+        "size": 27,
+        "label": "რა არის მზის ნიშანი? ✦"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-14.max-w-3xl:nth-of-type(3) > div.space-y-3 > details.group.rounded-2xl:nth-of-type(2) > summary.flex.cursor-pointer",
+        "tag": "SUMMARY",
+        "w": 817,
+        "h": 27,
+        "size": 27,
+        "label": "რატომ არის მნიშვნელოვანი მზის ნიშნის ცოდნა? ✦"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-14.max-w-3xl:nth-of-type(3) > div.space-y-3 > details.group.rounded-2xl:nth-of-type(3) > summary.flex.cursor-pointer",
+        "tag": "SUMMARY",
+        "w": 817,
+        "h": 27,
+        "size": 27,
+        "label": "რა განსხვავებაა მზის ნიშანსა და ნატალურ რუკას შორის? ✦"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-14.max-w-3xl:nth-of-type(3) > div.space-y-3 > details.group.rounded-2xl:nth-of-type(4) > summary.flex.cursor-pointer",
+        "tag": "SUMMARY",
+        "w": 817,
+        "h": 27,
+        "size": 27,
+        "label": "რა არის 'cusp' პიროვნება? ✦"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-14.max-w-3xl:nth-of-type(3) > div.space-y-3 > details.group.rounded-2xl:nth-of-type(5) > summary.flex.cursor-pointer",
+        "tag": "SUMMARY",
+        "w": 817,
+        "h": 27,
+        "size": 27,
+        "label": "შეიძლება თუ არა მზის ნიშანი შეიცვალოს? ✦"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 188,
+        "h": 32,
+        "size": 32,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 116,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > footer.relative.z-10 > div.mx-auto.flex:nth-of-type(1) > div.max-w-sm:nth-of-type(1) > a.inline-flex.items-center",
+        "tag": "A",
+        "w": 120,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.inline-flex.items-center:nth-of-type(2)",
+        "tag": "A",
+        "w": 126,
+        "h": 41,
+        "size": 41,
+        "label": "რუკის შექმნა"
+      },
+      {
+        "selector": "div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.max-w-xs:nth-of-type(2) > div > button.inline-flex.items-center",
+        "tag": "BUTTON",
+        "w": 267,
+        "h": 43,
+        "size": 43,
+        "label": "დაამატე მთავარ ეკრანზე"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > span.hidden.uppercase",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.truncate:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden.text-\\[var\\(--vivida-gold\\)\\]:nth-of-type(3)",
+        "fontSize": 11,
+        "text": "♌ ლომი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden:nth-of-type(5)",
+        "fontSize": 11,
+        "text": "54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "fontSize": 11,
+        "text": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "footer.relative.z-10 > div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.flex-col:nth-of-type(1) > span.text-\\[10px\\].font-semibold",
+        "fontSize": 10,
+        "text": "უსაფრთხო გადახდა"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 288,
+        "h": 47,
+        "top": -90,
+        "bottom": -43,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 45,
+        "h": 45,
+        "top": 842,
+        "bottom": 887,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "url": "/zodiac/tavsebadoba",
+    "pattern": "/zodiac/tavsebadoba",
+    "width": 1280,
+    "status": 200,
+    "finalUrl": "/zodiac/tavsebadoba",
+    "title": "ზოდიაქოს ნიშნების თავსებადობა: იპოვე შენი იდეალური პარტნიორი | ასტროლოგიური გზამკვლევი",
+    "lang": "ka",
+    "screenshot": "shots/zodiac_tavsebadoba__1280-tablet.jpg",
+    "error": null,
+    "viewportMeta": "width=device-width, initial-scale=1",
+    "doc": {
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "scrollHeight": 4598,
+      "scrollX": 0,
+      "bodyPaddingBottom": "0px"
+    },
+    "horizontalScroll": 0,
+    "underlyingScrollWidth": 0,
+    "overflowOffenders": [],
+    "clippedText": [],
+    "smallTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "tag": "A",
+        "w": 233,
+        "h": 17,
+        "size": 17,
+        "label": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > section.relative.z-10 > nav.mb-6.flex > a",
+        "tag": "A",
+        "w": 84,
+        "h": 18,
+        "size": 18,
+        "label": "ცის ნიშნები"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 98,
+        "h": 23,
+        "size": 23,
+        "label": "ჰოროსკოპი"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(2)",
+        "tag": "A",
+        "w": 133,
+        "h": 23,
+        "size": 23,
+        "label": "ნატალური რუკა"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(3)",
+        "tag": "A",
+        "w": 77,
+        "h": 23,
+        "size": 23,
+        "label": "ზოდიაქო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(4)",
+        "tag": "A",
+        "w": 47,
+        "h": 23,
+        "size": 23,
+        "label": "ტარო"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > nav.hidden.items-center > a.shrink-0.whitespace-nowrap:nth-of-type(5)",
+        "tag": "A",
+        "w": 71,
+        "h": 23,
+        "size": 23,
+        "label": "ტესტები"
+      },
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > div.flex.shrink-0 > a.hidden.whitespace-nowrap:nth-of-type(1)",
+        "tag": "A",
+        "w": 63,
+        "h": 23,
+        "size": 23,
+        "label": "შესვლა"
+      }
+    ],
+    "mediumTapTargets": [
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "tag": "A",
+        "w": 24,
+        "h": 41,
+        "size": 24,
+        "label": "EN"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-14.max-w-3xl:nth-of-type(2) > div.space-y-3 > details.group.rounded-2xl:nth-of-type(1) > summary.flex.cursor-pointer",
+        "tag": "SUMMARY",
+        "w": 817,
+        "h": 27,
+        "size": 27,
+        "label": "რა არის ყველაზე თავსებადი ზოდიაქოს ნიშნები? ✦"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-14.max-w-3xl:nth-of-type(2) > div.space-y-3 > details.group.rounded-2xl:nth-of-type(2) > summary.flex.cursor-pointer",
+        "tag": "SUMMARY",
+        "w": 817,
+        "h": 27,
+        "size": 27,
+        "label": "შეუძლია თუ არა ორ არათავსებად ნიშანს წარმატებული ურთიერთობა "
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-14.max-w-3xl:nth-of-type(2) > div.space-y-3 > details.group.rounded-2xl:nth-of-type(3) > summary.flex.cursor-pointer",
+        "tag": "SUMMARY",
+        "w": 817,
+        "h": 27,
+        "size": 27,
+        "label": "რა როლს თამაშობს ასცედენტი თავსებადობაში? ✦"
+      },
+      {
+        "selector": "section.relative.z-10 > section.mt-14.max-w-3xl:nth-of-type(2) > div.space-y-3 > details.group.rounded-2xl:nth-of-type(4) > summary.flex.cursor-pointer",
+        "tag": "SUMMARY",
+        "w": 817,
+        "h": 27,
+        "size": 27,
+        "label": "რა არის სინასტრია და რატომ არის ის მნიშვნელოვანი? ✦"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "tag": "BUTTON",
+        "w": 188,
+        "h": 32,
+        "size": 32,
+        "label": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.flex.min-h-0:nth-of-type(2) > main.relative.isolate > header.sticky.top-0 > div.mx-auto.flex:nth-of-type(1) > a.inline-flex.shrink-0",
+        "tag": "A",
+        "w": 116,
+        "h": 36,
+        "size": 36,
+        "label": "Vivida"
+      },
+      {
+        "selector": "table.w-full.text-xs > tbody > tr:nth-of-type(1) > td.px-1.py-1:nth-of-type(1) > a.grid.h-7",
+        "tag": "A",
+        "w": 70,
+        "h": 36,
+        "size": 36,
+        "label": "ვერძი × ვერძი: გამომწვევი"
+      },
+      {
+        "selector": "table.w-full.text-xs > tbody > tr:nth-of-type(1) > td.px-1.py-1:nth-of-type(2) > a.grid.h-7",
+        "tag": "A",
+        "w": 70,
+        "h": 36,
+        "size": 36,
+        "label": "ვერძი × კურო: გამომწვევი"
+      },
+      {
+        "selector": "table.w-full.text-xs > tbody > tr:nth-of-type(1) > td.px-1.py-1:nth-of-type(3) > a.grid.h-7",
+        "tag": "A",
+        "w": 55,
+        "h": 36,
+        "size": 36,
+        "label": "ვერძი × ტყუპები: ჰარმონიული"
+      },
+      {
+        "selector": "table.w-full.text-xs > tbody > tr:nth-of-type(1) > td.px-1.py-1:nth-of-type(4) > a.grid.h-7",
+        "tag": "A",
+        "w": 70,
+        "h": 36,
+        "size": 36,
+        "label": "ვერძი × კირჩხიბი: გამომწვევი"
+      },
+      {
+        "selector": "table.w-full.text-xs > tbody > tr:nth-of-type(1) > td.px-1.py-1:nth-of-type(5) > a.grid.h-7",
+        "tag": "A",
+        "w": 70,
+        "h": 36,
+        "size": 36,
+        "label": "ვერძი × ლომი: ძლიერი"
+      },
+      {
+        "selector": "table.w-full.text-xs > tbody > tr:nth-of-type(1) > td.px-1.py-1:nth-of-type(6) > a.grid.h-7",
+        "tag": "A",
+        "w": 70,
+        "h": 36,
+        "size": 36,
+        "label": "ვერძი × ქალწული: გამომწვევი"
+      },
+      {
+        "selector": "table.w-full.text-xs > tbody > tr:nth-of-type(1) > td.px-1.py-1:nth-of-type(7) > a.grid.h-7",
+        "tag": "A",
+        "w": 55,
+        "h": 36,
+        "size": 36,
+        "label": "ვერძი × სასწორი: გამომწვევი"
+      },
+      {
+        "selector": "table.w-full.text-xs > tbody > tr:nth-of-type(1) > td.px-1.py-1:nth-of-type(8) > a.grid.h-7",
+        "tag": "A",
+        "w": 70,
+        "h": 36,
+        "size": 36,
+        "label": "ვერძი × მორიელი: გამომწვევი"
+      }
+    ],
+    "inputZoom": [],
+    "tinyText": [
+      {
+        "selector": "main.relative.isolate > header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > span.hidden.uppercase",
+        "fontSize": 11,
+        "text": "41°43′N · 44°47′E"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი · ♌ ლომი · 54%"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.truncate:nth-of-type(1)",
+        "fontSize": 11,
+        "text": "ბოლო მეოთხედი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden.text-\\[var\\(--vivida-gold\\)\\]:nth-of-type(3)",
+        "fontSize": 11,
+        "text": "♌ ლომი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.min-w-0:nth-of-type(1) > a.inline-flex.min-w-0 > span.hidden:nth-of-type(5)",
+        "fontSize": 11,
+        "text": "54%"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > a.inline-flex.h-9",
+        "fontSize": 11,
+        "text": "EN"
+      },
+      {
+        "selector": "header.sticky.top-0 > div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "div.border-t.border-border:nth-of-type(2) > div.mx-auto.flex > div.flex.shrink-0:nth-of-type(2) > button.inline-flex.h-7 > span.hidden",
+        "fontSize": 11,
+        "text": "ყველა ინსტრუმენტი"
+      },
+      {
+        "selector": "footer.relative.z-10 > div.border-t.border-border\\/30:nth-of-type(2) > div.mx-auto.flex > div.flex.flex-col:nth-of-type(1) > span.text-\\[10px\\].font-semibold",
+        "fontSize": 10,
+        "text": "უსაფრთხო გადახდა"
+      }
+    ],
+    "wideImages": [],
+    "fixedOverlays": [
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > a.fixed.left-4",
+        "w": 288,
+        "h": 47,
+        "top": -90,
+        "bottom": -43,
+        "zIndex": "100",
+        "text": "მთავარ კონტენტზე გადასვლა"
+      },
+      {
+        "selector": "html.dark.scroll-smooth > body.min-h-full.flex > button.fixed.bottom-3",
+        "w": 45,
+        "h": 45,
+        "top": 842,
+        "bottom": 887,
+        "zIndex": "90",
+        "text": ""
+      }
+    ],
+    "horizontalScrollers": [],
+    "coveredControls": [],
+    "tabBar": null,
+    "consoleErrors": [],
+    "pageErrors": []
+  }
+]

@@ -181,7 +181,7 @@ function cardCopy(
   drawn: { card: DeckCard; reversed: boolean },
   locale: UserLocale,
 ) {
-  if (locale === "en") {
+  if (locale !== "ka") {
     return englishCardBySlug(drawn.card.slug, drawn.reversed);
   }
   return {
@@ -203,6 +203,17 @@ function fallbackReading(
   const copy = drawn.map((card) => cardCopy(card, locale));
   const perCard = copy.map((card) => card.meaning);
   const [past, present, future] = copy.map((card) => card.name);
+  if (locale === "pl") {
+    return {
+      headline: `W świetle karty ${present}`,
+      cards: perCard,
+      reading:
+        `Trzy karty odpowiadają na Twoje pytanie. ${past} leży u podstaw sytuacji, ${present} określa teraźniejszość, a ${future} otwiera drogę przed Tobą. ` +
+        perCard.join(" "),
+      advice: perCard[1],
+      followupSuggestions: tarotFollowupFallback(locale),
+    };
+  }
   if (locale === "en") {
     return {
       headline: `In the light of ${present}`,
@@ -389,13 +400,17 @@ export async function performReading(
       position: positions[i],
       name: cardCopy(d, locale).name,
       orientation:
-        locale === "en"
+        locale === "pl"
           ? d.reversed
-            ? "reversed"
-            : "upright"
-          : d.reversed
-            ? "შებრუნებული"
-            : "პირდაპირი",
+            ? "odwrócona"
+            : "prosta"
+          : locale === "en"
+            ? d.reversed
+              ? "reversed"
+              : "upright"
+            : d.reversed
+              ? "შებრუნებული"
+              : "პირდაპირი",
       meaning: cardCopy(d, locale).meaning,
     })),
     spreadLogic:

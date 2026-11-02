@@ -1,0 +1,46 @@
+
+=== 390x844: 36 routes (concurrency 2) ===
+[1/36] 390 /feed tap<24 x15 covered x3 (4s)
+[2/36] 390 /dashboard tap<24 x2 covered x1 (4s)
+[3/36] 390 /feed/post-3 tap<24 x3 (7s)
+[4/36] 390 /feed/post-1 tap<24 x9 covered x1 (7s)
+[5/36] 390 /friends?tab=incoming tap<24 x2 (10s)
+[6/36] 390 /friends tap<24 x1 (10s)
+[7/36] 390 /friends?tab=compatibility tap<24 x2 (14s)
+[8/36] 390 /people tap<24 x10 covered x2 (14s)
+[9/36] 390 /messages ok (17s)
+[10/36] 390 /messages?with=22222222-2222-4222-8222-222222222222 tap<24 x1 (17s)
+[11/36] 390 /ask ok (20s)
+[12/36] 390 /discover tap<24 x2 covered x1 (21s)
+[13/36] 390 /account ok (24s)
+[14/36] 390 /credits ok (24s)
+[15/36] 390 /subscription covered x1 (28s)
+[16/36] 390 /library covered x1 (28s)
+[17/36] 390 /library/lib-1 ok (31s)
+[18/36] 390 /library/lib-2 ok (31s)
+[19/36] 390 /synastry ok (34s)
+[20/36] 390 /synastry/new tap<24 x1 covered x3 (35s)
+[21/36] 390 /piradi-horoskopi tap<24 x2 (38s)
+[22/36] 390 /piradi-ruka tap<24 x10 (38s)
+[23/36] 390 /sky covered x1 (42s)
+[24/36] 390 /nataluri-ruka tap<24 x13 (42s)
+[25/36] 390 /timing ok (45s)
+[26/36] 390 /reports covered x1 (45s)
+[27/36] 390 /onboarding/result ok (49s)
+[28/36] 390 /report tap<24 x2 covered x1 (49s)
+[29/36] 390 /post-login tap<24 x2 covered x1 (52s)
+[30/36] 390 /u/nino-audit ok (53s)
+[31/36] 390 /u/luka-audit tap<24 x3 (56s)
+[32/36] 390 /iq-testi/shedegi/iq-audit-1 ok (56s)
+[33/36] 390 /iq-testi/shedegi/iq-audit-2 ok (60s)
+[34/36] 390 /eq-testi/shedegi/eq-audit-1 tap<24 x1 (60s)
+[35/36] 390 /pirovnebis-testi/claim ok (64s)
+[36/36] 390 /big-five/shedegi/bf-audit-1 ok (64s)
+=== 390 done: 36 routes in 64s ===
+[
+  {
+    "width": 390,
+    "height": 844,
+    "count": 36
+  }
+]

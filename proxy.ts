@@ -23,6 +23,75 @@ import {
 const { auth } = NextAuth(authConfig);
 
 /**
+ * Shared application, auth, and API route prefixes on vividaastro.com that do
+ * not carry a `/pl` URL prefix. On these non-indexable/app routes, a visitor
+ * whose `vivida_lang` cookie is `"pl"` receives `x-vivida-locale: pl` so they
+ * stay in Polish through login, signup, onboarding, dashboard, and API calls.
+ */
+const SHARED_APP_PREFIXES = [
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+  "/verify-email",
+  "/post-login",
+  "/unsubscribe",
+  "/onboarding",
+  "/dashboard",
+  "/account",
+  "/report",
+  "/reports",
+  "/synastry",
+  "/ask",
+  "/credits",
+  "/subscription",
+  "/feed",
+  "/messages",
+  "/friends",
+  "/people",
+  "/discover",
+  "/sky",
+  "/library",
+  "/timing",
+  "/test-results",
+  "/relationship",
+  "/u/",
+  "/api/",
+  "/mbti",
+  "/pirovnebis-testi/claim",
+  "/personality-test/claim",
+  "/iq-testi/shedegi",
+  "/iq-test/shedegi",
+  "/eq-testi/shedegi",
+  "/eq-test/shedegi",
+  "/big-five/shedegi",
+] as const;
+
+function isSharedAppPath(pathname: string): boolean {
+  return SHARED_APP_PREFIXES.some(
+    (prefix) =>
+      pathname === prefix ||
+      (prefix.endsWith("/")
+        ? pathname.startsWith(prefix)
+        : pathname.startsWith(`${prefix}/`)),
+  );
+}
+
+function forwardSharedPolishLocale(
+  request: NextRequest,
+): NextResponse | undefined {
+  const host =
+    request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  if (!isEnglishHost(host)) return undefined;
+  if (!isSharedAppPath(request.nextUrl.pathname)) return undefined;
+  if (request.cookies.get("vivida_lang")?.value !== "pl") return undefined;
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-vivida-locale", "pl");
+  return NextResponse.next({ request: { headers: requestHeaders } });
+}
+
+/**
  * Retired Armenian (`/am`) URLs permanently redirect onto the same path
  * without the prefix, so indexed links and bookmarks keep resolving instead
  * of 404ing. Same-host: the Georgian host renders Georgian, the
@@ -73,10 +142,30 @@ function internationalEnglishRouting(
   }
 
   const internalPath = internationalInternalPath(pathname);
-  if (internalPath === pathname) return undefined;
+  const hadPolishCookie = request.cookies.get("vivida_lang")?.value === "pl";
+  if (internalPath === pathname) {
+    if (hadPolishCookie && !isSharedAppPath(pathname)) {
+      const response = NextResponse.next();
+      response.cookies.set("vivida_lang", "en", {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 365,
+        sameSite: "lax",
+      });
+      return response;
+    }
+    return undefined;
+  }
   const destination = request.nextUrl.clone();
   destination.pathname = internalPath;
-  return NextResponse.rewrite(destination);
+  const response = NextResponse.rewrite(destination);
+  if (hadPolishCookie) {
+    response.cookies.set("vivida_lang", "en", {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: "lax",
+    });
+  }
+  return response;
 }
 
 /**
@@ -114,6 +203,7 @@ function internationalPolishRouting(
   });
   response.cookies.set("vivida_lang", "pl", {
     path: "/",
+    maxAge: 60 * 60 * 24 * 365,
     sameSite: "lax",
   });
   return response;
@@ -146,12 +236,23 @@ function signedInLandingRedirect(
   // 307, never 308: whether this visitor is signed in is a property of the
   // request, not of the URL, and a cached permanent redirect would follow the
   // browser into signed-out sessions.
-  return NextResponse.redirect(destination, 307);
+  const response = NextResponse.redirect(destination, 307);
+  if (
+    request.nextUrl.pathname === "/pl" ||
+    request.nextUrl.pathname === "/pl/"
+  ) {
+    response.cookies.set("vivida_lang", "pl", {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: "lax",
+    });
+  }
+  return response;
 }
 
 const protectedProxy = auth((request) => {
   const req = request as NextRequest;
-  return retiredArmenianRedirect(req);
+  return retiredArmenianRedirect(req) ?? forwardSharedPolishLocale(req);
 }) as unknown as NextMiddleware;
 
 /**
@@ -168,6 +269,7 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
     signedInLandingRedirect(request) ??
     retiredArmenianRedirect(request) ??
     internationalPolishRouting(request) ??
+    forwardSharedPolishLocale(request) ??
     internationalEnglishRouting(request)
   );
 }

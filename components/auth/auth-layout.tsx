@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { VividaMark } from "@/components/brand/vivida-mark";
 import { Starfield } from "@/components/landing/starfield";
+import { AppLanguageSwitcher } from "@/components/i18n/international-language-switcher";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 
 /**
@@ -31,12 +32,16 @@ export function AuthLayout({
       <div className="relative z-10 flex flex-1 flex-col">
         <header className="border-b border-border/70">
           <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
-            <Link href="/" className="inline-flex items-center gap-2.5">
+            <Link
+              href={locale === "pl" ? "/pl" : "/"}
+              className="inline-flex items-center gap-2.5"
+            >
               <VividaMark size={30} id="auth-header" />
               <span className="font-display text-2xl font-medium tracking-tight text-foreground">
                 Vivida
               </span>
             </Link>
+            <AppLanguageSwitcher locale={locale} authed={false} />
           </div>
         </header>
 

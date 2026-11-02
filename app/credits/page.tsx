@@ -130,7 +130,7 @@ export default async function CreditsPage({
   // Phone-gift needs a Georgian number: gate by host, not by the stored
   // interface preference (an English-preference account on vivida.ge keeps
   // the card; a Georgian-preference account on vividaastro.com hides it).
-  const hostEn = (await getRequestLocale()) === "en";
+  const hostEn = await requestIsEnglishHost();
   // Stripe is primary on both hosts; the English host additionally offers
   // the USDC crypto rail as an alternative. KA never sees it.
   const cryptoPay = (await requestIsEnglishHost()) && isCryptoPayConfigured();

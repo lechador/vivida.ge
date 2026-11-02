@@ -36,6 +36,7 @@ import { SynastryDisplayPl } from "@/components/synastry/synastry-display-pl";
 import { RelationshipControls } from "@/components/synastry/relationship-controls";
 import { RelationshipWeeklyCard } from "@/components/synastry/relationship-weekly-card";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { getUserLocale } from "@/lib/i18n/user-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -55,10 +56,10 @@ export default async function SynastryDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const locale = await getRequestLocale();
-  const en = locale !== "ka";
   const { id } = await params;
   const user = await requireUser();
+  const locale = await getUserLocale(user.id);
+  const en = locale !== "ka";
   const partner = await getRelationshipPartnerForViewer(id, user.id);
   if (!partner) notFound();
 

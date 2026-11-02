@@ -30,7 +30,7 @@ function isLandingPath(pathname: string, englishHost: boolean): boolean {
   // first; that redirect lands on the English host, where this check fires.
   // Short-circuiting it here would drop an Armenian reader into the Georgian
   // app, since the interface language is decided by host.
-  return englishHost && path === "/am";
+  return englishHost && (path === "/am" || path === "/pl");
 }
 
 /**

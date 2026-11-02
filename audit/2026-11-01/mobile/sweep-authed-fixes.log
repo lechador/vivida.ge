@@ -1,0 +1,24 @@
+
+=== 390x844: 14 routes (concurrency 2) ===
+[1/14] 390 /friends tap<24 x1 (4s)
+[2/14] 390 /friends?tab=incoming tap<24 x2 (4s)
+[3/14] 390 /big-five/shedegi/bf-audit-1 ok (7s)
+[4/14] 390 /report tap<24 x2 covered x1 (8s)
+[5/14] 390 /account ok (11s)
+[6/14] 390 /feed tap<24 x15 covered x3 (11s)
+[7/14] 390 /feed/post-1 tap<24 x9 covered x1 (15s)
+[8/14] 390 /library covered x1 (15s)
+[9/14] 390 /messages?with=22222222-2222-4222-8222-222222222222 tap<24 x1 (18s)
+[10/14] 390 /library/lib-1 ok (18s)
+[11/14] 390 /ask ok (21s)
+[12/14] 390 /people tap<24 x10 covered x2 (21s)
+[13/14] 390 /reports covered x1 (25s)
+[14/14] 390 /synastry/new tap<24 x1 covered x3 (25s)
+=== 390 done: 14 routes in 25s ===
+[
+  {
+    "width": 390,
+    "height": 844,
+    "count": 14
+  }
+]

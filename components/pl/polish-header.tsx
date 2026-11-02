@@ -6,7 +6,7 @@ import { LunarPhaseDisc } from "@/components/brand/celestial-icons";
 import { computeMoonPhase } from "@/lib/moon-phase";
 import { signByIndex } from "@/lib/zodiac";
 import { ObservatoryDrawer } from "@/components/nav/observatory-drawer";
-import { GEORGIAN_SITE_URL, ENGLISH_SITE_URL } from "@/lib/seo/locales";
+import { PublicLanguageSwitcher } from "@/components/i18n/international-language-switcher";
 
 const NAV_ITEMS = [
   { path: "/pl/horoskop-urodzeniowy", label: "Horoskop urodzeniowy" },
@@ -33,7 +33,6 @@ export function PolishHeader({
 }: {
   georgianPath?: string;
 } = {}) {
-  const kaUrl = `${GEORGIAN_SITE_URL}${georgianPath === "/" ? "" : georgianPath}`;
   const moonSnapshot = computeMoonPhase(new Date());
   const illumPct = moonSnapshot
     ? Math.round(moonSnapshot.illumination * 100)
@@ -71,8 +70,13 @@ export function PolishHeader({
           ))}
         </nav>
 
-        {/* Zone 3: Primary CTA */}
-        <div className="flex shrink-0 items-center gap-3">
+        {/* Zone 3: Language Switcher + Primary CTA */}
+        <div className="flex shrink-0 items-center gap-2.5 sm:gap-3">
+          <PublicLanguageSwitcher
+            currentLocale="pl"
+            georgianPath={georgianPath}
+            onEnglishHost={true}
+          />
           <Link
             href="/login"
             className="hidden whitespace-nowrap text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline"
@@ -121,20 +125,6 @@ export function PolishHeader({
           </div>
 
           <div className="flex shrink-0 items-center gap-3">
-            <a
-              href={ENGLISH_SITE_URL}
-              hrefLang="en"
-              className="whitespace-nowrap font-mono text-[11px] font-medium uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
-            >
-              EN
-            </a>
-            <a
-              href={kaUrl}
-              hrefLang="ka-GE"
-              className="whitespace-nowrap font-mono text-[11px] font-medium uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
-            >
-              KA
-            </a>
             <ObservatoryDrawer authed={false} locale="pl" />
           </div>
         </div>

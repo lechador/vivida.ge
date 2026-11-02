@@ -1,0 +1,62 @@
+[
+  {
+    "url": "/",
+    "pattern": "/",
+    "dynamic": false
+  },
+  {
+    "url": "/tavsebadoba",
+    "pattern": "/tavsebadoba",
+    "dynamic": false
+  },
+  {
+    "url": "/tests",
+    "pattern": "/tests",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/datit",
+    "pattern": "/zodiac/datit",
+    "dynamic": false
+  },
+  {
+    "url": "/astrologiuri-saxlebi/1",
+    "pattern": "/astrologiuri-saxlebi/1",
+    "dynamic": false
+  },
+  {
+    "url": "/mbti/intj",
+    "pattern": "/mbti/intj",
+    "dynamic": false
+  },
+  {
+    "url": "/astrologiuri-kalendari",
+    "pattern": "/astrologiuri-kalendari",
+    "dynamic": false
+  },
+  {
+    "url": "/horoskopi",
+    "pattern": "/horoskopi",
+    "dynamic": false
+  },
+  {
+    "url": "/en",
+    "pattern": "/en",
+    "dynamic": false
+  },
+  {
+    "url": "/en/compatibility",
+    "pattern": "/en/compatibility",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/tavsebadoba",
+    "pattern": "/zodiac/tavsebadoba",
+    "dynamic": false
+  },
+  {
+    "url": "/articles",
+    "pattern": "/articles",
+    "dynamic": false
+  }
+]

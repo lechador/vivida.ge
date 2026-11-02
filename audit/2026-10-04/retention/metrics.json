@@ -1,0 +1,525 @@
+{
+  "scope": "registered users with interface_language = 'ka'; anonymous traffic excluded",
+  "source": "production database; aggregate SELECTs only",
+  "readOnly": true,
+  "limitations": [
+    "Includes operator/test accounts if their locale is ka; no PII fetched or manual account exclusion.",
+    "Activity rows indicate an authenticated visit, not a value action or session count.",
+    "date_local is the user profile timezone; dashboard-style Tbilisi cutoffs are used.",
+    "Generated/saved content is not proof of reading.",
+    "Cumulative return 24h-8d is not exact-day D7 retention."
+  ],
+  "results": {
+    "clock": [
+      {
+        "captured_at": "2026-10-04T06:57:46.740Z",
+        "transaction_read_only": "on"
+      }
+    ],
+    "accounts": [
+      {
+        "interface_language": "ka",
+        "accounts": 2006
+      },
+      {
+        "interface_language": "en",
+        "accounts": 8
+      },
+      {
+        "interface_language": "am",
+        "accounts": 7
+      }
+    ],
+    "activity": [
+      {
+        "today_dau_partial": 21,
+        "yesterday_dau": 55,
+        "wau_rolling": 280,
+        "mau_rolling": 831,
+        "active_28d": 795,
+        "ritual_users_28d": 39,
+        "ritual_completions_28d": 55
+      }
+    ],
+    "daily_series": [
+      {
+        "day": "2026-09-05",
+        "active_users": 53,
+        "ritual_users": 1
+      },
+      {
+        "day": "2026-09-06",
+        "active_users": 53,
+        "ritual_users": 3
+      },
+      {
+        "day": "2026-09-07",
+        "active_users": 52,
+        "ritual_users": 3
+      },
+      {
+        "day": "2026-09-08",
+        "active_users": 57,
+        "ritual_users": 2
+      },
+      {
+        "day": "2026-09-09",
+        "active_users": 56,
+        "ritual_users": 2
+      },
+      {
+        "day": "2026-09-10",
+        "active_users": 58,
+        "ritual_users": 4
+      },
+      {
+        "day": "2026-09-11",
+        "active_users": 50,
+        "ritual_users": 0
+      },
+      {
+        "day": "2026-09-12",
+        "active_users": 58,
+        "ritual_users": 3
+      },
+      {
+        "day": "2026-09-13",
+        "active_users": 62,
+        "ritual_users": 3
+      },
+      {
+        "day": "2026-09-14",
+        "active_users": 70,
+        "ritual_users": 2
+      },
+      {
+        "day": "2026-09-15",
+        "active_users": 57,
+        "ritual_users": 0
+      },
+      {
+        "day": "2026-09-16",
+        "active_users": 57,
+        "ritual_users": 4
+      },
+      {
+        "day": "2026-09-17",
+        "active_users": 57,
+        "ritual_users": 3
+      },
+      {
+        "day": "2026-09-18",
+        "active_users": 46,
+        "ritual_users": 4
+      },
+      {
+        "day": "2026-09-19",
+        "active_users": 60,
+        "ritual_users": 2
+      },
+      {
+        "day": "2026-09-20",
+        "active_users": 58,
+        "ritual_users": 2
+      },
+      {
+        "day": "2026-09-21",
+        "active_users": 55,
+        "ritual_users": 1
+      },
+      {
+        "day": "2026-09-22",
+        "active_users": 57,
+        "ritual_users": 0
+      },
+      {
+        "day": "2026-09-23",
+        "active_users": 68,
+        "ritual_users": 6
+      },
+      {
+        "day": "2026-09-24",
+        "active_users": 64,
+        "ritual_users": 3
+      },
+      {
+        "day": "2026-09-25",
+        "active_users": 70,
+        "ritual_users": 1
+      },
+      {
+        "day": "2026-09-26",
+        "active_users": 54,
+        "ritual_users": 1
+      },
+      {
+        "day": "2026-09-27",
+        "active_users": 58,
+        "ritual_users": 0
+      },
+      {
+        "day": "2026-09-28",
+        "active_users": 58,
+        "ritual_users": 1
+      },
+      {
+        "day": "2026-09-29",
+        "active_users": 74,
+        "ritual_users": 1
+      },
+      {
+        "day": "2026-09-30",
+        "active_users": 67,
+        "ritual_users": 1
+      },
+      {
+        "day": "2026-10-01",
+        "active_users": 67,
+        "ritual_users": 0
+      },
+      {
+        "day": "2026-10-02",
+        "active_users": 56,
+        "ritual_users": 2
+      },
+      {
+        "day": "2026-10-03",
+        "active_users": 55,
+        "ritual_users": 1
+      },
+      {
+        "day": "2026-10-04",
+        "active_users": 21,
+        "ritual_users": 2
+      }
+    ],
+    "active_days_distribution": [
+      {
+        "active_days": "1",
+        "users": 512
+      },
+      {
+        "active_days": "2-3",
+        "users": 232
+      },
+      {
+        "active_days": "4-7",
+        "users": 55
+      },
+      {
+        "active_days": "8+",
+        "users": 32
+      }
+    ],
+    "signup_cohorts": [
+      {
+        "week": "2026-08-17",
+        "signups": 17,
+        "profiles_now": 12,
+        "eligible_d1": 17,
+        "returned_d1": 1,
+        "eligible_week1": 17,
+        "returned_week1": 4,
+        "ritual_week1": 3
+      },
+      {
+        "week": "2026-08-24",
+        "signups": 153,
+        "profiles_now": 91,
+        "eligible_d1": 153,
+        "returned_d1": 6,
+        "eligible_week1": 153,
+        "returned_week1": 27,
+        "ritual_week1": 4
+      },
+      {
+        "week": "2026-08-31",
+        "signups": 154,
+        "profiles_now": 87,
+        "eligible_d1": 154,
+        "returned_d1": 4,
+        "eligible_week1": 154,
+        "returned_week1": 21,
+        "ritual_week1": 0
+      },
+      {
+        "week": "2026-09-07",
+        "signups": 169,
+        "profiles_now": 96,
+        "eligible_d1": 169,
+        "returned_d1": 12,
+        "eligible_week1": 169,
+        "returned_week1": 28,
+        "ritual_week1": 4
+      },
+      {
+        "week": "2026-09-14",
+        "signups": 164,
+        "profiles_now": 89,
+        "eligible_d1": 164,
+        "returned_d1": 9,
+        "eligible_week1": 164,
+        "returned_week1": 16,
+        "ritual_week1": 2
+      },
+      {
+        "week": "2026-09-21",
+        "signups": 189,
+        "profiles_now": 124,
+        "eligible_d1": 189,
+        "returned_d1": 12,
+        "eligible_week1": 145,
+        "returned_week1": 22,
+        "ritual_week1": 1
+      },
+      {
+        "week": "2026-09-28",
+        "signups": 170,
+        "profiles_now": 108,
+        "eligible_d1": 121,
+        "returned_d1": 8,
+        "eligible_week1": 0,
+        "returned_week1": 0,
+        "ritual_week1": 0
+      }
+    ],
+    "ritual_repeat": [
+      {
+        "ritual_users": 39,
+        "users_2plus_completions": 8,
+        "users_7plus_completions": 0
+      }
+    ],
+    "credit_economy": [
+      {
+        "free_issued": 22755,
+        "purchased_issued": 405,
+        "spent": 5390,
+        "spending_users": 384,
+        "credit_buyers": 10
+      }
+    ],
+    "credit_reasons": [
+      {
+        "reason": "signup_bonus",
+        "transactions": 724,
+        "users": 724,
+        "credits": 10750
+      },
+      {
+        "reason": "monthly_bonus",
+        "transactions": 1933,
+        "users": 1933,
+        "credits": 9665
+      },
+      {
+        "reason": "spend_tarot",
+        "transactions": 686,
+        "users": 405,
+        "credits": -3130
+      },
+      {
+        "reason": "admin_grant",
+        "transactions": 1,
+        "users": 1,
+        "credits": 1000
+      },
+      {
+        "reason": "spend_chat",
+        "transactions": 543,
+        "users": 78,
+        "credits": -989
+      },
+      {
+        "reason": "spend_report",
+        "transactions": 95,
+        "users": 94,
+        "credits": -558
+      },
+      {
+        "reason": "referral",
+        "transactions": 48,
+        "users": 2,
+        "credits": 480
+      },
+      {
+        "reason": "purchase",
+        "transactions": 12,
+        "users": 10,
+        "credits": 405
+      },
+      {
+        "reason": "first_return_bonus",
+        "transactions": 81,
+        "users": 81,
+        "credits": 405
+      },
+      {
+        "reason": "spend_tarot_followup",
+        "transactions": 151,
+        "users": 67,
+        "credits": -345
+      },
+      {
+        "reason": "earn_profile_photo",
+        "transactions": 84,
+        "users": 81,
+        "credits": 252
+      },
+      {
+        "reason": "earn_phone_verify",
+        "transactions": 20,
+        "users": 20,
+        "credits": 200
+      },
+      {
+        "reason": "spend_weekly",
+        "transactions": 11,
+        "users": 11,
+        "credits": -110
+      },
+      {
+        "reason": "spend_iq",
+        "transactions": 14,
+        "users": 13,
+        "credits": -70
+      },
+      {
+        "reason": "spend_mbti",
+        "transactions": 13,
+        "users": 12,
+        "credits": -65
+      },
+      {
+        "reason": "spend_synastry",
+        "transactions": 45,
+        "users": 35,
+        "credits": -65
+      },
+      {
+        "reason": "spend_bigfive",
+        "transactions": 5,
+        "users": 5,
+        "credits": -25
+      },
+      {
+        "reason": "spend_dream",
+        "transactions": 9,
+        "users": 4,
+        "credits": -18
+      },
+      {
+        "reason": "spend_eq",
+        "transactions": 3,
+        "users": 3,
+        "credits": -15
+      },
+      {
+        "reason": "earn_feed_post",
+        "transactions": 3,
+        "users": 3,
+        "credits": 3
+      }
+    ],
+    "saved_results": [
+      {
+        "kind": "daily",
+        "generated_entries": 15663,
+        "users": 911,
+        "favorites": 0,
+        "noted_entries": 1
+      },
+      {
+        "kind": "ai",
+        "generated_entries": 938,
+        "users": 203,
+        "favorites": 0,
+        "noted_entries": 0
+      },
+      {
+        "kind": "tarot",
+        "generated_entries": 736,
+        "users": 406,
+        "favorites": 0,
+        "noted_entries": 1
+      },
+      {
+        "kind": "weekly",
+        "generated_entries": 326,
+        "users": 130,
+        "favorites": 0,
+        "noted_entries": 0
+      },
+      {
+        "kind": "report",
+        "generated_entries": 99,
+        "users": 95,
+        "favorites": 0,
+        "noted_entries": 0
+      }
+    ],
+    "recorded_actions": [
+      {
+        "feature": "ask_user_turn",
+        "records": 938,
+        "users": 203
+      },
+      {
+        "feature": "feed_post",
+        "records": 4,
+        "users": 2
+      },
+      {
+        "feature": "feed_comment",
+        "records": 0,
+        "users": 0
+      },
+      {
+        "feature": "direct_message",
+        "records": 3,
+        "users": 2
+      }
+    ],
+    "push_adoption": [
+      {
+        "subscribed_users": 65,
+        "subscribed_active_30d": 41
+      }
+    ],
+    "reminder_funnel": [
+      {
+        "topic": "relationship",
+        "channel": "in_app",
+        "status": "sent",
+        "deliveries": 33,
+        "users": 5,
+        "value_completed": 12
+      },
+      {
+        "topic": "relationship",
+        "channel": "push",
+        "status": "failed",
+        "deliveries": 33,
+        "users": 5,
+        "value_completed": 0
+      },
+      {
+        "topic": "timing",
+        "channel": "email",
+        "status": "sent",
+        "deliveries": 5,
+        "users": 1,
+        "value_completed": 3
+      },
+      {
+        "topic": "timing",
+        "channel": "in_app",
+        "status": "sent",
+        "deliveries": 5,
+        "users": 1,
+        "value_completed": 3
+      }
+    ]
+  },
+  "finishedAt": "2026-10-04T06:57:51.208Z"
+}

@@ -1,0 +1,87 @@
+[
+  {
+    "url": "/",
+    "pattern": "/",
+    "dynamic": false
+  },
+  {
+    "url": "/horoskopi",
+    "pattern": "/horoskopi",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/aries",
+    "pattern": "/zodiac/aries",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/datit",
+    "pattern": "/zodiac/datit",
+    "dynamic": false
+  },
+  {
+    "url": "/tests",
+    "pattern": "/tests",
+    "dynamic": false
+  },
+  {
+    "url": "/taro/the-magician",
+    "pattern": "/taro/the-magician",
+    "dynamic": false
+  },
+  {
+    "url": "/privacy",
+    "pattern": "/privacy",
+    "dynamic": false
+  },
+  {
+    "url": "/astrologiuri-saxlebi",
+    "pattern": "/astrologiuri-saxlebi",
+    "dynamic": false
+  },
+  {
+    "url": "/tavsebadoba",
+    "pattern": "/tavsebadoba",
+    "dynamic": false
+  },
+  {
+    "url": "/nataluri-ruka",
+    "pattern": "/nataluri-ruka",
+    "dynamic": false
+  },
+  {
+    "url": "/mbti/intj",
+    "pattern": "/mbti/intj",
+    "dynamic": false
+  },
+  {
+    "url": "/en",
+    "pattern": "/en",
+    "dynamic": false
+  },
+  {
+    "url": "/en/readings",
+    "pattern": "/en/readings",
+    "dynamic": false
+  },
+  {
+    "url": "/savse-mtvare",
+    "pattern": "/savse-mtvare",
+    "dynamic": false
+  },
+  {
+    "url": "/numerologia",
+    "pattern": "/numerologia",
+    "dynamic": false
+  },
+  {
+    "url": "/articles",
+    "pattern": "/articles",
+    "dynamic": false
+  },
+  {
+    "url": "/zodiac/tavsebadoba",
+    "pattern": "/zodiac/tavsebadoba",
+    "dynamic": false
+  }
+]

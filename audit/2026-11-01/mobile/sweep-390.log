@@ -1,0 +1,396 @@
+
+=== 390x844: 158 routes (concurrency 3) ===
+[1/158] 390 /akhali-mtvare tap<24 x2 (11s)
+[2/158] 390 / tap<24 x15 zoom x2 (12s)
+[3/158] 390 /account tap<24 x15 zoom x2 (12s)
+[4/158] 390 /akhali-mtvare/2026-11-09 tap<24 x2 (14s)
+[5/158] 390 /akhali-mtvare/2026-11-20 HTTP404 (14s)
+[6/158] 390 /akhali-mtvare/2026-12-09 tap<24 x2 (14s)
+[7/158] 390 /angeluri-ricxvebi tap<24 x3 (16s)
+[8/158] 390 /angeluri-ricxvebi/000 tap<24 x4 (17s)
+[9/158] 390 /angeluri-ricxvebi/111 tap<24 x4 (17s)
+[10/158] 390 /articles/mze-mtvare-ascedenti-natalur-rukashi tap<24 x9 (20s)
+[11/158] 390 /articles/piradi-sivrce-urtiertobashi tap<24 x9 (20s)
+[12/158] 390 /articles tap<24 x15 (20s)
+[13/158] 390 /ask tap<24 x2 (22s)
+[14/158] 390 /astrologiuri-kalendari/2026-11-01 tap<24 x2 (23s)
+[15/158] 390 /astrologiuri-kalendari tap<24 x2 (23s)
+[16/158] 390 /astrologiuri-kalendari/2026-11-02 tap<24 x2 (25s)
+[17/158] 390 /astrologiuri-saxlebi/1 tap<24 x5 (25s)
+[18/158] 390 /astrologiuri-saxlebi tap<24 x4 (25s)
+[19/158] 390 /astrologiuri-saxlebi/2 tap<24 x5 (27s)
+[20/158] 390 /big-five/shedegi tap<24 x2 (27s)
+[21/158] 390 /big-five tap<24 x2 (27s)
+[22/158] 390 /big-five/shedegi/sample tap<24 x15 zoom x2 (30s)
+[23/158] 390 /chinuri-horoskopi tap<24 x3 (30s)
+[24/158] 390 /chinuri-horoskopi/dragon tap<24 x3 (30s)
+[25/158] 390 /credits tap<24 x2 (32s)
+[26/158] 390 /chinuri-horoskopi/ox tap<24 x3 (33s)
+[27/158] 390 /chinuri-horoskopi/rat tap<24 x3 (33s)
+[28/158] 390 /dabnelebebi tap<24 x2 (34s)
+[29/158] 390 /dabnelebebi/2026-08-12-mzis-sruli-dabneleba tap<24 x2 (35s)
+[30/158] 390 /dabnelebebi/2026-08-28-mtvaris-nawilobrivi-dabneleba tap<24 x2 (35s)
+[31/158] 390 /dabnelebebi/mze-mtvare HTTP404 (36s)
+[32/158] 390 /dashboard tap<24 x15 zoom x2 (38s)
+[33/158] 390 /discover tap<24 x15 zoom x2 (38s)
+[34/158] 390 /emociuri-inteleqti tap<24 x2 (39s)
+[35/158] 390 /emociuri-inteleqti/rogor-avimaghlo-empathia tap<24 x2 (40s)
+[36/158] 390 /emociuri-inteleqti/ra-aris-emociuri-inteleqti tap<24 x2 (40s)
+[37/158] 390 /en tap<24 x14 (41s)
+[38/158] 390 /en/about tap<24 x3 (42s)
+[39/158] 390 /en/compatibility tap<24 x5 zoom x2 (42s)
+[40/158] 390 /en/horoscope tap<24 x3 (43s)
+[41/158] 390 /en/natal-chart tap<24 x8 (45s)
+[42/158] 390 /en/privacy tap<24 x3 (45s)
+[43/158] 390 /en/readings tap<24 x3 zoom x1 (46s)
+[44/158] 390 /en/terms tap<24 x3 (47s)
+[45/158] 390 /en/tests tap<24 x3 (47s)
+[46/158] 390 /en/zodiac tap<24 x3 (48s)
+[47/158] 390 /eq-testi/shedegi tap<24 x2 (49s)
+[48/158] 390 /eq-testi tap<24 x2 (49s)
+[49/158] 390 /eq-testi/shedegi/sample tap<24 x15 zoom x2 (51s)
+[50/158] 390 /features tap<24 x2 (51s)
+[51/158] 390 /feed tap<24 x15 zoom x2 (52s)
+[52/158] 390 /feed/sample tap<24 x15 zoom x2 (53s)
+[53/158] 390 /finansuri-horoskopi tap<24 x3 (54s)
+[54/158] 390 /finansuri-horoskopi/aries tap<24 x2 (54s)
+[55/158] 390 /finansuri-horoskopi/taurus tap<24 x2 (56s)
+[56/158] 390 /forgot-password tap<24 x1 (56s)
+[57/158] 390 /friends tap<24 x15 zoom x2 (57s)
+[58/158] 390 /frtxili-dgheebi tap<24 x2 (58s)
+[59/158] 390 /horoskopi tap<24 x15 (58s)
+[60/158] 390 /horoskopi/kvireuli tap<24 x4 (59s)
+[61/158] 390 /horoskopi/tviuri tap<24 x4 (60s)
+[62/158] 390 /how-it-works tap<24 x2 (61s)
+[63/158] 390 /ighbliani-dgheebi tap<24 x2 (61s)
+[64/158] 390 /iq-testi/shedegi tap<24 x2 (63s)
+[65/158] 390 /iq-testi tap<24 x2 (63s)
+[66/158] 390 /iq-testi/shedegi/sample tap<24 x15 zoom x2 (64s)
+[67/158] 390 /karieris-horoskopi/aries tap<24 x2 (65s)
+[68/158] 390 /karieris-horoskopi tap<24 x3 (65s)
+[69/158] 390 /karieris-horoskopi/taurus tap<24 x2 (66s)
+[70/158] 390 /library tap<24 x2 (67s)
+[71/158] 390 /library/sample tap<24 x2 (67s)
+[72/158] 390 /login tap<24 x2 (68s)
+[73/158] 390 /mbti tap<24 x2 (69s)
+[74/158] 390 /mbti/intj tap<24 x5 (70s)
+[75/158] 390 /mbti/isfj tap<24 x5 (71s)
+[76/158] 390 /mbti/istj tap<24 x5 (72s)
+[77/158] 390 /merkuri-retrogradi tap<24 x3 (74s)
+[78/158] 390 /mijachvulobis-testi tap<24 x2 (75s)
+[79/158] 390 /messages tap<24 x15 zoom x2 (75s)
+[80/158] 390 /mkitxaoba tap<24 x3 (77s)
+[81/158] 390 /nataluri-ruka tap<24 x13 (77s)
+[82/158] 390 /mtvaris-kalendari tap<24 x3 (79s)
+[83/158] 390 /numerologia tap<24 x6 zoom x1 (80s)
+[84/158] 390 /numerologia/1 tap<24 x4 (80s)
+[85/158] 390 /numerologia/2 tap<24 x4 (82s)
+[86/158] 390 /numerologia/7 tap<24 x4 (82s)
+[87/158] 390 /onboarding tap<24 x15 zoom x2 (83s)
+[88/158] 390 /onboarding/result tap<24 x15 zoom x2 (84s)
+[89/158] 390 /piradi-horoskopi tap<24 x2 (86s)
+[90/158] 390 /people tap<24 x15 zoom x2 (86s)
+[91/158] 390 /piradi-ruka tap<24 x10 (87s)
+[92/158] 390 /piradi-ruka/rogor-shevadginot tap<24 x2 (88s)
+[93/158] 390 /pirovnebis-testi tap<24 x2 (90s)
+[94/158] 390 /pirovnebis-testi/claim tap<24 x2 (90s)
+[95/158] 390 /planetebi tap<24 x4 (92s)
+[96/158] 390 /planetebi/mze tap<24 x5 (93s)
+[97/158] 390 /planetebi/mtvare tap<24 x5 (93s)
+[98/158] 390 /post-login tap<24 x15 zoom x2 (96s)
+[99/158] 390 /privacy tap<24 x2 (96s)
+[100/158] 390 /quiz/namdvili-nishani tap<24 x2 (97s)
+[101/158] 390 /quiz/varskvlavebis-zodiaqo tap<24 x2 (100s)
+[102/158] 390 /relationship/invite/sample ERR (104s)
+    Error: page.goto: net::ERR_EMPTY_RESPONSE at http://127.0.0.1:3100/relationship/invite/sample
+Call log:
+  - navigating to "http://127.0.0.1:3100/relationship/invite/sample", waiting until "domcontentloaded"
+
+[103/158] 390 /r/sample ERR (104s)
+    Error: page.goto: net::ERR_EMPTY_RESPONSE at http://127.0.0.1:3100/r/sample
+Call log:
+  - navigating to "http://127.0.0.1:3100/r/sample", waiting until "domcontentloaded"
+
+[104/158] 390 /report ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/report
+Call log:
+  - navigating to "http://127.0.0.1:3100/report", waiting until "domcontentloaded"
+
+[105/158] 390 /reset-password ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/reset-password
+Call log:
+  - navigating to "http://127.0.0.1:3100/reset-password", waiting until "domcontentloaded"
+
+[106/158] 390 /reports/sample ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/reports/sample
+Call log:
+  - navigating to "http://127.0.0.1:3100/reports/sample", waiting until "domcontentloaded"
+
+[107/158] 390 /reports ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/reports
+Call log:
+  - navigating to "http://127.0.0.1:3100/reports", waiting until "domcontentloaded"
+
+[108/158] 390 /savse-mtvare ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/savse-mtvare
+Call log:
+  - navigating to "http://127.0.0.1:3100/savse-mtvare", waiting until "domcontentloaded"
+
+[109/158] 390 /savse-mtvare/2026-11-24 ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/savse-mtvare/2026-11-24
+Call log:
+  - navigating to "http://127.0.0.1:3100/savse-mtvare/2026-11-24", waiting until "domcontentloaded"
+
+[110/158] 390 /savse-mtvare/2026-11-05 ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/savse-mtvare/2026-11-05
+Call log:
+  - navigating to "http://127.0.0.1:3100/savse-mtvare/2026-11-05", waiting until "domcontentloaded"
+
+[111/158] 390 /siyvarulis-horoskopi ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/siyvarulis-horoskopi
+Call log:
+  - navigating to "http://127.0.0.1:3100/siyvarulis-horoskopi", waiting until "domcontentloaded"
+
+[112/158] 390 /signup ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/signup
+Call log:
+  - navigating to "http://127.0.0.1:3100/signup", waiting until "domcontentloaded"
+
+[113/158] 390 /savse-mtvare/2026-12-24 ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/savse-mtvare/2026-12-24
+Call log:
+  - navigating to "http://127.0.0.1:3100/savse-mtvare/2026-12-24", waiting until "domcontentloaded"
+
+[114/158] 390 /siyvarulis-horoskopi/aries ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/siyvarulis-horoskopi/aries
+Call log:
+  - navigating to "http://127.0.0.1:3100/siyvarulis-horoskopi/aries", waiting until "domcontentloaded"
+
+[115/158] 390 /sizmris-akhsna ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/sizmris-akhsna
+Call log:
+  - navigating to "http://127.0.0.1:3100/sizmris-akhsna", waiting until "domcontentloaded"
+
+[116/158] 390 /siyvarulis-horoskopi/taurus ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/siyvarulis-horoskopi/taurus
+Call log:
+  - navigating to "http://127.0.0.1:3100/siyvarulis-horoskopi/taurus", waiting until "domcontentloaded"
+
+[117/158] 390 /sizmris-akhsna/gveli ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/sizmris-akhsna/gveli
+Call log:
+  - navigating to "http://127.0.0.1:3100/sizmris-akhsna/gveli", waiting until "domcontentloaded"
+
+[118/158] 390 /sizmris-akhsna/wyali ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/sizmris-akhsna/wyali
+Call log:
+  - navigating to "http://127.0.0.1:3100/sizmris-akhsna/wyali", waiting until "domcontentloaded"
+
+[119/158] 390 /sky ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/sky
+Call log:
+  - navigating to "http://127.0.0.1:3100/sky", waiting until "domcontentloaded"
+
+[120/158] 390 /subscription ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/subscription
+Call log:
+  - navigating to "http://127.0.0.1:3100/subscription", waiting until "domcontentloaded"
+
+[121/158] 390 /synastry/new ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/synastry/new
+Call log:
+  - navigating to "http://127.0.0.1:3100/synastry/new", waiting until "domcontentloaded"
+
+[122/158] 390 /synastry ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/synastry
+Call log:
+  - navigating to "http://127.0.0.1:3100/synastry", waiting until "domcontentloaded"
+
+[123/158] 390 /taro/the-fool ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/taro/the-fool
+Call log:
+  - navigating to "http://127.0.0.1:3100/taro/the-fool", waiting until "domcontentloaded"
+
+[124/158] 390 /taro ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/taro
+Call log:
+  - navigating to "http://127.0.0.1:3100/taro", waiting until "domcontentloaded"
+
+[125/158] 390 /synastry/sample ERR (104s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/synastry/sample
+Call log:
+  - navigating to "http://127.0.0.1:3100/synastry/sample", waiting until "domcontentloaded"
+
+[126/158] 390 /terms ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/terms
+Call log:
+  - navigating to "http://127.0.0.1:3100/terms", waiting until "domcontentloaded"
+
+[127/158] 390 /tavsebadoba ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/tavsebadoba
+Call log:
+  - navigating to "http://127.0.0.1:3100/tavsebadoba", waiting until "domcontentloaded"
+
+[128/158] 390 /taro/the-magician ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/taro/the-magician
+Call log:
+  - navigating to "http://127.0.0.1:3100/taro/the-magician", waiting until "domcontentloaded"
+
+[129/158] 390 /timing ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/timing
+Call log:
+  - navigating to "http://127.0.0.1:3100/timing", waiting until "domcontentloaded"
+
+[130/158] 390 /tests ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/tests
+Call log:
+  - navigating to "http://127.0.0.1:3100/tests", waiting until "domcontentloaded"
+
+[131/158] 390 /test-results/sample ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/test-results/sample
+Call log:
+  - navigating to "http://127.0.0.1:3100/test-results/sample", waiting until "domcontentloaded"
+
+[132/158] 390 /uk ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/uk
+Call log:
+  - navigating to "http://127.0.0.1:3100/uk", waiting until "domcontentloaded"
+
+[133/158] 390 /u/vivida ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/u/vivida
+Call log:
+  - navigating to "http://127.0.0.1:3100/u/vivida", waiting until "domcontentloaded"
+
+[134/158] 390 /tvit-shepasebis-testi ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/tvit-shepasebis-testi
+Call log:
+  - navigating to "http://127.0.0.1:3100/tvit-shepasebis-testi", waiting until "domcontentloaded"
+
+[135/158] 390 /zodiac ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac", waiting until "domcontentloaded"
+
+[136/158] 390 /unsubscribe ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/unsubscribe
+Call log:
+  - navigating to "http://127.0.0.1:3100/unsubscribe", waiting until "domcontentloaded"
+
+[137/158] 390 /verify-email ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/verify-email
+Call log:
+  - navigating to "http://127.0.0.1:3100/verify-email", waiting until "domcontentloaded"
+
+[138/158] 390 /zodiac/amomavali/taurus ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/amomavali/taurus
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/amomavali/taurus", waiting until "domcontentloaded"
+
+[139/158] 390 /zodiac/amomavali ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/amomavali
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/amomavali", waiting until "domcontentloaded"
+
+[140/158] 390 /zodiac/amomavali/aries ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/amomavali/aries
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/amomavali/aries", waiting until "domcontentloaded"
+
+[141/158] 390 /zodiac/aries ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/aries
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/aries", waiting until "domcontentloaded"
+
+[142/158] 390 /zodiac/aries/dghes ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/aries/dghes
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/aries/dghes", waiting until "domcontentloaded"
+
+[143/158] 390 /zodiac/aries/2026 ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/aries/2026
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/aries/2026", waiting until "domcontentloaded"
+
+[144/158] 390 /zodiac/datit ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/datit
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/datit", waiting until "domcontentloaded"
+
+[145/158] 390 /zodiac/elementebi ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/elementebi
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/elementebi", waiting until "domcontentloaded"
+
+[146/158] 390 /zodiac/elementebi/earth ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/elementebi/earth
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/elementebi/earth", waiting until "domcontentloaded"
+
+[147/158] 390 /zodiac/gemini ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/gemini
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/gemini", waiting until "domcontentloaded"
+
+[148/158] 390 /zodiac/elementebi/fire ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/elementebi/fire
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/elementebi/fire", waiting until "domcontentloaded"
+
+[149/158] 390 /zodiac/gzamkvlevi ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/gzamkvlevi
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/gzamkvlevi", waiting until "domcontentloaded"
+
+[150/158] 390 /zodiac/mtvare/aries ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/mtvare/aries
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/mtvare/aries", waiting until "domcontentloaded"
+
+[151/158] 390 /zodiac/mtvare ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/mtvare
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/mtvare", waiting until "domcontentloaded"
+
+[152/158] 390 /zodiac/mtvare/taurus ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/mtvare/taurus
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/mtvare/taurus", waiting until "domcontentloaded"
+
+[153/158] 390 /zodiac/reitingebi/tavsebadi ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/reitingebi/tavsebadi
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/reitingebi/tavsebadi", waiting until "domcontentloaded"
+
+[154/158] 390 /zodiac/reitingebi/romantiuli ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/reitingebi/romantiuli
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/reitingebi/romantiuli", waiting until "domcontentloaded"
+
+[155/158] 390 /zodiac/reitingebi ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/reitingebi
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/reitingebi", waiting until "domcontentloaded"
+
+[156/158] 390 /zodiac/tavsebadoba/aries-gemini ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/tavsebadoba/aries-gemini
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/tavsebadoba/aries-gemini", waiting until "domcontentloaded"
+
+[157/158] 390 /zodiac/tavsebadoba/aries-aries ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/tavsebadoba/aries-aries
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/tavsebadoba/aries-aries", waiting until "domcontentloaded"
+
+[158/158] 390 /zodiac/tavsebadoba ERR (105s)
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3100/zodiac/tavsebadoba
+Call log:
+  - navigating to "http://127.0.0.1:3100/zodiac/tavsebadoba", waiting until "domcontentloaded"
+
+=== 390 done: 158 routes in 105s ===
+[
+  {
+    "width": 390,
+    "height": 844,
+    "count": 158
+  }
+]

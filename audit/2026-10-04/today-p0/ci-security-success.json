@@ -1,0 +1,103 @@
+{
+  "run_id": 37216708011,
+  "commit": "d0d574ad8244975376411ac908a54993c3fcce8e",
+  "status": "completed",
+  "conclusion": "success",
+  "url": "https://github.com/lechador/vivida.ge/actions/runs/37216708011",
+  "jobs": [
+    {
+      "name": "quality",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Initialize containers",
+          "conclusion": "success"
+        },
+        {
+          "name": "Check out repository",
+          "conclusion": "success"
+        },
+        {
+          "name": "Set up Node.js",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Audit production dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Check env coverage",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint",
+          "conclusion": "success"
+        },
+        {
+          "name": "Type-check",
+          "conclusion": "success"
+        },
+        {
+          "name": "Apply database migrations",
+          "conclusion": "success"
+        },
+        {
+          "name": "Test",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Playwright browser",
+          "conclusion": "success"
+        },
+        {
+          "name": "End-to-end smoke tests",
+          "conclusion": "success"
+        },
+        {
+          "name": "Upload Playwright failure reports",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Lighthouse performance budgets",
+          "conclusion": "success"
+        },
+        {
+          "name": "Check Lighthouse report integrity",
+          "conclusion": "success"
+        },
+        {
+          "name": "Upload Lighthouse reports",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Set up Node.js",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Check out repository",
+          "conclusion": "success"
+        },
+        {
+          "name": "Stop containers",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+> vivida.ge@0.1.0 check
+> npm run check:env && npm run lint && npm run typecheck
+
+
+> vivida.ge@0.1.0 check:env
+> node scripts/check-env.mjs
+
+OK — 50 env keys used, all documented in .env.example.
+
+> vivida.ge@0.1.0 lint
+> eslint
+
+
+> vivida.ge@0.1.0 typecheck
+> tsc --noEmit
+
+
+ RUN  v4.1.10 /Users/giviendeladze/.hermes/cache/scratch/vivida-today-p0-spark-20261004
+
+
+ Test Files  114 passed | 2 skipped (116)
+      Tests  532 passed | 8 skipped (540)
+   Start at  18:14:49
+   Duration  9.30s (transform 4.98s, setup 0ms, import 20.12s, tests 15.98s, environment 9ms)

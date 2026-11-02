@@ -1,0 +1,17 @@
+!!! CONTRIBUTOR TIER — TRAINS ON YOUR DATA !!!
+
+This is Meta's contributor tier. Selecting it permits Meta to use your
+prompts and completions to train future Meta models.
+
+See current pricing and rate limits for the Meta Model API here:
+  https://dev.meta.ai/docs/pricing-rate-limits/
+
+It lowers the barrier to entry for prototyping, testing integrations, and
+scaling experiments where training on your data is acceptable. Do NOT use it
+for confidential, proprietary, personal, or otherwise sensitive data. For the
+same model with no training on your data, select the standard variant
+(without the -contributor suffix).
+
+Confirm only if training on your prompts and completions is acceptable.
+To acknowledge data-training tiers for unattended runs, set security.allow_data_training_tiers_noninteractive to true in config.yaml.
+Refusing this startup model override in non-interactive mode. Run interactively and confirm if you intend to use it.

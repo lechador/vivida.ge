@@ -1,0 +1,229 @@
+
+> vivida.ge@0.1.0 build
+> next build
+
+▲ Next.js 16.3.5 (Turbopack)
+✓ Running next.config.ts took 382ms
+- Experiments (use with caution):
+  · clientTraceMetadata
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 10.7s
+  Running next.config.js provided runAfterProductionCompile ...
+✓ Completed runAfterProductionCompile in 310ms
+  Running TypeScript ...
+  Finished TypeScript in 14.0s ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/673) ...
+  Generating static pages using 9 workers (168/673) 
+  Generating static pages using 9 workers (336/673) 
+  Generating static pages using 9 workers (504/673) 
+✓ Generating static pages using 9 workers (673/673) in 1138ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ƒ /_not-found
+├ ƒ /account
+├ ƒ /akhali-mtvare
+├ ƒ /akhali-mtvare/[date]
+├ ƒ /angeluri-ricxvebi
+├ ƒ /angeluri-ricxvebi/[number]
+├ ƒ /api/admin/article-images
+├ ƒ /api/admin/emails/send
+├ ƒ /api/admin/quiz-assets/zodiac-famous
+├ ƒ /api/articles/[id]/comments
+├ ƒ /api/articles/[id]/like
+├ ƒ /api/ask
+├ ƒ /api/ask/memory
+├ ƒ /api/auth/[...nextauth]
+├ ƒ /api/auth/verify-email
+├ ƒ /api/avatar/generate
+├ ƒ /api/big-five/submit
+├ ƒ /api/billing/session
+├ ƒ /api/calendar/[token]
+├ ƒ /api/chat/bootstrap
+├ ƒ /api/credits/checkout
+├ ƒ /api/credits/unlock
+├ ƒ /api/cron/ask-nudges
+├ ƒ /api/cron/daily-horoscope
+├ ƒ /api/cron/daily-horoscope-retry
+├ ƒ /api/cron/feed-notification-emails
+├ ƒ /api/cron/monthly-credits
+├ ƒ /api/cron/personal-reminders
+├ ƒ /api/cron/relationship-updates
+├ ƒ /api/dev/birthday-test
+├ ƒ /api/dev/report-pdf
+├ ƒ /api/dreams/interpret
+├ ƒ /api/eq/submit
+├ ƒ /api/experiments/[experiment]
+├ ƒ /api/geocode
+├ ƒ /api/iq/submit
+├ ƒ /api/messages
+├ ƒ /api/messages/poll
+├ ƒ /api/messages/stream
+├ ƒ /api/og/chart
+├ ƒ /api/og/page
+├ ƒ /api/photos/[id]
+├ ƒ /api/photos/[id]/finalize
+├ ƒ /api/photos/[id]/promote
+├ ƒ /api/photos/upload-url
+├ ƒ /api/public/geocode
+├ ƒ /api/public/horoscope-subscribe
+├ ƒ /api/public/natal
+├ ƒ /api/push/subscribe
+├ ƒ /api/push/test
+├ ƒ /api/push/unsubscribe
+├ ƒ /api/pwa/open
+├ ƒ /api/reports/[id]
+├ ƒ /api/reports/[id]/download
+├ ƒ /api/reports/[id]/email
+├ ƒ /api/reports/checkout
+├ ƒ /api/search
+├ ƒ /api/stripe/webhook
+├ ƒ /api/subscription/cancel
+├ ƒ /api/subscription/checkout
+├ ƒ /api/subscription/portal
+├ ƒ /api/synastry/[id]/deep
+├ ƒ /api/tarot/followup
+├ ƒ /api/tarot/history
+├ ƒ /api/tarot/reading
+├ ƒ /api/test-visibility
+├ ƒ /api/users/search
+├ ○ /apple-icon.png
+├ ƒ /articles
+├ ƒ /articles/[slug]
+├ ƒ /articles/feed.xml
+├ ƒ /ask
+├ ƒ /astrologiuri-kalendari
+├ ƒ /astrologiuri-kalendari/[date]
+├ ƒ /astrologiuri-saxlebi
+├ ƒ /astrologiuri-saxlebi/[number]
+├ ƒ /big-five
+├ ƒ /big-five/shedegi
+├ ƒ /big-five/shedegi/[id]
+├ ƒ /chinuri-horoskopi
+├ ƒ /chinuri-horoskopi/[animal]
+├ ƒ /credits
+├ ƒ /dabnelebebi
+├ ƒ /dabnelebebi/[slug]
+├ ƒ /dashboard
+├ ƒ /discover
+├ ƒ /emociuri-inteleqti
+├ ƒ /emociuri-inteleqti/[slug]
+├ ƒ /en
+├ ƒ /en/about
+├ ƒ /en/compatibility
+├ ƒ /en/horoscope
+├ ƒ /en/natal-chart
+├ ƒ /en/privacy
+├ ƒ /en/terms
+├ ƒ /en/tests
+├ ƒ /en/zodiac
+├ ƒ /eq-testi
+├ ƒ /eq-testi/shedegi
+├ ƒ /eq-testi/shedegi/[id]
+├ ƒ /features
+├ ƒ /feed
+├ ƒ /feed/[postId]
+├ ƒ /finansuri-horoskopi
+├ ƒ /finansuri-horoskopi/[sign]
+├ ƒ /forgot-password
+├ ƒ /friends
+├ ƒ /frtxili-dgheebi
+├ ƒ /horoskopi
+├ ƒ /horoskopi/kvireuli
+├ ƒ /horoskopi/tviuri
+├ ƒ /how-it-works
+├ ○ /icon.svg
+├ ƒ /ighbliani-dgheebi
+├ ƒ /iq-testi
+├ ƒ /iq-testi/shedegi
+├ ƒ /iq-testi/shedegi/[id]
+├ ƒ /karieris-horoskopi
+├ ƒ /karieris-horoskopi/[sign]
+├ ƒ /library
+├ ƒ /library/[id]
+├ ƒ /login
+├ ○ /manifest.webmanifest
+├ ƒ /mbti
+├ ƒ /mbti/[type]
+├ ƒ /merkuri-retrogradi
+├ ƒ /messages
+├ ƒ /mijachvulobis-testi
+├ ƒ /mkitxaoba
+├ ƒ /mtvaris-kalendari
+├ ƒ /nataluri-ruka
+├ ƒ /numerologia
+├ ƒ /numerologia/[number]
+├ ƒ /onboarding
+├ ƒ /onboarding/result
+├ ƒ /opengraph-image
+├ ƒ /people
+├ ƒ /piradi-horoskopi
+├ ƒ /piradi-ruka
+├ ƒ /piradi-ruka/rogor-shevadginot
+├ ƒ /pirovnebis-testi
+├ ƒ /pirovnebis-testi/claim
+├ ƒ /planetebi
+├ ƒ /planetebi/[planet]
+├ ƒ /post-login
+├ ƒ /privacy
+├ ƒ /quiz/namdvili-nishani
+├ ƒ /quiz/varskvlavebis-zodiaqo
+├ ƒ /r/[id]
+├ ƒ /r/[id]/opengraph-image
+├ ƒ /relationship/invite/[token]
+├ ƒ /reminders/[deliveryId]
+├ ƒ /report
+├ ƒ /reports
+├ ƒ /reports/[id]
+├ ƒ /reset-password
+├ ƒ /robots.txt
+├ ƒ /savse-mtvare
+├ ƒ /savse-mtvare/[date]
+├ ƒ /signup
+├ ƒ /sitemap.xml
+├ ƒ /siyvarulis-horoskopi
+├ ƒ /siyvarulis-horoskopi/[sign]
+├ ƒ /sizmris-akhsna
+├ ƒ /sizmris-akhsna/[symbol]
+├ ƒ /sky
+├ ƒ /subscription
+├ ƒ /synastry
+├ ƒ /synastry/[id]
+├ ƒ /synastry/new
+├ ƒ /taro
+├ ƒ /taro/[card]
+├ ƒ /tavsebadoba
+├ ƒ /terms
+├ ƒ /test-results/[id]
+├ ƒ /tests
+├ ƒ /timing
+├ ƒ /tvit-shepasebis-testi
+├ ƒ /u/[username]
+├ ƒ /uk
+├ ƒ /unsubscribe
+├ ƒ /verify-email
+├ ƒ /zodiac
+├ ƒ /zodiac/[sign]
+├ ƒ /zodiac/[sign]/[slug]
+├ ƒ /zodiac/amomavali
+├ ƒ /zodiac/amomavali/[sign]
+├ ƒ /zodiac/datit
+├ ƒ /zodiac/elementebi
+├ ƒ /zodiac/elementebi/[element]
+├ ƒ /zodiac/gzamkvlevi
+├ ƒ /zodiac/mtvare
+├ ƒ /zodiac/mtvare/[sign]
+├ ƒ /zodiac/reitingebi
+├ ƒ /zodiac/reitingebi/[topic]
+├ ƒ /zodiac/tavsebadoba
+└ ƒ /zodiac/tavsebadoba/[pair]
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

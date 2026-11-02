@@ -1,0 +1,47 @@
+[
+  {
+    "url": "/dashboard",
+    "pattern": "/dashboard",
+    "dynamic": false
+  },
+  {
+    "url": "/credits",
+    "pattern": "/credits",
+    "dynamic": false
+  },
+  {
+    "url": "/u/luka-audit",
+    "pattern": "/u/luka-audit",
+    "dynamic": false
+  },
+  {
+    "url": "/u/nino-audit",
+    "pattern": "/u/nino-audit",
+    "dynamic": false
+  },
+  {
+    "url": "/ask",
+    "pattern": "/ask",
+    "dynamic": false
+  },
+  {
+    "url": "/synastry/new",
+    "pattern": "/synastry/new",
+    "dynamic": false
+  },
+  {
+    "url": "/people",
+    "pattern": "/people",
+    "dynamic": false
+  },
+  {
+    "url": "/messages",
+    "pattern": "/messages",
+    "dynamic": false
+  },
+  {
+    "url": "/subscription",
+    "pattern": "/subscription",
+    "dynamic": false
+  }
+]

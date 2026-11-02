@@ -1,0 +1,22 @@
+
+=== 320x568: 2 routes (concurrency 1) ===
+[1/2] 320 / tap<24 x14 (3s)
+[2/2] 320 /en tap<24 x14 (5s)
+=== 320 done: 2 routes in 5s ===
+
+=== 390x844: 2 routes (concurrency 1) ===
+[1/2] 390 / tap<24 x15 (3s)
+[2/2] 390 /en tap<24 x14 (5s)
+=== 390 done: 2 routes in 5s ===
+[
+  {
+    "width": 320,
+    "height": 568,
+    "count": 2
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "count": 2
+  }
+]

@@ -1,0 +1,42 @@
+
+=== 320x568: 12 routes (concurrency 2) ===
+[1/12] 320 /tavsebadoba tap<24 x1 (2s)
+[2/12] 320 / tap<24 x14 (3s)
+[3/12] 320 /tests tap<24 x3 (5s)
+[4/12] 320 /zodiac/datit tap<24 x3 (5s)
+[5/12] 320 /astrologiuri-saxlebi/1 tap<24 x5 (7s)
+[6/12] 320 /mbti/intj tap<24 x5 (8s)
+[7/12] 320 /astrologiuri-kalendari tap<24 x2 (10s)
+[8/12] 320 /horoskopi tap<24 x15 (11s)
+[9/12] 320 /en tap<24 x14 (12s)
+[10/12] 320 /en/compatibility tap<24 x3 (13s)
+[11/12] 320 /zodiac/tavsebadoba tap<24 x3 (15s)
+[12/12] 320 /articles tap<24 x15 (16s)
+=== 320 done: 12 routes in 16s ===
+
+=== 360x780: 12 routes (concurrency 2) ===
+[1/12] 360 /tavsebadoba tap<24 x1 (2s)
+[2/12] 360 / tap<24 x15 (3s)
+[3/12] 360 /tests tap<24 x3 (5s)
+[4/12] 360 /zodiac/datit tap<24 x3 (5s)
+[5/12] 360 /astrologiuri-saxlebi/1 tap<24 x5 (7s)
+[6/12] 360 /mbti/intj tap<24 x5 (8s)
+[7/12] 360 /astrologiuri-kalendari tap<24 x2 (9s)
+[8/12] 360 /horoskopi tap<24 x15 (11s)
+[9/12] 360 /en tap<24 x14 (12s)
+[10/12] 360 /en/compatibility tap<24 x3 (13s)
+[11/12] 360 /zodiac/tavsebadoba tap<24 x3 (15s)
+[12/12] 360 /articles tap<24 x15 (16s)
+=== 360 done: 12 routes in 16s ===
+[
+  {
+    "width": 320,
+    "height": 568,
+    "count": 12
+  },
+  {
+    "width": 360,
+    "height": 780,
+    "count": 12
+  }
+]

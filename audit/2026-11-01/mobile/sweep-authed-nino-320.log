@@ -1,0 +1,46 @@
+
+=== 320x568: 36 routes (concurrency 2) ===
+[1/36] 320 /feed textx1 tap<24 x15 covered x4 (4s)
+[2/36] 320 /dashboard textx1 tap<24 x2 covered x1 (4s)
+[3/36] 320 /feed/post-3 textx1 tap<24 x3 covered x1 (7s)
+[4/36] 320 /feed/post-1 textx1 tap<24 x9 covered x1 (7s)
+[5/36] 320 /friends?tab=incoming textx1 (11s)
+[6/36] 320 /friends textx2 tap<24 x2 (11s)
+[7/36] 320 /friends?tab=compatibility textx1 tap<24 x2 covered x3 (14s)
+[8/36] 320 /people textx1 tap<24 x4 covered x2 (14s)
+[9/36] 320 /messages?with=22222222-2222-4222-8222-222222222222 textx1 tap<24 x1 (17s)
+[10/36] 320 /messages textx1 (17s)
+[11/36] 320 /ask textx2 (21s)
+[12/36] 320 /discover textx1 tap<24 x2 covered x1 (21s)
+[13/36] 320 /account textx2 (25s)
+[14/36] 320 /credits textx2 covered x3 (25s)
+[15/36] 320 /subscription textx1 (28s)
+[16/36] 320 /library textx1 (28s)
+[17/36] 320 /library/lib-1 textx1 (32s)
+[18/36] 320 /library/lib-2 textx1 (32s)
+[19/36] 320 /synastry textx1 (35s)
+[20/36] 320 /synastry/new textx1 tap<24 x1 (35s)
+[21/36] 320 /piradi-horoskopi tap<24 x2 (39s)
+[22/36] 320 /piradi-ruka tap<24 x9 (39s)
+[23/36] 320 /sky textx1 (42s)
+[24/36] 320 /nataluri-ruka tap<24 x12 (43s)
+[25/36] 320 /timing textx1 (46s)
+[26/36] 320 /reports textx1 (46s)
+[27/36] 320 /onboarding/result ok (50s)
+[28/36] 320 /report textx1 tap<24 x2 covered x1 (50s)
+[29/36] 320 /post-login textx1 tap<24 x2 covered x1 (53s)
+[30/36] 320 /u/nino-audit textx1 (54s)
+[31/36] 320 /iq-testi/shedegi/iq-audit-1 textx1 (57s)
+[32/36] 320 /u/luka-audit textx2 tap<24 x3 (57s)
+[33/36] 320 /iq-testi/shedegi/iq-audit-2 textx1 (61s)
+[34/36] 320 /eq-testi/shedegi/eq-audit-1 textx1 tap<24 x1 (61s)
+[35/36] 320 /pirovnebis-testi/claim textx1 (64s)
+[36/36] 320 /big-five/shedegi/bf-audit-1 textx1 (64s)
+=== 320 done: 36 routes in 64s ===
+[
+  {
+    "width": 320,
+    "height": 568,
+    "count": 36
+  }
+]

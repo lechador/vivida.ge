@@ -36,13 +36,20 @@ export function countryDisplayName(
 ): string {
   const code = normalizeCountryCode(countryCode);
   if (!code) {
-    return locale === "en" ? "Not determined" : "ვერ განისაზღვრა";
+    return locale === "pl"
+      ? "Nieokreślony"
+      : locale === "en"
+        ? "Not determined"
+        : "ვერ განისაზღვრა";
   }
   try {
     return (
-      new Intl.DisplayNames([locale === "en" ? "en" : "ka"], {
-        type: "region",
-      }).of(code) ?? code
+      new Intl.DisplayNames(
+        [locale === "pl" ? "pl" : locale === "en" ? "en" : "ka"],
+        {
+          type: "region",
+        },
+      ).of(code) ?? code
     );
   } catch {
     return code;

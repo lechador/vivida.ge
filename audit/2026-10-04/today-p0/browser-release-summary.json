@@ -1,0 +1,21 @@
+{
+  "count": 6,
+  "cases": [
+    "ka-free-mobile",
+    "ka-free-desktop",
+    "ka-pro-mobile",
+    "ka-complete-mobile",
+    "en-free-mobile",
+    "en-free-desktop"
+  ],
+  "passed": true,
+  "scope": "Actual shipped components rendered with explicit local mock props; not authenticated production E2E",
+  "checks": [
+    "native forecast details open/close",
+    "correct four primary destinations plus accessible More",
+    "report/tests/messages/account in More",
+    "focus enters drawer; Tab remains inside; Escape dismisses; More focus restored",
+    "no horizontal overflow",
+    "pending daily focus is enabled, above bottom bar, and not covered at elementFromPoint"
+  ]
+}

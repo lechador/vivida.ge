@@ -1,0 +1,182 @@
+[
+  {
+    "url": "/dashboard",
+    "pattern": "/dashboard",
+    "dynamic": false
+  },
+  {
+    "url": "/feed",
+    "pattern": "/feed",
+    "dynamic": false
+  },
+  {
+    "url": "/feed/post-1",
+    "pattern": "/feed/post-1",
+    "dynamic": false
+  },
+  {
+    "url": "/feed/post-3",
+    "pattern": "/feed/post-3",
+    "dynamic": false
+  },
+  {
+    "url": "/friends",
+    "pattern": "/friends",
+    "dynamic": false
+  },
+  {
+    "url": "/friends?tab=incoming",
+    "pattern": "/friends",
+    "dynamic": false
+  },
+  {
+    "url": "/friends?tab=compatibility",
+    "pattern": "/friends",
+    "dynamic": false
+  },
+  {
+    "url": "/people",
+    "pattern": "/people",
+    "dynamic": false
+  },
+  {
+    "url": "/messages",
+    "pattern": "/messages",
+    "dynamic": false
+  },
+  {
+    "url": "/messages?with=22222222-2222-4222-8222-222222222222",
+    "pattern": "/messages",
+    "dynamic": false
+  },
+  {
+    "url": "/ask",
+    "pattern": "/ask",
+    "dynamic": false
+  },
+  {
+    "url": "/discover",
+    "pattern": "/discover",
+    "dynamic": false
+  },
+  {
+    "url": "/account",
+    "pattern": "/account",
+    "dynamic": false
+  },
+  {
+    "url": "/credits",
+    "pattern": "/credits",
+    "dynamic": false
+  },
+  {
+    "url": "/subscription",
+    "pattern": "/subscription",
+    "dynamic": false
+  },
+  {
+    "url": "/library",
+    "pattern": "/library",
+    "dynamic": false
+  },
+  {
+    "url": "/library/lib-1",
+    "pattern": "/library/lib-1",
+    "dynamic": false
+  },
+  {
+    "url": "/library/lib-2",
+    "pattern": "/library/lib-2",
+    "dynamic": false
+  },
+  {
+    "url": "/synastry",
+    "pattern": "/synastry",
+    "dynamic": false
+  },
+  {
+    "url": "/synastry/new",
+    "pattern": "/synastry/new",
+    "dynamic": false
+  },
+  {
+    "url": "/piradi-ruka",
+    "pattern": "/piradi-ruka",
+    "dynamic": false
+  },
+  {
+    "url": "/piradi-horoskopi",
+    "pattern": "/piradi-horoskopi",
+    "dynamic": false
+  },
+  {
+    "url": "/nataluri-ruka",
+    "pattern": "/nataluri-ruka",
+    "dynamic": false
+  },
+  {
+    "url": "/sky",
+    "pattern": "/sky",
+    "dynamic": false
+  },
+  {
+    "url": "/timing",
+    "pattern": "/timing",
+    "dynamic": false
+  },
+  {
+    "url": "/reports",
+    "pattern": "/reports",
+    "dynamic": false
+  },
+  {
+    "url": "/report",
+    "pattern": "/report",
+    "dynamic": false
+  },
+  {
+    "url": "/onboarding/result",
+    "pattern": "/onboarding/result",
+    "dynamic": false
+  },
+  {
+    "url": "/post-login",
+    "pattern": "/post-login",
+    "dynamic": false
+  },
+  {
+    "url": "/u/nino-audit",
+    "pattern": "/u/nino-audit",
+    "dynamic": false
+  },
+  {
+    "url": "/u/luka-audit",
+    "pattern": "/u/luka-audit",
+    "dynamic": false
+  },
+  {
+    "url": "/iq-testi/shedegi/iq-audit-1",
+    "pattern": "/iq-testi/shedegi/iq-audit-1",
+    "dynamic": false
+  },
+  {
+    "url": "/iq-testi/shedegi/iq-audit-2",
+    "pattern": "/iq-testi/shedegi/iq-audit-2",
+    "dynamic": false
+  },
+  {
+    "url": "/eq-testi/shedegi/eq-audit-1",
+    "pattern": "/eq-testi/shedegi/eq-audit-1",
+    "dynamic": false
+  },
+  {
+    "url": "/big-five/shedegi/bf-audit-1",
+    "pattern": "/big-five/shedegi/bf-audit-1",
+    "dynamic": false
+  },
+  {
+    "url": "/pirovnebis-testi/claim",
+    "pattern": "/pirovnebis-testi/claim",
+    "dynamic": false
+  }
+]
