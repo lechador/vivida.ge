@@ -22,6 +22,7 @@ export const LEGAL_ENTITY = {
   address: "30 N Gould St, Ste R, Sheridan, WY 82801, United States",
   addressKa: "30 N Gould St, Ste R, Sheridan, WY 82801, აშშ",
   contactEmail: "hello@vivida.ge",
+  internationalContactEmail: "hello@vividaastro.com",
 } as const;
 
 /** "…registered in Wyoming, United States (filing ID …), at <address>." */

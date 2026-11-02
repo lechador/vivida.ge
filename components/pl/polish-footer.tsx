@@ -55,10 +55,10 @@ export function PolishFooter() {
             planet i synastria partnerska w języku polskim.
           </p>
           <a
-            href="mailto:hello@vivida.ge"
+            href="mailto:hello@vividaastro.com"
             className="mt-3 inline-block text-sm text-[var(--vivida-cyan)] hover:underline"
           >
-            hello@vivida.ge
+            hello@vividaastro.com
           </a>
         </div>
 

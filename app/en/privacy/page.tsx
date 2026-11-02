@@ -48,10 +48,10 @@ export default function EnglishPrivacyPage() {
           {LEGAL_ENTITY.address}. Privacy questions and data requests can be
           sent to{" "}
           <a
-            href="mailto:hello@vivida.ge"
+            href="mailto:hello@vividaastro.com"
             className="text-[var(--vivida-cyan)] hover:underline"
           >
-            hello@vivida.ge
+            hello@vividaastro.com
           </a>
           .
         </p>
@@ -142,10 +142,10 @@ export default function EnglishPrivacyPage() {
           withdraw consent for future processing. You can change many profile
           settings inside your account or contact us at{" "}
           <a
-            href="mailto:hello@vivida.ge"
+            href="mailto:hello@vividaastro.com"
             className="text-[var(--vivida-cyan)] hover:underline"
           >
-            hello@vivida.ge
+            hello@vividaastro.com
           </a>
           . You may also complain to your supervisory authority: in Georgia the
           State Audit Office (
@@ -222,10 +222,10 @@ export default function EnglishPrivacyPage() {
           be revised when material changes are published. Questions can be sent
           to{" "}
           <a
-            href="mailto:hello@vivida.ge"
+            href="mailto:hello@vividaastro.com"
             className="text-[var(--vivida-cyan)] hover:underline"
           >
-            hello@vivida.ge
+            hello@vividaastro.com
           </a>
           . The Georgian policy remains available at{" "}
           <Link

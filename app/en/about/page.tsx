@@ -43,7 +43,7 @@ export default function EnglishAboutPage() {
         "@type": "Organization",
         name: "Vivida",
         url: ENGLISH_SITE_URL,
-        email: "hello@vivida.ge",
+        email: "hello@vividaastro.com",
         address: { "@type": "PostalAddress", addressCountry: "GE" },
         sameAs: ["https://www.vivida.ge"],
       },
@@ -122,10 +122,10 @@ export default function EnglishAboutPage() {
             <p className="mt-2 text-sm text-muted-foreground">
               Questions or corrections:{" "}
               <a
-                href="mailto:hello@vivida.ge"
+                href="mailto:hello@vividaastro.com"
                 className="text-[var(--vivida-cyan)] hover:underline"
               >
-                hello@vivida.ge
+                hello@vividaastro.com
               </a>
               .
             </p>
