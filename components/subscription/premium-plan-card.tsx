@@ -14,6 +14,7 @@ import {
   type PremiumPlan,
 } from "@/lib/billing-config";
 import { USDC_PREMIUM_PASS } from "@/lib/crypto-config";
+import { kaDayMonthGenitive } from "@/lib/i18n/ka-date";
 import { PayByCardButton } from "@/components/crypto/crypto-pay";
 import type { UserLocale } from "@/lib/i18n/user-locale";
 import { fbTrack } from "@/lib/fb-pixel";
@@ -83,13 +84,19 @@ export function PremiumPlanCard({
     locale,
   );
   // Seeded once on mount: the first-charge date must not drift between
-  // re-renders when the buyer toggles plans.
-  const [trialChargeDate] = useState(() =>
-    new Intl.DateTimeFormat(locale === "ka" ? "ka-GE" : "en-GB", {
-      day: "numeric",
-      month: "long",
-    }).format(new Date(Date.now() + PRO_TRIAL_DAYS * 86_400_000)),
-  );
+  // re-renders when the buyer toggles plans. Georgian goes through the
+  // CLDR table in lib/i18n/ka-date, never Intl: browsers without Georgian
+  // ICU data would render an English month here and React would discard
+  // the server-rendered card over the mismatch.
+  const [trialChargeDate] = useState(() => {
+    const date = new Date(Date.now() + PRO_TRIAL_DAYS * 86_400_000);
+    return locale === "ka"
+      ? kaDayMonthGenitive(date)
+      : new Intl.DateTimeFormat("en-GB", {
+          day: "numeric",
+          month: "long",
+        }).format(date);
+  });
   const renewalPhrase =
     months === 1
       ? en
@@ -189,7 +196,7 @@ export function PremiumPlanCard({
         className="absolute -right-16 -top-20 size-56 rounded-full bg-[var(--vivida-gold)]/15 blur-3xl"
       />
       <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-        <div>
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-[var(--vivida-gold)]">
             <Crown className="size-4" /> Vivida PRO
           </div>
@@ -207,7 +214,7 @@ export function PremiumPlanCard({
             ))}
           </ul>
         </div>
-        <div className="shrink-0 rounded-2xl border border-[var(--vivida-gold)]/25 bg-background/35 p-4 text-center sm:min-w-56">
+        <div className="w-full shrink-0 rounded-2xl border border-[var(--vivida-gold)]/25 bg-background/35 p-4 text-center sm:w-72">
           {discountedPlan && !active && (
             <div
               className={`mb-4 grid rounded-xl border border-border/60 bg-background/45 p-1 text-xs ${canChooseMonthly ? "grid-cols-2" : "grid-cols-1"}`}

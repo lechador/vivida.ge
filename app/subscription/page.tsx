@@ -33,6 +33,7 @@ import {
   requestIsEnglishHost,
 } from "@/lib/i18n/request-locale";
 import { getUserLocale } from "@/lib/i18n/user-locale";
+import { kaDayMonth } from "@/lib/i18n/ka-date";
 import { Suspense } from "react";
 import { CheckoutSuccessTracker } from "@/components/billing/checkout-success-tracker";
 import { CryptoPayHost } from "@/components/crypto/crypto-pay";
@@ -297,7 +298,7 @@ export default async function SubscriptionPage({
                       ? `Twój darmowy okres próbny kończy się ${formatDate(subscription.currentPeriodEnd, locale)}. Jeśli do tego czasu nie anulujesz, karta zostanie obciążona kwotą ${formatBillingAmount(subscription.amountMinor, subscription.currency, locale)}. Anuluj w dowolnym momencie przed tą datą, a nic nie zapłacisz.`
                       : en
                         ? `Your free trial ends on ${formatDate(subscription.currentPeriodEnd, locale)}. If you do not cancel by then, your card will automatically be charged ${formatBillingAmount(subscription.amountMinor, subscription.currency, locale)}. Cancel anytime before that date and you pay nothing.`
-                        : `უფასო საცდელი პერიოდი ${formatDate(subscription.currentPeriodEnd, locale)} მთავრდება. თუ ამ თარიღამდე არ გააუქმებ, ბარათიდან ავტომატურად ჩამოიჭრება ${formatBillingAmount(subscription.amountMinor, subscription.currency, locale)}. მანამდე ნებისმიერ დროს შეგიძლია გააუქმო და არაფერს გადაიხდი.`}
+                        : `უფასო საცდელი პერიოდი ${kaDayMonth(subscription.currentPeriodEnd)} მთავრდება. თუ ამ თარიღამდე არ გააუქმებ, ბარათიდან ავტომატურად ჩამოიჭრება ${formatBillingAmount(subscription.amountMinor, subscription.currency, locale)}. მანამდე ნებისმიერ დროს შეგიძლია გააუქმო და არაფერს გადაიხდი.`}
                   </p>
                 )}
 
