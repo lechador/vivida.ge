@@ -90,6 +90,9 @@ export type SendOptions = {
   ctaUrl?: string | null;
   /** When true, resolve the audience but don't actually send. Returns counts only. */
   dryRun?: boolean;
+  /** Send at most this many recipients (after resumability exclusions), so a
+   *  campaign can go out in monitored batches instead of one blast. */
+  limit?: number;
   /** Persist recipients and conversions under this campaign. */
   campaignId?: string;
   /** Preview sends must render even when the test account already has a profile. */
@@ -459,6 +462,7 @@ export async function sendBulk(opts: SendOptions): Promise<SendResult> {
     const sentIds = new Set(alreadySent.map((row) => row.userId));
     audience = audience.filter((recipient) => !sentIds.has(recipient.userId));
   }
+  if (opts.limit && opts.limit > 0) audience = audience.slice(0, opts.limit);
   if (opts.dryRun || !c) {
     return {
       audienceTotal: audience.length,

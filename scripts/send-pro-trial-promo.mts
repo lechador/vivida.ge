@@ -8,7 +8,8 @@
  * Usage:
  *   npx tsx scripts/send-pro-trial-promo.mts                        # dry-run audience count
  *   npx tsx scripts/send-pro-trial-promo.mts --test=you@example.com # send one real test email
- *   npx tsx scripts/send-pro-trial-promo.mts --execute              # create campaign + send
+ *   npx tsx scripts/send-pro-trial-promo.mts --execute              # create campaign + send all
+ *   npx tsx scripts/send-pro-trial-promo.mts --execute --limit=500  # send the next batch of 500
  *
  * Retrying --execute is safe: recipients with a sent row on the campaign
  * are excluded before anyone is mailed twice.
@@ -50,6 +51,10 @@ const {
 const executeFlag = process.argv.includes("--execute");
 const testArg = process.argv.find((a) => a.startsWith("--test="));
 const testEmail = testArg ? testArg.slice("--test=".length).trim() : null;
+const limitArg = process.argv.find((a) => a.startsWith("--limit="));
+const limit = limitArg
+  ? Number.parseInt(limitArg.slice("--limit=".length), 10)
+  : NaN;
 
 console.log("=== PRO Free Trial Launch Campaign ===");
 console.log(`Campaign slug : ${PRO_TRIAL_CAMPAIGN_SLUG}`);
@@ -82,10 +87,13 @@ if (!executeFlag) {
 }
 
 const campaign = await ensureProTrialCampaign();
-console.log(`Launching campaign (${campaign.id})...`);
+console.log(
+  `Launching campaign (${campaign.id})${Number.isFinite(limit) && limit > 0 ? `, batch limit ${limit}` : ""}...`,
+);
 const result = await sendBulk({
   template: "pro_trial",
   campaignId: campaign.id,
+  limit: Number.isFinite(limit) && limit > 0 ? limit : undefined,
 });
 console.log("\n=== Campaign Result ===");
 console.log(JSON.stringify(result, null, 2));
