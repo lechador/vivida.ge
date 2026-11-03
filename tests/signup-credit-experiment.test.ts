@@ -25,8 +25,8 @@ describe("signup credit experiment", () => {
   });
 
   it("gives both variants the 4-credit welcome bonus", () => {
-    expect(initialSignupCredits("control_20")).toBe(4);
-    expect(initialSignupCredits("staged_10_plus_5")).toBe(4);
+    expect(initialSignupCredits("control_20")).toBe(10);
+    expect(initialSignupCredits("staged_10_plus_5")).toBe(10);
   });
 
   it("does not qualify the return bonus until 24 hours have elapsed", () => {

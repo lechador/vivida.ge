@@ -100,6 +100,7 @@ export default async function SubscriptionPage({
     getPremiumSubscription(user.id),
     isPremiumUser(user.id),
   ]);
+  const isTrial = subscription?.status === "trialing";
   // Stripe is primary on both hosts; the English host additionally offers
   // a one-time USDC PRO pass as an alternative. KA never sees it.
   const cryptoPay = (await requestIsEnglishHost()) && isCryptoPayConfigured();
@@ -191,27 +192,28 @@ export default async function SubscriptionPage({
                       ₾29 promo bills quarterly, and telling its buyers they
                       pay that every month would be a false billing claim. */}
                       <span className="text-sm font-normal text-muted-foreground">
-                        /
-                        {subscription.source === "crypto"
+                        {isTrial
                           ? locale === "pl"
-                            ? "przepustka jednorazowa"
+                            ? " po okresie próbnym"
                             : en
-                              ? "one-time pass"
-                              : "ერთჯერადი პასი"
-                          : billingCadenceLabel(
-                              billingPeriodMonths(
-                                subscription.currentPeriodStart,
-                                subscription.currentPeriodEnd,
-                              ),
-                              locale,
-                            )}
+                              ? " after the free trial"
+                              : " უფასო პერიოდის შემდეგ"
+                          : ` /${subscription.source === "crypto" ? (locale === "pl" ? "przepustka jednorazowa" : en ? "one-time pass" : "ერთჯერადი პასი") : billingCadenceLabel(billingPeriodMonths(subscription.currentPeriodStart, subscription.currentPeriodEnd), locale)}`}
                       </span>
                     </div>
                   </div>
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-semibold ${active ? "bg-emerald-400/12 text-emerald-300" : "bg-foreground/10 text-muted-foreground"}`}
                   >
-                    {active ? "PRO" : subscription.status.replaceAll("_", " ")}
+                    {isTrial
+                      ? locale === "pl"
+                        ? "Okres próbny"
+                        : en
+                          ? "Free trial"
+                          : "უფასო პერიოდი"
+                      : active
+                        ? "PRO"
+                        : subscription.status.replaceAll("_", " ")}
                   </span>
                 </div>
 
@@ -241,18 +243,24 @@ export default async function SubscriptionPage({
                   <Detail
                     icon={CalendarDays}
                     label={
-                      subscription.cancelAtPeriodEnd ||
-                      subscription.source === "crypto"
+                      isTrial && !subscription.cancelAtPeriodEnd
                         ? locale === "pl"
-                          ? "Dostęp wygasa"
+                          ? "Pierwsza opłata"
                           : en
-                            ? "Access ends"
-                            : "წვდომა დასრულდება"
-                        : locale === "pl"
-                          ? "Następne odnowienie"
-                          : en
-                            ? "Next renewal"
-                            : "შემდეგი განახლება"
+                            ? "First charge"
+                            : "პირველი ჩამოჭრა"
+                        : subscription.cancelAtPeriodEnd ||
+                            subscription.source === "crypto"
+                          ? locale === "pl"
+                            ? "Dostęp wygasa"
+                            : en
+                              ? "Access ends"
+                              : "წვდომა დასრულდება"
+                          : locale === "pl"
+                            ? "Następne odnowienie"
+                            : en
+                              ? "Next renewal"
+                              : "შემდეგი განახლება"
                     }
                     value={formatDate(subscription.currentPeriodEnd, locale)}
                   />
@@ -282,6 +290,16 @@ export default async function SubscriptionPage({
                     }
                   />
                 </dl>
+
+                {isTrial && !subscription.cancelAtPeriodEnd && (
+                  <p className="mt-4 text-sm leading-relaxed text-foreground/85">
+                    {locale === "pl"
+                      ? `Twój darmowy okres próbny kończy się ${formatDate(subscription.currentPeriodEnd, locale)}. Jeśli do tego czasu nie anulujesz, karta zostanie obciążona kwotą ${formatBillingAmount(subscription.amountMinor, subscription.currency, locale)}. Anuluj w dowolnym momencie przed tą datą, a nic nie zapłacisz.`
+                      : en
+                        ? `Your free trial ends on ${formatDate(subscription.currentPeriodEnd, locale)}. If you do not cancel by then, your card will automatically be charged ${formatBillingAmount(subscription.amountMinor, subscription.currency, locale)}. Cancel anytime before that date and you pay nothing.`
+                        : `უფასო საცდელი პერიოდი ${formatDate(subscription.currentPeriodEnd, locale)} მთავრდება. თუ ამ თარიღამდე არ გააუქმებ, ბარათიდან ავტომატურად ჩამოიჭრება ${formatBillingAmount(subscription.amountMinor, subscription.currency, locale)}. მანამდე ნებისმიერ დროს შეგიძლია გააუქმო და არაფერს გადაიხდი.`}
+                  </p>
+                )}
 
                 <div
                   className="mt-4 h-1.5 overflow-hidden rounded-full bg-foreground/10"
@@ -376,6 +394,7 @@ export default async function SubscriptionPage({
               returnTo={returnTo}
               product={product}
               cryptoAvailable={cryptoPay}
+              trialEligible
             />
           )}
         </section>

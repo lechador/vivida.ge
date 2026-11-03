@@ -2,10 +2,17 @@ import { after, NextResponse } from "next/server";
 
 import { auth } from "@/auth";
 import {
+  featuredPremiumPlanForCountry,
   premiumPlanByKeyForCountry,
   premiumPlanForCountry,
+  PRO_TRIAL_DAYS,
+  trialPlanByKeyForCountry,
 } from "@/lib/billing-config";
-import { getBillingIdentity, isPremiumUser } from "@/lib/premium";
+import {
+  getBillingIdentity,
+  hasPremiumSubscriptionHistory,
+  isPremiumUser,
+} from "@/lib/premium";
 import { createPremiumCheckoutSession, isStripeConfigured } from "@/lib/stripe";
 import {
   checkoutTrackingFromRequest,
@@ -43,8 +50,13 @@ export async function POST(req: Request) {
     planKey?: unknown;
     returnTo?: unknown;
     product?: unknown;
+    trial?: unknown;
   } | null;
   const wantsOffer = body?.offer === "low_credits";
+  // A trial never stacks on a discounted campaign offer: the offer price is
+  // already the incentive, and trial eligibility is re-validated below
+  // against subscription history, never trusted from the client flag alone.
+  const wantsTrial = body?.trial === true && !wantsOffer;
   const returnTo =
     typeof body?.returnTo === "string"
       ? normalizeReturnPath(body.returnTo)
@@ -61,16 +73,30 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "offer_unavailable" }, { status: 403 });
   }
 
+  // A trial buyer explicitly chooses the plan the first charge will use, so
+  // the trial resolver may return the monthly plan even in markets where
+  // monthly is retired for direct purchase. The flag alone never widens the
+  // catalogue for a non-trial checkout.
   const selectedPlan =
     body?.planKey == null
       ? null
-      : premiumPlanByKeyForCountry(identity?.countryCode, body.planKey);
+      : wantsTrial
+        ? trialPlanByKeyForCountry(identity?.countryCode, body.planKey)
+        : premiumPlanByKeyForCountry(identity?.countryCode, body.planKey);
   if (body?.planKey != null && !selectedPlan) {
     return NextResponse.json({ error: "invalid_plan" }, { status: 400 });
   }
 
   const plan =
-    offer?.plan ?? selectedPlan ?? premiumPlanForCountry(identity?.countryCode);
+    offer?.plan ??
+    selectedPlan ??
+    (wantsTrial
+      ? featuredPremiumPlanForCountry(identity?.countryCode)
+      : premiumPlanForCountry(identity?.countryCode));
+
+  if (wantsTrial && (await hasPremiumSubscriptionHistory(userId))) {
+    return NextResponse.json({ error: "trial_unavailable" }, { status: 403 });
+  }
 
   try {
     const tracking = checkoutTrackingFromRequest(req);
@@ -85,6 +111,7 @@ export async function POST(req: Request) {
         purchase_context: purchaseContext,
       },
       returnTo,
+      trialDays: wantsTrial ? PRO_TRIAL_DAYS : undefined,
     });
     await recordExperimentOutcomesBestEffort(
       userId,
@@ -109,9 +136,12 @@ export async function POST(req: Request) {
     return NextResponse.json({
       url: checkout.url,
       eventId: `${checkout.id}:initiate_checkout`,
-      value: plan.amountMinor / 100,
+      // Nothing is due today on a trial, so ad analytics must not book the
+      // plan price as checkout value until the first real charge lands.
+      value: wantsTrial ? 0 : plan.amountMinor / 100,
       currency: plan.currency.toUpperCase(),
       contentId: plan.key,
+      trial: wantsTrial,
     });
   } catch (err) {
     console.error("[subscription/checkout] failed:", err);

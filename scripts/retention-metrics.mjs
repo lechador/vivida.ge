@@ -154,7 +154,9 @@ async function main() {
         (select count(distinct u.id) from "user" u
           where u.created_at > now() - interval '30 days'
             and (u.id in (select user_id from credit_transaction where reason = 'purchase')
-                 or u.id in (select user_id from premium_subscription)))::int as converted_30d`,
+                 -- A still-trialing subscription has paid nothing yet; once the
+                 -- first invoice lands the row turns active and counts.
+                 or u.id in (select user_id from premium_subscription where status <> 'trialing')))::int as converted_30d`,
     // Paywall funnel, from recorded experiment outcomes. Purchases are written
     // server-side from the Stripe webhook, so this is not a browser proxy.
     txn`

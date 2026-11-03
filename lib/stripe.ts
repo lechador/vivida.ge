@@ -179,6 +179,13 @@ export async function createPremiumCheckoutSession(opts: {
   plan: PremiumPlan;
   trackingMetadata?: Record<string, string>;
   returnTo?: string | null;
+  /**
+   * Free-trial length in days. When set, Checkout must collect a card up
+   * front (`payment_method_collection: "always"`) so the first charge at
+   * trial end never depends on a later card prompt; Checkout itself renders
+   * the trial terms and first-charge date and amount next to the card form.
+   */
+  trialDays?: number;
 }): Promise<Stripe.Checkout.Session> {
   const {
     userId,
@@ -188,6 +195,7 @@ export async function createPremiumCheckoutSession(opts: {
     plan,
     trackingMetadata = {},
     returnTo,
+    trialDays,
   } = opts;
   const price = await priceForPlan(plan);
   const metadata = {
@@ -195,6 +203,7 @@ export async function createPremiumCheckoutSession(opts: {
     userId,
     planKey: plan.key,
     countryCode: plan.countryCode,
+    ...(trialDays ? { trialDays: String(trialDays) } : {}),
     ...trackingMetadata,
   };
 
@@ -204,10 +213,12 @@ export async function createPremiumCheckoutSession(opts: {
     ...(stripeCustomerId
       ? { customer: stripeCustomerId }
       : { customer_email: email ?? undefined }),
+    ...(trialDays ? { payment_method_collection: "always" as const } : {}),
     metadata,
     subscription_data: {
       metadata,
       description: "Vivida PRO · unlimited access",
+      ...(trialDays ? { trial_period_days: trialDays } : {}),
     },
     line_items: [{ price: price.id, quantity: 1 }],
     allow_promotion_codes: true,

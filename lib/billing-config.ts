@@ -370,6 +370,30 @@ export function premiumPlanByKeyForCountry(
   return match;
 }
 
+/** Free-trial length for a first PRO subscription, in days. */
+export const PRO_TRIAL_DAYS = 7;
+
+/**
+ * Resolve the plan a free trial will convert into, without trusting any
+ * client-supplied price.
+ *
+ * Unlike `premiumPlanByKeyForCountry` this deliberately ignores the
+ * retired-monthly gate: the buyer explicitly chooses at trial start whether
+ * the first charge is the discounted quarterly plan or the standard monthly
+ * plan, and that choice is the whole point of the trial offer. Monthly stays
+ * unsellable outside a trial in retired markets; this resolver is only for
+ * the trial checkout path. Market scoping is identical to the standard one.
+ */
+export function trialPlanByKeyForCountry(
+  countryCode: string | null | undefined,
+  planKey: unknown,
+): PremiumPlan | null {
+  if (typeof planKey !== "string") return null;
+  const standard = premiumPlanForCountry(countryCode);
+  const discounted = discountedPremiumPlanForCountry(countryCode);
+  return [standard, discounted].find((plan) => plan?.key === planKey) ?? null;
+}
+
 /** Prefer the discounted multi-month plan anywhere a single PRO price is shown. */
 export function featuredPremiumPlanForCountry(
   countryCode: string | null | undefined,

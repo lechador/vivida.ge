@@ -4,7 +4,7 @@ import { after } from "next/server";
 
 import { db } from "@/db";
 import { pdfReports } from "@/db/schema";
-import { constructWebhookEvent } from "@/lib/stripe";
+import { constructWebhookEvent, stripe } from "@/lib/stripe";
 import { generateAndStoreReport } from "@/lib/reports/generate";
 import { grantPurchaseCredits } from "@/lib/credits";
 import {
@@ -47,7 +47,10 @@ export async function POST(req: Request) {
       const uid = sessionObj.metadata?.userId ?? "";
       try {
         await activatePremiumFromCheckout(sessionObj);
-        if (uid) {
+        // A trial checkout completes with no payment due, so it must not be
+        // booked as a purchase: the payer event fires on the first paid
+        // invoice instead (see `invoice.paid` below).
+        if (uid && sessionObj.payment_status === "paid") {
           await recordExperimentOutcomesBestEffort(
             uid,
             [EXPERIMENTS.pricingPresentation, EXPERIMENTS.contextualPaywall],
@@ -61,7 +64,9 @@ export async function POST(req: Request) {
         return new Response("premium sync failed", { status: 500 });
       }
       after(async () => {
-        const identity = await getBillingIdentity(sessionObj.metadata?.userId ?? "");
+        const identity = await getBillingIdentity(
+          sessionObj.metadata?.userId ?? "",
+        );
         await trackCheckoutCompleted({
           session: sessionObj,
           email: identity?.email,
@@ -140,6 +145,40 @@ export async function POST(req: Request) {
         .where(eq(pdfReports.id, reportId));
 
       after(() => generateAndStoreReport(reportId));
+    }
+  }
+
+  // First real money for a subscription: a trial conversion or a renewal.
+  // Renewals also land here; the payer outcome is keyed by invoice id and
+  // recorded at most once per user+experiment by the outcome ledger, and the
+  // subscription sync is the same one the subscription events perform.
+  if (event.type === "invoice.paid") {
+    const invoice = event.data.object as Stripe.Invoice;
+    const subscriptionRef =
+      invoice.parent?.subscription_details?.subscription ?? null;
+    const subscriptionId =
+      typeof subscriptionRef === "string"
+        ? subscriptionRef
+        : (subscriptionRef?.id ?? null);
+    if (subscriptionId) {
+      try {
+        const subscription =
+          await stripe().subscriptions.retrieve(subscriptionId);
+        await syncPremiumSubscription(subscription);
+        const uid = subscription.metadata?.userId ?? "";
+        if (uid && subscription.metadata?.kind === "premium") {
+          await recordExperimentOutcomesBestEffort(
+            uid,
+            [EXPERIMENTS.pricingPresentation, EXPERIMENTS.contextualPaywall],
+            "purchase_completed",
+            "stripe_webhook:invoice_paid",
+            invoice.id,
+          );
+        }
+      } catch (err) {
+        console.error("[stripe/webhook] invoice sync failed:", err);
+        return new Response("invoice sync failed", { status: 500 });
+      }
     }
   }
 

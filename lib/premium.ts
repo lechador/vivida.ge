@@ -37,6 +37,24 @@ export async function getPremiumSubscription(userId: string) {
   return row ?? null;
 }
 
+/**
+ * Whether the user has any premium subscription row, current or historical.
+ *
+ * One row per user is kept across cancellations, so a row in any status
+ * (including a store or crypto row) means the free trial has already been
+ * available to this account and must not be offered again.
+ */
+export async function hasPremiumSubscriptionHistory(
+  userId: string,
+): Promise<boolean> {
+  const [row] = await db
+    .select({ userId: premiumSubscriptions.userId })
+    .from(premiumSubscriptions)
+    .where(eq(premiumSubscriptions.userId, userId))
+    .limit(1);
+  return Boolean(row);
+}
+
 export async function getBillingIdentity(userId: string) {
   const [row] = await db
     .select({

@@ -22,7 +22,11 @@ import {
 } from "@/lib/i18n/request-locale";
 import { getUserLocale } from "@/lib/i18n/user-locale";
 import type { UserLocale } from "@/lib/i18n/user-locale";
-import { getBillingIdentity, isPremiumUser } from "@/lib/premium";
+import {
+  getBillingIdentity,
+  hasPremiumSubscriptionHistory,
+  isPremiumUser,
+} from "@/lib/premium";
 import {
   premiumPlanForCountry,
   shouldShowPurchasePromotion,
@@ -144,6 +148,7 @@ export default async function CreditsPage({
     recentSpend,
     giftState,
     monthlyGate,
+    subscriptionHistory,
   ] = await Promise.all([
     getBalance(user.id),
     getReferralStats(user.id),
@@ -163,6 +168,8 @@ export default async function CreditsPage({
     getPhoneGiftState(user.id),
     // Monthly-drop gate, so the progress card never promises a paused bonus.
     monthlyGateFor(user.id),
+    // Any historical subscription row retires the free-trial offer.
+    hasPremiumSubscriptionHistory(user.id),
   ]);
   // Accounts created before residence tracking have no country, which would
   // hide PRO and fall the packs back to GEL by luck rather than by geo. Same
@@ -266,6 +273,7 @@ export default async function CreditsPage({
                 locale={locale}
                 placement="credits_hub"
                 cryptoAvailable={cryptoPay}
+                trialEligible={!subscriptionHistory}
               />
             </div>
           ) : null}

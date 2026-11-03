@@ -10,6 +10,7 @@ import {
   monthlyPlanOffered,
   formatBillingAmount,
   premiumPlanSavingsPercent,
+  PRO_TRIAL_DAYS,
   type PremiumPlan,
 } from "@/lib/billing-config";
 import { USDC_PREMIUM_PASS } from "@/lib/crypto-config";
@@ -39,6 +40,7 @@ export function PremiumPlanCard({
   returnTo,
   product,
   cryptoAvailable = false,
+  trialEligible = false,
 }: {
   plan: PremiumPlan;
   locale: UserLocale;
@@ -48,10 +50,17 @@ export function PremiumPlanCard({
   product?: string | null;
   /** English site only: USDC 30-day pass as an alternative below Stripe. */
   cryptoAvailable?: boolean;
+  /**
+   * Server-decided: the account has never had a subscription, so checkout
+   * may start with the free trial. The buyer picks in this card which plan
+   * the first charge at trial end will use. The route re-validates.
+   */
+  trialEligible?: boolean;
 }) {
   const en = locale !== "ka";
   const [pending, setPending] = useState(false);
   const [error, setError] = useState(false);
+  const [trialUsed, setTrialUsed] = useState(false);
   const discountedPlan = discountedPremiumPlanForCountry(plan.countryCode);
   // Georgia retired monthly PRO: the discounted multi-month plan is the only
   // choice, so the toggle is not rendered and `plan` stays as the price anchor.
@@ -65,6 +74,30 @@ export function PremiumPlanCard({
   const selectedPlan =
     discountedPlan?.key === selectedKey ? discountedPlan : plan;
   const months = selectedPlan.intervalCount ?? 1;
+  // A trial buyer chooses the post-trial cadence in this card, so the monthly
+  // plan joins the toggle even where monthly is retired for direct purchase.
+  const canChooseMonthly = offerMonthly || trialEligible;
+  const selectedAmount = formatBillingAmount(
+    selectedPlan.amountMinor,
+    selectedPlan.currency,
+    locale,
+  );
+  // Seeded once on mount: the first-charge date must not drift between
+  // re-renders when the buyer toggles plans.
+  const [trialChargeDate] = useState(() =>
+    new Intl.DateTimeFormat(locale === "ka" ? "ka-GE" : "en-GB", {
+      day: "numeric",
+      month: "long",
+    }).format(new Date(Date.now() + PRO_TRIAL_DAYS * 86_400_000)),
+  );
+  const renewalPhrase =
+    months === 1
+      ? en
+        ? "every month"
+        : "ყოველთვიურად"
+      : en
+        ? `every ${months} months`
+        : `ყოველ ${months} თვეში ერთხელ`;
   const isDiscounted = Boolean(
     discountedPlan && selectedPlan.key === discountedPlan.key,
   );
@@ -107,7 +140,12 @@ export function PremiumPlanCard({
       const response = await fetch("/api/subscription/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ planKey: selectedPlan.key, returnTo, product }),
+        body: JSON.stringify({
+          planKey: selectedPlan.key,
+          returnTo,
+          product,
+          ...(trialEligible ? { trial: true } : {}),
+        }),
       });
       const data = (await response.json().catch(() => ({}))) as {
         url?: string;
@@ -115,7 +153,9 @@ export function PremiumPlanCard({
         value?: number;
         currency?: string;
         contentId?: string;
+        error?: string;
       };
+      if (data.error === "trial_unavailable") setTrialUsed(true);
       if (data.url) {
         fbTrack(
           "InitiateCheckout",
@@ -170,7 +210,7 @@ export function PremiumPlanCard({
         <div className="shrink-0 rounded-2xl border border-[var(--vivida-gold)]/25 bg-background/35 p-4 text-center sm:min-w-56">
           {discountedPlan && !active && (
             <div
-              className={`mb-4 grid rounded-xl border border-border/60 bg-background/45 p-1 text-xs ${offerMonthly ? "grid-cols-2" : "grid-cols-1"}`}
+              className={`mb-4 grid rounded-xl border border-border/60 bg-background/45 p-1 text-xs ${canChooseMonthly ? "grid-cols-2" : "grid-cols-1"}`}
             >
               <button
                 type="button"
@@ -180,7 +220,7 @@ export function PremiumPlanCard({
               >
                 {en ? "3 months" : "3 თვე"}
               </button>
-              {offerMonthly && (
+              {canChooseMonthly && (
                 <button
                   type="button"
                   onClick={() => setSelectedKey(plan.key)}
@@ -198,23 +238,46 @@ export function PremiumPlanCard({
               {en ? `Save ${savings}%` : `დაზოგე ${savings}%`}
             </div>
           )}
-          <div className="text-3xl font-bold tracking-tight">
-            {formatBillingAmount(
-              selectedPlan.amountMinor,
-              selectedPlan.currency,
-              locale,
-            )}
-          </div>
-          <div className="text-xs text-muted-foreground">
-            /
-            {months === 1
-              ? en
-                ? "month"
-                : "თვე"
-              : en
-                ? `${months} months`
-                : `${months} თვე`}
-          </div>
+          {trialEligible && !active ? (
+            <>
+              <div className="mb-2 inline-flex items-center gap-1 rounded-full bg-[var(--vivida-gold)]/16 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-[var(--vivida-gold)]">
+                <Sparkles className="size-3" />
+                {en ? "Free trial" : "უფასო საცდელი პერიოდი"}
+              </div>
+              <div className="text-3xl font-bold tracking-tight">
+                {en
+                  ? `${PRO_TRIAL_DAYS} days free`
+                  : `${PRO_TRIAL_DAYS} დღე უფასოდ`}
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                {en ? "then" : "შემდეგ"} {selectedAmount}
+                {" / "}
+                {months === 1
+                  ? en
+                    ? "month"
+                    : "თვე"
+                  : en
+                    ? `${months} months`
+                    : `${months} თვე`}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="text-3xl font-bold tracking-tight">
+                {selectedAmount}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                /
+                {months === 1
+                  ? en
+                    ? "month"
+                    : "თვე"
+                  : en
+                    ? `${months} months`
+                    : `${months} თვე`}
+              </div>
+            </>
+          )}
           {isDiscounted && (
             <div className="mt-1 text-xs text-foreground/70">
               {en ? "Only" : "მხოლოდ"}{" "}
@@ -243,29 +306,43 @@ export function PremiumPlanCard({
               disabled={pending}
             >
               {pending && <Loader2 className="size-4 animate-spin" />}
-              {isDiscounted
+              {trialEligible
                 ? en
-                  ? "Get 3 months"
-                  : "მიიღე 3 თვე"
-                : en
-                  ? "Get PRO"
-                  : "გახდი PRO"}
+                  ? "Start free trial"
+                  : "დაიწყე უფასო პერიოდი"
+                : isDiscounted
+                  ? en
+                    ? "Get 3 months"
+                    : "მიიღე 3 თვე"
+                  : en
+                    ? "Get PRO"
+                    : "გახდი PRO"}
             </Button>
           )}
           {error && (
             <p className="mt-2 text-xs text-destructive">
-              {en ? "Checkout could not start." : "გადახდა ვერ დაიწყო."}
+              {trialUsed
+                ? en
+                  ? "The free trial has already been used on this account."
+                  : "უფასო საცდელი პერიოდი ამ ანგარიშზე უკვე გამოყენებულია."
+                : en
+                  ? "Checkout could not start."
+                  : "გადახდა ვერ დაიწყო."}
             </p>
           )}
           {!active && (
             <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
-              {isDiscounted
+              {trialEligible
                 ? en
-                  ? "Renews every 3 months at the same price. Cancel anytime."
-                  : "იგივე ფასად ყოველ 3 თვეში განახლდება. გაუქმება ნებისმიერ დროს შეგიძლია."
-                : en
-                  ? "Renews automatically each month. Cancel anytime."
-                  : "ყოველთვიურად ავტომატურად განახლდება. გაუქმება ნებისმიერ დროს შეგიძლია."}
+                  ? `A card is required, but you will not be charged today. If you do not cancel by ${trialChargeDate}, your card will automatically be charged ${selectedAmount} on that day and then renew ${renewalPhrase}. Cancel anytime — cancel before the trial ends and you pay nothing.`
+                  : `ბარათის მითითება საჭიროა, თუმცა დღეს თანხა არ ჩამოგეჭრება. თუ ${trialChargeDate}-მდე არ გააუქმებ, იმ დღეს ბარათიდან ავტომატურად ჩამოგეჭრება ${selectedAmount} და შემდეგ ${renewalPhrase} განახლდება. გაუქმება ნებისმიერ დროს შეგიძლია — საცდელი პერიოდის დასრულებამდე გაუქმებისას თანხა არ ჩამოგეჭრება.`
+                : isDiscounted
+                  ? en
+                    ? "Renews every 3 months at the same price. Cancel anytime."
+                    : "იგივე ფასად ყოველ 3 თვეში განახლდება. გაუქმება ნებისმიერ დროს შეგიძლია."
+                  : en
+                    ? "Renews automatically each month. Cancel anytime."
+                    : "ყოველთვიურად ავტომატურად განახლდება. გაუქმება ნებისმიერ დროს შეგიძლია."}
             </p>
           )}
           {cryptoAvailable && !active && (

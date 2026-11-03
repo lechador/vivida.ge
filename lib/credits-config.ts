@@ -9,12 +9,14 @@
  * Tuning the economy is a one-line change in this file.
  */
 
-export const SIGNUP_BONUS = 4;
+export const SIGNUP_BONUS = 10;
 /** signup_credits_v1: staged cohort receives this immediately. */
-export const STAGED_SIGNUP_BONUS = 4;
+export const STAGED_SIGNUP_BONUS = 10;
 /**
  * signup_credits_v1: staged cohort receives this on its first 24h+ return.
- * Retired to 0 (2026-10-24): the welcome grant is now a single 4-credit bonus,
+ * Retired to 0 (2026-10-24): the welcome grant is a single 10-credit bonus
+ * (raised 4 → 10 on 2026-11-03, exactly one full tarot reading or two
+ * follow-ups, so a new user can complete a real paid-depth loop on day one),
  * and returning is rewarded through the monthly bonus instead.
  */
 export const STAGED_RETURN_BONUS = 0;

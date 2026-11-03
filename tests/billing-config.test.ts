@@ -15,8 +15,10 @@ import {
   premiumPlanSavingsPercent,
   monthlyPlanOffered,
   premiumPlanForCountry,
+  PRO_TRIAL_DAYS,
   PURCHASE_PROMOTION_CREDIT_THRESHOLD,
   shouldShowPurchasePromotion,
+  trialPlanByKeyForCountry,
 } from "@/lib/billing-config";
 
 describe("country billing catalogue", () => {
@@ -440,5 +442,37 @@ describe("monthly PRO retirement (Georgia, owner decision 2026-10-16)", () => {
     expect(premiumPlanByKeyForCountry("GB", "premium_gb_monthly")?.key).toBe(
       "premium_gb_monthly",
     );
+  });
+});
+
+describe("free trial plan choice (2026-11-03)", () => {
+  it("runs for seven days", () => {
+    expect(PRO_TRIAL_DAYS).toBe(7);
+  });
+
+  it("lets a Georgian trial buyer choose the monthly plan for the first charge", () => {
+    // Direct purchase of this key stays refused (see the suite above); only
+    // the explicit post-trial cadence choice may resolve it.
+    expect(trialPlanByKeyForCountry("GE", "premium_ge_monthly")).toEqual(
+      PREMIUM_PLANS_BY_COUNTRY.GE,
+    );
+    expect(premiumPlanByKeyForCountry("GE", "premium_ge_monthly")).toBeNull();
+  });
+
+  it("lets a Georgian trial buyer choose the quarterly plan", () => {
+    expect(trialPlanByKeyForCountry("GE", LOW_CREDIT_PROMO_PLAN.key)?.key).toBe(
+      LOW_CREDIT_PROMO_PLAN.key,
+    );
+  });
+
+  it("keeps trial plans scoped to the buyer's own market", () => {
+    expect(
+      trialPlanByKeyForCountry("GB", LOW_CREDIT_PROMO_PLAN.key),
+    ).toBeNull();
+    expect(trialPlanByKeyForCountry("GB", "premium_gb_monthly")?.key).toBe(
+      "premium_gb_monthly",
+    );
+    expect(trialPlanByKeyForCountry("GE", "made_up_price")).toBeNull();
+    expect(trialPlanByKeyForCountry("GE", null)).toBeNull();
   });
 });
