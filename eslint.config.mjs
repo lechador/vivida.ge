@@ -16,6 +16,22 @@ const eslintConfig = defineConfig([
     ".claude/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      // db.transaction() type-checks but throws at runtime on the prod
+      // neon-http driver (see db/index.ts); ban it so CI cannot green-light
+      // a transaction path that fails in production.
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "CallExpression[callee.type='MemberExpression'][callee.object.name='db'][callee.property.name='transaction']",
+          message:
+            "db.transaction() is unsupported on the neon-http production driver; use sequential idempotent writes instead (see db/index.ts).",
+        },
+      ],
+    },
+  },
 ]);
 
 export default eslintConfig;

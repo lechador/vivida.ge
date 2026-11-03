@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { signHoroscopeSeoEn } from "@/components/seo/sign-horoscope-page-en";
+import { signHoroscopeSeoEn } from "@/lib/seo/sign-horoscope-en";
 import { calendarDaySeoEn } from "@/lib/seo/astrology-calendar-en";
 
 const GEORGIAN = /[ა-ჰ]/;

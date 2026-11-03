@@ -4,6 +4,8 @@ import type { NatalChartJson } from "@/db/schema";
 import { computeChartSalience } from "@/lib/report-salience";
 import { buildChartChatSystem } from "@/lib/chart-chat";
 import {
+  ASK_MEMORY_REFRESH_EVERY_TURNS,
+  askMemoryRefreshDue,
   buildMemoryBlock,
   inferVerbosity,
   sanitizeMergedMemory,
@@ -156,5 +158,34 @@ describe("chart chat system prompt", () => {
       "   ",
     );
     expect(withoutMem).not.toContain("გახსოვს ამ ადამიანზე");
+  });
+});
+
+describe("askMemoryRefreshDue", () => {
+  it("never merges on an empty history", () => {
+    expect(askMemoryRefreshDue(0, null)).toBe(false);
+    expect(askMemoryRefreshDue(0, 0)).toBe(false);
+  });
+
+  it("merges once there is history and no baseline yet", () => {
+    expect(askMemoryRefreshDue(1, null)).toBe(true);
+    expect(askMemoryRefreshDue(3, undefined)).toBe(true);
+  });
+
+  it("waits for a full window of new user turns after a merge", () => {
+    // 4 user turns (plus their 4 assistant replies) after a merge at 0.
+    expect(askMemoryRefreshDue(4, 0)).toBe(false);
+    // The 5th user turn opens the window, even with 5 assistant rows beside.
+    expect(askMemoryRefreshDue(5, 0)).toBe(true);
+    expect(askMemoryRefreshDue(ASK_MEMORY_REFRESH_EVERY_TURNS, 0)).toBe(true);
+  });
+
+  it("clamps pre-user-only baselines at zero instead of double-refreshing", () => {
+    // turnsSeen counted both roles (e.g. 10 rows for 5 user turns); the
+    // inflated baseline must not trigger a merge until 5 genuinely new
+    // user turns accumulate past it.
+    expect(askMemoryRefreshDue(5, 10)).toBe(false);
+    expect(askMemoryRefreshDue(14, 10)).toBe(false);
+    expect(askMemoryRefreshDue(15, 10)).toBe(true);
   });
 });

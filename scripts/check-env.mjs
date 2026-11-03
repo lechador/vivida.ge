@@ -12,10 +12,20 @@ const ROOT = new URL("..", import.meta.url).pathname;
 const EXAMPLE = join(ROOT, ".env.example");
 
 // Vercel/Next/Node built-ins, never belong in .env.example.
-const ALLOWLIST = new Set(["NODE_ENV", "VERCEL", "VERCEL_ENV"]);
+const ALLOWLIST = new Set(["NODE_ENV", "VERCEL", "VERCEL_ENV", "NEXT_RUNTIME"]);
 
-const SCAN_DIRS = ["app", "lib", "actions", "components", "scripts"];
-const SCAN_FILES = ["auth.ts", "auth.config.ts", "proxy.ts"];
+const SCAN_DIRS = ["app", "lib", "actions", "components", "scripts", "db"];
+const SCAN_FILES = [
+  "auth.ts",
+  "auth.config.ts",
+  "proxy.ts",
+  "next.config.ts",
+  "sentry.edge.config.ts",
+  "sentry.server.config.ts",
+  "instrumentation.ts",
+  "instrumentation-client.ts",
+  "drizzle.config.ts",
+];
 
 function exampleKeys() {
   const text = readFileSync(EXAMPLE, "utf8");

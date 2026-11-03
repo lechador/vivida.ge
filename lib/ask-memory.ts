@@ -1,10 +1,14 @@
-import { desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import { askUserMemories, chartChatMessages } from "@/db/schema";
 import type { AskUserMemory } from "@/db/schema";
 import type { UserLocale } from "@/lib/i18n/user-locale";
-import { MAX_SUMMARY_CHARS } from "@/lib/ask-memory-pure";
+import {
+  ASK_MEMORY_REFRESH_EVERY_TURNS,
+  askMemoryRefreshDue,
+  MAX_SUMMARY_CHARS,
+} from "@/lib/ask-memory-pure";
 import { sanitizeMergedMemory } from "@/lib/ask-memory-pure";
 
 export {
@@ -39,7 +43,6 @@ export type {
  * most one call per 5 new user turns. Failures only log; chat never breaks.
  */
 
-const REFRESH_EVERY_TURNS = 5;
 const RECENT_TURNS_FOR_MERGE = 30;
 
 export async function getAskMemory(
@@ -77,12 +80,19 @@ export async function refreshAskMemory(
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) return false;
 
+    // Count user turns only: each exchange writes a user row and an
+    // assistant row, so counting all rows refreshes ~2x as often as the
+    // documented "per 5 new user turns" cadence.
     const [countRow] = await db
       .select({ n: sql<number>`count(*)::int` })
       .from(chartChatMessages)
-      .where(eq(chartChatMessages.userId, userId));
+      .where(
+        and(
+          eq(chartChatMessages.userId, userId),
+          eq(chartChatMessages.role, "user"),
+        ),
+      );
     const totalTurns = countRow?.n ?? 0;
-    if (totalTurns === 0) return false;
 
     const [existing] = await db
       .select()
@@ -90,8 +100,11 @@ export async function refreshAskMemory(
       .where(eq(askUserMemories.userId, userId))
       .limit(1);
     if (
-      existing &&
-      totalTurns - (existing.turnsSeen ?? 0) < REFRESH_EVERY_TURNS
+      !askMemoryRefreshDue(
+        totalTurns,
+        existing?.turnsSeen,
+        ASK_MEMORY_REFRESH_EVERY_TURNS,
+      )
     )
       return false;
 

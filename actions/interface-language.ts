@@ -22,17 +22,24 @@ export async function updateInterfaceLanguage(
     .where(eq(users.id, user.id));
 
   // On vividaastro.com, keep the `vivida_lang` cookie in sync with the stored
-  // preference ("en" | "pl") so shared routes and proxy forwarding agree.
+  // preference so shared routes and proxy forwarding agree. Switching to
+  // Georgian must clear a stale `pl` cookie: otherwise proxy forwarding
+  // (x-vivida-locale) keeps rendering shared routes in Polish despite the
+  // stored `ka` preference preferring English on this host.
   // Public indexable SEO routes ignore this cookie (getRequestLocale never
   // reads cookies()).
-  if ((locale === "en" || locale === "pl") && (await requestIsEnglishHost())) {
+  if (await requestIsEnglishHost()) {
     try {
       const cookieStore = await cookies();
-      cookieStore.set("vivida_lang", locale, {
-        path: "/",
-        maxAge: 60 * 60 * 24 * 365,
-        sameSite: "lax",
-      });
+      if (locale === "en" || locale === "pl") {
+        cookieStore.set("vivida_lang", locale, {
+          path: "/",
+          maxAge: 60 * 60 * 24 * 365,
+          sameSite: "lax",
+        });
+      } else {
+        cookieStore.delete("vivida_lang");
+      }
     } catch {
       // Ignore in test environments where cookies() may be mocked.
     }

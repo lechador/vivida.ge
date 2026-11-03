@@ -21,6 +21,7 @@ import {
   type MoonEvent,
 } from "@/lib/seo/moon-events";
 import { lunarDayFromAge } from "@/lib/seo/moon-reference";
+import { moonCalendarPlCopy } from "@/lib/seo/moon-calendar-pl-copy";
 import { tbilisiCalendarParts, tbilisiNoonUtc } from "@/lib/moon-calendar-date";
 
 const SITE = "https://www.vividaastro.com";
@@ -40,11 +41,6 @@ const cachedUpcomingEvents = unstable_cache(
   ["moon-calendar-upcoming-v2"],
   { revalidate: 86400 },
 );
-
-export const moonCalendarPlCopy = (year: number) => ({
-  title: `Kalendarz Księżycowy ${year}: Fazy Księżyca i Znak Zodiaku Dzisiaj`,
-  description: `Kalendarz księżycowy na rok ${year}: aktualna faza księżyca, stopień oświetlenia, znak zodiaku, daty pełni i nowiu oraz prognoza księżycowa na 30 dni.`,
-});
 
 const PHASES_PL: Array<{ key: PhaseKey; range: string; meaning: string }> = [
   {

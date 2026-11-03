@@ -28,10 +28,8 @@ import {
   moonCalendarEnCopy,
   MoonCalendarPageEn,
 } from "@/components/seo/moon-calendar-en";
-import {
-  moonCalendarPlCopy,
-  MoonCalendarPagePl,
-} from "@/components/seo/moon-calendar-pl";
+import { MoonCalendarPagePl } from "@/components/seo/moon-calendar-pl";
+import { moonCalendarPlCopy } from "@/lib/seo/moon-calendar-pl-copy";
 
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { tbilisiCalendarParts, tbilisiNoonUtc } from "@/lib/moon-calendar-date";

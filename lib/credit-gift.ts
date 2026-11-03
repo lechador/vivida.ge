@@ -41,11 +41,24 @@ import { acquireResendSlot } from "@/lib/resend-throttle";
 import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
 
-export const CREDIT_GIFT_CAMPAIGN_SLUG = "credit-gift-10-2026-11";
-export const CREDIT_GIFT_AMOUNT = 10;
-/** Balance at or below which a spender counts as "out of credits". */
-export const CREDIT_GIFT_BALANCE_THRESHOLD = 3;
-const SEND_LOG_KIND = "credit_gift";
+export {
+  CREDIT_GIFT_AMOUNT,
+  CREDIT_GIFT_BALANCE_THRESHOLD,
+  CREDIT_GIFT_CAMPAIGN_SLUG,
+  CREDIT_GIFT_SEND_LOG_KIND,
+  creditGiftGrantRef,
+  creditGiftIdempotencyKey,
+  creditGiftLogKind,
+} from "./credit-gift-pure";
+import {
+  CREDIT_GIFT_AMOUNT,
+  CREDIT_GIFT_BALANCE_THRESHOLD,
+  CREDIT_GIFT_CAMPAIGN_SLUG,
+  CREDIT_GIFT_SEND_LOG_KIND,
+  creditGiftGrantRef,
+  creditGiftIdempotencyKey,
+  creditGiftLogKind,
+} from "./credit-gift-pure";
 
 function resolveFrom(envVal: string | undefined, fallback: string): string {
   if (!envVal) return fallback;
@@ -130,7 +143,7 @@ async function alreadySent(userId: string): Promise<boolean> {
     .where(
       and(
         eq(emailSendLog.userId, userId),
-        eq(emailSendLog.kind, SEND_LOG_KIND),
+        eq(emailSendLog.kind, CREDIT_GIFT_SEND_LOG_KIND),
         eq(emailSendLog.status, "sent"),
       ),
     )
@@ -164,7 +177,7 @@ async function giftAndEmail(
     .insert(emailSendLog)
     .values({
       userId: recipient.userId,
-      kind: SEND_LOG_KIND,
+      kind: creditGiftLogKind(isTest),
       email: recipient.email,
       subject,
       status: "pending",
@@ -196,7 +209,7 @@ async function giftAndEmail(
         recipient.userId,
         CREDIT_GIFT_AMOUNT,
         "admin_grant",
-        `${CREDIT_GIFT_CAMPAIGN_SLUG}:${recipient.userId}`,
+        creditGiftGrantRef(recipient.userId, isTest),
       ));
 
     const token = await getOrCreateUnsubscribeToken(recipient.userId);
@@ -228,7 +241,7 @@ async function giftAndEmail(
           "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
         },
       },
-      { idempotencyKey: `${SEND_LOG_KIND}:${recipient.userId}` },
+      { idempotencyKey: creditGiftIdempotencyKey(recipient.userId, isTest) },
     );
     if (result.error) throw new Error(result.error.message ?? "send failed");
 

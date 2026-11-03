@@ -41,9 +41,9 @@ import { HoroscopeView } from "./horoscope-view";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import {
   SignHoroscopePageEn,
-  signHoroscopeSeoEn,
   VIEW_LABEL_EN,
 } from "@/components/seo/sign-horoscope-page-en";
+import { signHoroscopeSeoEn } from "@/lib/seo/sign-horoscope-en";
 import { YearlyHoroscopePageEn } from "@/components/seo/yearly-horoscope-page-en";
 
 import { yearlyHoroscopeEnglish } from "@/lib/yearly-horoscope-en";

@@ -8,6 +8,26 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
 
 export const MAX_SUMMARY_CHARS = 1500;
 
+/** Throttle window for the rolling-portrait merge, counted in user turns. */
+export const ASK_MEMORY_REFRESH_EVERY_TURNS = 5;
+
+/**
+ * True when a portrait merge is due: at least `every` new *user* turns since
+ * the last merge. A missing baseline always merges once there is anything to
+ * merge. `turnsSeen` stored before user-only counting can exceed the current
+ * total; that delta clamps at 0 so those rows re-baseline instead of
+ * refreshing on the old doubled cadence.
+ */
+export function askMemoryRefreshDue(
+  totalUserTurns: number,
+  turnsSeen: number | null | undefined,
+  every: number = ASK_MEMORY_REFRESH_EVERY_TURNS,
+): boolean {
+  if (totalUserTurns === 0) return false;
+  if (turnsSeen == null) return true;
+  return Math.max(0, totalUserTurns - turnsSeen) >= every;
+}
+
 export type MergedMemory = { summary: string; traits: AskUserMemoryTraits };
 
 /**

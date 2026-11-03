@@ -122,7 +122,7 @@ export async function touchAskConversation(
       updatedAt: new Date(),
       ...(firstQuestion
         ? {
-            title: sql`CASE WHEN ${askConversations.title} = '' THEN ${conversationTitle(
+            title: sql`CASE WHEN btrim(${askConversations.title}) = '' THEN ${conversationTitle(
               firstQuestion,
             )} ELSE ${askConversations.title} END`,
           }

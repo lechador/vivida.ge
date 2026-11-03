@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { localizedHref, polishPublicPath } from "@/lib/seo/public-paths";
 import { localizedAlternates } from "@/lib/seo/locales";
-import { moonCalendarPlCopy } from "@/components/seo/moon-calendar-pl";
+import { moonCalendarPlCopy } from "@/lib/seo/moon-calendar-pl-copy";
 
 describe("Stage 5A: Polish Public Routes & SEO Invariants", () => {
   it("resolves clean Polish public URLs across all Stage 5A hubs", () => {
