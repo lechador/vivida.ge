@@ -139,7 +139,13 @@ export async function syncPremiumSubscription(
     amountMinor,
     currentPeriodStart: periodStart,
     currentPeriodEnd: periodEnd,
-    cancelAtPeriodEnd: subscription.cancel_at_period_end,
+    // Current Stripe APIs schedule a cancellation through `cancel_at`
+    // (an absolute timestamp) and leave `cancel_at_period_end` false —
+    // notably for trial cancellations, where the run ends at trial end.
+    // Reading only the legacy flag mirrored a cancelled trial as a
+    // happily renewing one, trial notice and all.
+    cancelAtPeriodEnd:
+      subscription.cancel_at_period_end || subscription.cancel_at != null,
     canceledAt: subscription.canceled_at
       ? new Date(subscription.canceled_at * 1000)
       : null,
