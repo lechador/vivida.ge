@@ -9,6 +9,7 @@ import {
   emailCampaignRecipients,
   emailCampaigns,
   emailSendLog,
+  premiumSubscriptions,
   profiles,
   users,
 } from "@/db/schema";
@@ -22,6 +23,7 @@ import { DailyHoroscopeEmail } from "@/lib/email-templates/daily-horoscope";
 import { ProfileIncompleteEmail } from "@/lib/email-templates/profile-incomplete";
 import { MarketingEmail } from "@/lib/email-templates/marketing";
 import { LowCreditOfferEmail } from "@/lib/email-templates/low-credit-offer";
+import { ProTrialEmail } from "@/lib/email-templates/pro-trial";
 import { ensureDailyFor } from "@/actions/daily";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
 import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
@@ -32,10 +34,13 @@ import {
   LOW_CREDIT_OFFER_THRESHOLD,
 } from "@/lib/promo-offer";
 import {
+  discountedPremiumPlanForCountry,
   formatBillingAmount,
   HALLOWEEN_PROMO_MONTHS,
   HALLOWEEN_PROMO_PLAN,
+  premiumPlanForCountry,
   PREMIUM_PLANS_BY_COUNTRY,
+  PRO_TRIAL_DAYS,
 } from "@/lib/billing-config";
 import { kaDayMonthGenitive } from "@/lib/i18n/ka-date";
 import { dailyEmailSubject } from "@/lib/daily-headline";
@@ -68,7 +73,11 @@ function localizedAbsUrl(path: string, locale: UserLocale): string {
 
 /** Type of bulk-send the admin can trigger. */
 export type EmailTemplateKind =
-  "daily_horoscope" | "profile_incomplete" | "marketing" | "low_credit_offer";
+  | "daily_horoscope"
+  | "profile_incomplete"
+  | "marketing"
+  | "low_credit_offer"
+  | "pro_trial";
 
 export type SendOptions = {
   template: EmailTemplateKind;
@@ -102,6 +111,8 @@ type Recipient = {
   /** Credit balance at audience-resolution time. Only the offer template
    *  reads it, it is the reason that email is being sent. */
   balance?: number;
+  /** Residence market for local plan pricing. Only the trial template reads it. */
+  countryCode?: string | null;
 };
 
 /**
@@ -238,6 +249,47 @@ async function resolveAudience(
       }));
   }
 
+  if (template === "pro_trial") {
+    // Everyone who could actually start the trial tomorrow morning:
+    // marketing-consented, not PRO right now, and no subscription row ever —
+    // a single historical row permanently retires trial eligibility, and
+    // emailing the offer to someone the checkout will refuse is worse than
+    // not emailing them at all.
+    const rows = await db
+      .select({
+        userId: users.id,
+        email: users.email,
+        name: users.name,
+        locale: users.interfaceLanguage,
+        countryCode: users.residenceCountryCode,
+        isPremium: users.isPremium,
+        premiumUntil: users.premiumUntil,
+      })
+      .from(users)
+      .where(
+        and(
+          eq(users.emailMarketing, true),
+          sql`NOT EXISTS (
+            SELECT 1 FROM premium_subscription ps WHERE ps.user_id = ${users.id}
+          )`,
+        ),
+      );
+    const now = Date.now();
+    return rows
+      .filter((r): r is typeof r & { email: string } => !!r.email)
+      .filter(
+        (r) =>
+          !(r.isPremium && r.premiumUntil && r.premiumUntil.getTime() > now),
+      )
+      .map((r) => ({
+        userId: r.userId,
+        email: r.email,
+        name: r.name,
+        locale: r.locale,
+        countryCode: r.countryCode,
+      }));
+  }
+
   // marketing
   return await db
     .select({
@@ -311,6 +363,36 @@ export async function ensureLowCreditOfferCampaign(): Promise<{ id: string }> {
   return campaign;
 }
 
+export const PRO_TRIAL_CAMPAIGN_SLUG = "pro-trial-launch-2026-11";
+
+const TRIAL_SUBJECT = {
+  ka: `✦ ${PRO_TRIAL_DAYS} დღე ულიმიტო Vivida PRO უფასოდ — დღეს არც ერთი თეთრი`,
+  en: `✦ ${PRO_TRIAL_DAYS} days of unlimited Vivida PRO, free — nothing charged today`,
+  pl: `✦ ${PRO_TRIAL_DAYS} dni Vivida PRO bez limitu za darmo — dziś bez opłat`,
+};
+
+export async function ensureProTrialCampaign(): Promise<{ id: string }> {
+  const [campaign] = await db
+    .insert(emailCampaigns)
+    .values({
+      slug: PRO_TRIAL_CAMPAIGN_SLUG,
+      name: "PRO free trial launch · 7 days free",
+      template: "pro_trial",
+      subject: TRIAL_SUBJECT.ka,
+      // No credit reward: the conversion is the trial start itself.
+      rewardCredits: 0,
+      status: "draft",
+      ctaLabel: `დაიწყე უფასო ${PRO_TRIAL_DAYS} დღე`,
+      ctaUrl: "/subscription",
+    })
+    .onConflictDoUpdate({
+      target: emailCampaigns.slug,
+      set: { subject: TRIAL_SUBJECT.ka },
+    })
+    .returning({ id: emailCampaigns.id });
+  return campaign;
+}
+
 /**
  * Send-with-concurrency-cap. Resend's free tier rate-limits at 2 req/s,
  * but the paid tier accepts much more. We default to 5 concurrent
@@ -361,7 +443,10 @@ export async function sendBulk(opts: SendOptions): Promise<SendResult> {
   // Same resumability for the offer blast, keyed off the campaign rather than
   // the subject line: whoever already has a sent row must not be mailed twice
   // if the route times out and the admin retries.
-  if (opts.template === "low_credit_offer" && opts.campaignId) {
+  if (
+    (opts.template === "low_credit_offer" || opts.template === "pro_trial") &&
+    opts.campaignId
+  ) {
     const alreadySent = await db
       .select({ userId: emailCampaignRecipients.userId })
       .from(emailCampaignRecipients)
@@ -502,6 +587,36 @@ export async function sendLowCreditOfferTest(to: string): Promise<boolean> {
     },
     { ...recipient, email: recipient.email },
     `campaign-test:${campaign.id}:${recipient.userId}:${Date.now()}`,
+  );
+}
+
+/**
+ * Send the PRO trial launch email to one named account, bypassing the
+ * audience filters (the tester may already have had PRO). No recipient row
+ * is written, so the test never pollutes the campaign's own figures.
+ */
+export async function sendProTrialTest(to: string): Promise<boolean> {
+  const [recipient] = await db
+    .select({
+      userId: users.id,
+      email: users.email,
+      name: users.name,
+      locale: users.interfaceLanguage,
+      countryCode: users.residenceCountryCode,
+    })
+    .from(users)
+    .where(eq(users.email, to.trim().toLowerCase()))
+    .limit(1);
+  if (!recipient?.email)
+    throw new Error("test recipient is not a registered user");
+  return dispatch(
+    {
+      template: "pro_trial",
+      // The tester is usually ineligible on purpose; send anyway.
+      allowCompletedProfile: true,
+    },
+    { ...recipient, email: recipient.email },
+    `pro-trial-test:${recipient.userId}:${Date.now()}`,
   );
 }
 
@@ -812,6 +927,122 @@ async function dispatch(
     await logToUnifiedSendLog(
       recipient.userId,
       "low_credit_offer",
+      recipient.email,
+      subject,
+      result.error?.message,
+    );
+    if (result.error) throw new Error(result.error.message ?? "send failed");
+    return true;
+  }
+
+  if (opts.template === "pro_trial") {
+    // Re-check eligibility at dispatch: between audience resolution and the
+    // actual send someone may have started PRO (or the trial) already, and
+    // the checkout would refuse them a second trial after this email
+    // promised them one.
+    const [current] = await db
+      .select({
+        isPremium: users.isPremium,
+        premiumUntil: users.premiumUntil,
+      })
+      .from(users)
+      .where(eq(users.id, recipient.userId))
+      .limit(1);
+    const [history] = await db
+      .select({ userId: premiumSubscriptions.userId })
+      .from(premiumSubscriptions)
+      .where(eq(premiumSubscriptions.userId, recipient.userId))
+      .limit(1);
+    const stillPremium = Boolean(
+      current?.isPremium &&
+      current.premiumUntil &&
+      current.premiumUntil.getTime() > Date.now(),
+    );
+    if ((stillPremium || history) && !opts.allowCompletedProfile) return false;
+
+    const unsubUrl = localizedAbsUrl(
+      `/unsubscribe?token=${token}&type=marketing`,
+      locale,
+    );
+    // Same residence fallbacks as the billing surfaces the email lands on:
+    // stored country wins, Polish readers without one price in PLN, and the
+    // catalogue itself defaults everyone else to the Georgian market.
+    const effectiveCountry =
+      recipient.countryCode || (locale === "pl" ? "PL" : undefined);
+    const monthlyPlan = premiumPlanForCountry(effectiveCountry);
+    const quarterlyPlan = discountedPremiumPlanForCountry(effectiveCountry);
+    const subject =
+      locale === "pl"
+        ? TRIAL_SUBJECT.pl
+        : locale === "en"
+          ? TRIAL_SUBJECT.en
+          : TRIAL_SUBJECT.ka;
+    await acquireResendSlot();
+    const result = await c.emails.send(
+      {
+        from: FROM,
+        to: recipient.email,
+        subject,
+        react: ProTrialEmail({
+          name: recipient.name?.split(" ")[0] ?? null,
+          trialDays: PRO_TRIAL_DAYS,
+          zeroPriceLabel: formatBillingAmount(0, monthlyPlan.currency, locale),
+          monthlyPriceLabel: formatBillingAmount(
+            monthlyPlan.amountMinor,
+            monthlyPlan.currency,
+            locale,
+          ),
+          quarterlyPriceLabel: quarterlyPlan
+            ? formatBillingAmount(
+                quarterlyPlan.amountMinor,
+                quarterlyPlan.currency,
+                locale,
+              )
+            : null,
+          quarterlyPerMonthLabel: quarterlyPlan
+            ? formatBillingAmount(
+                Math.round(
+                  quarterlyPlan.amountMinor /
+                    (quarterlyPlan.intervalCount ?? 1),
+                ),
+                quarterlyPlan.currency,
+                locale,
+              )
+            : null,
+          // Preserve the destination even when the email is opened in a
+          // browser where the recipient is not currently signed in.
+          trialUrl: localizedAbsUrl(
+            `/login?next=${encodeURIComponent("/subscription?product=pro_trial_launch")}`,
+            locale,
+          ),
+          unsubscribeUrl: unsubUrl,
+          locale,
+        }),
+        headers: {
+          "List-Unsubscribe": `<${unsubUrl}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
+      },
+      idempotencyKey ? { idempotencyKey } : undefined,
+    );
+    if (opts.campaignId) {
+      await db
+        .update(emailCampaignRecipients)
+        .set({
+          status: result.error ? "failed" : "sent",
+          error: result.error?.message ?? null,
+          sentAt: result.error ? null : new Date(),
+        })
+        .where(
+          and(
+            eq(emailCampaignRecipients.campaignId, opts.campaignId),
+            eq(emailCampaignRecipients.userId, recipient.userId),
+          ),
+        );
+    }
+    await logToUnifiedSendLog(
+      recipient.userId,
+      "pro_trial",
       recipient.email,
       subject,
       result.error?.message,
