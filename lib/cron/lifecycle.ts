@@ -23,6 +23,10 @@ import {
   sendWinbackNudges,
   type WinbackResult,
 } from "@/lib/winback";
+import {
+  sendTrialEndingReminders,
+  type TrialReminderResult,
+} from "@/lib/trial-reminders";
 
 /**
  * Daily lifecycle workload: push, birthday gifts, winback, lead horoscopes and
@@ -95,6 +99,24 @@ export async function runLifecycleCron(req: NextRequest) {
     );
   }
 
+  // Last-day-of-trial notices run before the discretionary sequences: the
+  // window is under 24 hours, so deferring one behind a capped winback run
+  // could mean it lands after the first charge it exists to announce.
+  let trialReminders: TrialReminderResult = {
+    candidates: 0,
+    emailed: 0,
+    skipped: 0,
+    failed: 0,
+  };
+  try {
+    trialReminders = await sendTrialEndingReminders(budget);
+  } catch (err) {
+    console.warn(
+      "[cron:lifecycle] trial reminder sequence failed:",
+      (err as Error).message,
+    );
+  }
+
   let leads: LeadBlastResult = { audience: 0, sent: 0, skipped: 0, failed: 0 };
   try {
     leads = await sendDailyHoroscopeToLeads({ sendDate });
@@ -143,6 +165,7 @@ export async function runLifecycleCron(req: NextRequest) {
     push,
     birthdays,
     winback,
+    trialReminders,
     leads,
     renudge,
     // Surfaced so an operator can see the cap actually binding and that the
