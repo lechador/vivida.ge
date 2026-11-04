@@ -53,7 +53,11 @@ export async function POST(req: Request) {
         if (uid && sessionObj.payment_status === "paid") {
           await recordExperimentOutcomesBestEffort(
             uid,
-            [EXPERIMENTS.pricingPresentation, EXPERIMENTS.contextualPaywall],
+            [
+              EXPERIMENTS.pricingPresentation,
+              EXPERIMENTS.contextualPaywall,
+              EXPERIMENTS.firstPurchaseOffer,
+            ],
             "purchase_completed",
             `stripe_webhook:${sessionObj.metadata?.purchase_context ?? "premium"}`,
             sessionObj.id,
@@ -85,7 +89,11 @@ export async function POST(req: Request) {
           await grantPurchaseCredits(uid, credits, sessionObj.id);
           await recordExperimentOutcomesBestEffort(
             uid,
-            [EXPERIMENTS.pricingPresentation, EXPERIMENTS.contextualPaywall],
+            [
+              EXPERIMENTS.pricingPresentation,
+              EXPERIMENTS.contextualPaywall,
+              EXPERIMENTS.firstPurchaseOffer,
+            ],
             "purchase_completed",
             `stripe_webhook:${sessionObj.metadata?.purchase_context ?? "credits"}`,
             sessionObj.id,
@@ -169,7 +177,11 @@ export async function POST(req: Request) {
         if (uid && subscription.metadata?.kind === "premium") {
           await recordExperimentOutcomesBestEffort(
             uid,
-            [EXPERIMENTS.pricingPresentation, EXPERIMENTS.contextualPaywall],
+            [
+              EXPERIMENTS.pricingPresentation,
+              EXPERIMENTS.contextualPaywall,
+              EXPERIMENTS.firstPurchaseOffer,
+            ],
             "purchase_completed",
             "stripe_webhook:invoice_paid",
             invoice.id,

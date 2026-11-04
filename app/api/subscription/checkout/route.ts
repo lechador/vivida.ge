@@ -115,7 +115,11 @@ export async function POST(req: Request) {
     });
     await recordExperimentOutcomesBestEffort(
       userId,
-      [EXPERIMENTS.pricingPresentation, EXPERIMENTS.contextualPaywall],
+      [
+        EXPERIMENTS.pricingPresentation,
+        EXPERIMENTS.contextualPaywall,
+        EXPERIMENTS.firstPurchaseOffer,
+      ],
       "checkout_started",
       "subscription_checkout",
       checkout.id,

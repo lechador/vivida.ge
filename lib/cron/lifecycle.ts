@@ -27,6 +27,10 @@ import {
   sendTrialEndingReminders,
   type TrialReminderResult,
 } from "@/lib/trial-reminders";
+import {
+  sendCheckoutRecovery,
+  type CheckoutRecoveryResult,
+} from "@/lib/checkout-recovery";
 
 /**
  * Daily lifecycle workload: push, birthday gifts, winback, lead horoscopes and
@@ -117,6 +121,24 @@ export async function runLifecycleCron(req: NextRequest) {
     );
   }
 
+  // Abandoned-checkout rescue shares the trial reminder's urgency logic:
+  // its 1–48h window also closes inside a day, so it runs with the
+  // time-critical jobs rather than behind the discretionary sequences.
+  let checkoutRecovery: CheckoutRecoveryResult = {
+    candidates: 0,
+    emailed: 0,
+    skipped: 0,
+    failed: 0,
+  };
+  try {
+    checkoutRecovery = await sendCheckoutRecovery(budget);
+  } catch (err) {
+    console.warn(
+      "[cron:lifecycle] checkout recovery sequence failed:",
+      (err as Error).message,
+    );
+  }
+
   let leads: LeadBlastResult = { audience: 0, sent: 0, skipped: 0, failed: 0 };
   try {
     leads = await sendDailyHoroscopeToLeads({ sendDate });
@@ -166,6 +188,7 @@ export async function runLifecycleCron(req: NextRequest) {
     birthdays,
     winback,
     trialReminders,
+    checkoutRecovery,
     leads,
     renudge,
     // Surfaced so an operator can see the cap actually binding and that the

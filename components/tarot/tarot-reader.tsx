@@ -24,6 +24,7 @@ import {
   trackFirstResultViewed,
 } from "@/lib/analytics";
 import { fbTrack, fbTrackCustom } from "@/lib/fb-pixel";
+import { PUSH_VALUE_MOMENT_EVENT } from "@/lib/push-prompt";
 import type { UserLocale } from "@/lib/i18n/locale";
 import {
   nextTarotAttempt,
@@ -361,6 +362,10 @@ export function TarotReader({
           content_name: "first_tarot_reading",
           content_category: "tarot",
         });
+        // First completed reading is the strongest "worth coming back for"
+        // moment a new user has; let the push prompt ask there (it honours
+        // its own snooze schedule, so this can never nag).
+        window.dispatchEvent(new Event(PUSH_VALUE_MOMENT_EVENT));
       }
       setReading(next);
       setTeaserPreview(null);
