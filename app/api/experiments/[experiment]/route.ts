@@ -7,6 +7,10 @@ import {
   isExperimentOutcome,
 } from "@/lib/experiment-catalog";
 import { recordExperimentEvent } from "@/lib/experiments";
+import { db } from "@/db";
+import { profiles } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { birthDateActivationEligible } from "@/lib/birth-date-activation-config";
 import { firstPurchaseEligible } from "@/lib/first-purchase-experiment-config";
 import { hasEverPaid } from "@/lib/payer";
 import { isPremiumUser } from "@/lib/premium";
@@ -42,6 +46,23 @@ export async function GET(
         authenticated: true,
         hasEverPaid: paid,
         isPremium: premium,
+      })
+    ) {
+      return NextResponse.json({ variant: null, eligible: false });
+    }
+  }
+  // Birth-date gate: only accounts with no birth date on file may enroll, so
+  // a saved date can be attributed to the arm that was actually shown.
+  if (experiment === EXPERIMENTS.birthDateActivation) {
+    const [profile] = await db
+      .select({ dateOfBirth: profiles.dateOfBirth })
+      .from(profiles)
+      .where(eq(profiles.userId, session.user.id))
+      .limit(1);
+    if (
+      !birthDateActivationEligible({
+        authenticated: true,
+        hasBirthDate: Boolean(profile?.dateOfBirth),
       })
     ) {
       return NextResponse.json({ variant: null, eligible: false });

@@ -4,6 +4,8 @@ import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
+import { EXPERIMENTS } from "@/lib/experiment-catalog";
+import { recordExistingExperimentOutcomes } from "@/lib/experiments";
 import { MINIMUM_AGE_YEARS } from "@/lib/profile-core";
 import { ageFromDob } from "@/lib/profile-utils";
 import { ensureChartFor } from "@/actions/chart";
@@ -96,6 +98,19 @@ export async function POST(req: Request) {
     });
 
   await ensureChartFor(userId);
+
+  // First-ever save is the birth-date activation experiment's primary
+  // outcome. Recorded server-side against an existing assignment only, and
+  // never allowed to fail the save itself.
+  if (!existing?.dateOfBirth) {
+    await recordExistingExperimentOutcomes(
+      userId,
+      [EXPERIMENTS.birthDateActivation],
+      "birth_date_saved",
+      "profile_birth_date",
+      `birth-date:${userId}`,
+    ).catch(() => undefined);
+  }
 
   return NextResponse.json({ ok: true, dateOfBirth: lockedDate });
 }

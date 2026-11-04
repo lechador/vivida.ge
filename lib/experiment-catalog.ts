@@ -3,6 +3,7 @@ export const EXPERIMENTS = {
   contextualPaywall: "contextual_paywall_v1",
   reminderPrompt: "reminder_prompt_v1",
   firstPurchaseOffer: "first_purchase_offer_v1",
+  birthDateActivation: "birth_date_activation_v1",
 } as const;
 
 export type ExperimentName = (typeof EXPERIMENTS)[keyof typeof EXPERIMENTS];
@@ -42,6 +43,11 @@ export const EXPERIMENT_CATALOG = {
       "checkout_started",
       "purchase_completed",
     ],
+  },
+  [EXPERIMENTS.birthDateActivation]: {
+    eligibility: "authenticated_no_birth_date_dashboard",
+    variants: ["banner_link", "inline_preview"],
+    outcomes: ["viewed", "birth_date_saved"],
   },
 } as const satisfies Record<
   ExperimentName,

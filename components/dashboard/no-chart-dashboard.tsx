@@ -4,7 +4,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { AppHeader } from "@/components/nav/app-header";
 import { PopularTools } from "@/components/nav/popular-tools";
 import { RestrictedNotice } from "@/components/safety/restricted-notice";
-import { BirthDataBanner } from "@/components/dashboard/birth-banner";
+import { ChartPreviewBirthBanner } from "@/components/dashboard/chart-preview-birth-banner";
 import { MoonPhaseCard } from "@/components/dashboard/moon-phase-card";
 import { DashboardTestPromo } from "@/components/dashboard/test-promo-widget";
 import { DashboardArticleRecommendations } from "@/components/dashboard/article-recommendations";
@@ -65,7 +65,7 @@ export function NoChartDashboard({
           </div>
         </div>
 
-        <BirthDataBanner locale={locale} />
+        <ChartPreviewBirthBanner locale={locale} />
 
         <div className="mt-8 grid gap-6 lg:grid-cols-12 lg:items-start">
           {moonPhase && (
