@@ -17,11 +17,43 @@ import { expect, test } from "@playwright/test";
  */
 
 const GE_HOST = "www.vivida.ge";
+const GE_APEX_HOST = "vivida.ge";
 const EN_HOST = "www.vividaastro.com";
 const BROWSER_UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36";
 
 test.describe("locale routing", () => {
+  // The apex host is a permanent alias only. A 307 here made every crawler
+  // re-check the redirect, and left robots.txt/sitemap.xml on an unstable
+  // host. Assert the exact status and one-hop target for each public entry.
+  for (const path of ["/", "/robots.txt", "/sitemap.xml"]) {
+    test(`apex ${path} permanently redirects to www`, async ({ request }) => {
+      const res = await request.get(path, {
+        headers: { host: GE_APEX_HOST },
+        maxRedirects: 0,
+      });
+
+      expect(res.status()).toBe(308);
+      expect(res.headers()["location"]).toBe(
+        `https://www.vivida.ge${path === "/" ? "" : path}`,
+      );
+    });
+  }
+
+  test("apex redirect preserves the path and query string", async ({
+    request,
+  }) => {
+    const res = await request.get("/nataluri-ruka?utm_source=apex", {
+      headers: { host: GE_APEX_HOST },
+      maxRedirects: 0,
+    });
+
+    expect(res.status()).toBe(308);
+    expect(res.headers()["location"]).toBe(
+      "https://www.vivida.ge/nataluri-ruka?utm_source=apex",
+    );
+  });
+
   test("Georgian host serves the Georgian page in place", async ({
     request,
   }) => {

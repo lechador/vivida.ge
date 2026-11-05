@@ -52,8 +52,8 @@ const fraunces = Fraunces({
   display: "optional",
 });
 
-// Vercel routes vivida.ge → www.vivida.ge with a 307. Using www as the
-// canonical here so OG cards and emails skip the redirect hop.
+// The apex host permanently redirects to www (next.config.ts), so using www
+// as the canonical here lets OG cards and emails skip the redirect hop.
 const SITE_URL = "https://www.vivida.ge";
 
 const TITLE = "Vivida, შენი კოსმიური რუკა";

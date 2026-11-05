@@ -7,6 +7,7 @@ import {
   ENGLISH_PUBLIC_ROUTES,
   ENGLISH_SITE_URL,
   GEORGIAN_HOSTS,
+  GEORGIAN_SITE_URL,
 } from "./lib/seo/locales";
 import {
   englishSecurityHeaders,
@@ -21,6 +22,20 @@ const REPORT_PDF_ROUTES = [
   "/api/reports/checkout",
   "/api/reports/[id]",
 ] as const;
+
+/**
+ * The apex host is not canonical: every page, robots.txt and sitemap.xml must
+ * permanently point at www. This stays a 308 so crawlers consolidate the apex
+ * URL instead of re-checking a temporary redirect on every crawl, and it runs
+ * before the host-scoped locale rules so an apex request never lands on the
+ * English domain by accident.
+ */
+const GEORGIAN_APEX_REDIRECT = {
+  source: "/:path*",
+  has: [{ type: "host" as const, value: "vivida.ge" }],
+  destination: `${GEORGIAN_SITE_URL}/:path*`,
+  permanent: true,
+};
 
 const nextConfig: NextConfig = {
   // The PDF report route reads the Georgian TTFs at runtime via fs, Vercel's
@@ -57,6 +72,7 @@ const nextConfig: NextConfig = {
     );
 
     return [
+      GEORGIAN_APEX_REDIRECT,
       ...legacyEnglishRedirects,
       ...legacyContentRedirects,
       { source: "/test", destination: "/pirovnebis-testi", permanent: true },
