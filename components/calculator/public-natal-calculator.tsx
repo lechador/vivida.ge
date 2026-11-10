@@ -637,9 +637,6 @@ function HoroscopeEmailCapture({
   const [msg, setMsg] = useState<string | null>(null);
 
   if (sunSign == null) return null;
-  // The lead email is the Georgian sign horoscope (no English or Polish
-  // version exists), so only offer it where readers can read it.
-  if ((locale ?? "ka") !== "ka") return null;
 
   async function submit() {
     const value = email.trim();
@@ -650,7 +647,7 @@ function HoroscopeEmailCapture({
       const res = await fetch("/api/public/horoscope-subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: value, sunSign, big }),
+        body: JSON.stringify({ email: value, sunSign, big, locale }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.ok) {

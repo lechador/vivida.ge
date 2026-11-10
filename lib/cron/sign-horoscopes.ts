@@ -1,10 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { and, eq, inArray } from "drizzle-orm";
 
-import { ensureSignHoroscope } from "@/actions/sign-horoscope";
+import {
+  ensureSignHoroscope,
+  signHoroscopeStorageKey,
+} from "@/actions/sign-horoscope";
 import { db } from "@/db";
 import { signHoroscopes, type SignHoroscopePeriod } from "@/db/schema";
 import { cronAuthed } from "@/lib/cron/auth";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 import { SIGN_HOROSCOPE_PROMPT_VERSION } from "@/lib/openrouter";
 import {
   ALL_HOROSCOPE_VIEWS,
@@ -15,8 +19,10 @@ import {
 import { ALL_SLUGS, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
 
 /**
- * Pre-generates the Georgian sign horoscopes the public /zodiac/<sign>/<view>
- * pages render, so a visitor (usually Googlebot) never waits on an AI call.
+ * Pre-generates the sign horoscopes the public /zodiac/<sign>/<view> pages
+ * render (Georgian on vivida.ge, English on vividaastro.com), plus today's
+ * Polish reading for the Polish lead email, so a visitor (usually Googlebot)
+ * never waits on an AI call.
  *
  * Runs on its OWN schedule and budget: a slow job here must never delay the
  * email blast or lifecycle jobs (see the nine-week starvation incident noted
@@ -24,7 +30,7 @@ import { ALL_SLUGS, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
  */
 
 /** Max concurrent AI generations. */
-export const SIGN_HOROSCOPE_CONCURRENCY = 3;
+export const SIGN_HOROSCOPE_CONCURRENCY = 5;
 
 /**
  * Stop STARTING new generations after this long. The route's maxDuration is
@@ -33,34 +39,52 @@ export const SIGN_HOROSCOPE_CONCURRENCY = 3;
 export const SIGN_HOROSCOPE_BUDGET_MS = 180_000;
 
 export type SignHoroscopeJob = {
+  language: UserLocale;
   sign: ZodiacSlug;
   period: SignHoroscopePeriod;
   periodKey: string;
   anchor: Date;
 };
 
-/** Every (sign, period, periodKey) the public pages request, de-duplicated. */
+/**
+ * Which views each language needs. Georgian and English back every public
+ * page; Polish has no per-sign pages yet and only feeds today's lead email.
+ * Order matters: the time budget may run out, and Georgian (the indexed
+ * traffic) goes first.
+ */
+const LANGUAGE_VIEWS: ReadonlyArray<
+  [UserLocale, ReadonlyArray<(typeof ALL_HOROSCOPE_VIEWS)[number]>]
+> = [
+  ["ka", ALL_HOROSCOPE_VIEWS],
+  ["pl", ["today"]],
+  ["en", ALL_HOROSCOPE_VIEWS],
+];
+
+/** Every (language, sign, period, periodKey) to pre-generate, de-duplicated. */
 export function buildSignHoroscopeJobs(now: Date): SignHoroscopeJob[] {
   const seen = new Set<string>();
   const jobs: SignHoroscopeJob[] = [];
-  for (const view of ALL_HOROSCOPE_VIEWS) {
-    const period = periodForView(view);
-    const anchor = anchorForView(view, now);
-    const periodKey = signHoroscopePeriodKey(anchor, period);
-    for (const sign of ALL_SLUGS) {
-      const id = `${sign}:${period}:${periodKey}`;
-      if (seen.has(id)) continue;
-      seen.add(id);
-      jobs.push({ sign, period, periodKey, anchor });
+  for (const [language, views] of LANGUAGE_VIEWS) {
+    for (const view of views) {
+      const period = periodForView(view);
+      const anchor = anchorForView(view, now);
+      const periodKey = signHoroscopePeriodKey(anchor, period);
+      for (const sign of ALL_SLUGS) {
+        const job = { language, sign, period, periodKey, anchor };
+        const id = jobId(job);
+        if (seen.has(id)) continue;
+        seen.add(id);
+        jobs.push(job);
+      }
     }
   }
   return jobs;
 }
 
 export function jobId(
-  job: Pick<SignHoroscopeJob, "sign" | "period" | "periodKey">,
+  job: Pick<SignHoroscopeJob, "language" | "sign" | "period" | "periodKey">,
 ) {
-  return `${job.sign}:${job.period}:${job.periodKey}`;
+  return `${job.language}:${job.sign}:${job.period}:${job.periodKey}`;
 }
 
 /** Jobs without an up-to-date row yet (idempotency: existing rows are skipped). */
@@ -118,23 +142,41 @@ export async function runBounded<T>(
 }
 
 async function existingJobIds(jobs: SignHoroscopeJob[]): Promise<Set<string>> {
+  const storageKeys = [
+    ...new Set(
+      jobs.map((j) => signHoroscopeStorageKey(j.periodKey, j.language)),
+    ),
+  ];
   const rows = await db
     .select({
       sign: signHoroscopes.sign,
       period: signHoroscopes.period,
       periodKey: signHoroscopes.periodKey,
+      language: signHoroscopes.language,
     })
     .from(signHoroscopes)
     .where(
       and(
-        inArray(signHoroscopes.periodKey, [
-          ...new Set(jobs.map((j) => j.periodKey)),
-        ]),
+        inArray(signHoroscopes.periodKey, storageKeys),
         eq(signHoroscopes.promptVersion, SIGN_HOROSCOPE_PROMPT_VERSION),
-        eq(signHoroscopes.language, "ka"),
       ),
     );
-  return new Set(rows.map((r) => jobId(r as SignHoroscopeJob)));
+  return new Set(
+    rows.map((r) => {
+      const language = r.language as UserLocale;
+      // Strip the "en:"/"pl:" storage prefix back to the plain period key.
+      const periodKey =
+        language === "ka"
+          ? r.periodKey
+          : r.periodKey.slice(language.length + 1);
+      return jobId({
+        language,
+        sign: r.sign as ZodiacSlug,
+        period: r.period as SignHoroscopePeriod,
+        periodKey,
+      });
+    }),
+  );
 }
 
 export async function runSignHoroscopeCron(req: NextRequest) {
@@ -149,7 +191,12 @@ export async function runSignHoroscopeCron(req: NextRequest) {
     concurrency: SIGN_HOROSCOPE_CONCURRENCY,
     budgetMs: SIGN_HOROSCOPE_BUDGET_MS,
     work: async (job) =>
-      (await ensureSignHoroscope(job.sign, job.period, job.anchor)) !== null,
+      (await ensureSignHoroscope(
+        job.sign,
+        job.period,
+        job.anchor,
+        job.language,
+      )) !== null,
   });
 
   return NextResponse.json({

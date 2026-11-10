@@ -6,6 +6,9 @@ import { horoscopeLeads, type HoroscopeLead } from "@/db/schema";
 import { acquireResendSlot } from "@/lib/resend-throttle";
 import { MarketingEmail } from "@/lib/email-templates/marketing";
 import { ensureSignHoroscope } from "@/actions/sign-horoscope";
+import { pickCopy } from "@/lib/email-templates/_copy";
+import type { UserLocale } from "@/lib/i18n/user-locale";
+import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 import { signByIndex } from "@/lib/zodiac";
 import { slugByLabelKa } from "@/lib/seo/zodiac-content";
 
@@ -34,16 +37,37 @@ function resolveFrom(envVal: string | undefined, fallback: string): string {
 }
 const FROM = resolveFrom(process.env.RESEND_FROM, "Vivida <hello@vivida.ge>");
 const ORIGIN = process.env.EMAIL_ORIGIN ?? "https://vivida.ge";
-function absUrl(path: string): string {
-  return `${ORIGIN.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
+function absUrl(path: string, locale: UserLocale): string {
+  const origin = locale === "ka" ? ORIGIN : ENGLISH_SITE_URL;
+  return `${origin.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+/**
+ * The lead's language rides on `source` (where it was captured): the
+ * Georgian calculator keeps the original value, the international one gets a
+ * suffix. Avoids a schema change for a three-value attribute.
+ */
+const LEAD_SOURCE: Record<UserLocale, string> = {
+  ka: "natal_calculator",
+  en: "natal_calculator_en",
+  pl: "natal_calculator_pl",
+};
+
+export function leadSourceFor(locale: UserLocale): string {
+  return LEAD_SOURCE[locale];
+}
+
+export function leadLocale(source: string | null | undefined): UserLocale {
+  if (source?.endsWith("_pl")) return "pl";
+  if (source?.endsWith("_en")) return "en";
+  return "ka";
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const BIG_RE = /^\d{1,2}\.\d{1,2}\.\d{1,2}$/;
 
 export type SubscribeResult =
-  | { ok: true; isNew: boolean }
-  | { ok: false; error: string };
+  { ok: true; isNew: boolean } | { ok: false; error: string };
 
 /**
  * Upsert a lead. Idempotent on email: a repeat subscribe reactivates a
@@ -53,18 +77,35 @@ export async function subscribeHoroscopeLead(input: {
   email: string;
   sunSign: number;
   big?: string | null;
+  locale?: UserLocale;
 }): Promise<SubscribeResult> {
+  const locale = input.locale ?? "ka";
   const email = input.email.trim().toLowerCase();
   if (!EMAIL_RE.test(email) || email.length > 254) {
-    return { ok: false, error: "შეიყვანე სწორი ელფოსტა" };
+    return {
+      ok: false,
+      error: pickCopy(locale, {
+        ka: "შეიყვანე სწორი ელფოსტა",
+        en: "Enter a valid email address",
+        pl: "Podaj poprawny adres e-mail",
+      }),
+    };
   }
   if (
     !Number.isInteger(input.sunSign) ||
     input.sunSign < 0 ||
     input.sunSign > 11
   ) {
-    return { ok: false, error: "ნიშანი ვერ დადგინდა" };
+    return {
+      ok: false,
+      error: pickCopy(locale, {
+        ka: "ნიშანი ვერ დადგინდა",
+        en: "We couldn't determine your sign",
+        pl: "Nie udało się ustalić znaku",
+      }),
+    };
   }
+  const source = leadSourceFor(locale);
   const big = input.big && BIG_RE.test(input.big) ? input.big : null;
 
   const [existing] = await db
@@ -76,14 +117,14 @@ export async function subscribeHoroscopeLead(input: {
   if (existing) {
     await db
       .update(horoscopeLeads)
-      .set({ sunSign: input.sunSign, big, unsubscribedAt: null })
+      .set({ sunSign: input.sunSign, big, source, unsubscribedAt: null })
       .where(eq(horoscopeLeads.id, existing.id));
     return { ok: true, isNew: false };
   }
 
   await db
     .insert(horoscopeLeads)
-    .values({ email, sunSign: input.sunSign, big });
+    .values({ email, sunSign: input.sunSign, big, source });
   return { ok: true, isNew: true };
 }
 
@@ -95,52 +136,80 @@ export async function subscribeHoroscopeLead(input: {
  */
 async function sendToLead(
   lead: HoroscopeLead,
-  opts?: { welcome?: boolean; idempotencyKey?: string }
+  opts?: { welcome?: boolean; idempotencyKey?: string },
 ): Promise<boolean> {
   const c = client();
   if (!c || lead.unsubscribedAt) return false;
 
+  const locale = leadLocale(lead.source);
+  const t = <T>(copy: { ka: T; en: T; pl: T }) => pickCopy(locale, copy);
   const sign = signByIndex(lead.sunSign);
   const slug = slugByLabelKa(sign.labelKa);
   if (!slug) return false;
-  const row = await ensureSignHoroscope(slug, "day");
+  const row = await ensureSignHoroscope(slug, "day", new Date(), locale);
   if (!row) return false;
 
+  const signName = t({ ka: sign.labelKa, en: sign.labelEn, pl: sign.labelPl });
   const unsubUrl = absUrl(
-    `/unsubscribe?token=${lead.unsubscribeToken}&type=lead`
+    `/unsubscribe?token=${lead.unsubscribeToken}&type=lead`,
+    locale,
   );
-  const signupUrl = absUrl("/signup");
+  const signupUrl = absUrl("/signup", locale);
 
   const heading = opts?.welcome
-    ? `🌙 გამოწერა დადასტურდა, ${sign.labelKa}`
-    : `${sign.symbol} ${sign.labelKa}, ${row.headline}`;
+    ? t({
+        ka: `🌙 გამოწერა დადასტურდა, ${signName}`,
+        en: `🌙 You're subscribed, ${signName}`,
+        pl: `🌙 Subskrypcja potwierdzona, ${signName}`,
+      })
+    : `${sign.symbol} ${signName}, ${row.headline}`;
 
   const body = opts?.welcome
-    ? `გილოცავ, გამოწერე დღიური ჰოროსკოპი! ყოველ დილით მიიღებ ${sign.labelKa}-ის ჰოროსკოპს ელფოსტაზე.\n\nდღეს: ${row.summary}\n\nგინდა შენს ნატალურ რუკაზე მორგებული, პერსონალური ჰოროსკოპი, AI ანალიზი და მეტი? შექმენი უფასო ანგარიში.`
+    ? t({
+        ka: `გილოცავ, გამოწერე დღიური ჰოროსკოპი! ყოველ დილით მიიღებ ${signName}-ის ჰოროსკოპს ელფოსტაზე.\n\nდღეს: ${row.summary}\n\nგინდა შენს ნატალურ რუკაზე მორგებული, პერსონალური ჰოროსკოპი, AI ანალიზი და მეტი? შექმენი უფასო ანგარიში.`,
+        en: `You're subscribed to the daily horoscope! Every morning you'll get the ${signName} horoscope in your inbox.\n\nToday: ${row.summary}\n\nWant a personal horoscope built on your birth chart, AI analysis and more? Create a free account.`,
+        pl: `Subskrypcja dziennego horoskopu jest aktywna! Każdego ranka dostaniesz horoskop dla znaku ${signName} na e-mail.\n\nDziś: ${row.summary}\n\nChcesz osobisty horoskop oparty na Twoim kosmogramie, analizę AI i więcej? Załóż darmowe konto.`,
+      })
     : `${row.summary}\n\n${row.body ?? ""}`;
+
+  const subject = opts?.welcome
+    ? t({
+        ka: `გამოწერა დადასტურდა, ${signName}-ის დღიური ჰოროსკოპი`,
+        en: `You're subscribed: the daily ${signName} horoscope`,
+        pl: `Subskrypcja potwierdzona: dzienny horoskop ${signName}`,
+      })
+    : row.headline?.trim() ||
+      t({
+        ka: `${signName}, დღევანდელი ჰოროსკოპი`,
+        en: `${signName}, your horoscope for today`,
+        pl: `${signName}, horoskop na dziś`,
+      });
 
   await acquireResendSlot();
   const result = await c.emails.send(
     {
       from: FROM,
       to: lead.email,
-      subject: opts?.welcome
-        ? `გამოწერა დადასტურდა, ${sign.labelKa}-ის დღიური ჰოროსკოპი`
-        : row.headline?.trim() || `${sign.labelKa}, დღევანდელი ჰოროსკოპი`,
+      subject,
       react: MarketingEmail({
         name: null,
         heading,
         body,
-        ctaLabel: "შექმენი უფასო ანგარიში",
+        ctaLabel: t({
+          ka: "შექმენი უფასო ანგარიში",
+          en: "Create a free account",
+          pl: "Załóż darmowe konto",
+        }),
         ctaUrl: signupUrl,
         unsubscribeUrl: unsubUrl,
+        locale,
       }),
       headers: {
         "List-Unsubscribe": `<${unsubUrl}>`,
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
       },
     },
-    opts?.idempotencyKey ? { idempotencyKey: opts.idempotencyKey } : undefined
+    opts?.idempotencyKey ? { idempotencyKey: opts.idempotencyKey } : undefined,
   );
   if (result.error) throw new Error(result.error.message ?? "send failed");
   return true;
@@ -165,7 +234,7 @@ export async function sendLeadWelcome(email: string): Promise<void> {
   } catch (err) {
     console.warn(
       "[horoscope-leads] welcome send failed:",
-      (err as Error).message
+      (err as Error).message,
     );
   }
 }
@@ -195,9 +264,9 @@ export async function sendDailyHoroscopeToLeads(opts: {
         isNull(horoscopeLeads.unsubscribedAt),
         or(
           isNull(horoscopeLeads.lastSentDate),
-          ne(horoscopeLeads.lastSentDate, opts.sendDate)
-        )
-      )
+          ne(horoscopeLeads.lastSentDate, opts.sendDate),
+        ),
+      ),
     );
 
   if (!c || leads.length === 0) {
@@ -224,7 +293,7 @@ export async function sendDailyHoroscopeToLeads(opts: {
     } catch (err) {
       console.warn(
         "[horoscope-leads] daily send failed:",
-        (err as Error).message
+        (err as Error).message,
       );
       failed++;
     }
@@ -238,7 +307,7 @@ export async function sendDailyHoroscopeToLeads(opts: {
  * Returns { email } on success, null when the token matches no lead.
  */
 export async function unsubscribeLeadByToken(
-  token: string
+  token: string,
 ): Promise<{ email: string } | null> {
   if (!token) return null;
   const [row] = await db

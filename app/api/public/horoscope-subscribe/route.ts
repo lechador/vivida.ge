@@ -2,6 +2,7 @@ import { after } from "next/server";
 
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { getClientIp } from "@/lib/api/security";
+import type { UserLocale } from "@/lib/i18n/user-locale";
 import { isEnglishHost } from "@/lib/seo/locales";
 import { subscribeHoroscopeLead, sendLeadWelcome } from "@/lib/horoscope-leads";
 
@@ -10,18 +11,11 @@ export const dynamic = "force-dynamic";
 
 /**
  * Public, no-auth "get the daily horoscope by email" capture for the free
- * natal calculator. A lower-friction alternative to full signup: stores an
+ * natal calculator, in Georgian, English or Polish. A lower-friction alternative to full signup: stores an
  * anonymous lead (email + sun sign) and fires an immediate welcome email in
  * the background so the user sees instant success. IP rate-limited.
  */
 export async function POST(req: Request) {
-  // The lead email is Georgian-only; the international site no longer offers
-  // it, and an English/Polish reader must not be subscribed to it.
-  const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host");
-  if (isEnglishHost(host)) {
-    return Response.json({ error: "unsupported_locale" }, { status: 404 });
-  }
-
   try {
     await enforceRateLimit({
       bucket: "horoscope_subscribe_ip",
@@ -37,6 +31,7 @@ export async function POST(req: Request) {
     email?: unknown;
     sunSign?: unknown;
     big?: unknown;
+    locale?: unknown;
   } | null;
   if (!body) return Response.json({ error: "bad_request" }, { status: 400 });
 
@@ -44,7 +39,16 @@ export async function POST(req: Request) {
   const sunSign = typeof body.sunSign === "number" ? body.sunSign : NaN;
   const big = typeof body.big === "string" ? body.big : null;
 
-  const res = await subscribeHoroscopeLead({ email, sunSign, big });
+  // The host decides between Georgian and international; on the international
+  // site the form says which of English/Polish the reader was looking at.
+  const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host");
+  const locale: UserLocale = !isEnglishHost(host)
+    ? "ka"
+    : body.locale === "pl" || req.headers.get("x-vivida-locale") === "pl"
+      ? "pl"
+      : "en";
+
+  const res = await subscribeHoroscopeLead({ email, sunSign, big, locale });
   if (!res.ok) return Response.json({ error: res.error }, { status: 400 });
 
   // Send the welcome after the response so the button flips to success

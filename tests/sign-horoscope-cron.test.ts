@@ -1,7 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/db", () => ({ db: {} }));
-vi.mock("@/actions/sign-horoscope", () => ({ ensureSignHoroscope: vi.fn() }));
+vi.mock("@/actions/sign-horoscope", () => ({
+  ensureSignHoroscope: vi.fn(),
+  signHoroscopeStorageKey: (key: string, lang: string) =>
+    lang === "ka" ? key : `${lang}:${key}`,
+}));
 
 import {
   buildSignHoroscopeJobs,
@@ -14,9 +18,16 @@ const NOW = new Date("2026-11-10T04:00:00Z");
 
 describe("buildSignHoroscopeJobs", () => {
   it("covers 12 signs x 6 public views with unique period keys", () => {
-    const jobs = buildSignHoroscopeJobs(NOW);
+    const all = buildSignHoroscopeJobs(NOW);
+    // ka + en back every public page; pl only today's lead email.
+    expect(all).toHaveLength(72 + 72 + 12);
+    expect(new Set(all.map(jobId)).size).toBe(all.length);
+    expect(all.slice(0, 72).every((j) => j.language === "ka")).toBe(true);
+    expect(
+      all.filter((j) => j.language === "pl").map((j) => j.periodKey),
+    ).toEqual(Array(12).fill("2026-11-10"));
+    const jobs = all.filter((j) => j.language === "ka");
     expect(jobs).toHaveLength(72);
-    expect(new Set(jobs.map(jobId)).size).toBe(72);
     const keys = new Set(jobs.map((j) => `${j.period}:${j.periodKey}`));
     expect(keys).toEqual(
       new Set([

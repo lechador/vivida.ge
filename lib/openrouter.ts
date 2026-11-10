@@ -1753,6 +1753,54 @@ const PERIOD_PL: Record<
   },
 };
 
+const PERIOD_EN: Record<
+  SignHoroscopePeriodLabel,
+  {
+    label: string;
+    bodyShape: string;
+    headlineHint: string;
+  }
+> = {
+  day: {
+    label: "daily",
+    bodyShape:
+      "120-160 words, 2-3 paragraphs (\\n\\n): the day's lead influence (the Moon or a specific transit), how it feels for this sign, one concrete piece of advice or action for today.",
+    headlineHint:
+      "40-60 characters: today's concrete energy (not a generic 'good day')",
+  },
+  week: {
+    label: "weekly",
+    bodyShape:
+      "150-200 words, 3 paragraphs (\\n\\n): the week's main theme (inner-planet configuration), which opportunities it opens for this sign, which challenges arrive and how to respond. Point to specific days when possible (e.g. 'midweek').",
+    headlineHint: "40-60 characters: this week's key event or energy",
+  },
+  month: {
+    label: "monthly",
+    bodyShape:
+      "180-230 words, 3-4 paragraphs (\\n\\n): the month's backdrop (the Sun + outer planets), which cycle opens or closes for this sign, which area deserves focus (career/relationships/money/health), the month's advice.",
+    headlineHint: "40-60 characters: the month's key shift or theme",
+  },
+};
+
+const SIGN_HOROSCOPE_SYSTEM_PROMPT_EN = `You are a warm, modern astrologer and editor writing in English. You write a horoscope for one zodiac sign (Sun sign), not from a personal birth chart but from the collective energy affecting everyone born under that sign.
+
+Vivid, concrete, tangible language. No vague mysticism, no clichés ("the stars are waiting for you", "open your heart"). Give the reader one concrete thing to do today / this week / this month, or one emotion to pay attention to.
+
+Return only a valid JSON object with this shape:
+{
+  "headline": string,           // PERIOD_HEADLINE_HINT
+  "summary": string,            // 1-2 sentences: what is happening in the sky and how it touches this sign
+  "body": string,               // PERIOD_BODY_SHAPE
+  "themes": [string, string, string]  // 3 one- or two-word themes
+}
+
+Rules:
+- Address the reader directly as "you", in a warm, equal tone.
+- A specific transit or configuration must be visible (e.g. "the Moon in Scorpio", "Mercury turning retrograde").
+- Bring in the sign's nature (Fire vs Water, Fixed vs Cardinal) when relevant.
+- Avoid empty phrases ("be open", "trust your intuition").
+- JSON only, no code fences.`;
+
 const SIGN_HOROSCOPE_SYSTEM_PROMPT = `შენ ხარ თბილი, თანამედროვე ქართველი ასტროლოგი/რედაქტორი. წერ კონკრეტული ნიშნისთვის (sun sign), არა პერსონალური რუკით, არამედ კოლექტიური ენერგიით, რომელიც ეხება ყველას ამ ნიშნით დაბადებულს.
 
 ცოცხალი, კონკრეტული, ხელშესახები ენა. არა ბუნდოვანი მისტიკა, არა კლიშეები ("ვარსკვლავები გელიან", "მოამზადე გული"). მიეცი მკითხველს ერთი კონკრეტული რამ, რაც დღეს/კვირას/თვეს გააკეთოს ან რომელ ემოციას მიაქციოს ყურადღება.
@@ -1848,11 +1896,18 @@ export async function generateSignHoroscope(
   if (!apiKey) return null;
 
   const isPl = input.locale === "pl";
-  const periodCfg = isPl ? PERIOD_PL[input.period] : PERIOD_KA[input.period];
+  const isEn = input.locale === "en";
+  const periodCfg = isPl
+    ? PERIOD_PL[input.period]
+    : isEn
+      ? PERIOD_EN[input.period]
+      : PERIOD_KA[input.period];
 
   const systemTemplate = isPl
     ? SIGN_HOROSCOPE_SYSTEM_PROMPT_PL
-    : SIGN_HOROSCOPE_SYSTEM_PROMPT;
+    : isEn
+      ? SIGN_HOROSCOPE_SYSTEM_PROMPT_EN
+      : SIGN_HOROSCOPE_SYSTEM_PROMPT;
 
   const systemPrompt = systemTemplate
     .replace("PERIOD_HEADLINE_HINT", periodCfg.headlineHint)
@@ -1868,6 +1923,14 @@ export async function generateSignHoroscope(
       const sign = t.signPl ?? t.signEn;
       return `- ${planet} (${t.planetEn}) w znaku ${sign}${retro}${aspect}`;
     }
+    if (isEn) {
+      const retro = t.retrograde ? " (retrograde)" : "";
+      const aspect = t.aspectToReaderSign
+        ? `, ${t.aspectToReaderSign} to the reader's sign`
+        : "";
+      const planet = t.planetEn[0].toUpperCase() + t.planetEn.slice(1);
+      return `- ${planet} in ${t.signEn}${retro}${aspect}`;
+    }
     const retro = t.retrograde ? " (რეტროგრადი)" : "";
     const aspect = t.aspectToReaderSign
       ? `, ${t.aspectToReaderSign} მკითხველის ნიშანზე`
@@ -1875,7 +1938,11 @@ export async function generateSignHoroscope(
     return `- ${t.planet} (${t.planetEn}) ${t.signKa} ნიშანში${retro}${aspect}`;
   });
 
-  const signDisplay = isPl ? (input.signPl ?? input.signEn) : input.signKa;
+  const signDisplay = isPl
+    ? (input.signPl ?? input.signEn)
+    : isEn
+      ? input.signEn
+      : input.signKa;
 
   const userMessage = isPl
     ? [
@@ -1888,16 +1955,27 @@ export async function generateSignHoroscope(
         "",
         `Napisz horoskop ${periodCfg.label} dla znaku: ${signDisplay}. Zwróć jako poprawny JSON.`,
       ].join("\n")
-    : [
-        `ნიშანი: ${input.signKa} (${input.signEn})`,
-        `ელემენტი: ${input.element} · მოდალურობა: ${input.modality} · მმართველი: ${input.ruler}`,
-        `პერიოდი: ${periodCfg.label} (${input.periodLabel})`,
-        "",
-        "ცის ფონი ამ პერიოდისთვის:",
-        ...transitLines,
-        "",
-        `დააწერე ${periodCfg.label} ჰოროსკოპი ${input.signKa}-ისთვის. JSON-ად დააბრუნე.`,
-      ].join("\n");
+    : isEn
+      ? [
+          `Sign: ${signDisplay}`,
+          `Element: ${input.element} · Modality: ${input.modality} · Ruler: ${input.ruler}`,
+          `Period: ${periodCfg.label} (${input.periodLabel})`,
+          "",
+          "The sky for this period:",
+          ...transitLines,
+          "",
+          `Write the ${periodCfg.label} horoscope for ${signDisplay}. Return valid JSON.`,
+        ].join("\n")
+      : [
+          `ნიშანი: ${input.signKa} (${input.signEn})`,
+          `ელემენტი: ${input.element} · მოდალურობა: ${input.modality} · მმართველი: ${input.ruler}`,
+          `პერიოდი: ${periodCfg.label} (${input.periodLabel})`,
+          "",
+          "ცის ფონი ამ პერიოდისთვის:",
+          ...transitLines,
+          "",
+          `დააწერე ${periodCfg.label} ჰოროსკოპი ${input.signKa}-ისთვის. JSON-ად დააბრუნე.`,
+        ].join("\n");
 
   const res = await fetch(OPENROUTER_URL, {
     method: "POST",

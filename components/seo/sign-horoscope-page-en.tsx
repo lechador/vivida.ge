@@ -5,8 +5,12 @@ import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
+import { ensureSignHoroscope } from "@/actions/sign-horoscope";
 import {
   ALL_HOROSCOPE_VIEWS,
+  anchorForView,
+  periodAnchorDate,
+  periodForView,
   VIEW_PATH,
   type HoroscopeView,
 } from "@/lib/sign-horoscope";
@@ -31,7 +35,45 @@ export const VIEW_LABEL_EN: Record<HoroscopeView, string> = {
   nextMonth: "Next month's horoscope",
 };
 
-function forecast(sign: ZodiacSlug, view: HoroscopeView) {
+type Reading = {
+  headline: string;
+  summary: string;
+  paragraphs: string[];
+  /** Section headings; the AI reading is plain paragraphs and has none. */
+  sectionTitles: string[];
+  themes: string[];
+  /** When the reading was written; null for the evergreen template. */
+  publishedAt: string | null;
+};
+
+/**
+ * Today's AI-written English reading for this sign and view, the same
+ * pipeline as the Georgian pages. Falls back to the evergreen template only
+ * when generation is unavailable, so the page never renders empty.
+ */
+async function liveReading(
+  sign: ZodiacSlug,
+  view: HoroscopeView,
+): Promise<Reading | null> {
+  const period = periodForView(view);
+  const anchor = anchorForView(view, new Date());
+  const row = await ensureSignHoroscope(sign, period, anchor, "en");
+  if (!row) return null;
+  const paragraphs = row.body.split(/\n\n+/).filter(Boolean);
+  if (paragraphs.length === 0) return null;
+  return {
+    headline: row.headline,
+    summary: row.summary,
+    paragraphs,
+    sectionTitles: [],
+    themes: row.themes,
+    publishedAt: new Date(
+      row.createdAt ?? periodAnchorDate(anchor, period),
+    ).toISOString(),
+  };
+}
+
+function forecast(sign: ZodiacSlug, view: HoroscopeView): Reading {
   const profile = ZODIAC_SIGN_EN[sign];
   const horizon =
     view === "today"
@@ -63,10 +105,11 @@ function forecast(sign: ZodiacSlug, view: HoroscopeView) {
       `Career and priorities ${horizon}`,
     ],
     themes: ["Clear priorities", "Honest connection", "Sustainable progress"],
+    publishedAt: null,
   };
 }
 
-export function SignHoroscopePageEn({
+export async function SignHoroscopePageEn({
   sign,
   view,
 }: {
@@ -76,7 +119,7 @@ export function SignHoroscopePageEn({
   const meta = signMetaBySlug(sign)!;
   const name = meta.labelEn;
   const accent = signColor(meta);
-  const reading = forecast(sign, view);
+  const reading = (await liveReading(sign, view)) ?? forecast(sign, view);
   const label = VIEW_LABEL_EN[view];
   const seo = signHoroscopeSeoEn(name, view);
   const period = seo.period;
@@ -99,8 +142,8 @@ export function SignHoroscopePageEn({
       url,
       headline: seo.heading,
       description: seo.description,
-      datePublished: "2026-08-13T00:00:00Z",
-      dateModified: new Date().toISOString(),
+      datePublished: reading.publishedAt ?? "2026-08-13T00:00:00Z",
+      dateModified: reading.publishedAt ?? new Date().toISOString(),
       about: { "@type": "Thing", name: seo.heading },
     }),
     breadcrumbLd([
@@ -182,10 +225,12 @@ export function SignHoroscopePageEn({
         <section className="mt-10 max-w-2xl space-y-8 text-pretty text-base leading-relaxed text-foreground/90 sm:text-lg">
           {reading.paragraphs.map((paragraph, index) => (
             <div key={paragraph}>
-              <h2 className="text-xl font-semibold tracking-tight text-foreground">
-                {reading.sectionTitles[index]}
-              </h2>
-              <p className="mt-3">{paragraph}</p>
+              {reading.sectionTitles[index] ? (
+                <h2 className="mb-3 text-xl font-semibold tracking-tight text-foreground">
+                  {reading.sectionTitles[index]}
+                </h2>
+              ) : null}
+              <p>{paragraph}</p>
             </div>
           ))}
         </section>

@@ -1,4 +1,7 @@
-"use server";
+// Server-only module, deliberately NOT a "use server" file: as a server
+// action, any visitor could call ensureSignHoroscope with arbitrary dates and
+// languages and run up unbounded AI generations.
+import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
@@ -30,6 +33,8 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { signFromLongitude } from "@/lib/zodiac";
 import { claimGeneration, releaseGeneration } from "@/lib/generation-lock";
+import type { UserLocale } from "@/lib/i18n/user-locale";
+import { PLANET_LABELS_PL } from "@/lib/openrouter";
 
 /**
  * SEO daily/weekly/monthly horoscope per sun sign.
@@ -64,13 +69,110 @@ const PERIOD_BODIES: Record<SignHoroscopePeriod, string[]> = {
   month: ["sun", "mercury", "venus", "mars", "jupiter", "saturn"],
 };
 
-const ASPECT_LABEL_KA: Record<string, string> = {
-  conjunction: "კონიუნქცია (გაერთიანება)",
-  sextile: "სექსტილი (ჰარმონიული)",
-  square: "კვადრატი (დაძაბული)",
-  trine: "ტრინი (ჰარმონიული)",
-  opposition: "ოპოზიცია (დაძაბული)",
+const ASPECT_LABELS: Record<UserLocale, Record<string, string>> = {
+  ka: {
+    conjunction: "კონიუნქცია (გაერთიანება)",
+    sextile: "სექსტილი (ჰარმონიული)",
+    square: "კვადრატი (დაძაბული)",
+    trine: "ტრინი (ჰარმონიული)",
+    opposition: "ოპოზიცია (დაძაბული)",
+  },
+  en: {
+    conjunction: "conjunction (merging)",
+    sextile: "sextile (harmonious)",
+    square: "square (tense)",
+    trine: "trine (harmonious)",
+    opposition: "opposition (tense)",
+  },
+  pl: {
+    conjunction: "koniunkcja (połączenie)",
+    sextile: "sekstyl (harmonijny)",
+    square: "kwadratura (napięta)",
+    trine: "trygon (harmonijny)",
+    opposition: "opozycja (napięta)",
+  },
 };
+
+const ELEMENT_LABELS: Record<string, { en: string; pl: string }> = {
+  ცეცხლი: { en: "Fire", pl: "Ogień" },
+  მიწა: { en: "Earth", pl: "Ziemia" },
+  ჰაერი: { en: "Air", pl: "Powietrze" },
+  წყალი: { en: "Water", pl: "Woda" },
+};
+
+const MODALITY_LABELS: Record<string, { en: string; pl: string }> = {
+  კარდინალური: { en: "Cardinal", pl: "Kardynalny" },
+  ფიქსირებული: { en: "Fixed", pl: "Stały" },
+  მუტაბელური: { en: "Mutable", pl: "Zmienny" },
+};
+
+/** Georgian label → English planet key, for translating a sign's ruler. */
+const PLANET_KEY_BY_KA = Object.fromEntries(
+  Object.entries(PLANET_LABELS_KA).map(([key, ka]) => [ka, key]),
+);
+
+/** Georgian sign-meta field (element/modality/ruler) in the reading's language. */
+function localizedMeta(
+  value: string,
+  table: Record<string, { en: string; pl: string }> | "planet",
+  language: UserLocale,
+): string {
+  if (language === "ka") return value;
+  if (table === "planet") {
+    const key = PLANET_KEY_BY_KA[value];
+    if (!key) return value;
+    if (language === "pl") return PLANET_LABELS_PL[key] ?? key;
+    return key[0].toUpperCase() + key.slice(1);
+  }
+  return table[value]?.[language] ?? value;
+}
+
+/**
+ * Storage key. The table's primary key is (sign, period, periodKey) and
+ * predates other languages, so English/Polish rows live under a prefixed key
+ * ("en:2026-11-10") next to the untouched Georgian one; `language` mirrors it.
+ */
+export function signHoroscopeStorageKey(
+  periodKey: string,
+  language: UserLocale,
+): string {
+  return language === "ka" ? periodKey : `${language}:${periodKey}`;
+}
+
+/** Period label in the reading's language, quoted to the model. */
+function periodLabelFor(
+  now: Date,
+  period: SignHoroscopePeriod,
+  language: UserLocale,
+): string {
+  if (language === "ka") return signHoroscopePeriodLabel(now, period);
+  const tag = language === "pl" ? "pl-PL" : "en-GB";
+  const anchor = periodAnchorDate(now, period);
+  if (period === "day") {
+    return new Intl.DateTimeFormat(tag, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(anchor);
+  }
+  if (period === "month") {
+    return new Intl.DateTimeFormat(tag, {
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(anchor);
+  }
+  const end = new Date(anchor);
+  end.setUTCDate(end.getUTCDate() + 6);
+  const dayMonth = new Intl.DateTimeFormat(tag, {
+    day: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  });
+  return `${dayMonth.format(anchor)} – ${dayMonth.format(end)} ${end.getUTCFullYear()}`;
+}
 
 /**
  * Aspect string from a transiting body's longitude to the reader's
@@ -80,6 +182,7 @@ const ASPECT_LABEL_KA: Record<string, string> = {
 function aspectToSignCenter(
   bodyLongitude: number,
   signIndex: number,
+  language: UserLocale,
 ): string | undefined {
   const signCenter = signIndex * 30 + 15;
   const d = angularDistance(bodyLongitude, signCenter);
@@ -90,7 +193,7 @@ function aspectToSignCenter(
       best = { kind: a.kind, orb };
     }
   }
-  return best ? ASPECT_LABEL_KA[best.kind] : undefined;
+  return best ? ASPECT_LABELS[language][best.kind] : undefined;
 }
 
 /**
@@ -102,9 +205,13 @@ async function ensureSignHoroscopeUncached(
   slug: ZodiacSlug,
   period: SignHoroscopePeriod,
   now: Date,
+  language: UserLocale,
 ): Promise<SignHoroscope | null> {
   if (!(ALL_SLUGS as string[]).includes(slug)) return null;
-  const periodKey = signHoroscopePeriodKey(now, period);
+  const periodKey = signHoroscopeStorageKey(
+    signHoroscopePeriodKey(now, period),
+    language,
+  );
 
   const [existing] = await db
     .select()
@@ -123,6 +230,7 @@ async function ensureSignHoroscopeUncached(
 
   if (!isOpenRouterConfigured()) return existing ?? null;
 
+  // periodKey already carries the language prefix for en/pl.
   const lockKey = `sign-horoscope:${slug}:${period}:${periodKey}:v${SIGN_HOROSCOPE_PROMPT_VERSION}`;
   if (!(await claimGeneration(lockKey, 3 * 60 * 1000))) {
     return existing ?? null;
@@ -141,12 +249,14 @@ async function ensureSignHoroscopeUncached(
       const pos = transits[key];
       if (!pos) continue;
       const transitSign = signFromLongitude(pos.longitude);
-      const aspect = aspectToSignCenter(pos.longitude, meta.index);
+      const aspect = aspectToSignCenter(pos.longitude, meta.index, language);
       transitFacts.push({
         planet: PLANET_LABELS_KA[key] ?? key,
         planetEn: key,
+        planetPl: PLANET_LABELS_PL[key],
         signKa: transitSign.labelKa,
         signEn: transitSign.labelEn,
+        signPl: transitSign.labelPl,
         aspectToReaderSign: aspect,
       });
     }
@@ -154,12 +264,14 @@ async function ensureSignHoroscopeUncached(
     const reading = await generateSignHoroscope({
       signKa: meta.labelKa,
       signEn: meta.labelEn,
-      element: meta.element,
-      modality: meta.modality,
-      ruler: meta.ruler,
+      signPl: meta.labelPl,
+      element: localizedMeta(meta.element, ELEMENT_LABELS, language),
+      modality: localizedMeta(meta.modality, MODALITY_LABELS, language),
+      ruler: localizedMeta(meta.ruler, "planet", language),
       period,
-      periodLabel: signHoroscopePeriodLabel(now, period),
+      periodLabel: periodLabelFor(now, period, language),
       transits: transitFacts,
+      locale: language,
     });
 
     if (!reading) return existing ?? null;
@@ -176,7 +288,7 @@ async function ensureSignHoroscopeUncached(
         themes: reading.themes,
         promptVersion: SIGN_HOROSCOPE_PROMPT_VERSION,
         model: OPENROUTER_MODEL,
-        language: "ka",
+        language,
       })
       .onConflictDoUpdate({
         target: [
@@ -215,11 +327,17 @@ async function ensureSignHoroscopeUncached(
 class NoSignHoroscope extends Error {}
 
 const cachedSignHoroscope = unstable_cache(
-  async (slug: ZodiacSlug, period: SignHoroscopePeriod, anchorIso: string) => {
+  async (
+    slug: ZodiacSlug,
+    period: SignHoroscopePeriod,
+    anchorIso: string,
+    language: UserLocale,
+  ) => {
     const row = await ensureSignHoroscopeUncached(
       slug,
       period,
       new Date(anchorIso),
+      language,
     );
     // unstable_cache stores `null` like any value (for the full hour), which
     // would pin a transient AI failure. Thrown errors are not cached.
@@ -240,10 +358,16 @@ export async function ensureSignHoroscope(
   slug: ZodiacSlug,
   period: SignHoroscopePeriod,
   now: Date = new Date(),
+  language: UserLocale = "ka",
 ): Promise<SignHoroscope | null> {
   const anchor = periodAnchorDate(now, period);
   try {
-    return await cachedSignHoroscope(slug, period, anchor.toISOString());
+    return await cachedSignHoroscope(
+      slug,
+      period,
+      anchor.toISOString(),
+      language,
+    );
   } catch (err) {
     if (err instanceof NoSignHoroscope) return null;
     throw err;
