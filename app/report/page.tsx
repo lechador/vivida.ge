@@ -27,7 +27,7 @@ import {
   shouldShowPurchasePromotion,
 } from "@/lib/billing-config";
 import { getBalance } from "@/lib/credits";
-import { isPremiumUser } from "@/lib/premium";
+import { isPaidPremiumUser, isPremiumUser } from "@/lib/premium";
 import { CryptoPayHost } from "@/components/crypto/crypto-pay";
 import { isCryptoPayConfigured } from "@/lib/crypto-pay";
 
@@ -51,7 +51,7 @@ export default async function ReportPage({
   const user = await requireUser();
   const { offer } = await searchParams;
 
-  const [[profile], [userPrefs], premium] = await Promise.all([
+  const [[profile], [userPrefs], premium, paidPremium] = await Promise.all([
     db.select().from(profiles).where(eq(profiles.userId, user.id)).limit(1),
     db
       .select({
@@ -62,6 +62,7 @@ export default async function ReportPage({
       .where(eq(users.id, user.id))
       .limit(1),
     isPremiumUser(user.id),
+    isPaidPremiumUser(user.id),
   ]);
   const locale = await getRequestLocale(normalizeUserLocale(userPrefs?.locale));
   const en = locale !== "ka";
@@ -197,7 +198,7 @@ export default async function ReportPage({
                 userId={user.id}
                 locale={locale}
                 countryCode={userPrefs?.countryCode}
-                premium={premium}
+                premium={paidPremium}
               />
             </Suspense>
           </section>

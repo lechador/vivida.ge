@@ -28,6 +28,25 @@ export async function isPremiumUser(userId: string): Promise<boolean> {
   );
 }
 
+/**
+ * PRO that has actually been paid for: premium AND not merely trialing.
+ *
+ * A free-trial user is entitled (`isPremiumUser`) but has paid nothing, so
+ * anything whose deliverable outlives the trial (PDF reports) must not be
+ * given away to them. A premium user with no subscription row (manual grant)
+ * counts as paid; store and crypto rows are paid unless their status is
+ * `trialing`.
+ */
+export async function isPaidPremiumUser(userId: string): Promise<boolean> {
+  if (!(await isPremiumUser(userId))) return false;
+  const [row] = await db
+    .select({ status: premiumSubscriptions.status })
+    .from(premiumSubscriptions)
+    .where(eq(premiumSubscriptions.userId, userId))
+    .limit(1);
+  return row?.status !== "trialing";
+}
+
 export async function getPremiumSubscription(userId: string) {
   const [row] = await db
     .select()

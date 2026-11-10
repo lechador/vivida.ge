@@ -9,6 +9,7 @@ import {
   computeTransits,
   detectCrossAspects,
   localDateString,
+  transitInstantForLocalDate,
 } from "./transits";
 import { ASPECTS, type AspectFamily } from "./aspects";
 import type { UserLocale } from "./i18n/user-locale";
@@ -211,10 +212,10 @@ export function computeTiming(
   // (transit,natal,kind) → tightest occurrence in the window
   const notableMap = new Map<string, { item: NotableTransit; orb: number }>();
 
+  // Day 0 is the user's LOCAL date at startDate; sky and label both follow it.
+  const startKey = localDateString(startDate, timezone);
   for (let i = 0; i < days; i++) {
-    const at = new Date(startDate);
-    at.setUTCHours(12, 0, 0, 0);
-    at.setUTCDate(at.getUTCDate() + i);
+    const at = transitInstantForLocalDate(startKey, i);
 
     const transits = computeTransits(at);
     const aspects = detectCrossAspects(transits, natalPoints).filter(
@@ -240,8 +241,8 @@ export function computeTiming(
     const score =
       total > 0 ? Math.round(((harmony - challenge) / total) * 100) : 0;
 
-    const dateIso = localDateString(at, timezone);
-    const local = new Date(`${dateIso}T12:00:00Z`);
+    const dateIso = at.toISOString().slice(0, 10);
+    const local = at;
     out.push({
       dateIso,
       dom: local.getUTCDate(),

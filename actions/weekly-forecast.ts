@@ -1,4 +1,6 @@
-"use server";
+// Server-only module, deliberately NOT a "use server" file: its export takes
+// a userId, and a server action would let any caller read another user's data.
+import "server-only";
 
 import { eq } from "drizzle-orm";
 
@@ -12,7 +14,7 @@ import {
 } from "@/db/schema";
 import { ensureChartFor } from "@/actions/chart";
 import { computeWeeklyForecast } from "@/lib/weekly-forecast";
-import { localDateString } from "@/lib/transits";
+import { localDateString, transitInstantForLocalDate } from "@/lib/transits";
 import {
   WEEKLY_PROMPT_VERSION,
   generateWeeklyForecast,
@@ -98,8 +100,8 @@ export async function ensureWeeklyForecast(
     // Compute deterministic scores + drivers for each of the next 7 days,
     // starting TOMORROW, today is already covered by the daily horoscope
     // card, so the "next 7 days" card shouldn't repeat it.
-    const tomorrow = new Date(now);
-    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+    // Anchored on the user's LOCAL tomorrow (weekStart is their local today).
+    const tomorrow = transitInstantForLocalDate(weekStart, 1);
     const ctx = computeWeeklyForecast(chart.data, tomorrow, profile.timezone);
 
     // Fast path: compose all 7 narratives from the pre-generated transit

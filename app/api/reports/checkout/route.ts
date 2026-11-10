@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { charts, pdfReports } from "@/db/schema";
 import { CREDIT_COST, spendOnce } from "@/lib/credits";
+import { isPaidPremiumUser } from "@/lib/premium";
 import { generateAndStoreReport } from "@/lib/reports/generate";
 import { reportCurrency } from "@/lib/stripe";
 import {
@@ -208,11 +209,15 @@ export async function POST(req: Request) {
     .map((spec) => `${spec.type}:${spec.editionKey}:${spec.subjectKey}`)
     .sort()
     .join("|")}`;
+  // Reports persist after a free trial ends, so only paid PRO gets them
+  // included; trialing users are charged credits like free users.
+  const paidPro = await isPaidPremiumUser(userId);
   const unlockStatus = await spendOnce(
     userId,
     cost,
     "spend_report",
     purchaseRef,
+    paidPro ? undefined : { ignorePremium: true },
   );
   if (unlockStatus === "insufficient")
     return Response.json(

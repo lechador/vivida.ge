@@ -39,7 +39,7 @@ export function DailyDashboard({
 
   useEffect(() => {
     let cancelled = false;
-    loadDashboardCore(userId)
+    loadDashboardCore()
       .then((c) => {
         if (cancelled) return;
         setCore(c);
@@ -197,7 +197,7 @@ function DashboardExtrasSection({
 
   useEffect(() => {
     let cancelled = false;
-    loadDashboardExtras(userId, locale)
+    loadDashboardExtras(locale)
       .then((e) => {
         if (!cancelled) setExtras(e);
       })

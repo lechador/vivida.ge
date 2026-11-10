@@ -34,7 +34,7 @@ const TRANSIT_BODIES = [
 export function computeTransits(
   date: Date,
   latitude = 0,
-  longitude = 0
+  longitude = 0,
 ): TransitPositions {
   return computeAt(date, 12, 0, latitude, longitude);
 }
@@ -47,14 +47,14 @@ export function computeTransits(
 export function computeTransitsAt(
   date: Date,
   latitude = 0,
-  longitude = 0
+  longitude = 0,
 ): TransitPositions {
   return computeAt(
     date,
     date.getUTCHours(),
     date.getUTCMinutes(),
     latitude,
-    longitude
+    longitude,
   );
 }
 
@@ -63,7 +63,7 @@ function computeAt(
   hour: number,
   minute: number,
   latitude: number,
-  longitude: number
+  longitude: number,
 ): TransitPositions {
   const origin = new Origin({
     year: date.getUTCFullYear(),
@@ -96,11 +96,11 @@ function computeAt(
 }
 
 export type CrossAspect = {
-  transit: string;       // transiting body key
-  natal: string;         // natal body key
+  transit: string; // transiting body key
+  natal: string; // natal body key
   kind: AspectKind;
   orb: number;
-  intensity: number;     // 0..1, 1 = exact
+  intensity: number; // 0..1, 1 = exact
 };
 
 /**
@@ -110,7 +110,7 @@ export type CrossAspect = {
  */
 export function detectCrossAspects(
   transit: TransitPositions,
-  natal: Record<string, { longitude: number }>
+  natal: Record<string, { longitude: number }>,
 ): CrossAspect[] {
   const out: CrossAspect[] = [];
 
@@ -148,7 +148,7 @@ export function detectCrossAspects(
  */
 export function houseOfLongitude(
   longitude: number,
-  houses: HouseJson[]
+  houses: HouseJson[],
 ): number | null {
   if (houses.length < 12) return null;
   const sorted = [...houses].sort((a, b) => a.number - b.number);
@@ -189,4 +189,21 @@ export function localDateString(date: Date, timezone: string): string {
   } catch {
     return date.toISOString().slice(0, 10);
   }
+}
+
+/**
+ * The instant to hand `computeTransits` so it evaluates the sky for the
+ * user's LOCAL calendar day `dateKey` (YYYY-MM-DD, e.g. from
+ * `localDateString`), optionally `offsetDays` later. `computeTransits` reads
+ * the UTC calendar date of its input and pins the time to 12:00 UTC, so
+ * passing the local date at 12:00Z makes the sky match the date key instead
+ * of whichever UTC day `now` happens to fall on.
+ */
+export function transitInstantForLocalDate(
+  dateKey: string,
+  offsetDays = 0,
+): Date {
+  const at = new Date(`${dateKey}T12:00:00Z`);
+  at.setUTCDate(at.getUTCDate() + offsetDays);
+  return at;
 }

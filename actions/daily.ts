@@ -1,4 +1,6 @@
-"use server";
+// Server-only module, deliberately NOT a "use server" file: its export takes
+// a userId, and a server action would let any caller read another user's data.
+import "server-only";
 
 import { and, eq } from "drizzle-orm";
 
@@ -15,6 +17,7 @@ import {
   detectCrossAspects,
   houseOfLongitude,
   localDateString,
+  transitInstantForLocalDate,
 } from "@/lib/transits";
 import {
   DAILY_PROMPT_VERSION,
@@ -107,8 +110,9 @@ export async function ensureDailyFor(
 
   try {
     const now = new Date();
+    // Sky for the user's LOCAL day (the cache key), not the UTC day of `now`.
     const transits = computeTransits(
-      now,
+      transitInstantForLocalDate(today),
       profile.latitude ?? 0,
       profile.longitude ?? 0,
     );

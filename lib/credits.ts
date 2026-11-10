@@ -289,15 +289,17 @@ export type UnlockResult = "already" | "unlocked" | "insufficient";
  * Pay once to unlock `ref` (a test result, etc.). Idempotent: re-opening an
  * already-unlocked item is free. Returns 'already' if previously unlocked,
  * 'unlocked' on a fresh successful charge, 'insufficient' if the balance is
- * too low.
+ * too low. `ignorePremium` charges even entitled users (used for trial users
+ * on goods that outlive the trial).
  */
 export async function spendOnce(
   userId: string,
   cost: number,
   reason: CreditReason,
   ref: string,
+  opts?: { ignorePremium?: boolean },
 ): Promise<UnlockResult> {
-  if (await isPremiumUser(userId)) return "already";
+  if (!opts?.ignorePremium && (await isPremiumUser(userId))) return "already";
   const result = await db.execute<{
     result_status: UnlockResult;
     resulting_balance: number;

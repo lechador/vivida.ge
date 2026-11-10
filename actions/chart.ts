@@ -1,4 +1,6 @@
-"use server";
+// Server-only module, deliberately NOT a "use server" file: its export takes
+// a userId, and a server action would let any caller read another user's data.
+import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import { after } from "next/server";

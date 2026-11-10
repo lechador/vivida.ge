@@ -17,7 +17,7 @@ import { ASPECTS, type AspectFamily } from "./aspects";
 
 const FORECAST_DAYS = 7;
 const ASPECT_FAMILY: Record<string, AspectFamily> = Object.fromEntries(
-  ASPECTS.map((a) => [a.kind, a.family])
+  ASPECTS.map((a) => [a.kind, a.family]),
 );
 
 /**
@@ -30,15 +30,15 @@ const TENSE_PLANETS = new Set(["mars", "saturn", "pluto"]);
 const HARMONIC_PLANETS = new Set(["venus", "jupiter", "sun", "moon"]);
 
 export type WeeklyDayContext = {
-  dateIso: string;       // YYYY-MM-DD in user's TZ
-  weekdayKa: string;     // "ორშაბათი", ..
+  dateIso: string; // YYYY-MM-DD in user's TZ
+  weekdayKa: string; // "ორშაბათი", ..
   /** Date label used inside the prompt, "ორშაბათი, 5 მაისი". */
   promptLabel: string;
   moonSignKa: string;
   moonSignEn: string;
   /** Sign key ("aries"…), used to look up transit-library sign entries. */
   moonSignKey: string;
-  harmonyScore: number;  // 0..100
+  harmonyScore: number; // 0..100
   challengeScore: number;
   drivers: Array<{
     transit: string;
@@ -59,25 +59,29 @@ export type WeeklyDayContext = {
 export function computeWeeklyForecast(
   natal: NatalChartJson,
   startDate: Date,
-  timezone: string
+  _timezone: string,
 ): WeeklyDayContext[] {
   const natalBodies = Object.fromEntries(
-    Object.entries(natal.bodies).map(([k, v]) => [k, { longitude: v.longitude }])
+    Object.entries(natal.bodies).map(([k, v]) => [
+      k,
+      { longitude: v.longitude },
+    ]),
   );
 
   const out: WeeklyDayContext[] = [];
 
   for (let i = 0; i < FORECAST_DAYS; i++) {
-    // Step day-by-day from startDate at UTC noon. We don't want DST edge
-    // cases, the transit positions move slowly enough that a few hours
-    // of TZ drift doesn't change the qualitative picture.
+    // `startDate` is the local-date anchor (noon UTC of the user's local
+    // first day, see transitInstantForLocalDate). Step day-by-day from it;
+    // the UTC date of `at` IS the local date, so label it in UTC.
     const at = new Date(startDate);
     at.setUTCHours(12, 0, 0, 0);
     at.setUTCDate(at.getUTCDate() + i);
 
     const transits = computeTransits(at);
-    const aspects = detectCrossAspects(transits, natalBodies)
-      .filter((a) => a.orb <= 5);
+    const aspects = detectCrossAspects(transits, natalBodies).filter(
+      (a) => a.orb <= 5,
+    );
 
     const { harmonyScore, challengeScore, drivers } = scoreDay(aspects);
 
@@ -87,9 +91,9 @@ export function computeWeeklyForecast(
         ? signByIndex(Math.floor(moonLong / 30))
         : signByIndex(0);
 
-    const dateIso = localDateIsoForOffset(startDate, timezone, i);
-    const weekdayKa = formatWeekdayKa(at, timezone);
-    const promptLabel = formatPromptLabel(at, timezone);
+    const dateIso = at.toISOString().slice(0, 10);
+    const weekdayKa = formatWeekdayKa(at, "UTC");
+    const promptLabel = formatPromptLabel(at, "UTC");
 
     out.push({
       dateIso,
@@ -157,8 +161,10 @@ function familyOf(a: CrossAspect): AspectFamily {
   const base = ASPECT_FAMILY[a.kind] ?? "neutral";
   if (a.kind !== "conjunction") return base;
   // Conjunction tilt by participating planets
-  if (TENSE_PLANETS.has(a.transit) || TENSE_PLANETS.has(a.natal)) return "tense";
-  if (HARMONIC_PLANETS.has(a.transit) || HARMONIC_PLANETS.has(a.natal)) return "harmonic";
+  if (TENSE_PLANETS.has(a.transit) || TENSE_PLANETS.has(a.natal))
+    return "tense";
+  if (HARMONIC_PLANETS.has(a.transit) || HARMONIC_PLANETS.has(a.natal))
+    return "harmonic";
   return "neutral";
 }
 
@@ -170,32 +176,10 @@ function familyOf(a: CrossAspect): AspectFamily {
 function planetWeight(a: CrossAspect): number {
   const t = a.transit;
   if (t === "moon") return 1.0;
-  if (t === "sun" || t === "mercury" || t === "venus" || t === "mars") return 0.85;
+  if (t === "sun" || t === "mercury" || t === "venus" || t === "mars")
+    return 0.85;
   if (t === "jupiter" || t === "saturn") return 0.6;
   return 0.4; // uranus, neptune, pluto, generational
-}
-
-/** YYYY-MM-DD in `timezone` for the day `offsetDays` after `startDate`. */
-function localDateIsoForOffset(
-  startDate: Date,
-  timezone: string,
-  offsetDays: number
-): string {
-  // Shift the start by N days, then format in TZ. Using en-CA gives us
-  // ISO-like "YYYY-MM-DD" without manual padding.
-  const shifted = new Date(startDate);
-  shifted.setUTCHours(12, 0, 0, 0);
-  shifted.setUTCDate(shifted.getUTCDate() + offsetDays);
-  try {
-    return new Intl.DateTimeFormat("en-CA", {
-      timeZone: timezone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(shifted);
-  } catch {
-    return shifted.toISOString().slice(0, 10);
-  }
 }
 
 function formatWeekdayKa(date: Date, timezone: string): string {
