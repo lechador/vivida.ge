@@ -9,8 +9,8 @@ const EXPLORE = [
   { href: "/pl/horoskop-tygodniowy", label: "Horoskop tygodniowy" },
   { href: "/pl/horoskop-miesieczny", label: "Horoskop miesięczny" },
   { href: "/pl/horoskop-partnerski", label: "Horoskop partnerski" },
-  { href: "/pl/features", label: "Funkcje" },
-  { href: "/pl/how-it-works", label: "Jak to działa" },
+  { href: `${ENGLISH_SITE_URL}/features`, label: "Funkcje" },
+  { href: `${ENGLISH_SITE_URL}/how-it-works`, label: "Jak to działa" },
 ];
 
 const LEARN = [

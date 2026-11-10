@@ -15,6 +15,7 @@ import {
   signLabel,
 } from "@/lib/zodiac";
 import { ZODIAC_HUB_PL } from "@/lib/seo/zodiac-sign-pl";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const SITE = "https://www.vividaastro.com";
 
@@ -95,7 +96,7 @@ export function ZodiacHubPl() {
         <script
           key={index}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(item) }}
         />
       ))}
 

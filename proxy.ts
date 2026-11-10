@@ -8,7 +8,8 @@ import {
 
 import { authConfig } from "@/auth.config";
 import { signedInLandingTarget } from "@/lib/landing-redirect";
-import { isEnglishHost } from "@/lib/seo/locales";
+import { isEnglishHost, resolveEnglishPath } from "@/lib/seo/locales";
+import { isPolishReadyPath } from "@/lib/seo/polish-ready";
 import {
   upgradeEnglishDetailSlug,
   upgradePolishDetailSlug,
@@ -169,6 +170,15 @@ function internationalEnglishRouting(
 }
 
 /**
+ * English clean URL for a `/pl` page, given its shared internal path. Falls
+ * back to the English home when the Polish URL maps to nothing we know.
+ */
+function englishTwinOfPolishPath(internalPath: string): string {
+  if (internalPath === "/pl" || internalPath.startsWith("/pl/")) return "/";
+  return upgradeEnglishDetailSlug(resolveEnglishPath(internalPath));
+}
+
+/**
  * Route Polish URLs under `/pl` on vividaastro.com via internal rewrite to the
  * shared tree, setting `x-vivida-locale: pl` on the rewritten request and
  * `vivida_lang=pl` cookie on the response.
@@ -185,13 +195,25 @@ function internationalPolishRouting(
 
   const stripped = pathname === "/pl" ? "/" : pathname.slice(3);
   const cleanPlPath = upgradePolishDetailSlug(polishPublicPath(stripped));
-  if (cleanPlPath !== pathname && cleanPlPath.startsWith("/pl")) {
+  if (
+    cleanPlPath !== pathname &&
+    (cleanPlPath === "/pl" || cleanPlPath.startsWith("/pl/"))
+  ) {
     const target = request.nextUrl.clone();
     target.pathname = cleanPlPath;
     return NextResponse.redirect(target, 308);
   }
 
   const internalPath = polishInternalPath(pathname);
+
+  // Polish is only partly translated. Anything not on the allowlist would
+  // render Georgian/English under a /pl URL, so send it to its English twin
+  // (or the English home when it has none). Auth/app routes keep rewriting.
+  if (!isPolishReadyPath(pathname) && !isSharedAppPath(internalPath)) {
+    const target = request.nextUrl.clone();
+    target.pathname = englishTwinOfPolishPath(internalPath);
+    return NextResponse.redirect(target, 308);
+  }
   const destination = request.nextUrl.clone();
   destination.pathname = internalPath;
 

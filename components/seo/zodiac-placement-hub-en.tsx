@@ -12,6 +12,7 @@ import {
   placementEnglish,
   type PlacementKind,
 } from "@/lib/zodiac-placement-en";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const CONFIG = {
   moon: {
@@ -122,7 +123,7 @@ export function ZodiacPlacementHubEn({ kind }: { kind: PlacementKind }) {
         <script
           key={index}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(item) }}
         />
       ))}
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">

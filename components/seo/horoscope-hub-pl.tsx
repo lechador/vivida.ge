@@ -149,7 +149,7 @@ export function HoroscopeHubPl() {
             { href: "/siyvarulis-horoskopi", label: "Miłosny" },
             { href: "/finansuri-horoskopi", label: "Finansowy" },
             { href: "/mtvaris-kalendari", label: "Kalendarz księżycowy" },
-            { href: "/retrograduli-merkuri", label: "Retrogradacja Merkurego" },
+            { href: "/mercury-retrograde", label: "Retrogradacja Merkurego" },
           ].map((item) => (
             <Link
               key={item.href}

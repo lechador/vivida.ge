@@ -28,6 +28,7 @@ import {
   englishSiteHref,
   localizedAlternates,
 } from "@/lib/seo/locales";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 export function thematicHubMetadataEn(theme: HoroscopeTheme) {
   const config = THEME_CONFIG_EN[theme];
@@ -148,7 +149,7 @@ export function ThematicHoroscopeHubEn({ theme }: { theme: HoroscopeTheme }) {
         <script
           key={index}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(item) }}
         />
       ))}
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-20 pt-8 sm:px-6 sm:pt-12">
@@ -303,7 +304,7 @@ export function ThematicHoroscopeDetailEn({
         <script
           key={index}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(item) }}
         />
       ))}
       <article className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-20 pt-8 sm:px-6 sm:pt-12">

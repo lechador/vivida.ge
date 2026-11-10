@@ -62,7 +62,7 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical,
       languages: {
-        "ka-GE": articleUrl("ka"),
+        ka: articleUrl("ka"),
         en: articleUrl("en"),
         "x-default": articleUrl("en"),
       },

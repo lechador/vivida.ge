@@ -18,6 +18,7 @@ import {
   RANKING_CATEGORY_ORDER,
   RANKING_TOPICS,
 } from "@/lib/seo/rankings";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -122,11 +123,11 @@ export default async function RankingsHubPage() {
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(itemListLd) }}
       />
 
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">

@@ -23,6 +23,7 @@ import {
   RULER_EN,
   ZODIAC_SIGN_EN,
 } from "@/lib/zodiac-sign-en";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const LEVEL_COLOR: Record<string, string> = {
   Strong: "oklch(0.78 0.18 305)",
@@ -125,7 +126,7 @@ export function ZodiacSignPageEn({ sign }: { sign: ZodiacSlug }) {
         <script
           key={index}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(item) }}
         />
       ))}
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">

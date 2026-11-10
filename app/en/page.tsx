@@ -14,6 +14,7 @@ import {
   localizedAlternates,
 } from "@/lib/seo/locales";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const URL = ENGLISH_SITE_URL;
 const TITLE_EN = "Natal Charts, Horoscopes and Zodiac Guides, Vivida";
@@ -219,7 +220,7 @@ export default async function EnglishHomePage() {
       <PolishShell georgianPath="/">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(ldPl) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(ldPl) }}
         />
 
         {/* Swiss-Grid Architectural Hero Ledger */}
@@ -483,7 +484,7 @@ export default async function EnglishHomePage() {
     <EnglishShell georgianPath="/">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ldEn) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(ldEn) }}
       />
 
       {/* Swiss-Grid Architectural Hero Ledger */}

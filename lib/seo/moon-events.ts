@@ -131,6 +131,20 @@ export function moonEventForDate(
   return moonEvents(kind, 7, date).find((event) => event.iso === iso) ?? null;
 }
 
+/**
+ * The new/full moon within 3 days of `date`, from an 8-day scan around it
+ * (replaces a 1,000-day scan on eclipse detail pages). Unlike a scan from
+ * today, it also resolves for dates already in the past.
+ */
+export function moonEventNearDate(
+  kind: MoonEventKind,
+  date: Date,
+): MoonEvent | undefined {
+  return moonEvents(kind, 8, new Date(date.getTime() - 4 * 86400000)).find(
+    (event) => Math.abs(event.date.getTime() - date.getTime()) < 3 * 86400000,
+  );
+}
+
 export type Eclipse = {
   slug: string;
   date: string;

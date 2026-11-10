@@ -21,10 +21,13 @@ const SITE_URL = "https://www.vivida.ge";
  * it here keeps `inLanguage` correct without every call site threading a
  * locale through.
  */
-function inLanguageFor(url: string): "en" | "ka-GE" {
+export function inLanguageFor(url: string): "en" | "pl" | "ka-GE" {
   try {
     const parsed = new URL(url);
-    return isEnglishHost(parsed.host) ? "en" : "ka-GE";
+    if (!isEnglishHost(parsed.host)) return "ka-GE";
+    return parsed.pathname === "/pl" || parsed.pathname.startsWith("/pl/")
+      ? "pl"
+      : "en";
   } catch {
     return "ka-GE";
   }
@@ -116,18 +119,6 @@ export function faqLd(entries: FaqEntry[]): JsonLd {
   };
 }
 
-/** WebSite identity, emitted once on the home page. */
-export function websiteLd(): JsonLd {
-  return {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    url: SITE_URL,
-    name: "Vivida",
-    inLanguage: "ka-GE",
-    publisher: ORG,
-  };
-}
-
 /**
  * Renders a `<script type="application/ld+json">` payload. Returns the
  * raw string the page should set via dangerouslySetInnerHTML. Multiple
@@ -135,17 +126,33 @@ export function websiteLd(): JsonLd {
  * each independently.
  */
 export function serializeLd(ld: JsonLd | JsonLd[]): string {
-  return JSON.stringify(ld, (_key, value: unknown) => {
-    if (typeof value !== "string" || !value.startsWith("http")) return value;
+  return escapeJsonLd(
+    JSON.stringify(ld, (_key, value: unknown) => {
+      if (typeof value !== "string" || !value.startsWith("http")) return value;
 
-    try {
-      const url = new URL(value);
-      if (!isEnglishHost(url.host)) return value;
+      try {
+        const url = new URL(value);
+        if (!isEnglishHost(url.host)) return value;
 
-      url.pathname = internationalPublicPath(url.pathname);
-      return url.toString();
-    } catch {
-      return value;
-    }
-  });
+        url.pathname = internationalPublicPath(url.pathname);
+        return url.toString();
+      } catch {
+        return value;
+      }
+    }),
+  );
+}
+
+/**
+ * Makes a JSON string safe to inline in a <script> element: `<` becomes
+ * its unicode escape so DB text containing `</script>` cannot break out
+ * (per the Next.js JSON-LD guide). Valid JSON, parses to the same value.
+ */
+export function escapeJsonLd(json: string): string {
+  return json.replace(/</g, "\\u003c");
+}
+
+/** JSON.stringify + escape, for pages that don't need serializeLd's URL rewriting. */
+export function jsonLdString(value: unknown): string {
+  return escapeJsonLd(JSON.stringify(value));
 }

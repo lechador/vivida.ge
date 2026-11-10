@@ -19,9 +19,9 @@ describe("international SEO locale helpers", () => {
     ).toEqual({
       canonical: `${ENGLISH_SITE_URL}/natal-chart`,
       languages: {
-        "ka-GE": `${GEORGIAN_SITE_URL}/nataluri-ruka`,
+        ka: `${GEORGIAN_SITE_URL}/nataluri-ruka`,
         en: `${ENGLISH_SITE_URL}/natal-chart`,
-        "pl-PL": `${POLISH_SITE_URL}/horoskop-urodzeniowy`,
+        pl: `${POLISH_SITE_URL}/horoskop-urodzeniowy`,
         "x-default": `${ENGLISH_SITE_URL}/natal-chart`,
       },
     });
@@ -31,9 +31,9 @@ describe("international SEO locale helpers", () => {
     expect(localizedAlternates("/", "/en", "ka")).toEqual({
       canonical: GEORGIAN_SITE_URL,
       languages: {
-        "ka-GE": GEORGIAN_SITE_URL,
+        ka: GEORGIAN_SITE_URL,
         en: ENGLISH_SITE_URL,
-        "pl-PL": POLISH_SITE_URL,
+        pl: POLISH_SITE_URL,
         "x-default": ENGLISH_SITE_URL,
       },
     });
@@ -45,9 +45,9 @@ describe("international SEO locale helpers", () => {
     ).toEqual({
       canonical: `${POLISH_SITE_URL}/horoskop-urodzeniowy`,
       languages: {
-        "ka-GE": `${GEORGIAN_SITE_URL}/nataluri-ruka`,
+        ka: `${GEORGIAN_SITE_URL}/nataluri-ruka`,
         en: `${ENGLISH_SITE_URL}/natal-chart`,
-        "pl-PL": `${POLISH_SITE_URL}/horoskop-urodzeniowy`,
+        pl: `${POLISH_SITE_URL}/horoskop-urodzeniowy`,
         "x-default": `${ENGLISH_SITE_URL}/natal-chart`,
       },
     });
@@ -64,9 +64,9 @@ describe("international SEO locale helpers", () => {
 
   it("upgrades detail slugs to English and Polish keyword slugs in localizedAlternates", () => {
     const expectedLanguages = {
-      "ka-GE": `${GEORGIAN_SITE_URL}/sizmris-akhsna/gveli`,
+      ka: `${GEORGIAN_SITE_URL}/sizmris-akhsna/gveli`,
       en: `${ENGLISH_SITE_URL}/dream-meanings/snake`,
-      "pl-PL": `${POLISH_SITE_URL}/sennik/waz`,
+      pl: `${POLISH_SITE_URL}/sennik/waz`,
       "x-default": `${ENGLISH_SITE_URL}/dream-meanings/snake`,
     };
 

@@ -24,6 +24,7 @@ import {
   englishSiteHref,
   localizedAlternates,
 } from "@/lib/seo/locales";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
 const HUB_PATH = "/zodiac/amomavali";
@@ -175,15 +176,15 @@ export default async function RisingSignPage({
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(articleLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(faqLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbLd) }}
       />
 
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
@@ -375,14 +376,13 @@ export default async function RisingSignPage({
             ნამდვილად {c.labelKa} ამომავალი ხარ?
           </h2>
           <p className="mx-auto mt-3 max-w-md text-pretty text-base text-muted-foreground">
-            ასცენდენტი ~2 საათში ცვლის ნიშანს, დაბადების ზუსტი დრო ცვლის
-            სურათს. Vivida უფასოდ შენი სრული რუკის გენერაცია.
+            ასცენდენტი ~2 საათში ცვლის ნიშანს, დაბადების ზუსტი დრო ცვლის სურათს.
+            Vivida უფასოდ შენი სრული რუკის გენერაცია.
           </p>
           <Button asChild variant="mystic" size="lg" className="mt-6">
             <Link href="/nataluri-ruka">გაიგე ჩემი ამომავალი ნიშანი</Link>
           </Button>
         </div>
-
       </section>
 
       <SiteFooter />

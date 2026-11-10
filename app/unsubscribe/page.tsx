@@ -17,6 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
       (await getRequestLocale()) !== "ka"
         ? "Unsubscribe"
         : "გამოწერის გაუქმება",
+    robots: { index: false },
   };
 }
 export const dynamic = "force-dynamic";

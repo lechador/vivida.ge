@@ -19,6 +19,7 @@ import {
   localizedAlternates,
 } from "@/lib/seo/locales";
 import { paragraphs } from "@/lib/seo/zodiac-content";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
 const URL = `${SITE_URL}/chinuri-horoskopi`;
@@ -83,7 +84,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-
 export default async function ChineseZodiacHubPage() {
   const locale = await getRequestLocale();
   if (locale === "en") return <ChineseZodiacHubEn />;
@@ -134,16 +134,16 @@ export default async function ChineseZodiacHubPage() {
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(itemListLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbLd) }}
       />
       {faqLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(faqLd) }}
         />
       )}
 
@@ -237,7 +237,6 @@ export default async function ChineseZodiacHubPage() {
             </div>
           </section>
         )}
-
       </section>
 
       <SiteFooter />

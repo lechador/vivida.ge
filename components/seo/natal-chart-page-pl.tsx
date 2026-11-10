@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { Accent } from "@/components/en/editorial";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vividaastro.com";
 const PAGE_URL = `${SITE_URL}/pl/horoskop-urodzeniowy`;
@@ -85,7 +86,7 @@ export function NatalChartPagePl() {
         <script
           key={index}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(item) }}
         />
       ))}
 

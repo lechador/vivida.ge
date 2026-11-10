@@ -46,6 +46,7 @@ import {
   internationalPublicPath,
   polishPublicPath,
 } from "@/lib/seo/public-paths";
+import { isPolishReadyPath } from "@/lib/seo/polish-ready";
 import { articleUrl, listPublishedArticleSitemapItems } from "@/lib/articles";
 
 /**
@@ -73,6 +74,19 @@ const ENGLISH_ASTROLOGY_PUBLISHED = new Date("2026-08-13");
 const ASTROLOGY_GUIDES_PUBLISHED = new Date("2026-07-27");
 /** მკითხაობა / სიზმრის ახსნა / ანგელოზური რიცხვები clusters. */
 const NEW_CLUSTERS_PUBLISHED = new Date("2026-07-29");
+/** Yearly sign pages; matches `dateModified` in their JSON-LD. */
+const YEARLY_PUBLISHED = new Date("2026-10-27");
+
+/**
+ * lastmod for a page about one calendar date (`YYYY-MM-DD`): the later of that
+ * date and `floor` (when the page type shipped), never in the future, a
+ * future lastmod is ignored by Google and discredits the rest.
+ */
+function datedLastModified(iso: string, floor: Date): Date {
+  const about = new Date(`${iso}T00:00:00Z`);
+  const latest = about > floor ? about : floor;
+  return latest > NOW ? NOW : latest;
+}
 
 const VIEW_CHANGE_FREQ: Record<
   (typeof ALL_HOROSCOPE_VIEWS)[number],
@@ -106,15 +120,15 @@ function alternatesFor(
   const englishUrl = `${ENGLISH_SITE_URL}${publicEnPath === "/" ? "" : publicEnPath}`;
   const languages: Record<string, string> = {};
   if (kaPath) {
-    languages["ka-GE"] = `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
+    languages.ka = `${GEORGIAN_SITE_URL}${kaPath === "/" ? "" : kaPath}`;
   }
   languages.en = englishUrl;
   languages["x-default"] = englishUrl;
 
   const targetForPl = kaPath ?? enPath;
   const plPath = upgradePolishDetailSlug(polishPublicPath(targetForPl));
-  if (plPath && plPath !== targetForPl) {
-    languages["pl-PL"] = `${ENGLISH_SITE_URL}${plPath === "/" ? "" : plPath}`;
+  if (plPath && plPath !== targetForPl && isPolishReadyPath(plPath)) {
+    languages.pl = `${ENGLISH_SITE_URL}${plPath === "/" ? "" : plPath}`;
   }
   return { languages };
 }
@@ -133,7 +147,7 @@ function articleAlternates(
   const languages: Record<string, string> = {};
   for (const sibling of siblings) {
     if (sibling.language === "ka")
-      languages["ka-GE"] = articleUrl("ka", sibling.slug);
+      languages.ka = articleUrl("ka", sibling.slug);
     if (sibling.language === "en")
       languages.en = articleUrl("en", sibling.slug);
   }
@@ -175,7 +189,7 @@ function articleHubEntry(
     priority: 0.86,
     alternates: {
       languages: {
-        "ka-GE": articleUrl("ka"),
+        ka: articleUrl("ka"),
         en: articleUrl("en"),
         "x-default": articleUrl("en"),
       },
@@ -238,7 +252,12 @@ function englishSitemap(articleItems: SitemapArticle[]): MetadataRoute.Sitemap {
   ]);
   const yearlyPages = ALL_YEARLY_YEARS.flatMap((year) =>
     ALL_SLUGS.filter((slug) => yearlyContentFor(slug, year)).map((slug) =>
-      samePathEntry(`/zodiac/${slug}/${year}`, "monthly", 0.76),
+      samePathEntry(
+        `/zodiac/${slug}/${year}`,
+        "monthly",
+        0.76,
+        YEARLY_PUBLISHED,
+      ),
     ),
   );
   const signHoroscopePages = ALL_SLUGS.flatMap((slug) =>
@@ -268,7 +287,8 @@ function englishSitemap(articleItems: SitemapArticle[]): MetadataRoute.Sitemap {
         `/astrologiuri-kalendari/${day.iso}`,
         "daily",
         0.65,
-        ENGLISH_ASTROLOGY_PUBLISHED,
+        // Day content is generated per day, like the sign horoscopes.
+        NOW,
       ),
   );
   const moonEventPages = (["full", "new"] as const).flatMap((kind) =>
@@ -277,6 +297,7 @@ function englishSitemap(articleItems: SitemapArticle[]): MetadataRoute.Sitemap {
         `/${kind === "full" ? "savse-mtvare" : "akhali-mtvare"}/${event.iso}`,
         "monthly",
         0.7,
+        datedLastModified(event.iso, ENGLISH_ASTROLOGY_PUBLISHED),
       ),
     ),
   );
@@ -326,7 +347,7 @@ function englishSitemap(articleItems: SitemapArticle[]): MetadataRoute.Sitemap {
       priority: pair.en === "/" ? 0.9 : 0.7,
       alternates: alternatesFor(pair.ka, pair.en),
     })),
-    // English-only pages (no Georgian equivalent, so no ka-GE alternate).
+    // English-only pages (no Georgian equivalent, so no ka alternate).
     // Driven off the shared table rather than hardcoded, so moving a route
     // into ENGLISH_ONLY_ROUTES can't silently drop it from this sitemap.
     ...ENGLISH_ONLY_ROUTES.map((route) => ({
@@ -423,7 +444,7 @@ function englishSitemap(articleItems: SitemapArticle[]): MetadataRoute.Sitemap {
   const seenUrls = new Set<string>(normalizedEntries.map((e) => e.url));
 
   for (const entry of normalizedEntries) {
-    const plUrl = entry.alternates?.languages?.["pl-PL"];
+    const plUrl = entry.alternates?.languages?.pl;
     if (plUrl && !seenUrls.has(plUrl)) {
       seenUrls.add(plUrl);
       plEntries.push({
@@ -497,7 +518,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (!yearlyContentFor(slug, year)) continue;
       yearlyPages.push({
         url: `${BASE}/zodiac/${slug}/${year}`,
-        lastModified: EVERGREEN,
+        lastModified: YEARLY_PUBLISHED,
         changeFrequency: "monthly",
         priority: 0.75,
       });
@@ -563,7 +584,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     SITEMAP_CALENDAR_DAYS,
   ).map((day) => ({
     url: `${BASE}/astrologiuri-kalendari/${day.iso}`,
-    lastModified: CONTENT_PUBLISHED,
+    // Day content is generated per day, like the sign horoscopes.
+    lastModified: NOW,
     changeFrequency: "daily" as const,
     priority: 0.65,
   }));
@@ -572,7 +594,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ).flatMap((kind) =>
     moonEvents(kind, SITEMAP_MOON_EVENT_DAYS).map((event) => ({
       url: `${BASE}/${kind === "full" ? "savse-mtvare" : "akhali-mtvare"}/${event.iso}`,
-      lastModified: CONTENT_PUBLISHED,
+      lastModified: datedLastModified(event.iso, CONTENT_PUBLISHED),
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),
@@ -914,18 +936,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...yearlyPages,
     ...signHoroscopePages,
     {
-      url: `${BASE}/login`,
-      lastModified: EVERGREEN,
-      changeFrequency: "yearly",
-      priority: 0.4,
-    },
-    {
-      url: `${BASE}/signup`,
-      lastModified: EVERGREEN,
-      changeFrequency: "yearly",
-      priority: 0.6,
-    },
-    {
       url: `${BASE}/terms`,
       lastModified: EVERGREEN,
       changeFrequency: "yearly",
@@ -950,8 +960,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // These render one tree in both languages at the same path.
     "/features",
     "/how-it-works",
-    "/login",
-    "/signup",
     "/pirovnebis-testi",
     "/iq-testi",
     "/eq-testi",

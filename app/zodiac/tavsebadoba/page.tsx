@@ -21,6 +21,7 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
 import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/tavsebadoba";
@@ -97,11 +98,11 @@ export default function CompatibilityHubPage() {
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(faqLd) }}
       />
 
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">

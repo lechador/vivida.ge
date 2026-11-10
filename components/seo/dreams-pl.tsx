@@ -18,6 +18,7 @@ import {
   type DreamSymbolPl,
 } from "@/lib/seo/dreams-pl";
 import { dreamPublicSlug } from "@/lib/seo/en-slugs";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const SITE = "https://www.vividaastro.com";
 
@@ -76,7 +77,7 @@ export function DreamsHubPl({ authed = false }: { authed?: boolean } = {}) {
       <SmartHeader locale="pl" georgianPath="/sizmris-akhsna" />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(structuredData) }}
       />
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
@@ -260,7 +261,7 @@ export function DreamSymbolPagePl({
       <SmartHeader locale="pl" georgianPath={`/sizmris-akhsna/${base.slug}`} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(structuredData) }}
       />
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-10">
         <nav className="mb-6 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">

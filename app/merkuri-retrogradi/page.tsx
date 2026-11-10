@@ -8,7 +8,7 @@ import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import {
   isMercuryRetrogradeNow,
-  mercuryRetrogradePeriods,
+  getMercuryRetrogradePeriods,
 } from "@/lib/retrograde";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import {
@@ -28,6 +28,8 @@ const SITE_URL = "https://www.vivida.ge";
 // Recompute daily, the "is it retrograde right now" banner and the year
 // tables come straight from the ephemeris, so the page never goes stale.
 export const revalidate = 86400;
+
+const PUBLISHED_AT = "2026-01-01T00:00:00+04:00";
 
 const TITLE = "მერკური რეტროგრადში, თარიღები, მნიშვნელობა და რჩევები";
 const DESCRIPTION =
@@ -132,15 +134,19 @@ export default async function MercuryRetrogradePage() {
   const now = new Date();
   const year = now.getUTCFullYear();
   const retroNow = isMercuryRetrogradeNow(now);
-  const thisYear = mercuryRetrogradePeriods(year);
-  const nextYear = mercuryRetrogradePeriods(year + 1);
+  const [thisYear, nextYear] = await Promise.all([
+    getMercuryRetrogradePeriods(year),
+    getMercuryRetrogradePeriods(year + 1),
+  ]);
 
   const ld = [
     articleLd({
       url: `${SITE_URL}/merkuri-retrogradi`,
       headline: TITLE,
       description: DESCRIPTION,
-      datePublished: now.toISOString(),
+      // Stable across requests: fake per-request freshness is a crawl signal
+      // Google learns to ignore.
+      datePublished: PUBLISHED_AT,
     }),
     breadcrumbLd([
       { name: "მთავარი", url: SITE_URL },
@@ -312,7 +318,6 @@ export default async function MercuryRetrogradePage() {
             </Link>
           </Button>
         </div>
-
       </section>
 
       <SiteFooter />

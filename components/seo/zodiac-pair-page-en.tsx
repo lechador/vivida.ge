@@ -10,6 +10,7 @@ import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
 import { signMetaBySlug, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
 import { signColor } from "@/lib/zodiac";
 import { zodiacPairEnglish } from "@/lib/zodiac-pair-en";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const RATING_COLOR: Record<string, string> = {
   Strong: "oklch(0.78 0.18 305)",
@@ -69,7 +70,7 @@ export function ZodiacPairPageEn({ a, b }: { a: ZodiacSlug; b: ZodiacSlug }) {
         <script
           key={index}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(item) }}
         />
       ))}
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">

@@ -15,6 +15,7 @@ import { PricingAnchor } from "@/components/landing/pricing-anchor";
 import { TrackedPublicLink } from "@/components/seo/tracked-public-link";
 import { CornerCrosshair } from "@/components/brand/celestial-icons";
 import { localizedAlternates } from "@/lib/seo/locales";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
 
@@ -43,7 +44,7 @@ const ORGANIZATION_LD = {
   "@type": "Organization",
   name: "Vivida",
   url: SITE_URL,
-  logo: `${SITE_URL}/icon.svg`,
+  logo: `${SITE_URL}/apple-icon.png`,
   description:
     "პერსონალური ასტროლოგიური სერვისი, ნატალური რუკა, ყოველდღიური ჰოროსკოპი და თავსებადობა ქართულად.",
   sameAs: [],
@@ -69,11 +70,11 @@ export default async function Home() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_LD) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(ORGANIZATION_LD) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(WEBSITE_LD) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(WEBSITE_LD) }}
       />
 
       <main className="relative isolate flex-1 overflow-x-clip bg-background">

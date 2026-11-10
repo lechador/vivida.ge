@@ -632,13 +632,13 @@ export default async function ZodiacSignSlugPage({
               კარიერის ჰოროსკოპი
             </Link>
             <Link
-              href={`/moon/${sign}`}
+              href={`/zodiac/mtvare/${sign}`}
               className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-1.5 text-sm transition-colors hover:bg-card/80"
             >
               მთვარე {c.labelKa}-ში
             </Link>
             <Link
-              href={`/rising/${sign}`}
+              href={`/zodiac/amomavali/${sign}`}
               className="inline-flex items-center rounded-full border border-border bg-card/55 px-3.5 py-1.5 text-sm transition-colors hover:bg-card/80"
             >
               {c.labelKa} ამომავალი

@@ -35,6 +35,7 @@ import { signColor } from "@/lib/zodiac";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { ZodiacGuideIndexEn } from "@/components/seo/zodiac-guides-en";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/gzamkvlevi";
@@ -180,11 +181,11 @@ export default async function GuideIndexPage() {
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(pageLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(pageLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbLd) }}
       />
 
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
@@ -541,7 +542,6 @@ export default async function GuideIndexPage() {
             <Link href="/signup">დაიწყე უფასოდ</Link>
           </Button>
         </div>
-
       </section>
 
       <SiteFooter />

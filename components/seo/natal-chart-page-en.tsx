@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { Starfield } from "@/components/landing/starfield";
 import { Accent } from "@/components/en/editorial";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vividaastro.com";
 const PAGE_URL = `${SITE_URL}/natal-chart`;
@@ -76,7 +77,7 @@ export function NatalChartPageEn() {
         <script
           key={index}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(item) }}
         />
       ))}
 
@@ -217,7 +218,10 @@ export function NatalChartPageEn() {
                 { href: "/horoscope", label: "Daily horoscope" },
                 { href: "/tests", label: "Personality tests" },
               ].map((item, idx) => (
-                <span key={item.href} className="inline-flex items-center gap-3">
+                <span
+                  key={item.href}
+                  className="inline-flex items-center gap-3"
+                >
                   {idx > 0 && <span aria-hidden>·</span>}
                   <Link
                     href={item.href}

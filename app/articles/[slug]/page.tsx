@@ -26,6 +26,7 @@ import {
 } from "@/lib/articles";
 import type { UserLocale } from "@/lib/i18n/locale";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -79,7 +80,7 @@ function metadataAlternates(
   const languages: Record<string, string> = {};
   for (const item of translations) {
     const language = item.language as UserLocale;
-    const key = language === "ka" ? "ka-GE" : "en";
+    const key = language === "ka" ? "ka" : "en";
     languages[key] = articleUrl(language, item.slug);
   }
   languages["x-default"] = languages.en ?? articleUrl(locale, currentSlug);
@@ -231,11 +232,11 @@ export default async function ArticlePage({ params }: Props) {
       <main className="relative z-10 flex-1">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(ld) }}
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbLd) }}
         />
 
         <article>

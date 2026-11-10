@@ -39,10 +39,10 @@ describe("Stage 5A: Polish Public Routes & SEO Invariants", () => {
     expect(alternates.canonical).toBe(
       "https://www.vividaastro.com/pl/horoskop-urodzeniowy",
     );
-    expect(alternates.languages?.["pl-PL"]).toBe(
+    expect(alternates.languages?.pl).toBe(
       "https://www.vividaastro.com/pl/horoskop-urodzeniowy",
     );
-    expect(alternates.languages?.["ka-GE"]).toBe(
+    expect(alternates.languages?.ka).toBe(
       "https://www.vivida.ge/nataluri-ruka",
     );
   });

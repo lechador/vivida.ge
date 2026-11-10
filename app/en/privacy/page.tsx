@@ -230,7 +230,7 @@ export default function EnglishPrivacyPage() {
           . The Georgian policy remains available at{" "}
           <Link
             href={`${GEORGIAN_SITE_URL}/privacy`}
-            hrefLang="ka-GE"
+            hrefLang="ka"
             className="text-[var(--vivida-cyan)] hover:underline"
           >
             vivida.ge/privacy

@@ -5,6 +5,7 @@ import { EnglishFooter } from "@/components/en/english-footer";
 import { PolishFooter } from "@/components/pl/polish-footer";
 import { InstallAppButton } from "@/components/pwa/install-button";
 import type { UserLocale } from "@/lib/i18n/locale";
+import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 
 const PRODUCT_LINKS = [
   { href: "/nataluri-ruka", label: "ნატალური რუკა" },
@@ -22,6 +23,7 @@ const LEARN_LINKS = [
   { href: "/zodiac/elementebi", label: "ელემენტები" },
   { href: "/zodiac/tavsebadoba", label: "თავსებადობა" },
   { href: "/zodiac/gzamkvlevi", label: "სრული გზამკვლევი" },
+  { href: "/zodiac/reitingebi", label: "ნიშნების რეიტინგები" },
   { href: "/astrologiuri-saxlebi", label: "ასტროლოგიური სახლები" },
   { href: "/planetebi", label: "პლანეტები" },
 ];
@@ -29,11 +31,17 @@ const LEARN_LINKS = [
 const TOOL_LINKS = [
   { href: "/horoskopi", label: "დღის ჰოროსკოპი" },
   { href: "/horoskopi/kvireuli", label: "კვირის ჰოროსკოპი" },
+  { href: "/siyvarulis-horoskopi", label: "სიყვარულის ჰოროსკოპი" },
+  { href: "/finansuri-horoskopi", label: "ფინანსური ჰოროსკოპი" },
+  { href: "/karieris-horoskopi", label: "კარიერის ჰოროსკოპი" },
   { href: "/taro", label: "ტაროზე მკითხაობა" },
   { href: "/mkitxaoba", label: "მკითხაობა ონლაინ" },
   { href: "/sizmris-akhsna", label: "სიზმრის ახსნა" },
   { href: "/tests", label: "ტესტები" },
   { href: "/iq-testi", label: "IQ ტესტი" },
+  { href: "/mbti", label: "MBTI ტესტი" },
+  { href: "/mijachvulobis-testi", label: "მიჯაჭვულობის ტესტი" },
+  { href: "/tvit-shepasebis-testi", label: "თვითშეფასების ტესტი" },
   { href: "/numerologia", label: "ნუმეროლოგია" },
   { href: "/angeluri-ricxvebi", label: "ანგელოზური რიცხვები" },
   { href: "/chinuri-horoskopi", label: "ჩინური ჰოროსკოპი" },
@@ -43,7 +51,7 @@ const TOOL_LINKS = [
 const LEGAL_LINKS = [
   { href: "/terms", label: "წესები და პირობები" },
   { href: "/privacy", label: "კონფიდენციალურობა" },
-  { href: "/en", label: "English" },
+  { href: ENGLISH_SITE_URL, label: "English" },
 ];
 
 /**

@@ -8,6 +8,7 @@ import { AppHeader } from "@/components/nav/app-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ReadingsApp } from "@/components/bazaar/readings-app";
 import { DEFAULT_OG_IMAGE, ENGLISH_SITE_URL } from "@/lib/seo/locales";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 export const dynamic = "force-dynamic";
 
@@ -56,7 +57,7 @@ export default async function ReadingsPage() {
   const ldScript = (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+      dangerouslySetInnerHTML={{ __html: jsonLdString(ld) }}
     />
   );
 

@@ -17,6 +17,7 @@ import { SignByDatePicker } from "./sign-by-date-picker";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { DEFAULT_OG_IMAGE, localizedAlternates } from "@/lib/seo/locales";
 import { ZodiacByDatePageEn } from "@/components/seo/zodiac-guides-en";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const SITE_URL = "https://www.vivida.ge";
 const PATH = "/zodiac/datit";
@@ -110,11 +111,11 @@ export default async function ZodiacByDatePage() {
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_LD) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(FAQ_LD) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_LD) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(BREADCRUMB_LD) }}
       />
 
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">

@@ -15,6 +15,7 @@ import { VIEW_PATH } from "@/lib/sign-horoscope";
 import { signColor } from "@/lib/zodiac";
 import { ZODIAC_SIGN_EN } from "@/lib/zodiac-sign-en";
 import { internationalPublicPath } from "@/lib/seo/public-paths";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 export type EnglishPeriod = "week" | "month";
 
@@ -127,7 +128,7 @@ export function PeriodHoroscopeHubEn({ period }: { period: EnglishPeriod }) {
         <script
           key={index}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(item) }}
         />
       ))}
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">

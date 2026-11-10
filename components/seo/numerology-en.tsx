@@ -13,6 +13,7 @@ import {
   NUMEROLOGY_FAQ_EN,
   type LifePathContentEn,
 } from "@/lib/seo/numerology-content-en";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const SITE = "https://www.vividaastro.com";
 
@@ -71,7 +72,7 @@ export function NumerologyHubEn() {
       <SmartHeader locale="en" georgianPath="/numerologia" />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(structuredData) }}
       />
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-8 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
@@ -262,7 +263,7 @@ export function LifePathNumberPageEn({
       <SmartHeader locale="en" georgianPath={`/numerologia/${number}`} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(structuredData) }}
       />
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-8 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
@@ -342,8 +343,8 @@ export function LifePathNumberPageEn({
               One number is one part of the picture
             </h2>
             <p className="mt-2 text-pretty text-sm text-muted-foreground">
-              Explore a Western birth chart calculated from your exact birth time
-              and place.
+              Explore a Western birth chart calculated from your exact birth
+              time and place.
             </p>
           </div>
           <Button asChild size="lg" className="shrink-0">

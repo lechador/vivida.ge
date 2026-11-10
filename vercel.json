@@ -3,6 +3,10 @@
   "regions": ["fra1"],
   "crons": [
     {
+      "path": "/api/cron/sign-horoscopes",
+      "schedule": "0 4 * * *"
+    },
+    {
       "path": "/api/cron/daily-horoscope",
       "schedule": "0 5 * * *"
     },

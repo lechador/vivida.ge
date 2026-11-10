@@ -13,6 +13,7 @@ import {
   yearsForAnimal,
 } from "@/lib/seo/chinese-zodiac";
 import type { ChineseAnimalContentEn } from "@/lib/seo/chinese-zodiac-en";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const SITE = "https://www.vividaastro.com";
 
@@ -85,7 +86,7 @@ export function ChineseZodiacHubEn() {
       <SmartHeader locale="en" georgianPath="/chinuri-horoskopi" />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(structuredData) }}
       />
 
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
@@ -247,7 +248,7 @@ export function ChineseAnimalPageEn({
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(structuredData) }}
       />
 
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">

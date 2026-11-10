@@ -13,6 +13,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SmartHeader } from "@/components/smart-header";
 import { EQ_ARTICLES_EN, type EqArticleEn } from "@/lib/seo/eq-articles-en";
 import { eqPublicSlug } from "@/lib/seo/en-slugs";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const SITE = "https://www.vividaastro.com";
 
@@ -54,7 +55,7 @@ export function EqArticlesHubEn() {
       <SmartHeader locale="en" georgianPath="/emociuri-inteleqti" />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(structuredData) }}
       />
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-24 pt-10 sm:px-6">
         <nav className="mb-8 flex items-center gap-2 text-xs text-muted-foreground">
@@ -191,7 +192,7 @@ export function EqArticlePageEn({ item }: { item: EqArticleEn }) {
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(structuredData) }}
       />
       <article className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-24 pt-8 sm:px-6 sm:pt-12">
         <Link

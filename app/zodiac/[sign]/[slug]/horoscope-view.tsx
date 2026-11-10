@@ -11,6 +11,7 @@ import {
   ALL_HOROSCOPE_VIEWS,
   VIEW_PATH,
   anchorForView,
+  periodAnchorDate,
   periodForView,
   signHoroscopePeriodLabel,
   type HoroscopeView as HoroscopeViewKind,
@@ -70,6 +71,9 @@ export async function HoroscopeView({
   const periodLabelKa = VIEW_LABEL_KA[view];
   const horoscope = await ensureSignHoroscope(sign, period, anchor);
 
+  const publishedAt = new Date(
+    horoscope?.createdAt ?? periodAnchorDate(anchor, period),
+  ).toISOString();
   const url = `${SITE_URL}/zodiac/${sign}/${VIEW_PATH[view]}`;
   const pageTitle = `${sc.labelKa}, ${periodLabelKa}`;
   const description =
@@ -81,10 +85,9 @@ export async function HoroscopeView({
       url,
       headline: horoscope?.headline ?? pageTitle,
       description,
-      datePublished: now.toISOString(),
-      dateModified: horoscope?.createdAt
-        ? new Date(horoscope.createdAt).toISOString()
-        : undefined,
+      // The reading's real creation time (else the period start), never "now".
+      datePublished: publishedAt,
+      dateModified: publishedAt,
       about: {
         "@type": "Thing",
         name: `${sc.labelKa} ${periodLabelKa}`,
@@ -108,6 +111,14 @@ export async function HoroscopeView({
       />
       <Starfield count={130} shooting={3} />
       <SmartHeader />
+
+      {/* A server component cannot set a 503 status in Next 16. When the
+          reading is missing (AI failure), keep this thin placeholder out of
+          the index; React hoists the tag into <head>, and Google applies the
+          most restrictive of conflicting robots directives. */}
+      {bodyParagraphs.length === 0 && (
+        <meta name="robots" content="noindex, follow" />
+      )}
 
       <script
         type="application/ld+json"

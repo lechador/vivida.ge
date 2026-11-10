@@ -13,6 +13,7 @@ import {
   NUMEROLOGY_HUB_PL,
   type LifePathContentPl,
 } from "@/lib/seo/numerology-content-pl";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 export { NUMEROLOGY_HUB_PL };
 
@@ -68,7 +69,7 @@ export function NumerologyHubPl() {
       <SmartHeader locale="pl" georgianPath="/numerologia" />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(structuredData) }}
       />
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-8 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
@@ -267,7 +268,7 @@ export function LifePathNumberPagePl({
       <SmartHeader locale="pl" georgianPath={`/numerologia/${number}`} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(structuredData) }}
       />
       <section className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
         <nav className="mb-8 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">

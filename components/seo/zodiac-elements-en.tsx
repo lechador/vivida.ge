@@ -15,6 +15,7 @@ import {
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
 import { signColor } from "@/lib/zodiac";
 import { ELEMENT_ENGLISH } from "@/lib/zodiac-element-en";
+import { jsonLdString } from "@/lib/seo/jsonld";
 
 const PATH = "/zodiac/elementebi";
 const ACCENT: Record<ElementSlug, string> = {
@@ -80,7 +81,7 @@ export function ZodiacElementsHubEn() {
         <script
           key={index}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(item) }}
         />
       ))}
       <section className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">
@@ -234,7 +235,7 @@ export function ZodiacElementPageEn({ element }: { element: ElementSlug }) {
         <script
           key={index}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(item) }}
         />
       ))}
       <section className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-12">

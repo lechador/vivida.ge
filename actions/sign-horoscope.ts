@@ -23,7 +23,11 @@ import {
   signHoroscopePeriodKey,
   signHoroscopePeriodLabel,
 } from "@/lib/sign-horoscope";
-import { ALL_SLUGS, signMetaBySlug, type ZodiacSlug } from "@/lib/seo/zodiac-dates";
+import {
+  ALL_SLUGS,
+  signMetaBySlug,
+  type ZodiacSlug,
+} from "@/lib/seo/zodiac-dates";
 import { signFromLongitude } from "@/lib/zodiac";
 import { claimGeneration, releaseGeneration } from "@/lib/generation-lock";
 
@@ -75,7 +79,7 @@ const ASPECT_LABEL_KA: Record<string, string> = {
  */
 function aspectToSignCenter(
   bodyLongitude: number,
-  signIndex: number
+  signIndex: number,
 ): string | undefined {
   const signCenter = signIndex * 30 + 15;
   const d = angularDistance(bodyLongitude, signCenter);
@@ -109,8 +113,8 @@ async function ensureSignHoroscopeUncached(
       and(
         eq(signHoroscopes.sign, slug),
         eq(signHoroscopes.period, period),
-        eq(signHoroscopes.periodKey, periodKey)
-      )
+        eq(signHoroscopes.periodKey, periodKey),
+      ),
     )
     .limit(1);
   if (existing && existing.promptVersion === SIGN_HOROSCOPE_PROMPT_VERSION) {
@@ -128,88 +132,100 @@ async function ensureSignHoroscopeUncached(
     const meta = signMetaBySlug(slug);
     if (!meta) return null;
 
-  const anchor = periodAnchorDate(now, period);
-  const transits = computeTransits(anchor);
-  const bodyKeys = PERIOD_BODIES[period];
+    const anchor = periodAnchorDate(now, period);
+    const transits = computeTransits(anchor);
+    const bodyKeys = PERIOD_BODIES[period];
 
-  const transitFacts: SignHoroscopeTransitFact[] = [];
-  for (const key of bodyKeys) {
-    const pos = transits[key];
-    if (!pos) continue;
-    const transitSign = signFromLongitude(pos.longitude);
-    const aspect = aspectToSignCenter(pos.longitude, meta.index);
-    transitFacts.push({
-      planet: PLANET_LABELS_KA[key] ?? key,
-      planetEn: key,
-      signKa: transitSign.labelKa,
-      signEn: transitSign.labelEn,
-      aspectToReaderSign: aspect,
-    });
-  }
+    const transitFacts: SignHoroscopeTransitFact[] = [];
+    for (const key of bodyKeys) {
+      const pos = transits[key];
+      if (!pos) continue;
+      const transitSign = signFromLongitude(pos.longitude);
+      const aspect = aspectToSignCenter(pos.longitude, meta.index);
+      transitFacts.push({
+        planet: PLANET_LABELS_KA[key] ?? key,
+        planetEn: key,
+        signKa: transitSign.labelKa,
+        signEn: transitSign.labelEn,
+        aspectToReaderSign: aspect,
+      });
+    }
 
-  const reading = await generateSignHoroscope({
-    signKa: meta.labelKa,
-    signEn: meta.labelEn,
-    element: meta.element,
-    modality: meta.modality,
-    ruler: meta.ruler,
-    period,
-    periodLabel: signHoroscopePeriodLabel(now, period),
-    transits: transitFacts,
-  });
-
-  if (!reading) return existing ?? null;
-
-  await db
-    .insert(signHoroscopes)
-    .values({
-      sign: slug,
+    const reading = await generateSignHoroscope({
+      signKa: meta.labelKa,
+      signEn: meta.labelEn,
+      element: meta.element,
+      modality: meta.modality,
+      ruler: meta.ruler,
       period,
-      periodKey,
-      headline: reading.headline,
-      summary: reading.summary,
-      body: reading.body,
-      themes: reading.themes,
-      promptVersion: SIGN_HOROSCOPE_PROMPT_VERSION,
-      model: OPENROUTER_MODEL,
-      language: "ka",
-    })
-    .onConflictDoUpdate({
-      target: [
-        signHoroscopes.sign,
-        signHoroscopes.period,
-        signHoroscopes.periodKey,
-      ],
-      set: {
+      periodLabel: signHoroscopePeriodLabel(now, period),
+      transits: transitFacts,
+    });
+
+    if (!reading) return existing ?? null;
+
+    await db
+      .insert(signHoroscopes)
+      .values({
+        sign: slug,
+        period,
+        periodKey,
         headline: reading.headline,
         summary: reading.summary,
         body: reading.body,
         themes: reading.themes,
         promptVersion: SIGN_HOROSCOPE_PROMPT_VERSION,
         model: OPENROUTER_MODEL,
-      },
-    });
+        language: "ka",
+      })
+      .onConflictDoUpdate({
+        target: [
+          signHoroscopes.sign,
+          signHoroscopes.period,
+          signHoroscopes.periodKey,
+        ],
+        set: {
+          headline: reading.headline,
+          summary: reading.summary,
+          body: reading.body,
+          themes: reading.themes,
+          promptVersion: SIGN_HOROSCOPE_PROMPT_VERSION,
+          model: OPENROUTER_MODEL,
+        },
+      });
 
-  const [refreshed] = await db
-    .select()
-    .from(signHoroscopes)
-    .where(
-      and(
-        eq(signHoroscopes.sign, slug),
-        eq(signHoroscopes.period, period),
-        eq(signHoroscopes.periodKey, periodKey)
+    const [refreshed] = await db
+      .select()
+      .from(signHoroscopes)
+      .where(
+        and(
+          eq(signHoroscopes.sign, slug),
+          eq(signHoroscopes.period, period),
+          eq(signHoroscopes.periodKey, periodKey),
+        ),
       )
-    )
-    .limit(1);
+      .limit(1);
     return refreshed ?? null;
   } finally {
     await releaseGeneration(lockKey).catch(() => {});
   }
 }
 
+/** Thrown inside the cache scope so a failed generation is never cached. */
+class NoSignHoroscope extends Error {}
+
 const cachedSignHoroscope = unstable_cache(
-  async (slug: ZodiacSlug, period: SignHoroscopePeriod, anchorIso: string) =>
-    ensureSignHoroscopeUncached(slug, period, new Date(anchorIso)),
+  async (slug: ZodiacSlug, period: SignHoroscopePeriod, anchorIso: string) => {
+    const row = await ensureSignHoroscopeUncached(
+      slug,
+      period,
+      new Date(anchorIso),
+    );
+    // unstable_cache stores `null` like any value (for the full hour), which
+    // would pin a transient AI failure. Thrown errors are not cached.
+    if (!row) throw new NoSignHoroscope();
+    return row;
+  },
   ["sign-horoscope", String(SIGN_HOROSCOPE_PROMPT_VERSION)],
   { revalidate: 60 * 60 },
 );
@@ -217,7 +233,8 @@ const cachedSignHoroscope = unstable_cache(
 /**
  * Shared cross-request cache. Using the period anchor (rather than the current
  * timestamp) gives every request in the same day/week/month one cache key and
- * prevents crawler bursts from repeating the same DB/AI work.
+ * prevents crawler bursts from repeating the same DB/AI work. Only successful
+ * readings are cached; a miss returns null and is retried on the next request.
  */
 export async function ensureSignHoroscope(
   slug: ZodiacSlug,
@@ -225,5 +242,10 @@ export async function ensureSignHoroscope(
   now: Date = new Date(),
 ): Promise<SignHoroscope | null> {
   const anchor = periodAnchorDate(now, period);
-  return cachedSignHoroscope(slug, period, anchor.toISOString());
+  try {
+    return await cachedSignHoroscope(slug, period, anchor.toISOString());
+  } catch (err) {
+    if (err instanceof NoSignHoroscope) return null;
+    throw err;
+  }
 }

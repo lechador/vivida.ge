@@ -1,3 +1,5 @@
+import { unstable_cache } from "next/cache";
+
 import { computeTransits } from "@/lib/transits";
 import { signByIndex } from "@/lib/zodiac";
 
@@ -38,7 +40,9 @@ function signOf(longitude: number) {
  * UTC). Scans with a ±40d margin so periods straddling the year boundary
  * come back whole.
  */
-export function mercuryRetrogradePeriods(year: number): RetrogradePeriod[] {
+export function computeMercuryRetrogradePeriods(
+  year: number,
+): RetrogradePeriod[] {
   const start = Date.UTC(year - 1, 11, 1); // Dec 1 prior year
   const end = Date.UTC(year + 1, 1, 10); // Feb 10 next year
   const DAY = 24 * 60 * 60 * 1000;
@@ -75,6 +79,37 @@ export function mercuryRetrogradePeriods(year: number): RetrogradePeriod[] {
     (p) =>
       p.startIso.startsWith(String(year)) || p.endIso.startsWith(String(year)),
   );
+}
+
+/**
+ * The scan is ~440 full-ephemeris evaluations per year and the result is
+ * immutable, so compute each year once per process.
+ */
+const periodsMemo = new Map<number, RetrogradePeriod[]>();
+
+export function mercuryRetrogradePeriods(year: number): RetrogradePeriod[] {
+  let periods = periodsMemo.get(year);
+  if (!periods) {
+    periods = computeMercuryRetrogradePeriods(year);
+    periodsMemo.set(year, periods);
+  }
+  return periods;
+}
+
+const cachedPeriods = unstable_cache(
+  async (year: number) => mercuryRetrogradePeriods(year),
+  ["mercury-retrograde-periods"],
+  { revalidate: 60 * 60 * 24 * 30 },
+);
+
+/**
+ * Cross-instance cached variant for dynamic pages: a cold serverless instance
+ * reads the persisted result instead of re-running the ephemeris scan.
+ */
+export async function getMercuryRetrogradePeriods(
+  year: number,
+): Promise<RetrogradePeriod[]> {
+  return cachedPeriods(year);
 }
 
 /** Is Mercury retrograde right now (daily resolution)? */

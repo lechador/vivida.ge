@@ -14,7 +14,7 @@ import {
 } from "@/lib/seo/zodiac-dates";
 import { SIGNS_CONTENT } from "@/lib/seo/zodiac-content";
 import { signColor } from "@/lib/zodiac";
-import { breadcrumbLd } from "@/lib/seo/jsonld";
+import { breadcrumbLd, jsonLdString } from "@/lib/seo/jsonld";
 import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 
 const ELEMENT_EN: Record<string, string> = {
@@ -106,7 +106,7 @@ export function ZodiacHubEn() {
         <script
           key={index}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(item) }}
         />
       ))}
 

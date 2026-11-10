@@ -9,6 +9,7 @@ import {
   polishInternalPath,
   polishPublicPath,
 } from "./public-paths";
+import { isPolishReadyPath } from "./polish-ready";
 
 export const GEORGIAN_SITE_URL = "https://www.vivida.ge";
 export const ENGLISH_SITE_URL = "https://www.vividaastro.com";
@@ -143,15 +144,16 @@ export function localizedAlternates(
   const canonical =
     locale === "pl" ? polishUrl : locale === "en" ? englishUrl : georgianUrl;
 
-  return {
-    canonical,
-    languages: {
-      "ka-GE": georgianUrl,
-      en: englishUrl,
-      "pl-PL": polishUrl,
-      "x-default": englishUrl,
-    },
+  // Only advertise Polish where a Polish twin really renders; otherwise the
+  // pl target canonicalizes elsewhere and Google discards the whole cluster.
+  const languages: Record<string, string> = {
+    ka: georgianUrl,
+    en: englishUrl,
   };
+  if (isPolishReadyPath(polishPublic)) languages.pl = polishUrl;
+  languages["x-default"] = englishUrl;
+
+  return { canonical, languages };
 }
 
 /**

@@ -184,7 +184,7 @@ export default function EnglishTermsPage() {
           . The Georgian terms are available at{" "}
           <Link
             href={`${GEORGIAN_SITE_URL}/terms`}
-            hrefLang="ka-GE"
+            hrefLang="ka"
             className="text-[var(--vivida-cyan)] hover:underline"
           >
             vivida.ge/terms
