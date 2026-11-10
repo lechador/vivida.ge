@@ -14,6 +14,7 @@
  */
 import { Resend } from "resend";
 import { and, eq, inArray, sql } from "drizzle-orm";
+import type Stripe from "stripe";
 
 import { db } from "@/db";
 import {
@@ -24,6 +25,7 @@ import {
 } from "@/db/schema";
 import { PRO_TRIAL_DAYS } from "@/lib/billing-config";
 import {
+  abandonedStartsFromSessions,
   CHECKOUT_RECOVERY_COOLDOWN_MS,
   CHECKOUT_RECOVERY_KIND,
   isAbandonedCheckout,
@@ -35,6 +37,7 @@ import {
 } from "@/lib/email-frequency-cap";
 import { PER_JOB_SEND_CAP, type SendBudget } from "@/lib/email-send-budget";
 import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
+import { stripe } from "@/lib/stripe";
 import { acquireResendSlot } from "@/lib/resend-throttle";
 import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
@@ -74,7 +77,36 @@ type Candidate = {
   trialEligible: boolean;
 };
 
+/**
+ * Every checkout the last 48h, straight from Stripe. Experiment events only
+ * exist for users assigned to a paywall experiment, which misses checkouts
+ * begun from /subscription, /credits or dashboard nudges; Stripe sees all of
+ * them and needs no schema change. Failure degrades to the experiment-only
+ * source rather than breaking the cron.
+ */
+async function stripeAbandonedStarts(now: Date): Promise<Map<string, Date>> {
+  const sessions: Stripe.Checkout.Session[] = [];
+  try {
+    const list = stripe().checkout.sessions.list({
+      created: { gte: Math.floor((now.getTime() - 49 * 3_600_000) / 1000) },
+      limit: 100,
+    });
+    for await (const session of list) {
+      sessions.push(session);
+      if (sessions.length >= 1000) break;
+    }
+  } catch (err) {
+    console.warn(
+      "[checkout-recovery] stripe session listing failed:",
+      (err as Error).message,
+    );
+    return new Map();
+  }
+  return abandonedStartsFromSessions(sessions, now);
+}
+
 async function findCandidates(now: Date): Promise<Candidate[]> {
+  const fromStripe = await stripeAbandonedStarts(now);
   const rows = await db
     .select({
       userId: experimentEvents.userId,
@@ -129,6 +161,45 @@ async function findCandidates(now: Date): Promise<Candidate[]> {
       startedAt: r.startedAt,
       trialEligible: !r.subHistory,
     });
+  }
+
+  // Merge Stripe-sourced starts (checkouts with no experiment assignment).
+  const missing = [...fromStripe.keys()];
+  if (missing.length > 0) {
+    const userRows = await db
+      .select({
+        userId: users.id,
+        email: users.email,
+        name: users.name,
+        locale: users.interfaceLanguage,
+        isPremium: users.isPremium,
+        premiumUntil: users.premiumUntil,
+        subHistory: premiumSubscriptions.userId,
+      })
+      .from(users)
+      .leftJoin(premiumSubscriptions, eq(premiumSubscriptions.userId, users.id))
+      .where(inArray(users.id, missing));
+    for (const r of userRows) {
+      const startedAt = fromStripe.get(r.userId);
+      if (!startedAt || !r.email) continue;
+      if (
+        r.isPremium &&
+        r.premiumUntil &&
+        r.premiumUntil.getTime() > now.getTime()
+      )
+        continue;
+      const existing = byUser.get(r.userId);
+      if (existing && existing.startedAt.getTime() >= startedAt.getTime())
+        continue;
+      byUser.set(r.userId, {
+        userId: r.userId,
+        email: r.email,
+        name: r.name,
+        locale: normalizeUserLocale(r.locale),
+        startedAt,
+        trialEligible: !r.subHistory,
+      });
+    }
   }
   return [...byUser.values()];
 }

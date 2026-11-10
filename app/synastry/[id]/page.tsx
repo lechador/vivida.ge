@@ -1,8 +1,11 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import type { Metadata } from "next";
 
+import { getBillingIdentity } from "@/lib/premium";
+import { pricingCountryForRequest } from "@/lib/pricing-country";
 import { requireUser } from "@/lib/auth-helpers";
 import { ensureChartFor } from "@/actions/chart";
 import { ensureSynastryInterpretation } from "@/lib/partners-core";
@@ -104,6 +107,12 @@ export default async function SynastryDetailPage({
 
   if (!unlocked) {
     const balance = isOwner ? await getBalance(partner.userId) : 0;
+    const pricingCountry = isOwner
+      ? pricingCountryForRequest(
+          await headers(),
+          await getBillingIdentity(user.id),
+        )
+      : null;
     const teaserScores = isOwner
       ? computeSynastry(viewerChart.data, partner.chart)
       : null;
@@ -164,7 +173,7 @@ export default async function SynastryDetailPage({
                     ? `Odblokuj pełną analizę synastrii (${CREDIT_COST.synastry} kredytów)`
                     : en
                       ? `Unlock full synastry (${CREDIT_COST.synastry} credits)`
-                      : `გახსენი სრული სინასტრია (${CREDIT_COST.synastry} კრედიტი / 7.90 ₾)`
+                      : `გახსენი სრული სინასტრია (${CREDIT_COST.synastry} კრედიტი)`
                 }
                 blurb={
                   locale === "pl"
@@ -174,6 +183,7 @@ export default async function SynastryDetailPage({
                       : "გახსენი ვენერა–მარსის მიზიდულობა, მთავარი კონფლიქტის წერტილი, კარმული კავშირი და ყველა ასპექტის სრული ანალიზი. გადაიხადე ერთხელ, ეს პარტნიორი სამუდამოდ გახსნილია."
                 }
                 locale={locale}
+                countryCode={pricingCountry}
               />
             </>
           ) : (

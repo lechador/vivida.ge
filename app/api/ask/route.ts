@@ -8,6 +8,7 @@ import {
   CREDIT_COST,
   FREE_ALLOWANCE,
   getBalance,
+  refundCredits,
   spendCredits,
 } from "@/lib/credits";
 import { isPremiumUser } from "@/lib/premium";
@@ -135,7 +136,8 @@ export async function POST(req: Request) {
   // Credit gate: FREE_ALLOWANCE.chatPerDay free messages/day, then spend
   // CREDIT_COST.chat per message. 402 tells the client to open the credit
   // unlock screen (invite or buy). Kept last so a request rejected by any of
-  // the checks above (503/429/400) is never charged, there is no refund path.
+  // the checks above (503/429/400) is never charged. If the stream later fails or
+  // yields an empty answer, the paid message is refunded (not the free one).
   const [used] = await db
     .select({ n: sql<number>`count(*)::int` })
     .from(chartChatMessages)
@@ -146,6 +148,7 @@ export async function POST(req: Request) {
         sql`${chartChatMessages.createdAt} >= date_trunc('day', now())`,
       ),
     );
+  let chargedCredits = false;
   if ((used?.n ?? 0) >= FREE_ALLOWANCE.chatPerDay) {
     const paid = await spendCredits(userId, CREDIT_COST.chat, "spend_chat");
     if (!paid) {
@@ -154,6 +157,7 @@ export async function POST(req: Request) {
         { status: 402 },
       );
     }
+    chargedCredits = true;
   }
 
   // Persist the user's turn before we stream the answer.
@@ -274,6 +278,18 @@ export async function POST(req: Request) {
           );
         }
       } finally {
+        // No answer reached the user: give back the credits they paid for it.
+        if (!full.trim() && chargedCredits) {
+          try {
+            await refundCredits(
+              userId,
+              CREDIT_COST.chat,
+              `ask:${assistantMessageId}`,
+            );
+          } catch (e) {
+            console.error("[ask] refund failed:", e);
+          }
+        }
         if (full.trim()) {
           const assistantMessages = await db
             .insert(chartChatMessages)

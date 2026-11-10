@@ -31,6 +31,7 @@ import {
   premiumPlanForCountry,
   shouldShowPurchasePromotion,
 } from "@/lib/billing-config";
+import { pricingCountryForRequest } from "@/lib/pricing-country";
 import {
   countryCodeFromHeaders,
   setResidenceCountryIfMissing,
@@ -184,8 +185,10 @@ export default async function CreditsPage({
   } else if (identity && !identity.countryCode && locale === "pl") {
     identity = { ...identity, countryCode: "PL" };
   }
-  const effectiveCountry =
-    identity?.countryCode || (locale === "pl" ? "PL" : undefined);
+  const effectiveCountry = pricingCountryForRequest(await headers(), {
+    ...identity,
+    interfaceLanguage: locale === "pl" ? "pl" : identity?.interfaceLanguage,
+  });
   const link = `${SITE_URL[locale]}/?ref=${ref.code}`;
   const premiumPlan = premiumPlanForCountry(effectiveCountry);
   const showPurchasePromotions = shouldShowPurchasePromotion({

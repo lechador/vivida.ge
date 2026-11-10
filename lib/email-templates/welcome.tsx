@@ -70,10 +70,10 @@ export function WelcomeEmail({
       <Text style={paragraphStyle}>{greeting}</Text>
       <Text style={paragraphStyle}>
         {pl
-          ? "Twój horoskop urodzeniowy i codzienny horoskop są już gotowe do odkrycia. Pierwsze porównanie kompatybilności i rozkład tarota są bezpłatne; dalsze interpretacje i zaawansowane analizy korzystają z kredytów. Twoje powitalne kredyty czekają na koncie."
+          ? "Twój horoskop urodzeniowy i codzienny horoskop są już gotowe do odkrycia. Pierwszy rozkład tarota jest bezpłatny; porównania kompatybilności, dalsze interpretacje i zaawansowane analizy korzystają z kredytów. Twoje powitalne kredyty czekają na koncie."
           : en
-            ? "Your natal chart and daily horoscope are ready to explore. Your first compatibility comparison and tarot reading are free; further readings and some other actions use credits. Your starting credits are in your account."
-            : "შენი ნატალური რუკა და ყოველდღიური ჰოროსკოპი ხელმისაწვდომია უფასოდ. თავსებადობის პირველი შედარება და ტაროს პირველი კითხვა უფასოა; მომდევნო კითხვები და ზოგი სხვა მოქმედება კრედიტებს იყენებს. საწყისი კრედიტები შენს ანგარიშზეა."}
+            ? "Your natal chart and daily horoscope are ready to explore. Your first tarot reading is free; compatibility comparisons, further readings and some other actions use credits. Your starting credits are in your account."
+            : "შენი ნატალური რუკა და ყოველდღიური ჰოროსკოპი ხელმისაწვდომია უფასოდ. ტაროს პირველი კითხვა უფასოა; თავსებადობის შედარება, მომდევნო კითხვები და ზოგი სხვა მოქმედება კრედიტებს იყენებს. საწყისი კრედიტები შენს ანგარიშზეა."}
       </Text>
 
       <Text style={{ ...paragraphStyle, fontWeight: 600, color: "#ffffff" }}>

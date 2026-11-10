@@ -17,6 +17,7 @@ import { trackExperimentOutcome, useExperiment } from "@/lib/use-experiment";
 import { showSingleOffer } from "@/lib/first-purchase-experiment-config";
 import { paywallImpulseOffer, paywallPrimaryOffer } from "@/lib/paywall-offer";
 import type { CreditPack } from "@/lib/billing-config";
+import { usePricingCountry } from "@/components/billing/use-pricing-country";
 
 export function ContextualPaywallActions({
   locale,
@@ -25,7 +26,7 @@ export function ContextualPaywallActions({
   product,
   returnTo,
   placement,
-  countryCode,
+  countryCode: countryCodeProp,
 }: {
   locale: UserLocale;
   balance: number;
@@ -41,6 +42,11 @@ export function ContextualPaywallActions({
   const next = normalizeReturnPath(returnTo);
   // One primary one-time offer naming the locked outcome and its price for
   // every product, not only tarot; PRO stays the secondary, frequent-use path.
+  // The label must come from the same market the checkout route charges:
+  // the server-provided country when a parent passes it, otherwise the
+  // server's own answer (pricingCountryForRequest) fetched once per page.
+  const countryCode = usePricingCountry(countryCodeProp);
+  const pricingReady = Boolean(countryCode);
   const offer = paywallPrimaryOffer({ product, countryCode, locale });
   const impulse = paywallImpulseOffer({
     product,
@@ -185,7 +191,7 @@ export function ContextualPaywallActions({
                 : `გაკლია ${missing} კრედიტი.`}
       </p>
       <div className="flex flex-wrap items-center justify-center gap-2">
-        {impulse && (
+        {pricingReady && impulse && (
           <Button
             type="button"
             variant="mystic"
@@ -200,19 +206,21 @@ export function ContextualPaywallActions({
             {impulse.label}
           </Button>
         )}
-        <Button
-          type="button"
-          variant={impulse ? "secondary" : "mystic"}
-          disabled={pendingPackId !== null}
-          onClick={() => startDirectCheckout(offer.pack)}
-        >
-          {pendingPackId === offer.pack.id ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <CreditCard className="size-4" />
-          )}
-          {offer.label}
-        </Button>
+        {pricingReady && (
+          <Button
+            type="button"
+            variant={impulse ? "secondary" : "mystic"}
+            disabled={pendingPackId !== null}
+            onClick={() => startDirectCheckout(offer.pack)}
+          >
+            {pendingPackId === offer.pack.id ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <CreditCard className="size-4" />
+            )}
+            {offer.label}
+          </Button>
+        )}
         <Button asChild variant="outline">
           <Link
             href={creditsHref}
@@ -228,7 +236,7 @@ export function ContextualPaywallActions({
         </Button>
       </div>
       <p className="text-[11px] text-muted-foreground">
-        {`${impulse ? impulse.detail : offer.detail}${locale === "pl" ? " PRO jest dla częstego użytku." : en ? " PRO is for frequent use." : " PRO ხშირი გამოყენებისთვისაა."}`}
+        {`${pricingReady ? (impulse ? impulse.detail : offer.detail) : ""}${locale === "pl" ? " PRO jest dla częstego użytku." : en ? " PRO is for frequent use." : " PRO ხშირი გამოყენებისთვისაა."}`}
       </p>
     </div>
   );

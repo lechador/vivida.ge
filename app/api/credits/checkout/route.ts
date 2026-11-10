@@ -10,6 +10,7 @@ import {
   checkoutTrackingMetadata,
   trackCheckoutStarted,
 } from "@/lib/checkout-tracking";
+import { pricingCountryForRequest } from "@/lib/pricing-country";
 import { normalizeReturnPath } from "@/lib/safe-return-path";
 import { EXPERIMENTS } from "@/lib/experiment-catalog";
 import { recordExperimentOutcomesBestEffort } from "@/lib/experiment-outcomes";
@@ -47,7 +48,9 @@ export async function POST(req: Request) {
       ? body.product
       : "credits_hub";
   const billingUser = await getBillingIdentity(userId);
-  const pack = creditPackForCountry(billingUser?.countryCode, body.packId);
+  // Priced from the request's country, not the editable residence.
+  const pricingCountry = pricingCountryForRequest(req.headers, billingUser);
+  const pack = creditPackForCountry(pricingCountry, body.packId);
   if (!pack) return NextResponse.json({ error: "bad_pack" }, { status: 400 });
 
   const origin = new URL(req.url).origin;
@@ -64,6 +67,7 @@ export async function POST(req: Request) {
     const checkout = await createCreditCheckoutSession({
       userId,
       email: session.user?.email ?? null,
+      stripeCustomerId: billingUser?.stripeCustomerId ?? null,
       origin,
       credits: pack.credits,
       amountMinor: pack.amountMinor,
@@ -94,7 +98,7 @@ export async function POST(req: Request) {
           tracking,
           userId,
           email: session.user?.email,
-          countryCode: billingUser?.countryCode,
+          countryCode: pricingCountry,
           value: pack.amountMinor / 100,
           currency: pack.currency,
           contentId: `credits_${pack.credits}`,

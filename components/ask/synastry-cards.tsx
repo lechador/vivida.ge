@@ -29,12 +29,15 @@ export function SynastryProposalCard({
   locale,
   resolved,
   onResult,
+  countryCode = null,
 }: {
   proposal: SynastryProposal;
   locale: UserLocale;
   /** A result for this proposal already exists later in the thread. */
   resolved: boolean;
   onResult: (content: string) => void;
+  /** Pricing country (server-resolved); omitted callers resolve it client-side. */
+  countryCode?: string | null;
 }) {
   const en = locale !== "ka";
   const [busy, setBusy] = useState(false);
@@ -150,6 +153,7 @@ export function SynastryProposalCard({
             product="synastry"
             returnTo="/ask"
             placement="chart_chat_synastry"
+            countryCode={countryCode}
           />
           {!done && (
             <button

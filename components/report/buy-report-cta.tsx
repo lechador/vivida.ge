@@ -31,10 +31,13 @@ export function BuyReportCta({
   cost,
   balance,
   locale = "ka",
+  countryCode = null,
 }: {
   cost: number;
   balance: number;
   locale?: UserLocale;
+  /** Pricing country (server-resolved); omitted callers resolve it client-side. */
+  countryCode?: string | null;
 }) {
   const en = locale !== "ka";
   const router = useRouter();
@@ -193,6 +196,7 @@ export function BuyReportCta({
               product="natal_pdf"
               returnTo="/report"
               placement="natal_report_shortfall"
+              countryCode={countryCode}
             />
           )}
         </div>

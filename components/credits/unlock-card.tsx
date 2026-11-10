@@ -38,6 +38,7 @@ export function UnlockCard({
   title,
   blurb,
   locale = "ka",
+  countryCode = null,
 }: {
   kind: "iq" | "eq" | "big-five" | "mbti" | "synastry";
   resultId: string;
@@ -46,6 +47,8 @@ export function UnlockCard({
   title?: string;
   blurb?: string;
   locale?: UserLocale;
+  /** Pricing country (server-resolved); omitted callers resolve it client-side. */
+  countryCode?: string | null;
 }) {
   const en = locale !== "ka";
   const router = useRouter();
@@ -185,6 +188,7 @@ export function UnlockCard({
             product={kind}
             returnTo={resultPath(kind, resultId)}
             placement="result_unlock_shortfall"
+            countryCode={countryCode}
           />
         </div>
       )}

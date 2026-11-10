@@ -9,6 +9,8 @@ const mocks = vi.hoisted(() => ({
   isCryptoPayConfigured: vi.fn(),
   isPremiumUser: vi.fn(),
   isStripeConfigured: vi.fn(),
+  hasLiveSubscription: vi.fn(),
+  createPortal: vi.fn(),
 }));
 
 vi.mock("@/auth", () => ({ auth: mocks.auth }));
@@ -22,6 +24,8 @@ vi.mock("@/lib/promo-offer", () => ({
 }));
 vi.mock("@/lib/stripe", () => ({
   createPremiumCheckoutSession: mocks.createCheckout,
+  customerHasLiveSubscription: mocks.hasLiveSubscription,
+  createBillingPortalSession: mocks.createPortal,
   isStripeConfigured: mocks.isStripeConfigured,
 }));
 vi.mock("@/lib/crypto-pay", () => ({
@@ -47,6 +51,10 @@ describe("POST /api/subscription/checkout", () => {
     mocks.getLowCreditOffer.mockResolvedValue(null);
     mocks.hasPremiumSubscriptionHistory.mockResolvedValue(false);
     mocks.isPremiumUser.mockResolvedValue(false);
+    mocks.hasLiveSubscription.mockResolvedValue(false);
+    mocks.createPortal.mockResolvedValue({
+      url: "https://portal.stripe.test/p",
+    });
     mocks.isStripeConfigured.mockReturnValue(true);
     mocks.isCryptoPayConfigured.mockReturnValue(true);
   });
@@ -70,9 +78,49 @@ describe("POST /api/subscription/checkout", () => {
     });
   }
 
-  it("prices an Armenian resident from the Georgian fallback, not a dropped AMD market", async () => {
-    // The AMD market was removed on 2026-10-17, so AM is now an unlisted country
-    // and inherits the documented Georgian catalogue fallback.
+  it("sends a past_due subscriber to the billing portal instead of a second subscription", async () => {
+    mocks.getBillingIdentity.mockResolvedValue({
+      countryCode: "GB",
+      email: "buyer@example.com",
+      stripeCustomerId: "cus_old",
+    });
+    mocks.hasLiveSubscription.mockResolvedValue(true);
+
+    const response = await POST(checkoutRequest({}));
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      url: "https://portal.stripe.test/p",
+      existingSubscription: true,
+    });
+    expect(mocks.createCheckout).not.toHaveBeenCalled();
+  });
+
+  it("prices from the request IP country, not an edited GE residence", async () => {
+    mocks.getBillingIdentity.mockResolvedValue({
+      countryCode: "GE",
+      email: "buyer@example.com",
+      stripeCustomerId: null,
+    });
+    const response = await POST(
+      new Request("https://vivida.ge/api/subscription/checkout", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-vercel-ip-country": "US",
+        },
+        body: JSON.stringify({}),
+      }),
+    );
+    expect(response.status).toBe(200);
+    expect(mocks.createCheckout).toHaveBeenCalledWith(
+      expect.objectContaining({
+        plan: expect.objectContaining({ key: "premium_us_monthly" }),
+      }),
+    );
+  });
+
+  it("prices an Armenian resident in USD, not the Georgian catalogue", async () => {
     const response = await POST(
       new Request("https://vivida.ge/api/subscription/checkout", {
         method: "POST",
@@ -85,9 +133,9 @@ describe("POST /api/subscription/checkout", () => {
     expect(mocks.createCheckout).toHaveBeenCalledWith(
       expect.objectContaining({
         plan: expect.objectContaining({
-          key: "premium_ge_monthly",
-          currency: "gel",
-          amountMinor: 1990,
+          key: "premium_us_monthly",
+          currency: "usd",
+          amountMinor: 999,
         }),
       }),
     );

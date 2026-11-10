@@ -23,6 +23,7 @@ import {
   getPremiumSubscription,
   isPremiumUser,
 } from "@/lib/premium";
+import { pricingCountryForRequest } from "@/lib/pricing-country";
 import {
   countryCodeFromHeaders,
   countryDisplayName,
@@ -105,8 +106,11 @@ export default async function SubscriptionPage({
   // Stripe is primary on both hosts; the English host additionally offers
   // a one-time USDC PRO pass as an alternative. KA never sees it.
   const cryptoPay = (await requestIsEnglishHost()) && isCryptoPayConfigured();
-  const effectiveCountry =
-    identity?.countryCode || (locale === "pl" ? "PL" : undefined);
+  // Same rule the checkout route prices from: request IP first.
+  const effectiveCountry = pricingCountryForRequest(await headers(), {
+    ...identity,
+    interfaceLanguage: locale === "pl" ? "pl" : identity?.interfaceLanguage,
+  });
   const plan = premiumPlanForCountry(effectiveCountry);
   const country = countryDisplayName(effectiveCountry, locale);
 

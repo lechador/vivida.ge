@@ -198,6 +198,21 @@ export async function spendCredits(
 }
 
 /**
+ * Compensate a `spendCredits` charge when the paid work failed. Premium users
+ * were never charged (spendCredits passes them through), so they get nothing
+ * back. `requestId` makes the refund idempotent per attempt.
+ */
+export async function refundCredits(
+  userId: string,
+  amount: number,
+  requestId: string,
+): Promise<void> {
+  if (amount <= 0) return;
+  if (await isPremiumUser(userId)) return;
+  await grantCreditsOnce(userId, amount, "refund", `refund:${requestId}`);
+}
+
+/**
  * Grant purchased credits, idempotent on the Stripe session id, Stripe can
  * deliver the same `checkout.session.completed` more than once, and we must
  * never double-credit money.

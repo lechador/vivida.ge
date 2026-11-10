@@ -13,7 +13,13 @@ import {
   hasPremiumSubscriptionHistory,
   isPremiumUser,
 } from "@/lib/premium";
-import { createPremiumCheckoutSession, isStripeConfigured } from "@/lib/stripe";
+import {
+  createBillingPortalSession,
+  createPremiumCheckoutSession,
+  customerHasLiveSubscription,
+  isStripeConfigured,
+} from "@/lib/stripe";
+import { pricingCountryForRequest } from "@/lib/pricing-country";
 import {
   checkoutTrackingFromRequest,
   checkoutTrackingMetadata,
@@ -68,6 +74,31 @@ export async function POST(req: Request) {
       : "subscription";
 
   const identity = await getBillingIdentity(userId);
+  const pricingCountry = pricingCountryForRequest(req.headers, identity);
+
+  // A subscription that is active, trialing or failing to pay (past_due /
+  // unpaid) still lives on this Stripe customer. `isPremiumUser` is false for
+  // past_due, so without this a second subscription would bill twice. Send
+  // them to the billing portal to fix the payment instead.
+  if (identity?.stripeCustomerId) {
+    try {
+      if (await customerHasLiveSubscription(identity.stripeCustomerId)) {
+        const portal = await createBillingPortalSession({
+          customerId: identity.stripeCustomerId,
+          origin: new URL(req.url).origin,
+        });
+        return NextResponse.json({
+          url: portal.url,
+          existingSubscription: true,
+        });
+      }
+    } catch (err) {
+      // Fail closed: better to refuse than to risk a duplicate charge.
+      console.error("[subscription/checkout] subscription check failed:", err);
+      return NextResponse.json({ error: "failed" }, { status: 500 });
+    }
+  }
+
   const offer = wantsOffer ? await getLowCreditOffer(userId) : null;
   if (wantsOffer && !offer) {
     return NextResponse.json({ error: "offer_unavailable" }, { status: 403 });
@@ -81,8 +112,8 @@ export async function POST(req: Request) {
     body?.planKey == null
       ? null
       : wantsTrial
-        ? trialPlanByKeyForCountry(identity?.countryCode, body.planKey)
-        : premiumPlanByKeyForCountry(identity?.countryCode, body.planKey);
+        ? trialPlanByKeyForCountry(pricingCountry, body.planKey)
+        : premiumPlanByKeyForCountry(pricingCountry, body.planKey);
   if (body?.planKey != null && !selectedPlan) {
     return NextResponse.json({ error: "invalid_plan" }, { status: 400 });
   }
@@ -91,8 +122,8 @@ export async function POST(req: Request) {
     offer?.plan ??
     selectedPlan ??
     (wantsTrial
-      ? featuredPremiumPlanForCountry(identity?.countryCode)
-      : premiumPlanForCountry(identity?.countryCode));
+      ? featuredPremiumPlanForCountry(pricingCountry)
+      : premiumPlanForCountry(pricingCountry));
 
   if (wantsTrial && (await hasPremiumSubscriptionHistory(userId))) {
     return NextResponse.json({ error: "trial_unavailable" }, { status: 403 });
@@ -131,7 +162,7 @@ export async function POST(req: Request) {
           tracking,
           userId,
           email: identity?.email ?? session.user.email,
-          countryCode: identity?.countryCode,
+          countryCode: pricingCountry,
           value: plan.amountMinor / 100,
           currency: plan.currency,
           contentId: plan.key,

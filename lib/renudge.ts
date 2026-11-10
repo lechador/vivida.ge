@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { emailSendLog, profiles, users } from "@/db/schema";
 import { prepareVerificationResend } from "@/lib/auth-core";
 import { sendVerificationEmail } from "@/lib/email";
+import { enrolProfileIncompleteRecipient } from "@/lib/email-campaigns";
 import { ProfileIncompleteEmail } from "@/lib/email-templates/profile-incomplete";
 import { getOrCreateUnsubscribeToken } from "@/lib/unsubscribe";
 import { acquireResendSlot } from "@/lib/resend-throttle";
@@ -275,6 +276,16 @@ export async function sendProfileIncompleteRenudges(
       if (!res.error) {
         sent++;
         sentThisRun++;
+        // The email promises 50 bonus credits for adding a birth date; enrol
+        // the recipient so profile completion actually pays them (once).
+        try {
+          await enrolProfileIncompleteRecipient(u.id, u.email);
+        } catch (err) {
+          console.warn(
+            "[renudge] profile_incomplete enrol failed:",
+            (err as Error).message,
+          );
+        }
       }
     } catch (err) {
       console.warn(

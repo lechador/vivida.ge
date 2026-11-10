@@ -181,14 +181,28 @@ describe("country billing catalogue", () => {
     });
   });
 
-  it("keeps the Georgian catalogue as the rollout fallback", () => {
-    expect(creditPackForCountry("DE", "s")).toEqual({
-      id: "s",
-      credits: 25,
-      amountMinor: 790,
-      currency: "gel",
-    });
-    expect(premiumPlanForCountry("DE")).toEqual(PREMIUM_PLANS_BY_COUNTRY.GE);
+  it.each(["DE", "FR", "IT", "GR", "TR", "UA", "AM"])(
+    "prices %s (no catalogue of its own) in USD, never GEL",
+    (country) => {
+      expect(creditPackForCountry(country, "s")).toEqual({
+        id: "s",
+        credits: 30,
+        amountMinor: 299,
+        currency: "usd",
+      });
+      expect(creditPackForCountry(country, "xs")?.currency).toBe("usd");
+      expect(premiumPlanForCountry(country)).toEqual(
+        PREMIUM_PLANS_BY_COUNTRY.US,
+      );
+      expect(premiumPlanForCountry(country).stripeLookupKey).toBe(
+        "vivida_premium_us_monthly_999_v1",
+      );
+    },
+  );
+
+  it("keeps the Georgian catalogue for GE and for a missing country", () => {
+    expect(creditPackForCountry("GE", "s")?.currency).toBe("gel");
+    expect(premiumPlanForCountry("GE")).toEqual(PREMIUM_PLANS_BY_COUNTRY.GE);
     expect(premiumPlanForCountry(null)).toEqual(PREMIUM_PLANS_BY_COUNTRY.GE);
   });
 
@@ -405,11 +419,11 @@ describe("monthly PRO retirement (Georgia, owner decision 2026-10-16)", () => {
   it("still offers monthly PRO in markets that did not retire it", () => {
     expect(monthlyPlanOffered("GB")).toBe(true);
     expect(monthlyPlanOffered("US")).toBe(true);
-    // Unknown/missing country falls back to the Georgian catalogue for pricing,
-    // so it must inherit the retirement too — otherwise a caller could resolve
-    // the Georgian monthly plan for a market that has retired it.
+    // A missing country still prices from the Georgian catalogue, so it
+    // inherits the retirement; a known country without a catalogue prices as
+    // the US and so keeps monthly.
     expect(monthlyPlanOffered(null)).toBe(false);
-    expect(monthlyPlanOffered("ZZ")).toBe(false);
+    expect(monthlyPlanOffered("ZZ")).toBe(true);
   });
 
   it("refuses to enrol anyone in the retired Georgian monthly plan", () => {

@@ -88,6 +88,8 @@ export async function createReportCheckoutSession(opts: {
 export async function createCreditCheckoutSession(opts: {
   userId: string;
   email?: string | null;
+  /** Stored Stripe customer; reused so returning buyers get saved cards/Link. */
+  stripeCustomerId?: string | null;
   origin: string;
   credits: number;
   amountMinor: number;
@@ -99,6 +101,7 @@ export async function createCreditCheckoutSession(opts: {
   const {
     userId,
     email,
+    stripeCustomerId,
     origin,
     credits,
     amountMinor,
@@ -120,7 +123,10 @@ export async function createCreditCheckoutSession(opts: {
         : `${credits} ${creditWord}`;
   return stripe().checkout.sessions.create({
     mode: "payment",
-    customer_email: email ?? undefined,
+    // `customer` and `customer_email` are mutually exclusive in Checkout.
+    ...(stripeCustomerId
+      ? { customer: stripeCustomerId }
+      : { customer_email: email ?? undefined }),
     metadata: {
       userId,
       kind: "credits",
@@ -226,6 +232,32 @@ export async function createPremiumCheckoutSession(opts: {
     success_url: `${origin}/subscription?status=success&session_id={CHECKOUT_SESSION_ID}${returnTo ? `&next=${encodeURIComponent(returnTo)}` : ""}`,
     cancel_url: `${origin}/subscription?status=canceled${returnTo ? `&next=${encodeURIComponent(returnTo)}` : ""}`,
   });
+}
+
+/** Subscription statuses that still bill, or are about to, on a customer. */
+const BLOCKING_SUBSCRIPTION_STATUSES = new Set<string>([
+  "active",
+  "trialing",
+  "past_due",
+  "unpaid",
+]);
+
+/**
+ * Whether the Stripe customer already has a subscription that is live or
+ * failing to pay. A `past_due` one is not premium locally, so `isPremiumUser`
+ * misses it, and a second checkout on the same customer would bill twice.
+ */
+export async function customerHasLiveSubscription(
+  customerId: string,
+): Promise<boolean> {
+  const list = await stripe().subscriptions.list({
+    customer: customerId,
+    status: "all",
+    limit: 20,
+  });
+  return list.data.some((sub) =>
+    BLOCKING_SUBSCRIPTION_STATUSES.has(sub.status),
+  );
 }
 
 export async function createBillingPortalSession(opts: {

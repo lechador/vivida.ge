@@ -16,11 +16,8 @@ import type { UserLocale } from "@/lib/i18n/user-locale";
  *
  * This presents, in order:
  *   1. the concrete value being given up, in the user's own currency;
- *   2. the cheaper alternative (the discounted quarterly plan), as the primary
- *      action, and for PRO there genuinely is one — the promo undercuts the
- *      standard monthly rate by roughly half;
- *   3. a reason, so churn becomes legible;
- *   4. an honest, undark-patterned confirm.
+ *   2. a reason, so churn becomes legible;
+ *   3. an honest, undark-patterned confirm.
  *
  * Deliberately NOT offered: pausing collection. `isPremiumUser` derives access
  * from `users.premiumUntil`, which is written from the Stripe period and would
@@ -45,16 +42,19 @@ export function SubscriptionCancelFlow({
   cancelAtPeriodEnd,
   /** Formatted price of the plan the user is currently on. */
   currentPriceLabel,
-  /** Formatted price of the cheaper plan we can switch them to, if any. */
-  discountedPriceLabel,
-  /** What the discounted plan buys, e.g. "3 months". */
-  discountedPeriodLabel,
 }: {
   locale: UserLocale;
   cancelAtPeriodEnd: boolean;
   currentPriceLabel: string;
-  discountedPriceLabel: string | null;
-  discountedPeriodLabel: string | null;
+  /**
+   * Accepted but no longer rendered: the "switch to the cheaper plan" CTA
+   * linked to /subscription, which shows no plan card to active subscribers
+   * (and checkout refuses PRO users), so it was a dead end. The Stripe
+   * billing portal's plan switching depends on dashboard config we cannot
+   * verify from code, so the offer was removed rather than redirected.
+   */
+  discountedPriceLabel?: string | null;
+  discountedPeriodLabel?: string | null;
 }) {
   const en = locale !== "ka";
   const router = useRouter();
@@ -67,7 +67,7 @@ export function SubscriptionCancelFlow({
     setOpen(true);
     trackEvent(ANALYTICS_EVENT.cancelFlowViewed, {
       surface: "account",
-      has_alternative: Boolean(discountedPriceLabel),
+      has_alternative: false,
     });
   }
 
@@ -162,34 +162,6 @@ export function SubscriptionCancelFlow({
           ? `You are on ${currentPriceLabel}. PRO keeps every reading, report and AI chat unlocked.`
           : `შენს გეგმაა ${currentPriceLabel}. PRO ხსნის ყველა კითხვას, ანგარიშს და AI ჩატს.`}
       </p>
-
-      {discountedPriceLabel && discountedPeriodLabel && (
-        <div className="mt-4 rounded-xl border border-[var(--vivida-violet)]/40 bg-[var(--vivida-violet)]/10 p-4">
-          <p className="text-sm font-medium">
-            {en
-              ? `Pay less instead: ${discountedPriceLabel} for ${discountedPeriodLabel}`
-              : `გადაიხადე ნაკლები: ${discountedPriceLabel} ${discountedPeriodLabel}-ისთვის`}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {en
-              ? "Same unlimited access, lower monthly price. You keep your history and settings."
-              : "იგივე ულიმიტო წვდომა, დაბალი თვიური ფასი. ისტორია და პარამეტრები რჩება."}
-          </p>
-          <Button asChild variant="mystic" size="sm" className="mt-3">
-            <a
-              href="/subscription"
-              onClick={() =>
-                trackEvent(ANALYTICS_EVENT.cancelRetained, {
-                  surface: "account",
-                  action: "downgrade_offer",
-                })
-              }
-            >
-              {en ? "Switch to the cheaper plan" : "გადართვა იაფ გეგმაზე"}
-            </a>
-          </Button>
-        </div>
-      )}
 
       <fieldset className="mt-4">
         <legend className="text-xs font-medium uppercase tracking-wider text-muted-foreground">

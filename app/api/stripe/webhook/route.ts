@@ -9,10 +9,15 @@ import { generateAndStoreReport } from "@/lib/reports/generate";
 import { grantPurchaseCredits } from "@/lib/credits";
 import {
   activatePremiumFromCheckout,
+  findUserIdForStripeSubscription,
   getBillingIdentity,
   syncPremiumSubscription,
 } from "@/lib/premium";
-import { trackCheckoutCompleted } from "@/lib/checkout-tracking";
+import {
+  trackCheckoutCompleted,
+  trackInvoicePaid,
+} from "@/lib/checkout-tracking";
+import { sendPaymentFailedNotice } from "@/lib/payment-failed-notice";
 import { EXPERIMENTS } from "@/lib/experiment-catalog";
 import { recordExperimentOutcomesBestEffort } from "@/lib/experiment-outcomes";
 
@@ -20,6 +25,64 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 // after() runs the ~60-120s generation once we 200 the webhook.
 export const maxDuration = 300;
+
+function refOf(ref: string | { id: string } | null | undefined): string | null {
+  return typeof ref === "string" ? ref : (ref?.id ?? null);
+}
+
+function invoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
+  return refOf(invoice.parent?.subscription_details?.subscription ?? null);
+}
+
+/**
+ * Structured money-risk log (+ Sentry when available) for refunds and
+ * disputes. Credits are never clawed back automatically; a human decides.
+ */
+async function reportBillingRisk(
+  kind: "refund" | "dispute",
+  details: Record<string, unknown>,
+) {
+  console.warn(
+    `[stripe/webhook] billing risk: ${kind}`,
+    JSON.stringify(details),
+  );
+  try {
+    const Sentry = await import("@sentry/nextjs");
+    Sentry.captureMessage(`Stripe ${kind}`, {
+      level: "warning",
+      extra: details,
+    });
+  } catch {
+    /* Sentry is optional */
+  }
+}
+
+async function userIdForCustomer(customerId: string | null) {
+  if (!customerId) return null;
+  try {
+    const { users } = await import("@/db/schema");
+    const [row] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.stripeCustomerId, customerId))
+      .limit(1);
+    return row?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Stripe events can be stale or out of order: always act on the live object. */
+async function liveSubscription(
+  payload: Stripe.Subscription,
+): Promise<Stripe.Subscription> {
+  try {
+    return await stripe().subscriptions.retrieve(payload.id);
+  } catch (err) {
+    if ((err as { code?: string }).code === "resource_missing") return payload;
+    throw err;
+  }
+}
 
 /**
  * Stripe webhook. Source of truth for marking a report paid. On
@@ -40,7 +103,44 @@ export async function POST(req: Request) {
     return new Response(`bad signature: ${msg}`, { status: 400 });
   }
 
-  if (event.type === "checkout.session.completed") {
+  if (event.type === "checkout.session.async_payment_failed") {
+    const failed = event.data.object as Stripe.Checkout.Session;
+    console.warn(
+      `[stripe/webhook] async payment failed for session ${failed.id} (${failed.metadata?.kind ?? "unknown"}, user ${failed.metadata?.userId ?? "?"}); nothing was granted`,
+    );
+    return new Response("ok", { status: 200 });
+  }
+
+  if (
+    event.type === "charge.refunded" ||
+    event.type === "charge.dispute.created"
+  ) {
+    const obj = event.data.object as Stripe.Charge | Stripe.Dispute;
+    const isDispute = event.type === "charge.dispute.created";
+    const customerId = isDispute
+      ? null
+      : refOf((obj as Stripe.Charge).customer);
+    await reportBillingRisk(isDispute ? "dispute" : "refund", {
+      eventId: event.id,
+      objectId: obj.id,
+      userId: await userIdForCustomer(customerId),
+      customerId,
+      amountMinor: isDispute
+        ? (obj as Stripe.Dispute).amount
+        : (obj as Stripe.Charge).amount_refunded,
+      currency: obj.currency,
+      reason: isDispute ? (obj as Stripe.Dispute).reason : undefined,
+      paymentIntent: refOf(
+        obj.payment_intent as string | { id: string } | null,
+      ),
+    });
+    return new Response("ok", { status: 200 });
+  }
+
+  if (
+    event.type === "checkout.session.completed" ||
+    event.type === "checkout.session.async_payment_succeeded"
+  ) {
     const sessionObj = event.data.object as Stripe.Checkout.Session;
 
     if (sessionObj.metadata?.kind === "premium") {
@@ -82,6 +182,15 @@ export async function POST(req: Request) {
 
     // Credit top-up → award the pack's credits (idempotent on session id).
     if (sessionObj.metadata?.kind === "credits") {
+      // A delayed-payment method completes the session before money clears.
+      // Grant only when paid; `async_payment_succeeded` re-delivers this
+      // same session (same idempotency key) once it settles.
+      if (sessionObj.payment_status !== "paid") {
+        console.warn(
+          `[stripe/webhook] credits session ${sessionObj.id} not paid yet (${sessionObj.payment_status}); deferring grant`,
+        );
+        return new Response("ok", { status: 200 });
+      }
       const uid = sessionObj.metadata.userId as string | undefined;
       const credits = Number(sessionObj.metadata.credits);
       if (uid && Number.isFinite(credits) && credits > 0) {
@@ -113,6 +222,13 @@ export async function POST(req: Request) {
           });
         });
       }
+      return new Response("ok", { status: 200 });
+    }
+
+    if (sessionObj.payment_status !== "paid") {
+      console.warn(
+        `[stripe/webhook] report session ${sessionObj.id} not paid yet (${sessionObj.payment_status})`,
+      );
       return new Response("ok", { status: 200 });
     }
 
@@ -175,6 +291,19 @@ export async function POST(req: Request) {
         await syncPremiumSubscription(subscription);
         const uid = subscription.metadata?.userId ?? "";
         if (uid && subscription.metadata?.kind === "premium") {
+          after(async () => {
+            try {
+              const identity = await getBillingIdentity(uid);
+              await trackInvoicePaid({
+                invoice,
+                subscription,
+                email: identity?.email,
+                countryCode: identity?.countryCode,
+              });
+            } catch (err) {
+              console.warn("[stripe/webhook] invoice tracking failed:", err);
+            }
+          });
           await recordExperimentOutcomesBestEffort(
             uid,
             [
@@ -194,13 +323,46 @@ export async function POST(req: Request) {
     }
   }
 
+  // Renewal failed: tell the subscriber once per invoice so they can fix the
+  // card before Stripe gives up. Never fails the webhook (email is best
+  // effort and idempotent), so a Resend outage cannot cause retry storms.
+  if (event.type === "invoice.payment_failed") {
+    const invoice = event.data.object as Stripe.Invoice;
+    const subscriptionId = invoiceSubscriptionId(invoice);
+    if (subscriptionId) {
+      try {
+        const subscription =
+          await stripe().subscriptions.retrieve(subscriptionId);
+        if (subscription.metadata?.kind === "premium") {
+          const uid =
+            subscription.metadata.userId ||
+            (await findUserIdForStripeSubscription(subscription));
+          if (uid) {
+            const outcome = await sendPaymentFailedNotice({
+              invoice,
+              userId: uid,
+            });
+            console.warn(
+              `[stripe/webhook] payment failed for invoice ${invoice.id} user ${uid}: notice ${outcome}`,
+            );
+          }
+        }
+      } catch (err) {
+        console.error("[stripe/webhook] payment-failed notice error:", err);
+      }
+    }
+    return new Response("ok", { status: 200 });
+  }
+
   if (
     event.type === "customer.subscription.created" ||
     event.type === "customer.subscription.updated" ||
     event.type === "customer.subscription.deleted"
   ) {
     try {
-      await syncPremiumSubscription(event.data.object as Stripe.Subscription);
+      await syncPremiumSubscription(
+        await liveSubscription(event.data.object as Stripe.Subscription),
+      );
     } catch (err) {
       console.error("[stripe/webhook] subscription sync failed:", err);
       return new Response("subscription sync failed", { status: 500 });

@@ -14,6 +14,7 @@ import {
   type CreditReason,
   type UnlockResult,
 } from "@/lib/credits";
+import { currentWeeklyRef, isWeeklyUnlocked } from "@/lib/weekly-unlock";
 
 /**
  * Paying credits to unlock a deep result for the website's
@@ -83,8 +84,10 @@ async function ownsResult(
  * Spend credits to unlock one result. Idempotent, re-unlocking an item the
  * user already paid for costs nothing and returns "already".
  *
- * "weekly" is a per-user lifetime unlock (the 7-day forecast) keyed by a fixed
- * ref, so it takes no `resultId` and has no row to own. Every other kind needs
+ * "weekly" unlocks the 7-day forecast for the current ISO week of the user's
+ * local date (ref `weekly:YYYY-Www`), so it takes no `resultId` and has no row
+ * to own. A legacy lifetime "weekly" row is honoured through the week it
+ * shipped (see lib/weekly-unlock). Every other kind needs
  * a `resultId` that belongs to the caller.
  */
 export async function unlockForUser(
@@ -94,7 +97,9 @@ export async function unlockForUser(
 ): Promise<UnlockOutcome> {
   let ref: string;
   if (kind === "weekly") {
-    ref = "weekly";
+    // Already open this week via the grandfathered lifetime row: don't charge.
+    if (await isWeeklyUnlocked(userId)) return { ok: true, status: "already" };
+    ref = await currentWeeklyRef(userId);
   } else {
     if (!resultId) return { ok: false, error: "bad_request" };
     if (!(await ownsResult(userId, kind, resultId))) {

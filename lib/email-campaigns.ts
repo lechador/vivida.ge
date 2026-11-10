@@ -1,8 +1,13 @@
 import { and, eq, isNotNull, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
-import { emailCampaignRecipients, emailCampaigns } from "@/db/schema";
+import { emailCampaignRecipients, emailCampaigns, profiles } from "@/db/schema";
 import { grantCredits } from "@/lib/credits";
+
+/** Slug of the campaign the profile_incomplete re-nudge enrols recipients in. */
+export const PROFILE_INCOMPLETE_CAMPAIGN_SLUG = "profile-incomplete-bonus-v1";
+/** What the profile_incomplete email promises for adding a birth date. */
+export const PROFILE_INCOMPLETE_REWARD_CREDITS = 50;
 
 /**
  * Mark all campaigns addressed to this user as converted and pay each reward
@@ -23,6 +28,7 @@ export async function completeEligibleEmailCampaigns(
     .select({
       campaignId: emailCampaignRecipients.campaignId,
       reward: emailCampaigns.rewardCredits,
+      slug: emailCampaigns.slug,
     })
     .from(emailCampaignRecipients)
     .innerJoin(
@@ -38,7 +44,22 @@ export async function completeEligibleEmailCampaigns(
       ),
     );
 
+  let hasBirthDate: boolean | null = null;
   for (const row of eligible) {
+    // The profile_incomplete bonus is for adding a birth date, not for any
+    // visit or purchase (those paths also call this function), so it only
+    // converts once the profile actually has one.
+    if (row.slug === PROFILE_INCOMPLETE_CAMPAIGN_SLUG) {
+      if (hasBirthDate === null) {
+        const [p] = await db
+          .select({ dob: profiles.dateOfBirth })
+          .from(profiles)
+          .where(eq(profiles.userId, userId))
+          .limit(1);
+        hasBirthDate = !!p?.dob;
+      }
+      if (!hasBirthDate) continue;
+    }
     const [claimed] = await db
       .update(emailCampaignRecipients)
       .set({ completedAt: new Date() })
@@ -68,4 +89,46 @@ export async function completeEligibleEmailCampaigns(
         );
     }
   }
+}
+
+/**
+ * Enrol a user who was just mailed the profile_incomplete nudge in the
+ * birth-details bonus campaign, so the promised credits are paid (once, via
+ * `completeEligibleEmailCampaigns`) when they add a birth date. Idempotent:
+ * the second nudge and reruns are no-ops, and a completed row is never reset.
+ */
+export async function enrolProfileIncompleteRecipient(
+  userId: string,
+  email: string,
+): Promise<void> {
+  const fields = {
+    name: "Profile incomplete: birth-details bonus",
+    template: "profile_incomplete",
+    subject: "Complete your profile",
+    rewardCredits: PROFILE_INCOMPLETE_REWARD_CREDITS,
+    status: "active",
+  };
+  const [campaign] = await db
+    .insert(emailCampaigns)
+    .values({
+      slug: PROFILE_INCOMPLETE_CAMPAIGN_SLUG,
+      ...fields,
+      launchedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: emailCampaigns.slug,
+      set: fields,
+    })
+    .returning({ id: emailCampaigns.id });
+  if (!campaign) return;
+  await db
+    .insert(emailCampaignRecipients)
+    .values({
+      campaignId: campaign.id,
+      userId,
+      email,
+      status: "sent",
+      sentAt: new Date(),
+    })
+    .onConflictDoNothing();
 }

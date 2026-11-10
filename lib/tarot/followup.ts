@@ -66,6 +66,7 @@ export async function performFollowup(
   libraryId: string,
   followupQuestion: string,
   locale: UserLocale = "ka",
+  requestId?: string,
 ): Promise<FollowupResult> {
   const q = followupQuestion.trim().slice(0, 300);
   if (!libraryId || q.length < 3) return { ok: false, error: "bad_request" };
@@ -90,7 +91,13 @@ export async function performFollowup(
 
   // ── Gate: first follow-up free, then CREDIT_COST.tarotFollowup each ──────
   const cost = CREDIT_COST.tarotFollowup;
-  const ref = `tarot-followup:${entry.sourceId}:${previous.length + 1}`;
+  // The ledger ref is unique per request. It used to be derived from the
+  // follow-up count, so two parallel requests computed the same ref and the
+  // second `spendOnce` returned "already": a free AI answer. A client request
+  // id (when sent) keeps retries of the SAME request idempotent.
+  const ref = `tarot-followup:${entry.sourceId}:${
+    requestId ? `req-${requestId}` : crypto.randomUUID()
+  }`;
   let charged = 0;
   if (await isPremiumUser(userId)) {
     charged = first ? 0 : cost;

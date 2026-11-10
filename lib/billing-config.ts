@@ -42,8 +42,7 @@ export function monthlyPlanOffered(
   // market is priced from the Georgian catalogue, so it must inherit Georgian
   // rules too. Returning true here would let a caller resolve the Georgian
   // monthly plan for a market that has retired it.
-  const code = normalizeCountryCode(countryCode);
-  const market = code && PREMIUM_PLANS_BY_COUNTRY[code] ? code : "GE";
+  const market = catalogueMarket(countryCode);
   return !MONTHLY_RETIRED_MARKETS.has(market);
 }
 
@@ -160,8 +159,7 @@ const IMPULSE_PACK_BY_COUNTRY: Record<string, CreditPack> = {
 export function impulsePackForCountry(
   countryCode: string | null | undefined,
 ): CreditPack {
-  const code = normalizeCountryCode(countryCode);
-  return (code && IMPULSE_PACK_BY_COUNTRY[code]) || IMPULSE_PACK_BY_COUNTRY.GE;
+  return IMPULSE_PACK_BY_COUNTRY[catalogueMarket(countryCode)];
 }
 
 export const PREMIUM_PLANS_BY_COUNTRY: Record<string, PremiumPlan> = {
@@ -306,12 +304,30 @@ export function normalizeCountryCode(
   return code && /^[A-Z]{2}$/.test(code) ? code : null;
 }
 
-/** Preserve the Georgian catalogue as the fallback while markets roll out. */
+/**
+ * The catalogue market a country is priced from.
+ *
+ * - a country with its own catalogue prices from it;
+ * - any other known country (DE, FR, TR, AM...) prices in USD, never in
+ *   lari: GEL is a Georgian-market discount, not a default;
+ * - no country at all keeps the Georgian catalogue. Callers that know the
+ *   host/locale should resolve a concrete country first
+ *   (`pricingCountryForRequest`), so this null branch is only a last resort.
+ */
+export function catalogueMarket(
+  countryCode: string | null | undefined,
+): string {
+  const code = normalizeCountryCode(countryCode);
+  if (!code) return "GE";
+  return PREMIUM_PLANS_BY_COUNTRY[code] && CREDIT_PACKS_BY_COUNTRY[code]
+    ? code
+    : "US";
+}
+
 export function creditPacksForCountry(
   countryCode: string | null | undefined,
 ): readonly StandardCreditPack[] {
-  const code = normalizeCountryCode(countryCode);
-  return (code && CREDIT_PACKS_BY_COUNTRY[code]) || GE_CREDIT_PACKS;
+  return CREDIT_PACKS_BY_COUNTRY[catalogueMarket(countryCode)];
 }
 
 export function creditPackForCountry(
@@ -325,24 +341,18 @@ export function creditPackForCountry(
   );
 }
 
-/** Use Georgian PRO pricing until a country-specific market is launched. */
+/** PRO plan for a country; see `catalogueMarket` for the fallback rule. */
 export function premiumPlanForCountry(
   countryCode: string | null | undefined,
 ): PremiumPlan {
-  const code = normalizeCountryCode(countryCode);
-  return (
-    (code && PREMIUM_PLANS_BY_COUNTRY[code]) || PREMIUM_PLANS_BY_COUNTRY.GE
-  );
+  return PREMIUM_PLANS_BY_COUNTRY[catalogueMarket(countryCode)];
 }
 
 /** The public multi-month deal for this market, when one is available. */
 export function discountedPremiumPlanForCountry(
   countryCode: string | null | undefined,
 ): PremiumPlan | null {
-  const code = normalizeCountryCode(countryCode);
-  // Match the standard catalogue's Georgian fallback for markets that do not
-  // yet have their own prices. Launched GB and AM keep their local plans.
-  const market = code && PREMIUM_PLANS_BY_COUNTRY[code] ? code : "GE";
+  const market = catalogueMarket(countryCode);
   return DISCOUNTED_PREMIUM_PLANS_BY_COUNTRY[market] ?? null;
 }
 

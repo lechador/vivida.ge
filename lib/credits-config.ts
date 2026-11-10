@@ -128,6 +128,7 @@ export type CreditReason =
   | "spend_tarot"
   | "spend_tarot_followup"
   | "grandfather"
+  | "refund"
   | "admin_grant";
 
 /**
@@ -161,6 +162,7 @@ export const CREDIT_REASON_LABEL_KA: Record<CreditReason, string> = {
   spend_tarot: "ტარო კითხვა",
   spend_tarot_followup: "ტაროს დაზუსტება",
   grandfather: "საჩუქარი",
+  refund: "კრედიტის დაბრუნება",
   admin_grant: "საჩუქარი",
 };
 
@@ -190,6 +192,7 @@ export const CREDIT_REASON_LABEL_EN: Record<CreditReason, string> = {
   spend_tarot: "Tarot reading",
   spend_tarot_followup: "Tarot follow-up",
   grandfather: "Gift",
+  refund: "Credit refund",
   admin_grant: "Gift",
 };
 
@@ -219,6 +222,7 @@ export const CREDIT_REASON_LABEL_PL: Record<CreditReason, string> = {
   spend_tarot: "Rozkład tarota",
   spend_tarot_followup: "Doprecyzowanie tarota",
   grandfather: "Prezent",
+  refund: "Zwrot kredytów",
   admin_grant: "Prezent",
 };
 

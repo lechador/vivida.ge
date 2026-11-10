@@ -12,8 +12,8 @@ export const dynamic = "force-dynamic";
 /**
  * POST /api/credits/unlock { kind, resultId }, pay once to unlock a deep
  * result. For "iq" | "eq" | "mbti" | "synastry", `resultId` identifies the row
- * and is verified to belong to the caller. "weekly" is a per-user lifetime
- * unlock (the 7-day forecast) keyed by a fixed ref, so no row lookup is
+ * and is verified to belong to the caller. "weekly" unlocks the 7-day
+ * forecast for the current ISO week (per-week ref), so no row lookup is
  * needed. Spends credits idempotently (re-unlocking is free). 402 when short.
  *
  * Charging lives in lib/credits-unlock-core, which enforces pricing and

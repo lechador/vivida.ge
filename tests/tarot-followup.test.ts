@@ -110,7 +110,7 @@ describe("performFollowup", () => {
       "user-1",
       0,
       "spend_tarot_followup",
-      "tarot-followup:src-1:1",
+      expect.stringMatching(/^tarot-followup:src-1:[0-9a-f-]{36}$/),
     );
     expect(mocks.archiveLibraryEntry).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -165,7 +165,7 @@ describe("performFollowup", () => {
       "user-1",
       5,
       "spend_tarot_followup",
-      "tarot-followup:src-1:2",
+      expect.stringMatching(/^tarot-followup:src-1:[0-9a-f-]{36}$/),
     );
   });
 
@@ -214,5 +214,33 @@ describe("performFollowup", () => {
     if (!result.ok) return;
     expect(result.followup.degraded).toBe(true);
     expect(result.followup.answer.length).toBeGreaterThan(20);
+  });
+
+  it("uses a distinct ledger ref for parallel paid follow-ups", async () => {
+    mocks.getLibraryEntry.mockResolvedValue(
+      storedEntry([
+        {
+          question: "Q1",
+          answer: "A1",
+          degraded: false,
+          charged: 0,
+          free: true,
+        },
+      ]),
+    );
+    await Promise.all([
+      performFollowup("user-1", "lib-1", "Parallel one", "ka"),
+      performFollowup("user-1", "lib-1", "Parallel two", "ka"),
+    ]);
+    const refs = mocks.spendOnce.mock.calls.map((c) => c[3]);
+    expect(refs).toHaveLength(2);
+    expect(refs[0]).not.toBe(refs[1]);
+  });
+
+  it("keeps a retry of the same client request idempotent", async () => {
+    await performFollowup("user-1", "lib-1", "Same", "ka", "req-9");
+    await performFollowup("user-1", "lib-1", "Same", "ka", "req-9");
+    const refs = mocks.spendOnce.mock.calls.map((c) => c[3]);
+    expect(refs[0]).toBe(refs[1]);
   });
 });

@@ -48,12 +48,11 @@ describe("proAnchorFor", () => {
   it("treats a dropped AMD market as an unlisted country", () => {
     // AMD was removed on 2026-10-17; AM must now behave like any unknown market.
     const am = proAnchorFor(200, "AM");
-    expect(am?.currency).toBe("gel");
+    expect(am?.currency).toBe("usd");
   });
 
-  it("falls back to the GE catalogue for unknown countries", () => {
+  it("falls back to the US catalogue for unknown countries", () => {
     const anchor = proAnchorFor(60, "XX");
-    expect(anchor?.currency).toBe("gel");
-    expect(anchor?.kind).toBe("saves");
+    expect(anchor?.currency).toBe("usd");
   });
 });

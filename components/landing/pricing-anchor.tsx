@@ -3,6 +3,21 @@ import { Check } from "lucide-react";
 
 import { SignInButton } from "./sign-in-button";
 import { CornerCrosshair } from "@/components/brand/celestial-icons";
+import {
+  creditPacksForCountry,
+  formatBillingAmount,
+  impulsePackForCountry,
+} from "@/lib/billing-config";
+
+// Georgian landing page: the cheapest entry in the GE catalogue, derived so it
+// cannot drift from the real prices.
+const GE_ENTRY_PRICE = (() => {
+  const cheapest = [
+    impulsePackForCountry("GE"),
+    ...creditPacksForCountry("GE"),
+  ].reduce((a, b) => (b.amountMinor < a.amountMinor ? b : a));
+  return formatBillingAmount(cheapest.amountMinor, cheapest.currency, "ka");
+})();
 
 const FREE_ITEMS_KA = [
   "სრული ნატალური რუკა (მზე, მთვარე, ასცენდენტი, პლანეტები, 12 სახლი)",
@@ -110,7 +125,7 @@ export function PricingAnchor() {
                 </div>
                 <div className="shrink-0 text-right font-mono">
                   <span className="text-2xl font-semibold tabular-nums text-[var(--vivida-gold)]">
-                    9 ₾-დან
+                    {GE_ENTRY_PRICE}-დან
                   </span>
                   <span className="block text-[11px] text-muted-foreground">
                     ერთჯერადი ან თვიური

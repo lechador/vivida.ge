@@ -14,6 +14,31 @@ export function statusHasPremiumAccess(status: string): boolean {
   return ENTITLED_STATUSES.has(status);
 }
 
+/**
+ * Should a Stripe subscription event be ignored because it describes a
+ * different (older/duplicate) subscription than the one the user's single
+ * entitlement row currently mirrors, and that stored one is still entitled?
+ * Only a non-entitling incoming event is ignored: an entitled newer
+ * subscription legitimately takes the row over.
+ */
+export function shouldIgnoreStaleSubscriptionEvent(
+  stored: {
+    stripeSubscriptionId: string | null;
+    status: string;
+    currentPeriodEnd: Date;
+  } | null,
+  incoming: { id: string; status: string },
+  now: Date = new Date(),
+): boolean {
+  if (!stored) return false;
+  if (stored.stripeSubscriptionId === incoming.id) return false;
+  if (statusHasPremiumAccess(incoming.status)) return false;
+  return (
+    statusHasPremiumAccess(stored.status) &&
+    stored.currentPeriodEnd.getTime() > now.getTime()
+  );
+}
+
 /** Fast entitlement check used by every credit gate. */
 export async function isPremiumUser(userId: string): Promise<boolean> {
   const [row] = await db
@@ -130,6 +155,22 @@ export async function syncPremiumSubscription(
   const periodStart = new Date(item.current_period_start * 1000);
   const periodEnd = new Date(item.current_period_end * 1000);
   const active = statusHasPremiumAccess(subscription.status);
+
+  const [stored] = await db
+    .select({
+      stripeSubscriptionId: premiumSubscriptions.stripeSubscriptionId,
+      status: premiumSubscriptions.status,
+      currentPeriodEnd: premiumSubscriptions.currentPeriodEnd,
+    })
+    .from(premiumSubscriptions)
+    .where(eq(premiumSubscriptions.userId, userId))
+    .limit(1);
+  if (shouldIgnoreStaleSubscriptionEvent(stored ?? null, subscription)) {
+    console.warn(
+      `[premium] ignoring ${subscription.status} event for subscription ${subscription.id}: user ${userId} is entitled via ${stored?.stripeSubscriptionId ?? "another source"}`,
+    );
+    return userId;
+  }
 
   // Two sequential writes rather than a transaction: production runs the
   // neon-http driver, which throws "No transactions support in neon-http

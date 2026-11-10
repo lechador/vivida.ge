@@ -6,12 +6,24 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("@/auth", () => ({ auth: mocks.auth }));
-vi.mock("@/db", () => ({ db: {} }));
+vi.mock("@/db", () => ({
+  db: {
+    select: () => ({
+      from: () => ({
+        where: () => ({ limit: async () => [{ timezone: "UTC" }] }),
+      }),
+    }),
+  },
+}));
 vi.mock("@/lib/credits", async () => {
   const config = await vi.importActual<typeof import("@/lib/credits-config")>(
-    "@/lib/credits-config"
+    "@/lib/credits-config",
   );
-  return { CREDIT_COST: config.CREDIT_COST, spendOnce: mocks.spendOnce };
+  return {
+    CREDIT_COST: config.CREDIT_COST,
+    spendOnce: mocks.spendOnce,
+    isUnlocked: async () => false,
+  };
 });
 
 import { POST } from "@/app/api/credits/unlock/route";
@@ -46,7 +58,7 @@ describe("POST /api/credits/unlock", () => {
     expect(mocks.spendOnce).not.toHaveBeenCalled();
   });
 
-  it("charges the configured weekly cost with a stable idempotency ref", async () => {
+  it("charges the configured weekly cost with a per-ISO-week idempotency ref", async () => {
     const response = await POST(request({ kind: "weekly" }));
 
     expect(response.status).toBe(200);
@@ -55,7 +67,7 @@ describe("POST /api/credits/unlock", () => {
       "user-1",
       10,
       "spend_weekly",
-      "weekly"
+      expect.stringMatching(/^weekly:\d{4}-W\d{2}$/),
     );
   });
 

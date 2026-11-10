@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
-import { CREDIT_COST, getBalance, spendCredits } from "@/lib/credits";
+import {
+  CREDIT_COST,
+  getBalance,
+  refundCredits,
+  spendCredits,
+} from "@/lib/credits";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import { normalizeUserLocale } from "@/lib/i18n/locale";
 import {
@@ -23,7 +28,7 @@ const MAX_DREAM_LEN = 2000;
  * POST /api/dreams/interpret { dream }, interpret a user-told dream with AI.
  * Auth-gated (the client asks for sign-in before the request is sent) and
  * every interpretation costs CREDIT_COST.dream credits, charged BEFORE the
- * AI call so a failed upstream never spends the user's balance. 402 when
+ * AI call and refunded (compensating "refund" grant) if the upstream fails. 402 when
  * the balance is short; the client shows the top-up/invite prompt.
  */
 export async function POST(req: Request) {
@@ -62,8 +67,8 @@ export async function POST(req: Request) {
       ? normalizeUserLocale(body.locale)
       : await getRequestLocale();
 
-  // Charge first: no refund path exists, so a request rejected below must
-  // never reach this point. Premium users pass through for free.
+  // Charge first; the failure paths below refund. A request rejected before
+  // this point is never charged. Premium users pass through for free.
   const paid = await spendCredits(userId, CREDIT_COST.dream, "spend_dream");
   if (!paid) {
     const balance = await getBalance(userId);
@@ -73,9 +78,19 @@ export async function POST(req: Request) {
     );
   }
 
+  const requestId = `dream:${crypto.randomUUID()}`;
+  const refund = async () => {
+    try {
+      await refundCredits(userId, CREDIT_COST.dream, requestId);
+    } catch (err) {
+      console.error("[dreams] refund failed:", err);
+    }
+  };
+
   try {
     const result = await generateDreamInterpretation({ dream, locale });
     if (!result) {
+      await refund();
       return NextResponse.json({ error: "unavailable" }, { status: 503 });
     }
     const balance = await getBalance(userId);
@@ -85,6 +100,7 @@ export async function POST(req: Request) {
     );
   } catch (err) {
     console.error("[dreams] interpretation failed:", err);
+    await refund();
     return NextResponse.json({ error: "generation_failed" }, { status: 502 });
   }
 }

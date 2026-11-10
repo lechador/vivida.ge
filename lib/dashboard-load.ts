@@ -6,7 +6,8 @@ import { ensureChartFor } from "@/actions/chart";
 import { ensureDailyFor } from "@/actions/daily";
 import { ensureMoonPhase, type MoonPhaseRow } from "@/actions/moon-phase";
 import { ensureWeeklyForecast } from "@/actions/weekly-forecast";
-import { getBalance, isUnlocked } from "@/lib/credits";
+import { getBalance } from "@/lib/credits";
+import { isWeeklyUnlocked } from "@/lib/weekly-unlock";
 import { isPremiumUser } from "@/lib/premium";
 import { getDashboardSuggestions } from "@/lib/suggestions";
 import {
@@ -89,7 +90,7 @@ export async function loadDashboardCoreFor(
     SOCIAL_FEATURES.suggestedPeopleRail
       ? getDashboardSuggestions(userId, 20).catch(() => [] as DiscoverCard[])
       : Promise.resolve([] as DiscoverCard[]),
-    isUnlocked(userId, "weekly", "spend_weekly"),
+    isWeeklyUnlocked(userId),
     getBalance(userId),
     getDailyRitualProgress(userId),
     isPremiumUser(userId),
@@ -132,7 +133,7 @@ export async function loadDashboardExtrasFor(
   userId: string,
   locale: UserLocale = "ka",
 ): Promise<DashboardExtras> {
-  const canWeekly = await isUnlocked(userId, "weekly", "spend_weekly");
+  const canWeekly = await isWeeklyUnlocked(userId);
 
   const [daily, moonPhase, weeklyForecast] = await Promise.all([
     ensureDailyFor(userId, locale).catch((err) => {

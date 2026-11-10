@@ -159,9 +159,8 @@ describe("POST /api/credits/checkout", () => {
     );
   });
 
-  it("prices an Armenian resident from the Georgian fallback, not a dropped AMD market", async () => {
-    // The AMD market was removed on 2026-10-17. AM is now an unlisted country,
-    // so it inherits the documented Georgian fallback like any other market.
+  it("prices an Armenian resident in USD, not the Georgian catalogue", async () => {
+    // AM has no catalogue of its own; unknown countries price as the US.
     mocks.getBillingIdentity.mockResolvedValue({
       countryCode: "AM",
       interfaceLanguage: "en",
@@ -178,10 +177,44 @@ describe("POST /api/credits/checkout", () => {
     expect(response.status).toBe(200);
     expect(mocks.createCheckout).toHaveBeenCalledWith(
       expect.objectContaining({
-        credits: 25,
-        amountMinor: 790,
-        currency: "gel",
+        credits: 30,
+        amountMinor: 299,
+        currency: "usd",
       }),
+    );
+  });
+
+  it("prices from the request IP country, not an edited GE residence", async () => {
+    mocks.getBillingIdentity.mockResolvedValue({ countryCode: "GE" });
+    await POST(
+      new Request("https://vivida.ge/api/credits/checkout", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-vercel-ip-country": "US",
+        },
+        body: JSON.stringify({ packId: "s" }),
+      }),
+    );
+    expect(mocks.createCheckout).toHaveBeenCalledWith(
+      expect.objectContaining({ amountMinor: 299, currency: "usd" }),
+    );
+  });
+
+  it("reuses the stored Stripe customer", async () => {
+    mocks.getBillingIdentity.mockResolvedValue({
+      countryCode: "GE",
+      stripeCustomerId: "cus_123",
+    });
+    await POST(
+      new Request("https://vivida.ge/api/credits/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ packId: "s" }),
+      }),
+    );
+    expect(mocks.createCheckout).toHaveBeenCalledWith(
+      expect.objectContaining({ stripeCustomerId: "cus_123" }),
     );
   });
 

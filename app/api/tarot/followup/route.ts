@@ -27,6 +27,7 @@ export async function POST(req: Request) {
     libraryId?: unknown;
     question?: unknown;
     locale?: unknown;
+    requestId?: unknown;
   };
   const libraryId = typeof body.libraryId === "string" ? body.libraryId : "";
   const question = typeof body.question === "string" ? body.question : "";
@@ -49,7 +50,19 @@ export async function POST(req: Request) {
     body.locale === "en" || body.locale === "pl" || body.locale === "ka"
       ? normalizeUserLocale(body.locale)
       : await getRequestLocale();
-  const result = await performFollowup(userId, libraryId, question, locale);
+  const requestId =
+    typeof body.requestId === "string" &&
+    body.requestId.length > 0 &&
+    body.requestId.length <= 100
+      ? body.requestId
+      : undefined;
+  const result = await performFollowup(
+    userId,
+    libraryId,
+    question,
+    locale,
+    ...(requestId ? [requestId] : []),
+  );
   if (!result.ok) {
     if (result.error === "insufficient") {
       return NextResponse.json(

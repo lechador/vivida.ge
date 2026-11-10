@@ -96,6 +96,7 @@ export function ChartChat({
   conversations = [],
   activeConversationId = null,
   isNewTopic = false,
+  countryCode = null,
 }: {
   initialMessages: Msg[];
   initialStarter?: ChartStarterId;
@@ -115,6 +116,8 @@ export function ChartChat({
   activeConversationId?: string | null;
   /** The active conversation is a fresh topic with no turns yet. */
   isNewTopic?: boolean;
+  /** Pricing country (server-resolved); omitted callers resolve it client-side. */
+  countryCode?: string | null;
 }) {
   const en = locale !== "ka";
   const starters = chartStarterOptions(locale);
@@ -543,6 +546,7 @@ export function ChartChat({
                         locale={locale}
                         resolved={resolvedSynastryKeys.has(seg.data.key)}
                         onResult={appendAssistant}
+                        countryCode={countryCode}
                       />
                     ) : (
                       <SynastryResultCard
@@ -611,6 +615,7 @@ export function ChartChat({
                   product="ai_chart_chat"
                   returnTo="/ask"
                   placement="chart_chat_shortfall"
+                  countryCode={countryCode}
                 />
               </div>
             </div>

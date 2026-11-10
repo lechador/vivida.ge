@@ -19,11 +19,14 @@ export function WeeklyForecastLocked({
   balance,
   teaserDays,
   locale = "ka",
+  countryCode = null,
 }: {
   cost: number;
   balance: number;
   teaserDays?: WeeklyForecastDay[] | null;
   locale?: UserLocale;
+  /** Pricing country (server-resolved); omitted callers resolve it client-side. */
+  countryCode?: string | null;
 }) {
   const en = locale !== "ka";
   const [pending, setPending] = useState(false);
@@ -231,6 +234,7 @@ export function WeeklyForecastLocked({
             product="weekly_forecast"
             returnTo="/dashboard"
             placement="weekly_forecast_shortfall"
+            countryCode={countryCode}
           />
         )}
       </div>

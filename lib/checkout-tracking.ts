@@ -13,12 +13,17 @@ export type CheckoutTracking = {
 };
 
 function cookieMap(raw: string): Map<string, string> {
-  return new Map(raw.split(";").flatMap((part) => {
-    const [key, ...rest] = part.trim().split("=");
-    if (!key) return [];
-    try { return [[key, decodeURIComponent(rest.join("="))]] as const; }
-    catch { return [[key, rest.join("=")]] as const; }
-  }));
+  return new Map(
+    raw.split(";").flatMap((part) => {
+      const [key, ...rest] = part.trim().split("=");
+      if (!key) return [];
+      try {
+        return [[key, decodeURIComponent(rest.join("="))]] as const;
+      } catch {
+        return [[key, rest.join("=")]] as const;
+      }
+    }),
+  );
 }
 
 export function checkoutTrackingFromRequest(req: Request): CheckoutTracking {
@@ -26,15 +31,20 @@ export function checkoutTrackingFromRequest(req: Request): CheckoutTracking {
   const allowed = cookies.get(TRACKING_CONSENT_COOKIE) === "granted";
   return {
     allowed,
-    fbp: allowed ? cookies.get("_fbp") ?? null : null,
-    fbc: allowed ? cookies.get("_fbc") ?? null : null,
-    sourceUrl: (req.headers.get("referer") ?? new URL(req.url).origin).slice(0, 500),
+    fbp: allowed ? (cookies.get("_fbp") ?? null) : null,
+    fbc: allowed ? (cookies.get("_fbc") ?? null) : null,
+    sourceUrl: (req.headers.get("referer") ?? new URL(req.url).origin).slice(
+      0,
+      500,
+    ),
     clientIpAddress: allowed ? requestClientIp(req.headers) : null,
     clientUserAgent: allowed ? req.headers.get("user-agent") : null,
   };
 }
 
-export function checkoutTrackingMetadata(tracking: CheckoutTracking): Record<string, string> {
+export function checkoutTrackingMetadata(
+  tracking: CheckoutTracking,
+): Record<string, string> {
   if (!tracking.allowed) return { tracking_consent: "denied" };
   return {
     tracking_consent: "granted",
@@ -82,8 +92,12 @@ export async function trackCheckoutCompleted(input: {
   const kind = metadata.kind;
   if (kind !== "credits" && kind !== "premium") return;
   const value = (input.session.amount_total ?? 0) / 100;
-  const currency = input.session.currency ?? (kind === "premium" ? "gbp" : "gel");
-  const contentId = kind === "premium" ? metadata.planKey ?? "vivida_pro" : `credits_${metadata.credits ?? "pack"}`;
+  const currency =
+    input.session.currency ?? (kind === "premium" ? "gbp" : "gel");
+  const contentId =
+    kind === "premium"
+      ? (metadata.planKey ?? "vivida_pro")
+      : `credits_${metadata.credits ?? "pack"}`;
   const base = {
     eventSourceUrl: metadata.track_source_url ?? "https://www.vividaastro.com",
     email: input.email ?? input.session.customer_details?.email,
@@ -95,8 +109,55 @@ export async function trackCheckoutCompleted(input: {
     currency,
     contentId,
   };
-  await sendMetaConversion({ ...base, eventName: "Purchase", eventId: `${input.session.id}:purchase` });
+  await sendMetaConversion({
+    ...base,
+    eventName: "Purchase",
+    eventId: `${input.session.id}:purchase`,
+  });
   if (kind === "premium") {
-    await sendMetaConversion({ ...base, eventName: "Subscribe", eventId: `${input.session.id}:subscribe` });
+    await sendMetaConversion({
+      ...base,
+      eventName: "Subscribe",
+      eventId: `${input.session.id}:subscribe`,
+    });
   }
+}
+
+/**
+ * Server-side Purchase for a paid renewal or trial→paid conversion.
+ *
+ * `checkout.session.completed` books the first charge of a non-trial
+ * checkout (and a trial's value 0), so `subscription_create` invoices are
+ * skipped here to avoid double-counting. Consent cannot be read from a
+ * request on a webhook, but the Checkout Session copies the buyer's consent
+ * decision and fbp/fbc into the subscription's metadata, so we honour the
+ * same `tracking_consent === "granted"` rule from there; no consent record
+ * means no event. The event id is the invoice id, so Stripe redeliveries
+ * dedupe on Meta's side.
+ */
+export async function trackInvoicePaid(input: {
+  invoice: Stripe.Invoice;
+  subscription: Stripe.Subscription;
+  email?: string | null;
+  countryCode?: string | null;
+}): Promise<boolean> {
+  const { invoice, subscription } = input;
+  const metadata = subscription.metadata;
+  if (metadata?.tracking_consent !== "granted") return false;
+  if (metadata.kind !== "premium") return false;
+  if (invoice.billing_reason === "subscription_create") return false;
+  if (!invoice.id || !(invoice.amount_paid > 0)) return false;
+  return sendMetaConversion({
+    eventName: "Purchase",
+    eventId: invoice.id,
+    eventSourceUrl: metadata.track_source_url ?? "https://www.vivida.ge",
+    email: input.email,
+    externalId: metadata.userId,
+    countryCode: input.countryCode,
+    fbp: metadata.track_fbp,
+    fbc: metadata.track_fbc,
+    value: invoice.amount_paid / 100,
+    currency: invoice.currency,
+    contentId: metadata.planKey ?? "vivida_pro",
+  });
 }
