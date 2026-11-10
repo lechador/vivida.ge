@@ -198,7 +198,8 @@ export function computeTiming(
   days = 28,
   locale: UserLocale = "ka",
 ): { days: TimingDay[]; notable: NotableTransit[] } {
-  const en = locale === "en";
+  // No Polish transit library yet: Polish readers get English, never Georgian.
+  const en = locale !== "ka";
   const natalPoints: Record<string, { longitude: number }> = {};
   for (const [k, v] of Object.entries(natal.bodies)) {
     natalPoints[k] = { longitude: v.longitude };

@@ -262,8 +262,7 @@ export async function sendCheckoutRecovery(
   for (const candidate of fresh) {
     if (sentThisRun >= allowance) break;
     const locale = candidate.locale;
-    const en = locale === "en";
-    const origin = en ? ENGLISH_SITE_URL : ORIGIN;
+    const origin = locale === "ka" ? ORIGIN : ENGLISH_SITE_URL;
     const subject = subjectFor(locale);
 
     if (await isLifecycleFrequencyCapped(candidate.userId)) {

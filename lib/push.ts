@@ -184,6 +184,8 @@ export async function sendPushToUser(
 const GENERIC_BODY = "შენი დღევანდელი ჰოროსკოპი მზადაა, გახსენი და ნახე ✨";
 const GENERIC_BODY_EN =
   "Your daily horoscope is ready, open it to read more ✨";
+const GENERIC_BODY_PL =
+  "Twój dzienny horoskop jest gotowy, otwórz i przeczytaj ✨";
 
 /**
  * Daily push blast. One notification per subscribed user per day, using today's
@@ -276,9 +278,11 @@ export async function sendDailyPushBlast(opts: {
         body:
           recipient.language === locale && recipient.headline
             ? recipient.headline
-            : locale === "en"
-              ? GENERIC_BODY_EN
-              : GENERIC_BODY,
+            : locale === "pl"
+              ? GENERIC_BODY_PL
+              : locale === "en"
+                ? GENERIC_BODY_EN
+                : GENERIC_BODY,
         url: "/dashboard",
         tag: "vivida-daily",
       };

@@ -123,8 +123,7 @@ export async function sendPmfSurvey(
   for (const candidate of fresh) {
     if (sentThisRun >= allowance) break;
     const locale = normalizeUserLocale(candidate.locale);
-    const en = locale === "en";
-    const origin = en ? ENGLISH_SITE_URL : ORIGIN;
+    const origin = locale === "ka" ? ORIGIN : ENGLISH_SITE_URL;
     const subject = subjectFor(locale);
 
     const [claim] = await db

@@ -97,7 +97,28 @@ export type SendOptions = {
   campaignId?: string;
   /** Preview sends must render even when the test account already has a profile. */
   allowCompletedProfile?: boolean;
+  /**
+   * Only mail readers of this interface language. Marketing copy is one
+   * free-text language, so a marketing send defaults to Georgian; pass "all"
+   * to mail everyone. Templates with built-in translations default to "all".
+   */
+  audienceLocale?: UserLocale | "all";
 };
+
+/** Effective language filter for a send; see SendOptions.audienceLocale. */
+export function audienceLocaleFor(
+  template: EmailTemplateKind,
+  requested: UserLocale | "all" | undefined,
+): UserLocale | "all" {
+  return requested ?? (template === "marketing" ? "ka" : "all");
+}
+
+function inAudienceLocale(
+  recipient: { locale: string },
+  wanted: UserLocale | "all",
+): boolean {
+  return wanted === "all" || normalizeUserLocale(recipient.locale) === wanted;
+}
 
 export type SendResult = {
   audienceTotal: number;
@@ -424,7 +445,10 @@ async function pMap<T, R>(
 
 export async function sendBulk(opts: SendOptions): Promise<SendResult> {
   const c = client();
-  let audience = await resolveAudience(opts.template);
+  const wantedLocale = audienceLocaleFor(opts.template, opts.audienceLocale);
+  let audience = (await resolveAudience(opts.template)).filter((r) =>
+    inAudienceLocale(r, wantedLocale),
+  );
   // Marketing campaigns can outlive a server/request window. Make retries
   // resumable by excluding every recipient already attempted for the same
   // subject, so a partial retry never duplicates accepted deliveries.
@@ -694,7 +718,7 @@ async function buildDailyHoroscopeMessage(
     .limit(1);
   const tz = profile?.timezone ?? "UTC";
   const localizedDate = new Intl.DateTimeFormat(
-    locale === "en" ? "en-US" : "ka-GE",
+    locale === "pl" ? "pl-PL" : locale === "en" ? "en-US" : "ka-GE",
     {
       timeZone: tz,
       weekday: "long",
@@ -713,7 +737,11 @@ async function buildDailyHoroscopeMessage(
     firstName,
     headline:
       daily.headline?.trim() ||
-      (locale === "en" ? "Your daily horoscope" : "შენი დღევანდელი ჰოროსკოპი"),
+      (locale === "pl"
+        ? "Twój horoskop na dziś"
+        : locale === "en"
+          ? "Your daily horoscope"
+          : "შენი დღევანდელი ჰოროსკოპი"),
     dateKey: daily.date,
     locale,
     topAspects: daily.transits?.headlineAspect
@@ -787,13 +815,17 @@ async function dispatch(
     );
     const onboardingUrl = localizedAbsUrl("/onboarding", locale);
     const subject =
-      locale === "en"
+      locale === "pl"
         ? opts.campaignId
-          ? "Complete your birth details and get 50 credits"
-          : "Your birth chart is waiting, complete your profile"
-        : opts.campaignId
-          ? "შეავსე დაბადების დეტალები და მიიღე 50 კრედიტი"
-          : "შენი ნატალური რუკა გელოდება, დაასრულე რეგისტრაცია";
+          ? "Uzupełnij dane urodzenia i odbierz 50 kredytów"
+          : "Twój horoskop urodzeniowy czeka, dokończ profil"
+        : locale === "en"
+          ? opts.campaignId
+            ? "Complete your birth details and get 50 credits"
+            : "Your birth chart is waiting, complete your profile"
+          : opts.campaignId
+            ? "შეავსე დაბადების დეტალები და მიიღე 50 კრედიტი"
+            : "შენი ნატალური რუკა გელოდება, დაასრულე რეგისტრაცია";
     await acquireResendSlot();
     const result = await c.emails.send(
       {
@@ -1125,9 +1157,11 @@ async function logToUnifiedSendLog(
  */
 export async function audienceCount(
   template: EmailTemplateKind,
+  audienceLocale?: UserLocale | "all",
 ): Promise<number> {
+  const wanted = audienceLocaleFor(template, audienceLocale);
   const audience = await resolveAudience(template);
-  return audience.length;
+  return audience.filter((r) => inAudienceLocale(r, wanted)).length;
 }
 
 // ─────────────────────────────────────────────────────────────────────

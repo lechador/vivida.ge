@@ -7,6 +7,7 @@ import {
   type NotificationKind,
   type NotificationPayload,
 } from "@/db/schema";
+import { pickCopy } from "@/lib/email-templates/_copy";
 import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { isPushConfigured, sendPushToUser } from "@/lib/push";
 import { enforceRateLimit } from "@/lib/rate-limit";
@@ -22,7 +23,7 @@ import { isBlockedEitherWay } from "@/lib/block";
  * Design:
  *  - queueNotificationPush(): call right after inserting a `notification` row.
  *    Fire-and-forget via after() so it never adds latency or failure risk to
- *    the write path. Copy mirrors the bell dropdown's Georgian labels.
+ *    the write path. Copy is per recipient locale (ka/en/pl).
  *  - sendMessagePush(): chat messages don't create notification rows (they're
  *    SSE-driven in-app), so they get their own path, gated on the recipient
  *    being away from the app and throttled per sender→recipient pair so a
@@ -45,116 +46,171 @@ const REACTION_EN: Record<string, string> = {
   dislike: "disliked your post",
 };
 
-function copyFor(
+// Present tense on purpose: Polish past tense is gendered (polubił/polubiła)
+// and we don't know the sender's gender.
+const REACTION_PL: Record<string, string> = {
+  like: "lubi Twój post",
+  funny: "śmieje się z Twojego posta",
+  sad: "smuci się z powodu Twojego posta",
+  dislike: "nie lubi Twojego posta",
+};
+
+export function copyFor(
   kind: NotificationKind,
   payload: NotificationPayload,
   locale: UserLocale,
 ): { title: string; body: string; url: string; tag: string } | null {
-  const en = locale === "en";
+  const t = <T>(copy: { ka: T; en: T; pl: T }) => pickCopy(locale, copy);
   const name =
     payload.fromName ??
     payload.fromUsername ??
-    (en ? "A Vivida member" : "Vivida-ის წევრი");
+    t({ ka: "Vivida-ის წევრი", en: "A Vivida member", pl: "Ktoś z Vivida" });
   // Single-post route, not /feed#post-<id>: the anchor only exists while the
   // post is inside the feed's first page.
   const postUrl = payload.postId ? `/feed/${payload.postId}` : "/feed";
+  const synastryUrl = payload.partnerId
+    ? `/synastry/${payload.partnerId}`
+    : "/synastry";
   switch (kind) {
     case "friend_request":
       return {
-        title: en ? "Friend request ➕" : "მეგობრობის თხოვნა ➕",
-        body: en
-          ? `${name} sent you a friend request`
-          : `${name} გთხოვს დამეგობრებას`,
+        title: t({
+          ka: "მეგობრობის თხოვნა ➕",
+          en: "Friend request ➕",
+          pl: "Zaproszenie do znajomych ➕",
+        }),
+        body: t({
+          ka: `${name} გთხოვს დამეგობრებას`,
+          en: `${name} sent you a friend request`,
+          pl: `${name} zaprasza Cię do znajomych`,
+        }),
         url: "/friends?tab=incoming",
         tag: "friend-request",
       };
     case "friend_accepted":
       return {
-        title: en ? "Request accepted ✨" : "მოთხოვნა მიღებულია ✨",
-        body: en
-          ? `${name} accepted your friend request`
-          : `${name}-მ მიიღო შენი მეგობრობის თხოვნა`,
+        title: t({
+          ka: "მოთხოვნა მიღებულია ✨",
+          en: "Request accepted ✨",
+          pl: "Zaproszenie przyjęte ✨",
+        }),
+        body: t({
+          ka: `${name}-მ მიიღო შენი მეგობრობის თხოვნა`,
+          en: `${name} accepted your friend request`,
+          pl: `${name} przyjmuje Twoje zaproszenie do znajomych`,
+        }),
         url: payload.fromUsername ? `/u/${payload.fromUsername}` : "/friends",
         tag: "friend-accepted",
       };
     case "post_comment":
       return {
-        title: en
-          ? `💬 ${name} commented on your post`
-          : `💬 ${name} დააკომენტარა შენს პოსტს`,
+        title: t({
+          ka: `💬 ${name} დააკომენტარა შენს პოსტს`,
+          en: `💬 ${name} commented on your post`,
+          pl: `💬 ${name} komentuje Twój post`,
+        }),
         body: payload.preview ?? "",
         url: postUrl,
         tag: `post-${payload.postId ?? "x"}`,
       };
-    case "post_reaction":
+    case "post_reaction": {
+      const reaction = payload.reaction ?? "";
       return {
-        title: en ? "New reaction to your post" : "შენს პოსტს გამოეხმაურნენ",
-        body: en
-          ? `${name} ${REACTION_EN[payload.reaction ?? ""] ?? "reacted to your post"}`
-          : `${name}, ${REACTION_KA[payload.reaction ?? ""] ?? "გამოეხმაურა შენს პოსტს"}`,
+        title: t({
+          ka: "შენს პოსტს გამოეხმაურნენ",
+          en: "New reaction to your post",
+          pl: "Nowa reakcja na Twój post",
+        }),
+        body: t({
+          ka: `${name}, ${REACTION_KA[reaction] ?? "გამოეხმაურა შენს პოსტს"}`,
+          en: `${name} ${REACTION_EN[reaction] ?? "reacted to your post"}`,
+          pl: `${name} ${REACTION_PL[reaction] ?? "reaguje na Twój post"}`,
+        }),
         url: postUrl,
         // Collapse repeated reactions on the same post into one banner.
         tag: `reactions-${payload.postId ?? "x"}`,
       };
+    }
     case "mention":
       return {
-        title: en
-          ? payload.mentionContext === "comment"
-            ? `@ ${name} mentioned you in a comment`
-            : `@ ${name} mentioned you in a post`
-          : payload.mentionContext === "comment"
-            ? `@ ${name} მოგიხსენია კომენტარში`
-            : `@ ${name} მოგიხსენია პოსტში`,
+        title:
+          payload.mentionContext === "comment"
+            ? t({
+                ka: `@ ${name} მოგიხსენია კომენტარში`,
+                en: `@ ${name} mentioned you in a comment`,
+                pl: `@ ${name} wspomina o Tobie w komentarzu`,
+              })
+            : t({
+                ka: `@ ${name} მოგიხსენია პოსტში`,
+                en: `@ ${name} mentioned you in a post`,
+                pl: `@ ${name} wspomina o Tobie w poście`,
+              }),
         body: payload.preview ?? "",
         url: postUrl,
         tag: `mention-${payload.postId ?? "x"}`,
       };
     case "new_match":
       return {
-        title: en ? "New match ✨" : "ახალი მეჩი ✨",
-        body: en
-          ? `You and ${name} liked each other`
-          : `თქვენ და ${name} მოეწონეთ ერთმანეთს`,
+        title: t({
+          ka: "ახალი მეჩი ✨",
+          en: "New match ✨",
+          pl: "Nowe dopasowanie ✨",
+        }),
+        body: t({
+          ka: `თქვენ და ${name} მოეწონეთ ერთმანეთს`,
+          en: `You and ${name} liked each other`,
+          pl: `Ty i ${name} lubicie się nawzajem`,
+        }),
         url: "/messages",
         tag: "new-match",
       };
     case "relationship_connected":
       return {
-        title: en ? "Partner connected 💞" : "პარტნიორი დაკავშირებულია 💞",
-        body: en
-          ? `${name} accepted your relationship invitation`
-          : `${name}-მ მიიღო შენი ურთიერთობის მოწვევა`,
-        url:
-          payload.reminderUrl ??
-          (payload.partnerId ? `/synastry/${payload.partnerId}` : "/synastry"),
+        title: t({
+          ka: "პარტნიორი დაკავშირებულია 💞",
+          en: "Partner connected 💞",
+          pl: "Partner połączony 💞",
+        }),
+        body: t({
+          ka: `${name}-მ მიიღო შენი ურთიერთობის მოწვევა`,
+          en: `${name} accepted your relationship invitation`,
+          pl: `${name} przyjmuje Twoje zaproszenie do związku`,
+        }),
+        url: payload.reminderUrl ?? synastryUrl,
         tag: `relationship-connected-${payload.partnerId ?? "x"}`,
       };
     case "relationship_weekly":
       return {
-        title: en
-          ? "Your weekly relationship update"
-          : "ურთიერთობის ახალი კვირა",
+        title: t({
+          ka: "ურთიერთობის ახალი კვირა",
+          en: "Your weekly relationship update",
+          pl: "Twój tygodniowy przegląd związku",
+        }),
         body:
           payload.relationshipHeadline ??
-          (en
-            ? "See what this week brings for both of you"
-            : "ნახე, რას გთავაზობთ ეს კვირა ორივეს"),
-        url:
-          payload.reminderUrl ??
-          (payload.partnerId ? `/synastry/${payload.partnerId}` : "/synastry"),
+          t({
+            ka: "ნახე, რას გთავაზობთ ეს კვირა ორივეს",
+            en: "See what this week brings for both of you",
+            pl: "Zobacz, co ten tydzień przyniesie Wam obojgu",
+          }),
+        url: payload.reminderUrl ?? synastryUrl,
         tag: `relationship-weekly-${payload.partnerId ?? "x"}`,
       };
     case "relationship_transit":
       return {
-        title: en
-          ? "Important relationship transit"
-          : "ურთიერთობის მნიშვნელოვანი ტრანზიტი",
+        title: t({
+          ka: "ურთიერთობის მნიშვნელოვანი ტრანზიტი",
+          en: "Important relationship transit",
+          pl: "Ważny tranzyt w Twoim związku",
+        }),
         body:
           payload.transitTitle ??
-          (en
-            ? "A meaningful moment is approaching"
-            : "მნიშვნელოვანი მომენტი ახლოვდება"),
-        url: payload.partnerId ? `/synastry/${payload.partnerId}` : "/synastry",
+          t({
+            ka: "მნიშვნელოვანი მომენტი ახლოვდება",
+            en: "A meaningful moment is approaching",
+            pl: "Zbliża się ważny moment",
+          }),
+        url: synastryUrl,
         tag: `relationship-transit-${payload.partnerId ?? "x"}`,
       };
     case "timing_reminder":

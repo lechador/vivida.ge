@@ -2,6 +2,7 @@ import { Button, Heading, Text } from "@react-email/components";
 
 import { EmailLayout, buttonStyle, paragraphStyle } from "./_layout";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { pickCopy } from "./_copy";
 
 /**
  * Generic marketing template, admin types subject + body in the panel,
@@ -26,14 +27,14 @@ export function MarketingEmail({
   unsubscribeUrl: string;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const t = <T,>(copy: { ka: T; en: T; pl: T }) => pickCopy(locale, copy);
   const greeting = name
-    ? en
-      ? `Hello, ${name}!`
-      : `სალამი, ${name}!`
-    : en
-      ? "Hello!"
-      : "სალამი!";
+    ? t({
+        ka: `სალამი, ${name}!`,
+        en: `Hello, ${name}!`,
+        pl: `Cześć, ${name}!`,
+      })
+    : t({ ka: "სალამი!", en: "Hello!", pl: "Cześć!" });
   const paragraphs = body.split(/\n\n+/).filter(Boolean);
   return (
     <EmailLayout

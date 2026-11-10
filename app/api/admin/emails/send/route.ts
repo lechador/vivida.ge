@@ -25,7 +25,10 @@ import {
  *     body?: string,            // marketing only (paragraphs split on \n\n)
  *     ctaLabel?: string,
  *     ctaUrl?: string,
- *     dryRun?: boolean          // when true, only resolves audience size
+ *     dryRun?: boolean,         // when true, only resolves audience size
+ *     locale?: "ka" | "en" | "pl" | "all"
+ *                               // audience language; marketing defaults to
+ *                               // "ka" (its copy is one language), others "all"
  *   }
  *
  * Response: { audienceTotal, sent, skipped, failed: [...] }
@@ -61,6 +64,7 @@ export async function POST(req: NextRequest) {
     dryRun?: boolean;
     testEmail?: string;
     campaign?: boolean;
+    locale?: string;
   } | null;
 
   if (!body || typeof body.template !== "string") {
@@ -70,12 +74,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "invalid template" }, { status: 400 });
   }
   const template = body.template as EmailTemplateKind;
+  const audienceLocale =
+    body.locale === "ka" ||
+    body.locale === "en" ||
+    body.locale === "pl" ||
+    body.locale === "all"
+      ? body.locale
+      : undefined;
+  if (body.locale !== undefined && audienceLocale === undefined) {
+    return NextResponse.json({ error: "invalid locale" }, { status: 400 });
+  }
 
   // Cheap dry-run path, admin clicks "preview audience" without firing.
   // Marketing skips the content check here; we want audience-counting to
   // work before the admin has typed the subject/body.
   if (body.dryRun === true) {
-    const total = await audienceCount(template);
+    const total = await audienceCount(template, audienceLocale);
     return NextResponse.json({
       audienceTotal: total,
       sent: 0,
@@ -88,7 +102,7 @@ export async function POST(req: NextRequest) {
     if (!body.subject?.trim() || !body.body?.trim()) {
       return NextResponse.json(
         { error: "marketing requires subject and body" },
-        { status: 400 }
+        { status: 400 },
       );
     }
   }
@@ -130,6 +144,7 @@ export async function POST(req: NextRequest) {
     ctaLabel: body.ctaLabel ?? null,
     ctaUrl: body.ctaUrl ?? null,
     campaignId: campaign?.id,
+    audienceLocale,
   });
   return NextResponse.json(result);
 }

@@ -20,8 +20,10 @@ import { emailSendLog } from "@/db/schema";
 import { grantCredits } from "@/lib/credits";
 import { BIRTHDAY_CREDITS } from "@/lib/credits-config";
 import { BirthdayEmail } from "@/lib/email-templates/birthday";
+import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
 import { isPremiumUser } from "@/lib/premium";
 import { acquireResendSlot } from "@/lib/resend-throttle";
+import { ENGLISH_SITE_URL } from "@/lib/seo/locales";
 import { signByIndex } from "@/lib/zodiac";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
@@ -50,7 +52,14 @@ export { BIRTHDAY_CREDITS };
 // Celebration-first subject, deliberately no gift mention (the gift is a
 // P.S. inside, not the reason for the email).
 export const BIRTHDAY_SUBJECT = "დღეს შენი დღეა ✨ გილოცავ დაბადების დღეს!";
-const SUBJECT = BIRTHDAY_SUBJECT;
+const BIRTHDAY_SUBJECT_EN = "Today is your day ✨ Happy birthday!";
+const BIRTHDAY_SUBJECT_PL = "Dziś jest Twój dzień ✨ Wszystkiego najlepszego!";
+
+export function birthdaySubject(locale: UserLocale): string {
+  if (locale === "pl") return BIRTHDAY_SUBJECT_PL;
+  if (locale === "en") return BIRTHDAY_SUBJECT_EN;
+  return BIRTHDAY_SUBJECT;
+}
 
 /** Curated fallback body, used whenever the AI call fails or is unset. */
 export const FALLBACK_PARAGRAPHS = [
@@ -64,12 +73,42 @@ export const FALLBACK_PARAGRAPHS_PRO = [
   "ვარსკვლავები დღეს შენს პატივსაცემად ანათებენ — წინ საუკეთესო პირადი წელი გელოდება. ❤️",
 ];
 
+const FALLBACK_PARAGRAPHS_EN = [
+  "Today is your day, and the whole sky is turned your way. From all of us at Vivida, a heartfelt happy birthday: may this year be bright, warm and full of what truly makes you happy.",
+  "The stars are shining in your honour today, and we have a small gift waiting for you. ❤️",
+];
+const FALLBACK_PARAGRAPHS_PRO_EN = [
+  FALLBACK_PARAGRAPHS_EN[0],
+  "The stars are shining in your honour today, and your best personal year lies ahead. ❤️",
+];
+const FALLBACK_PARAGRAPHS_PL = [
+  "Dziś jest Twój dzień, a całe niebo zwraca się w Twoją stronę. Cały zespół Vivida składa Ci najserdeczniejsze życzenia urodzinowe: niech ten rok będzie jasny, ciepły i pełen tego, co naprawdę Cię cieszy.",
+  "Gwiazdy świecą dziś na Twoją cześć, a my przygotowaliśmy dla Ciebie mały prezent. ❤️",
+];
+const FALLBACK_PARAGRAPHS_PRO_PL = [
+  FALLBACK_PARAGRAPHS_PL[0],
+  "Gwiazdy świecą dziś na Twoją cześć, a przed Tobą najlepszy osobisty rok. ❤️",
+];
+
+/** Curated fallback body in the reader's language. */
+export function birthdayFallback(
+  locale: UserLocale,
+  gifted: boolean,
+): string[] {
+  if (locale === "pl")
+    return gifted ? FALLBACK_PARAGRAPHS_PL : FALLBACK_PARAGRAPHS_PRO_PL;
+  if (locale === "en")
+    return gifted ? FALLBACK_PARAGRAPHS_EN : FALLBACK_PARAGRAPHS_PRO_EN;
+  return gifted ? FALLBACK_PARAGRAPHS : FALLBACK_PARAGRAPHS_PRO;
+}
+
 type BirthdayUser = {
   userId: string;
   email: string | null;
   name: string | null;
   sunSignIndex: number | null;
   isPremium: boolean;
+  locale: UserLocale;
 };
 
 /**
@@ -83,8 +122,9 @@ async function findBirthdayUsers(): Promise<BirthdayUser[]> {
     name: string | null;
     sun_idx: number | null;
     is_premium: boolean | null;
+    locale: string | null;
   }>(dsql`
-    SELECT u.id AS user_id, u.email, u.name,
+    SELECT u.id AS user_id, u.email, u.name, u.interface_language AS locale,
            (u.is_premium AND u.premium_until IS NOT NULL AND u.premium_until > now()) AS is_premium,
            (c.data->'bodies'->'sun'->>'signIndex')::int AS sun_idx
     FROM profile p
@@ -109,6 +149,7 @@ async function findBirthdayUsers(): Promise<BirthdayUser[]> {
     name: (r.name as string) ?? null,
     sunSignIndex: r.sun_idx == null ? null : Number(r.sun_idx),
     isPremium: Boolean(r.is_premium),
+    locale: normalizeUserLocale(r.locale as string | null),
   }));
 }
 
@@ -147,17 +188,60 @@ interface OpenRouterJson {
   error?: { message: string };
 }
 
+/** English/Polish prompt; the Georgian one below is the approved original. */
+function internationalBirthdayPrompt(
+  name: string | null,
+  sign: string | null,
+  locale: "en" | "pl",
+): { system: string; user: string } {
+  const language = locale === "pl" ? "Polish" : "English";
+  const system =
+    `You are the warm voice of the Vivida team (an astrology platform). ` +
+    `Write sincere, human, natural ${language}: not formal, not over the top, ` +
+    `no clichés. The goal: the reader should feel they truly matter and that ` +
+    `their day is being celebrated from the heart, not with a template.` +
+    (locale === "pl"
+      ? " Address the reader informally (ty) and avoid gendered verb forms, " +
+        "since you do not know the reader's gender."
+      : "");
+  const user =
+    `Write a birthday greeting ${name ? `for ${name}` : "for our member"}` +
+    (sign ? ` (zodiac sign: ${sign})` : "") +
+    `. Exactly 2 short paragraphs (2-3 sentences each), in ${language}:\n` +
+    `- First: a personal, heartfelt greeting, the sense that this day and this ` +
+    `person are truly special${sign ? ", with a warm nod to what makes their sign unique" : ""}.\n` +
+    `- Second: a sincere wish for the new personal year, that the best lies ` +
+    `ahead, on a starry note.\n` +
+    `No product promotion, no mention of any gift, only the person and their ` +
+    `day. Return JSON: { "p1": string, "p2": string }`;
+  return { system, user };
+}
+
 /**
- * Two short, warm Georgian paragraphs from Gemini. Personalized with the
- * name and (when known) sun sign. Throws on failure, caller falls back.
+ * Two short, warm paragraphs from Gemini in the reader's language.
+ * Personalized with the name and (when known) sun sign, which the caller
+ * passes already in that language. Throws on failure, caller falls back.
  */
 export async function generateBirthdayCopy(
   name: string | null,
-  sunSignKa: string | null,
+  sunSign: string | null,
+  locale: UserLocale = "ka",
 ): Promise<string[]> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error("OPENROUTER_API_KEY missing");
 
+  const prompt =
+    locale === "ka"
+      ? georgianBirthdayPrompt(name, sunSign)
+      : internationalBirthdayPrompt(name, sunSign, locale);
+  const { system, user } = prompt;
+  return requestBirthdayCopy(apiKey, system, user);
+}
+
+function georgianBirthdayPrompt(
+  name: string | null,
+  sunSignKa: string | null,
+): { system: string; user: string } {
   const system =
     "შენ ხარ Vivida-ს (ქართული ასტროლოგიური პლატფორმის) გუნდის თბილი ხმა. " +
     "წერ გულწრფელ, ადამიანურ ქართულს, არა ოფიციალურს, არა გადამეტებულად " +
@@ -173,7 +257,14 @@ export async function generateBirthdayCopy(
     `- მეორე: გულწრფელი სურვილი ახალი პირადი წლისთვის, რომ წინ საუკეთესო ელოდება, ვარსკვლავურ ნოტაზე.\n` +
     `არავითარი პროდუქტის რეკლამა, არავითარი საჩუქრის ხსენება, მხოლოდ ადამიანი და მისი დღე. ` +
     `დააბრუნე JSON: { "p1": string, "p2": string }`;
+  return { system, user };
+}
 
+async function requestBirthdayCopy(
+  apiKey: string,
+  system: string,
+  user: string,
+): Promise<string[]> {
   const res = await fetch(OPENROUTER_URL, {
     method: "POST",
     headers: {
@@ -238,6 +329,7 @@ export async function sendBirthdayGifts(): Promise<BirthdayResult> {
     try {
       if (await alreadyGiftedThisYear(u.userId)) continue;
 
+      const subject = birthdaySubject(u.locale);
       // Claim the year's slot first, the guard row, so a concurrent cron
       // tick can't double-gift.
       const [claim] = await db
@@ -246,7 +338,7 @@ export async function sendBirthdayGifts(): Promise<BirthdayResult> {
           userId: u.userId,
           kind: "birthday",
           email: u.email,
-          subject: SUBJECT,
+          subject,
           status: "pending",
         })
         .returning({ id: emailSendLog.id });
@@ -268,18 +360,26 @@ export async function sendBirthdayGifts(): Promise<BirthdayResult> {
       }
 
       const firstName = u.name?.split(" ")[0] ?? null;
-      const sunSignKa =
-        u.sunSignIndex == null ? null : signByIndex(u.sunSignIndex).labelKa;
+      const signInfo =
+        u.sunSignIndex == null ? null : signByIndex(u.sunSignIndex);
+      const sunSign = signInfo
+        ? u.locale === "pl"
+          ? signInfo.labelPl
+          : u.locale === "en"
+            ? signInfo.labelEn
+            : signInfo.labelKa
+        : null;
+      const origin = u.locale === "ka" ? ORIGIN : ENGLISH_SITE_URL;
 
       let paragraphs: string[];
       try {
-        paragraphs = await generateBirthdayCopy(firstName, sunSignKa);
+        paragraphs = await generateBirthdayCopy(firstName, sunSign, u.locale);
       } catch (err) {
         console.warn(
           "[birthday] AI copy failed, using fallback:",
           (err as Error).message,
         );
-        paragraphs = gifted ? FALLBACK_PARAGRAPHS : FALLBACK_PARAGRAPHS_PRO;
+        paragraphs = birthdayFallback(u.locale, gifted);
       }
 
       // Shares the 2 req/s Resend budget with the daily blast that runs
@@ -289,12 +389,14 @@ export async function sendBirthdayGifts(): Promise<BirthdayResult> {
         {
           from: FROM,
           to: u.email,
-          subject: SUBJECT,
+          subject,
           react: BirthdayEmail({
             name: firstName,
             paragraphs,
-            dashboardUrl: `${ORIGIN.replace(/\/$/, "")}/dashboard`,
+            dashboardUrl: `${origin.replace(/\/$/, "")}/dashboard`,
             showGift: gifted,
+            credits: BIRTHDAY_CREDITS,
+            locale: u.locale,
           }),
         },
         { idempotencyKey: `birthday:${u.userId}:${year}` },

@@ -113,7 +113,7 @@ export async function sendPaymentFailedNotice(input: {
   }
 
   const locale = normalizeUserLocale(user.locale);
-  const origin = locale === "en" ? ENGLISH_SITE_URL : ORIGIN;
+  const origin = locale === "ka" ? ORIGIN : ENGLISH_SITE_URL;
   const subject = subjectFor(locale);
   const amountLabel =
     invoice.amount_due > 0

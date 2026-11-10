@@ -33,6 +33,7 @@ import { grantCreditsOnce } from "@/lib/credits";
 import {
   CREDIT_GIFT_SUBJECT,
   CREDIT_GIFT_SUBJECT_EN,
+  CREDIT_GIFT_SUBJECT_PL,
   CreditGiftEmail,
 } from "@/lib/email-templates/credit-gift";
 import { normalizeUserLocale, type UserLocale } from "@/lib/i18n/user-locale";
@@ -171,7 +172,11 @@ async function giftAndEmail(
 
   const locale = normalizeUserLocale(recipient.locale);
   const subject =
-    locale === "en" ? CREDIT_GIFT_SUBJECT_EN : CREDIT_GIFT_SUBJECT;
+    locale === "pl"
+      ? CREDIT_GIFT_SUBJECT_PL
+      : locale === "en"
+        ? CREDIT_GIFT_SUBJECT_EN
+        : CREDIT_GIFT_SUBJECT;
 
   const [claim] = await db
     .insert(emailSendLog)

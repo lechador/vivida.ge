@@ -2,10 +2,8 @@ import { after } from "next/server";
 
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { getClientIp } from "@/lib/api/security";
-import {
-  subscribeHoroscopeLead,
-  sendLeadWelcome,
-} from "@/lib/horoscope-leads";
+import { isEnglishHost } from "@/lib/seo/locales";
+import { subscribeHoroscopeLead, sendLeadWelcome } from "@/lib/horoscope-leads";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,6 +15,13 @@ export const dynamic = "force-dynamic";
  * the background so the user sees instant success. IP rate-limited.
  */
 export async function POST(req: Request) {
+  // The lead email is Georgian-only; the international site no longer offers
+  // it, and an English/Polish reader must not be subscribed to it.
+  const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host");
+  if (isEnglishHost(host)) {
+    return Response.json({ error: "unsupported_locale" }, { status: 404 });
+  }
+
   try {
     await enforceRateLimit({
       bucket: "horoscope_subscribe_ip",

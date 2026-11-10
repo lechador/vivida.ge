@@ -1,11 +1,8 @@
 import { Button, Heading, Text } from "@react-email/components";
 
-import {
-  EmailLayout,
-  buttonStyle,
-  paragraphStyle,
-} from "./_layout";
+import { EmailLayout, buttonStyle, paragraphStyle } from "./_layout";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { pickCopy } from "./_copy";
 
 /**
  * Daily horoscope teaser. Intentionally short, date, concrete product
@@ -36,10 +33,14 @@ export function DailyHoroscopeEmail({
   localizedDate: string;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const t = <T,>(copy: { ka: T; en: T; pl: T }) => pickCopy(locale, copy);
   const greeting = name
-    ? en ? `Hello, ${name}!` : `სალამი, ${name}!`
-    : en ? "Hello!" : "სალამი!";
+    ? t({
+        ka: `სალამი, ${name}!`,
+        en: `Hello, ${name}!`,
+        pl: `Cześć, ${name}!`,
+      })
+    : t({ ka: "სალამი!", en: "Hello!", pl: "Cześć!" });
 
   return (
     <EmailLayout
@@ -80,7 +81,11 @@ export function DailyHoroscopeEmail({
 
       <div style={{ marginTop: 22 }}>
         <Button href={dashboardUrl} style={buttonStyle}>
-          {en ? "Read your full horoscope" : "ნახე სრული ჰოროსკოპი"}
+          {t({
+            ka: "ნახე სრული ჰოროსკოპი",
+            en: "Read your full horoscope",
+            pl: "Przeczytaj pełny horoskop",
+          })}
         </Button>
       </div>
     </EmailLayout>

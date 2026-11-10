@@ -7,6 +7,7 @@ import {
   paragraphStyle,
 } from "./_layout";
 import type { UserLocale } from "@/lib/i18n/user-locale";
+import { pickCopy } from "./_copy";
 
 export function ProfileIncompleteEmail({
   name,
@@ -19,13 +20,21 @@ export function ProfileIncompleteEmail({
   unsubscribeUrl: string;
   locale?: UserLocale;
 }) {
-  const en = locale === "en";
+  const t = <T,>(copy: { ka: T; en: T; pl: T }) => pickCopy(locale, copy);
   const greeting = name
-    ? en ? `Hello, ${name}!` : `სალამი, ${name}!`
-    : en ? "Hello!" : "სალამი!";
+    ? t({
+        ka: `სალამი, ${name}!`,
+        en: `Hello, ${name}!`,
+        pl: `Cześć, ${name}!`,
+      })
+    : t({ ka: "სალამი!", en: "Hello!", pl: "Cześć!" });
   return (
     <EmailLayout
-      preview={en ? "Complete your profile, your birth chart is waiting" : "დაასრულე რეგისტრაცია, შენი ნატალური რუკა გელოდება"}
+      preview={t({
+        ka: "დაასრულე რეგისტრაცია, შენი ნატალური რუკა გელოდება",
+        en: "Complete your profile, your birth chart is waiting",
+        pl: "Dokończ profil, Twój horoskop urodzeniowy czeka",
+      })}
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
     >
@@ -40,14 +49,20 @@ export function ProfileIncompleteEmail({
           margin: "0 0 16px",
         }}
       >
-        {en ? "Your chart is still waiting" : "შენი რუკა ჯერ კიდევ გელოდება"}
+        {t({
+          ka: "შენი რუკა ჯერ კიდევ გელოდება",
+          en: "Your chart is still waiting",
+          pl: "Twój horoskop wciąż czeka",
+        })}
       </Heading>
 
       <Text style={paragraphStyle}>{greeting}</Text>
       <Text style={paragraphStyle}>
-        {en
-          ? "You created a Vivida account but have not added your birth date, time, and place yet, so we cannot calculate your natal chart."
-          : "შენ vivida.ge-ზე დარეგისტრირდი, მაგრამ ჯერ არ შეგიყვანია დაბადების თარიღი, დრო და ადგილი, ამიტომ ვერ ვუშვით შენი ნატალური რუკა."}
+        {t({
+          ka: "შენ vivida.ge-ზე დარეგისტრირდი, მაგრამ ჯერ არ შეგიყვანია დაბადების თარიღი, დრო და ადგილი, ამიტომ ვერ ვუშვით შენი ნატალური რუკა.",
+          en: "You created a Vivida account but have not added your birth date, time, and place yet, so we cannot calculate your natal chart.",
+          pl: "Masz konto w Vivida, ale nie podano jeszcze daty, godziny i miejsca urodzenia, więc nie możemy obliczyć Twojego horoskopu urodzeniowego.",
+        })}
       </Text>
       <Section
         style={{
@@ -67,7 +82,11 @@ export function ProfileIncompleteEmail({
             margin: "0 0 6px",
           }}
         >
-          {en ? "✦ 50 bonus credits" : "✦ 50 კრედიტი საჩუქრად"}
+          {t({
+            ka: "✦ 50 კრედიტი საჩუქრად",
+            en: "✦ 50 bonus credits",
+            pl: "✦ 50 kredytów w prezencie",
+          })}
         </Text>
         <Text
           style={{
@@ -77,14 +96,20 @@ export function ProfileIncompleteEmail({
             margin: 0,
           }}
         >
-          {en
-            ? "Complete your birth details and the bonus will be added automatically."
-            : "შეავსე დაბადების დეტალები და ბონუსი ავტომატურად დაგერიცხება."}
+          {t({
+            ka: "შეავსე დაბადების დეტალები და ბონუსი ავტომატურად დაგერიცხება.",
+            en: "Complete your birth details and the bonus will be added automatically.",
+            pl: "Uzupełnij dane urodzenia, a bonus zostanie dodany automatycznie.",
+          })}
         </Text>
       </Section>
 
       <Text style={{ ...paragraphStyle, fontWeight: 600, color: "#ffffff" }}>
-        {en ? "In about 60 seconds, you will unlock:" : "სულ 60 წამში მიიღებ:"}
+        {t({
+          ka: "სულ 60 წამში მიიღებ:",
+          en: "In about 60 seconds, you will unlock:",
+          pl: "W około 60 sekund odblokujesz:",
+        })}
       </Text>
 
       <ul
@@ -96,19 +121,53 @@ export function ProfileIncompleteEmail({
           paddingLeft: 22,
         }}
       >
-        <li>{en ? "Your big three, Sun, Moon, and rising sign" : "შენი დიდი სამეული, მზე, მთვარე და ასცენდენტი"}</li>
-        <li>{en ? "A complete natal chart and interpretation" : "სრული ნატალური რუკა და ინტერპრეტაცია"}</li>
-        <li>{en ? "A daily horoscope personalized to your chart" : "ყოველდღიური ჰოროსკოპი, შენს რუკაზე მორგებული"}</li>
-        <li>{en ? "Compatibility with friends and partners" : "თავსებადობა მეგობრებთან და პარტნიორებთან"}</li>
+        <li>
+          {t({
+            ka: "შენი დიდი სამეული, მზე, მთვარე და ასცენდენტი",
+            en: "Your big three, Sun, Moon, and rising sign",
+            pl: "Twoją wielką trójkę: Słońce, Księżyc i ascendent",
+          })}
+        </li>
+        <li>
+          {t({
+            ka: "სრული ნატალური რუკა და ინტერპრეტაცია",
+            en: "A complete natal chart and interpretation",
+            pl: "Pełny horoskop urodzeniowy z interpretacją",
+          })}
+        </li>
+        <li>
+          {t({
+            ka: "ყოველდღიური ჰოროსკოპი, შენს რუკაზე მორგებული",
+            en: "A daily horoscope personalized to your chart",
+            pl: "Codzienny horoskop dopasowany do Twojego horoskopu",
+          })}
+        </li>
+        <li>
+          {t({
+            ka: "თავსებადობა მეგობრებთან და პარტნიორებთან",
+            en: "Compatibility with friends and partners",
+            pl: "Zgodność z przyjaciółmi i partnerami",
+          })}
+        </li>
       </ul>
 
       <div style={{ marginTop: 22 }}>
         <Button href={onboardingUrl} style={buttonStyle}>
-          {en ? "Complete my profile and get 50 credits" : "შეავსე მონაცემები და მიიღე 50 კრედიტი"}
+          {t({
+            ka: "შეავსე მონაცემები და მიიღე 50 კრედიტი",
+            en: "Complete my profile and get 50 credits",
+            pl: "Uzupełnij profil i odbierz 50 kredytów",
+          })}
         </Button>
       </div>
 
-      <Text style={mutedStyle}>{en ? "If you have a question, simply reply to this email." : "თუ შეკითხვა გაქვს, უბრალოდ უპასუხე ამ წერილს."}</Text>
+      <Text style={mutedStyle}>
+        {t({
+          ka: "თუ შეკითხვა გაქვს, უბრალოდ უპასუხე ამ წერილს.",
+          en: "If you have a question, simply reply to this email.",
+          pl: "Jeśli masz pytanie, po prostu odpowiedz na tego e-maila.",
+        })}
+      </Text>
     </EmailLayout>
   );
 }

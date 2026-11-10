@@ -125,9 +125,11 @@ export async function submitMbtiFor(input: {
           name: firstName,
           resultId,
           mbtiType: type,
-          archetypeNameGe: en ? mbtiArchetypeEn(type) : archetypeNameGe,
+          // Polish has no archetype names of its own: English beats Georgian.
+          archetypeNameGe:
+            locale === "ka" ? archetypeNameGe : mbtiArchetypeEn(type),
           locale,
-          origin: en ? ENGLISH_SITE_URL : GEORGIAN_SITE_URL,
+          origin: locale === "ka" ? GEORGIAN_SITE_URL : ENGLISH_SITE_URL,
         });
       }
     } catch (err) {

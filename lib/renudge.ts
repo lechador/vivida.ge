@@ -142,16 +142,19 @@ export async function sendVerificationRenudges(
     if (!dispatch.send) continue;
     const locale = normalizeUserLocale(u.locale);
     const subject =
-      locale === "en"
-        ? "Complete your registration, verify your email"
-        : "დაასრულე რეგისტრაცია, დაადასტურე ელფოსტა";
+      locale === "pl"
+        ? "Dokończ rejestrację, potwierdź adres e-mail"
+        : locale === "en"
+          ? "Complete your registration, verify your email"
+          : "დაასრულე რეგისტრაცია, დაადასტურე ელფოსტა";
     try {
       await sendVerificationEmail({
         to: dispatch.email,
         name: dispatch.name,
         token: dispatch.token,
         code: dispatch.code,
-        origin: locale === "en" ? ENGLISH_SITE_URL : ORIGIN,
+        origin: locale === "ka" ? ORIGIN : ENGLISH_SITE_URL,
+        locale,
       });
       await db.insert(emailSendLog).values({
         userId: u.id,
@@ -245,9 +248,11 @@ export async function sendProfileIncompleteRenudges(
       locale,
     );
     const subject =
-      locale === "en"
-        ? "Your birth chart is waiting, complete your profile"
-        : "შენი ნატალური რუკა გელოდება, დაასრულე პროფილი";
+      locale === "pl"
+        ? "Twój horoskop urodzeniowy czeka, dokończ profil"
+        : locale === "en"
+          ? "Your birth chart is waiting, complete your profile"
+          : "შენი ნატალური რუკა გელოდება, დაასრულე პროფილი";
     try {
       await acquireResendSlot();
       const res = await c.emails.send({

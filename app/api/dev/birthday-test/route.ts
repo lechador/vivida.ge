@@ -3,11 +3,11 @@ import { Resend } from "resend";
 import { auth } from "@/auth";
 import { isAdminEmail } from "@/lib/admin-auth";
 import {
-  BIRTHDAY_SUBJECT,
-  FALLBACK_PARAGRAPHS,
-  FALLBACK_PARAGRAPHS_PRO,
+  birthdayFallback,
+  birthdaySubject,
   generateBirthdayCopy,
 } from "@/lib/birthday";
+import { normalizeUserLocale } from "@/lib/i18n/user-locale";
 import { BirthdayEmail } from "@/lib/email-templates/birthday";
 
 /**
@@ -36,6 +36,7 @@ export async function GET(req: Request) {
   const isPro =
     url.searchParams.get("pro") === "1" ||
     url.searchParams.get("pro") === "true";
+  const locale = normalizeUserLocale(url.searchParams.get("locale"));
   if (!to) return Response.json({ error: "to required" }, { status: 400 });
 
   const key = process.env.RESEND_API_KEY;
@@ -45,9 +46,9 @@ export async function GET(req: Request) {
   let paragraphs: string[];
   let source = "ai";
   try {
-    paragraphs = await generateBirthdayCopy(name, sign);
+    paragraphs = await generateBirthdayCopy(name, sign, locale);
   } catch (err) {
-    paragraphs = isPro ? FALLBACK_PARAGRAPHS_PRO : FALLBACK_PARAGRAPHS;
+    paragraphs = birthdayFallback(locale, !isPro);
     source = `fallback (${(err as Error).message})`;
   }
 
@@ -64,12 +65,13 @@ export async function GET(req: Request) {
   const result = await resend.emails.send({
     from,
     to,
-    subject: `[TEST] ${BIRTHDAY_SUBJECT}`,
+    subject: `[TEST] ${birthdaySubject(locale)}`,
     react: BirthdayEmail({
       name,
       paragraphs,
       dashboardUrl: `${origin.replace(/\/$/, "")}/dashboard`,
       showGift: !isPro,
+      locale,
     }),
   });
 

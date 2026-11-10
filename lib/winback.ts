@@ -415,9 +415,13 @@ export async function sendWinbackNudges(
     tally(result, step, "candidates");
 
     const locale = normalizeUserLocale(candidate.locale);
-    const en = locale === "en";
-    const subject = en ? step.subjectEn : step.subjectKa;
-    const origin = en ? ENGLISH_SITE_URL : ORIGIN;
+    const subject =
+      locale === "pl"
+        ? step.subjectPl
+        : locale === "en"
+          ? step.subjectEn
+          : step.subjectKa;
+    const origin = locale === "ka" ? ORIGIN : ENGLISH_SITE_URL;
     const ctaUrl = `${origin.replace(/\/$/, "")}${step.path}`;
 
     if (!resend) {
@@ -547,8 +551,18 @@ export async function sendWinbackNudges(
       if (isPushConfigured()) {
         try {
           const sent = await sendPushToUser(candidate.userId, {
-            title: en ? step.pushTitleEn : step.pushTitleKa,
-            body: en ? step.pushBodyEn : step.pushBodyKa,
+            title:
+              locale === "pl"
+                ? step.pushTitlePl
+                : locale === "en"
+                  ? step.pushTitleEn
+                  : step.pushTitleKa,
+            body:
+              locale === "pl"
+                ? step.pushBodyPl
+                : locale === "en"
+                  ? step.pushBodyEn
+                  : step.pushBodyKa,
             url: step.path,
             tag: step.kind,
           });

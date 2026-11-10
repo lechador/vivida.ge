@@ -177,7 +177,7 @@ export async function sendTrialEndingReminders(
     if (sentThisRun >= allowance) break;
     const locale = candidate.locale;
     const en = locale === "en";
-    const origin = en ? ENGLISH_SITE_URL : ORIGIN;
+    const origin = locale === "ka" ? ORIGIN : ENGLISH_SITE_URL;
     const amountLabel = formatBillingAmount(
       candidate.amountMinor,
       candidate.currency,

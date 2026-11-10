@@ -29,12 +29,20 @@ import {
   trackedReminderPath,
 } from "@/lib/reminder-delivery";
 
-async function claimDelivery(partnerId: string, userId: string, deliveryKey: string): Promise<boolean> {
-  const [claimed] = await db.insert(relationshipNotificationDeliveries).values({
-    partnerId,
-    userId,
-    deliveryKey,
-  }).onConflictDoNothing().returning({ id: relationshipNotificationDeliveries.id });
+async function claimDelivery(
+  partnerId: string,
+  userId: string,
+  deliveryKey: string,
+): Promise<boolean> {
+  const [claimed] = await db
+    .insert(relationshipNotificationDeliveries)
+    .values({
+      partnerId,
+      userId,
+      deliveryKey,
+    })
+    .onConflictDoNothing()
+    .returning({ id: relationshipNotificationDeliveries.id });
   return Boolean(claimed);
 }
 
@@ -48,7 +56,12 @@ async function deliverRelationshipChannels(input: {
   path: string;
   title: string;
   body: string;
-  payload: { partnerId: string; partnerName: string; relationshipHeadline?: string; transitTitle?: string };
+  payload: {
+    partnerId: string;
+    partnerName: string;
+    relationshipHeadline?: string;
+    transitTitle?: string;
+  };
   pushEnabled: boolean;
   emailEnabled: boolean;
 }): Promise<void> {
@@ -62,10 +75,15 @@ async function deliverRelationshipChannels(input: {
   });
   if (inAppId) {
     try {
-      await emitRelationshipNotification(input.userId, input.kind, {
-        ...input.payload,
-        reminderUrl: trackedReminderPath(inAppId),
-      }, { push: false });
+      await emitRelationshipNotification(
+        input.userId,
+        input.kind,
+        {
+          ...input.payload,
+          reminderUrl: trackedReminderPath(inAppId),
+        },
+        { push: false },
+      );
       await finishReminderDelivery(inAppId, true);
     } catch (error) {
       await finishReminderDelivery(inAppId, false);
@@ -126,40 +144,50 @@ export async function deliverRelationshipUpdates(
   transitsSent: number;
   skipped: number;
 }> {
-  const rows = await db.select({
-    subscription: relationshipSubscriptions,
-    partner: partners,
-    locale: users.interfaceLanguage,
-    email: users.email,
-    name: users.name,
-    emailAllowed: users.emailNudges,
-    reminder: reminderSettings,
-    profileTimezone: profiles.timezone,
-  }).from(relationshipSubscriptions)
+  const rows = await db
+    .select({
+      subscription: relationshipSubscriptions,
+      partner: partners,
+      locale: users.interfaceLanguage,
+      email: users.email,
+      name: users.name,
+      emailAllowed: users.emailNudges,
+      reminder: reminderSettings,
+      profileTimezone: profiles.timezone,
+    })
+    .from(relationshipSubscriptions)
     .innerJoin(partners, eq(partners.id, relationshipSubscriptions.partnerId))
     .innerJoin(users, eq(users.id, relationshipSubscriptions.userId))
-    .leftJoin(reminderSettings, eq(reminderSettings.userId, relationshipSubscriptions.userId))
+    .leftJoin(
+      reminderSettings,
+      eq(reminderSettings.userId, relationshipSubscriptions.userId),
+    )
     .leftJoin(profiles, eq(profiles.userId, relationshipSubscriptions.userId))
-    .where(and(
-      or(
-        eq(relationshipSubscriptions.weeklyEnabled, true),
-        eq(relationshipSubscriptions.transitEnabled, true),
+    .where(
+      and(
+        or(
+          eq(relationshipSubscriptions.weeklyEnabled, true),
+          eq(relationshipSubscriptions.transitEnabled, true),
+        ),
+        isNull(partners.deletedAt),
       ),
-      isNull(partners.deletedAt),
-    ));
+    );
 
   let weeklySent = 0;
   let transitsSent = 0;
   let skipped = 0;
   for (const row of rows) {
     const { partner, subscription } = row;
-    if (subscription.userId !== partner.userId && subscription.userId !== partner.linkedUserId) {
+    if (
+      subscription.userId !== partner.userId &&
+      subscription.userId !== partner.linkedUserId
+    ) {
       skipped += 1;
       continue;
     }
     if (
       partner.linkedUserId &&
-      await isBlockedEitherWay(partner.userId, partner.linkedUserId)
+      (await isBlockedEitherWay(partner.userId, partner.linkedUserId))
     ) {
       skipped += 1;
       continue;
@@ -169,7 +197,9 @@ export async function deliverRelationshipUpdates(
       continue;
     }
     const pushEnabled = row.reminder?.relationshipPush ?? true;
-    const emailEnabled = Boolean(row.reminder?.relationshipEmail && row.emailAllowed && row.email);
+    const emailEnabled = Boolean(
+      row.reminder?.relationshipEmail && row.emailAllowed && row.email,
+    );
     if (!pushEnabled && !emailEnabled) {
       skipped += 1;
       continue;
@@ -180,7 +210,11 @@ export async function deliverRelationshipUpdates(
       if (local.hour !== (row.reminder?.localHour ?? 9)) continue;
     }
     const locale = normalizeUserLocale(row.locale);
-    const weekly = await ensureRelationshipWeeklyUpdate(partner as Partner, locale, now);
+    const weekly = await ensureRelationshipWeeklyUpdate(
+      partner as Partner,
+      locale,
+      now,
+    );
     if (!weekly) {
       skipped += 1;
       continue;
@@ -202,7 +236,12 @@ export async function deliverRelationshipUpdates(
           kind: "relationship_weekly",
           deliveryKey: `${partner.id}:${key}`,
           path: `/synastry/${partner.id}`,
-          title: locale === "ka" ? "ურთიერთობის ახალი კვირა" : "Your weekly relationship update",
+          title:
+            locale === "pl"
+              ? "Twój tygodniowy przegląd związku"
+              : locale === "en"
+                ? "Your weekly relationship update"
+                : "ურთიერთობის ახალი კვირა",
           body: weekly.headline,
           payload,
           pushEnabled,
@@ -214,9 +253,12 @@ export async function deliverRelationshipUpdates(
 
     if (subscription.transitEnabled) {
       const today = localDateString(now, partner.timezone);
-      for (const notable of weekly.notable.filter((item) => item.dateIso === today)) {
+      for (const notable of weekly.notable.filter(
+        (item) => item.dateIso === today,
+      )) {
         const key = `transit:${notable.key}:${locale}`;
-        if (!(await claimDelivery(partner.id, subscription.userId, key))) continue;
+        if (!(await claimDelivery(partner.id, subscription.userId, key)))
+          continue;
         const payload = {
           ...payloadBase,
           transitTitle: notable.title,
@@ -229,7 +271,12 @@ export async function deliverRelationshipUpdates(
           kind: "relationship_transit",
           deliveryKey: `${partner.id}:${key}`,
           path: `/synastry/${partner.id}`,
-          title: locale === "ka" ? "ურთიერთობის მნიშვნელოვანი ტრანზიტი" : "Important relationship transit",
+          title:
+            locale === "pl"
+              ? "Ważny tranzyt w Twoim związku"
+              : locale === "en"
+                ? "Important relationship transit"
+                : "ურთიერთობის მნიშვნელოვანი ტრანზიტი",
           body: `${notable.title}. ${notable.meaning}`,
           payload,
           pushEnabled,

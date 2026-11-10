@@ -119,6 +119,7 @@ export function TrackingConsentManager({
   }
 
   const en = locale === "en";
+  const pl = locale === "pl";
   const showPanel = ready && (consent === null || settingsOpen);
   // Reserve document space equal to the panel's height while it is open. The
   // panel is `fixed`, so without this it sits on top of whatever is at the
@@ -175,7 +176,13 @@ export function TrackingConsentManager({
         <button
           type="button"
           data-privacy-reopen
-          aria-label={en ? "Privacy choices" : "კონფიდენციალურობა"}
+          aria-label={
+            pl
+              ? "Ustawienia prywatności"
+              : en
+                ? "Privacy choices"
+                : "კონფიდენციალურობა"
+          }
           onClick={() => setSettingsOpen(true)}
           className="fixed bottom-3 right-3 z-[90] hidden size-10 items-center justify-center rounded-full border border-border/70 bg-background/85 text-muted-foreground shadow-lg backdrop-blur transition-colors hover:text-foreground lg:inline-flex"
         >
@@ -200,14 +207,18 @@ export function TrackingConsentManager({
             </div>
             <div>
               <h2 className="text-sm font-semibold sm:text-base">
-                {en
-                  ? "Your privacy choices"
-                  : "შენი კონფიდენციალურობის არჩევანი"}
+                {pl
+                  ? "Twoje ustawienia prywatności"
+                  : en
+                    ? "Your privacy choices"
+                    : "შენი კონფიდენციალურობის არჩევანი"}
               </h2>
               <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                {en
-                  ? "Top.ge counts visits on vivida.ge regardless of this choice. With your permission, Google Analytics and Meta cookies measure campaign visits and purchases."
-                  : "Top.ge ვიზიტებს ითვლის vivida.ge-ზე ამ არჩევანის მიუხედავად. შენი თანხმობით, Google Analytics-ისა და Meta-ს cookie-ები კამპანიებისა და შესყიდვების გაზომვაში გვეხმარება."}
+                {pl
+                  ? "Za Twoją zgodą pliki cookie Google Analytics i Meta pomagają nam mierzyć wizyty z kampanii i zakupy."
+                  : en
+                    ? "Top.ge counts visits on vivida.ge regardless of this choice. With your permission, Google Analytics and Meta cookies measure campaign visits and purchases."
+                    : "Top.ge ვიზიტებს ითვლის vivida.ge-ზე ამ არჩევანის მიუხედავად. შენი თანხმობით, Google Analytics-ისა და Meta-ს cookie-ები კამპანიებისა და შესყიდვების გაზომვაში გვეხმარება."}
               </p>
             </div>
           </div>
@@ -221,7 +232,11 @@ export function TrackingConsentManager({
               size="sm"
               onClick={() => choose("denied")}
             >
-              {en ? "Continue without consent" : "თანხმობის გარეშე გაგრძელება"}
+              {pl
+                ? "Kontynuuj bez zgody"
+                : en
+                  ? "Continue without consent"
+                  : "თანხმობის გარეშე გაგრძელება"}
             </Button>
             <Button
               type="button"
@@ -229,7 +244,11 @@ export function TrackingConsentManager({
               size="sm"
               onClick={() => choose("granted")}
             >
-              {en ? "Allow analytics & Meta" : "ანალიტიკისა და Meta-ს დაშვება"}
+              {pl
+                ? "Zezwól na analitykę i Meta"
+                : en
+                  ? "Allow analytics & Meta"
+                  : "ანალიტიკისა და Meta-ს დაშვება"}
             </Button>
           </div>
         </div>

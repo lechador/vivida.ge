@@ -32,11 +32,18 @@ async function archiveWeeklyForecast(userId: string, forecast: WeeklyForecast) {
     userId,
     kind: "weekly",
     sourceId: forecast.weekStart,
-    title: language === "en" ? "Your 7-day forecast" : "შენი 7-დღიანი პროგნოზი",
+    title:
+      language === "pl"
+        ? "Twoja prognoza na 7 dni"
+        : language === "en"
+          ? "Your 7-day forecast"
+          : "შენი 7-დღიანი პროგნოზი",
     summary:
-      language === "en"
-        ? "Personal forecast for the next seven days"
-        : "პერსონალური პროგნოზი მომდევნო შვიდი დღისთვის",
+      language === "pl"
+        ? "Osobista prognoza na najbliższe siedem dni"
+        : language === "en"
+          ? "Personal forecast for the next seven days"
+          : "პერსონალური პროგნოზი მომდევნო შვიდი დღისთვის",
     content: {
       type: "weekly",
       weekStart: forecast.weekStart,
