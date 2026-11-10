@@ -179,22 +179,22 @@ const getPublishedArticleAcrossRequests = unstable_cache(
     locale: UserLocale,
     slug: string,
   ): Promise<PublishedArticle | null> => {
-    const rows = await safely(
-      () =>
-        db
-          .select()
-          .from(articles)
-          .where(
-            and(
-              eq(articles.language, locale),
-              eq(articles.slug, slug),
-              eq(articles.status, "published"),
-              lte(articles.publishedAt, new Date()),
-            ),
-          )
-          .limit(1),
-      [],
-    );
+    // No `safely()` here: a swallowed DB error became `null`, which
+    // unstable_cache stored for 5 minutes and served as a 404 for a real,
+    // sitemap-listed article. A thrown error is not cached and surfaces as a
+    // 5xx, which tells crawlers to retry instead of dropping the URL.
+    const rows = await db
+      .select()
+      .from(articles)
+      .where(
+        and(
+          eq(articles.language, locale),
+          eq(articles.slug, slug),
+          eq(articles.status, "published"),
+          lte(articles.publishedAt, new Date()),
+        ),
+      )
+      .limit(1);
     return rows[0] ?? null;
   },
   ["published-article"],

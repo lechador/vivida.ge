@@ -7,6 +7,7 @@ import { Starfield } from "@/components/landing/starfield";
 import { ECLIPSES_EN, type EnglishEclipse } from "@/lib/seo/eclipse-en";
 import { articleLd, breadcrumbLd, faqLd, serializeLd } from "@/lib/seo/jsonld";
 import {
+  moonEventNearDate,
   moonEvents,
   type MoonEvent,
   type MoonEventKind,
@@ -459,11 +460,9 @@ export function EclipseHubEn() {
 export function EclipseDetailEn({ eclipse }: { eclipse: EnglishEclipse }) {
   const url = `${SITE}/dabnelebebi/${eclipse.slug}`;
   const date = new Date(`${eclipse.date}T12:00:00Z`);
-  const snapshot = moonEvents(
+  const snapshot = moonEventNearDate(
     eclipse.type === "solar" ? "new" : "full",
-    1000,
-  ).find(
-    (event) => Math.abs(event.date.getTime() - date.getTime()) < 3 * 86400000,
+    date,
   );
   const ld = [
     articleLd({
